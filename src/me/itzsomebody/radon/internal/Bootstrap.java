@@ -339,7 +339,7 @@ public class Bootstrap { // Eyyy bootstrap bill
                             //renamedStuff = renamedStuff + "/" + splitName[j];
                             renamedStuff = renamedStuff + "/" + StringUtils.crazyString();
                         }
-                    }
+                    } // Meh, should we include this?
                     renamedStuff = renamedStuff + "/" + StringUtils.crazyString();*/
                         // ^^^ This makes file size huge ^^^
                         mappings.put(classNode.name, StringUtils.crazyString());
@@ -529,12 +529,7 @@ public class Bootstrap { // Eyyy bootstrap bill
             logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
             logStrings.add(LoggerUtils.stdOut("Writing classes to output"));
             for (ClassNode classNode : classes.values()) {
-                ClassWriter cw;
-                if (classExempts.contains(classNode.name)) {
-                    cw = new ClassWriter(0);
-                } else {
-                    cw = new CustomClassWriter(ClassWriter.COMPUTE_FRAMES);
-                }
+                ClassWriter cw = new CustomClassWriter(ClassWriter.COMPUTE_FRAMES);
 
                 if (watermarkMsg != null) {
                     if (watermarkType == 0
