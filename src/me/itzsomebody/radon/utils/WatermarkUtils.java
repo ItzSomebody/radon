@@ -12,11 +12,11 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 /**
- * Class used to extract watermarks injected by the obfuscator.
+ * Watermarking utils for the obfuscator.
  *
  * @author ItzSomebody
  */
-public class WatermarkUtils {
+public class WatermarkUtils { // TODO: Add more secure watermark injection
     /**
      * Extracts injected watermarks by console and stores them in a {@link List} as a {@link String}.
      *

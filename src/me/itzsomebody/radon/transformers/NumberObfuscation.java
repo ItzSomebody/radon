@@ -2,6 +2,7 @@ package me.itzsomebody.radon.transformers;
 
 import me.itzsomebody.radon.asm.Opcodes;
 import me.itzsomebody.radon.asm.tree.*;
+import me.itzsomebody.radon.utils.BytecodeUtils;
 import me.itzsomebody.radon.utils.LoggerUtils;
 
 import java.util.ArrayList;
@@ -31,7 +32,7 @@ public class NumberObfuscation {
     /**
      * Constructor used to create a {@link NumberObfuscation} object.
      *
-     * @param classNode the {@link ClassNode} object to obfuscate.
+     * @param classNode     the {@link ClassNode} object to obfuscate.
      * @param exemptMethods {@link ArrayList} of protected {@link MethodNode}s.
      */
     public NumberObfuscation(ClassNode classNode, ArrayList<String> exemptMethods) {
@@ -64,18 +65,15 @@ public class NumberObfuscation {
                         newNumber = number / 2;
 
                         methodNode.instructions.insert(insn, new InsnNode(Opcodes.IADD));
-                        if (newNumber < 127) {
-                            methodNode.instructions.insert(insn, new IntInsnNode(Opcodes.BIPUSH, newNumber));
-                        } else if (newNumber >= 127 && newNumber < 32767) {
-                            methodNode.instructions.insert(insn, new IntInsnNode(Opcodes.SIPUSH, newNumber));
-                        } else if (newNumber >= 32767) {
+
+                        if (newNumber >= -1 && newNumber <= 5) {
+                            methodNode.instructions.insert(insn, BytecodeUtils.getIConst(newNumber));
+                            methodNode.instructions.set(insn, BytecodeUtils.getIConst(newNumber));
+                        } else if (newNumber >= -32768 && newNumber <= 32767) {
+                            methodNode.instructions.insert(insn, BytecodeUtils.getIntInsn(newNumber));
+                            methodNode.instructions.set(insn, BytecodeUtils.getIntInsn(newNumber));
+                        } else {
                             methodNode.instructions.insert(insn, new LdcInsnNode(newNumber));
-                        }
-                        if (newNumber < 127) {
-                            methodNode.instructions.set(insn, new IntInsnNode(Opcodes.BIPUSH, newNumber));
-                        } else if (newNumber >= 127 && newNumber < 32767) {
-                            methodNode.instructions.set(insn, new IntInsnNode(Opcodes.SIPUSH, newNumber));
-                        } else if (newNumber >= 32767) {
                             methodNode.instructions.set(insn, new LdcInsnNode(newNumber));
                         }
                         count++;
@@ -88,18 +86,15 @@ public class NumberObfuscation {
 
 
                         methodNode.instructions.insert(insn, new InsnNode(Opcodes.IDIV));
-                        if (newNumber < 127) {
-                            methodNode.instructions.insert(insn, new IntInsnNode(Opcodes.BIPUSH, 2));
-                        } else if (newNumber >= 127 && newNumber < 32767) {
-                            methodNode.instructions.insert(insn, new IntInsnNode(Opcodes.SIPUSH, 2));
-                        } else if (newNumber >= 32767) {
-                            methodNode.instructions.insert(insn, new LdcInsnNode(2));
-                        }
-                        if (newNumber < 127) {
-                            methodNode.instructions.set(insn, new IntInsnNode(Opcodes.BIPUSH, newNumber));
-                        } else if (newNumber >= 127 && newNumber < 32767) {
-                            methodNode.instructions.set(insn, new IntInsnNode(Opcodes.SIPUSH, newNumber));
-                        } else if (newNumber >= 32767) {
+
+                        if (newNumber >= -1 && newNumber <= 5) {
+                            methodNode.instructions.insert(insn, new InsnNode(Opcodes.ICONST_2));
+                            methodNode.instructions.set(insn, BytecodeUtils.getIConst(newNumber));
+                        } else if (newNumber >= -32768 && newNumber <= 32767) {
+                            methodNode.instructions.insert(insn, new InsnNode(Opcodes.ICONST_2));
+                            methodNode.instructions.set(insn, BytecodeUtils.getIntInsn(newNumber));
+                        } else {
+                            methodNode.instructions.insert(insn, new InsnNode(Opcodes.ICONST_2));
                             methodNode.instructions.set(insn, new LdcInsnNode(newNumber));
                         }
                         count++;
@@ -113,12 +108,21 @@ public class NumberObfuscation {
                                 || String.valueOf(number).endsWith("4")
                                 || String.valueOf(number).endsWith("6")
                                 || String.valueOf(number).endsWith("8")
-                                || String.valueOf(number).endsWith("0") /* 0 + 0 LOL */) { // Even number
+                                || String.valueOf(number).endsWith("0")) { // Even number
                             newNumber = number / 2;
 
                             methodNode.instructions.insert(insn, new InsnNode(Opcodes.IADD));
-                            methodNode.instructions.insert(insn, new LdcInsnNode(newNumber));
-                            methodNode.instructions.set(insn, new LdcInsnNode(newNumber));
+
+                            if (newNumber >= -1 && newNumber <= 5) {
+                                methodNode.instructions.insert(insn, BytecodeUtils.getIConst(newNumber));
+                                methodNode.instructions.set(insn, BytecodeUtils.getIConst(newNumber));
+                            } else if (newNumber >= -32768 && newNumber <= 32767) {
+                                methodNode.instructions.insert(insn, BytecodeUtils.getIntInsn(newNumber));
+                                methodNode.instructions.set(insn, BytecodeUtils.getIntInsn(newNumber));
+                            } else {
+                                methodNode.instructions.insert(insn, new LdcInsnNode(newNumber));
+                                methodNode.instructions.set(insn, new LdcInsnNode(newNumber));
+                            }
                             count++;
                         } else if (String.valueOf(number).endsWith("1")
                                 || String.valueOf(number).endsWith("3")
@@ -128,12 +132,60 @@ public class NumberObfuscation {
                             newNumber = number * 2;
 
                             methodNode.instructions.insert(insn, new InsnNode(Opcodes.IDIV));
-                            methodNode.instructions.insert(insn, new LdcInsnNode(2));
-                            methodNode.instructions.set(insn, new LdcInsnNode(newNumber));
+
+                            if (newNumber >= -1 && newNumber <= 5) {
+                                methodNode.instructions.insert(insn, new InsnNode(Opcodes.ICONST_2));
+                                methodNode.instructions.set(insn, BytecodeUtils.getIConst(newNumber));
+                            } else if (newNumber >= -32768 && newNumber <= 32767) {
+                                methodNode.instructions.insert(insn, new InsnNode(Opcodes.ICONST_2));
+                                methodNode.instructions.set(insn, BytecodeUtils.getIntInsn(newNumber));
+                            } else {
+                                methodNode.instructions.insert(insn, new InsnNode(Opcodes.ICONST_2));
+                                methodNode.instructions.set(insn, new LdcInsnNode(newNumber));
+                            }
                             count++;
                         }
                     }
-                }
+                } /*else if (BytecodeUtils.isIConst(insn)) {
+                    int newNumber;
+                    int number = insn.getOpcode() - 3;
+
+                    if (String.valueOf(number).endsWith("2")
+                            || String.valueOf(number).endsWith("4")
+                            || String.valueOf(number).endsWith("6")
+                            || String.valueOf(number).endsWith("8")) { // Even number
+                        newNumber = number / 2;
+
+                        methodNode.instructions.insert(insn, new InsnNode(Opcodes.IADD));
+
+                        if (newNumber >= -1 && newNumber <= 5) {
+                            methodNode.instructions.insert(insn, BytecodeUtils.getIConst(newNumber));
+                            methodNode.instructions.set(insn, BytecodeUtils.getIConst(newNumber));
+                        } else if (newNumber >= -128 && newNumber <= 127) {
+                            methodNode.instructions.insert(insn, new IntInsnNode(Opcodes.BIPUSH, number));
+                            methodNode.instructions.set(insn, new IntInsnNode(Opcodes.BIPUSH, number));
+                        }
+                        count++;
+                    } else if (String.valueOf(number).endsWith("1")
+                            || String.valueOf(number).endsWith("3")
+                            || String.valueOf(number).endsWith("5")
+                            || String.valueOf(number).endsWith("7")
+                            || String.valueOf(number).endsWith("9")) { // Odd number
+                        newNumber = number * 2;
+
+
+                        methodNode.instructions.insert(insn, new InsnNode(Opcodes.IDIV));
+
+                        if (newNumber >= -1 && newNumber <= 5) {
+                            methodNode.instructions.insert(insn, new InsnNode(Opcodes.ICONST_2));
+                            methodNode.instructions.set(insn, BytecodeUtils.getIConst(newNumber));
+                        } else if (newNumber >= -128 && newNumber <= 127) {
+                            methodNode.instructions.insert(insn, new InsnNode(Opcodes.ICONST_2));
+                            methodNode.instructions.set(insn, new IntInsnNode(Opcodes.BIPUSH, number));
+                        }
+                        count++;
+                    }
+                }*/ // This causes issues with normal flow obfuscation for some reason
             }
         }
         logStrings.add(LoggerUtils.stdOut("Finished obfuscating numbers"));

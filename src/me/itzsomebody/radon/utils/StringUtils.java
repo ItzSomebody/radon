@@ -1,10 +1,14 @@
 package me.itzsomebody.radon.utils;
 
+import me.itzsomebody.radon.asm.tree.ClassNode;
+
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.MessageDigest;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.HashMap;
 
 /**
  * Utils for operating, and generating {@link String}s.
@@ -224,6 +228,29 @@ public class StringUtils {
         while (sb.length() < 65536 - 1) {
             sb.append("[");
         }
+        return new String(sb);
+    }
+
+    /**
+     * Returns a generated classname based on current class packages.
+     *
+     * @return a generated classname based on current class packages.
+     */
+    public static String randomClassName(HashMap<String, ClassNode> classes) {
+        ArrayList<String> classNames = new ArrayList<>();
+        classNames.addAll(classes.keySet());
+
+        String randomClass = classNames.get(MiscUtils.getRandomInt(classNames.size()));
+        String[] split = randomClass.split("/");
+        StringBuilder sb = new StringBuilder();
+
+        for (int i = 0; i < split.length - 1; i++) {
+            sb.append(split[i]);
+            sb.append("/");
+        }
+
+        sb.append(crazyString());
+
         return new String(sb);
     }
 }

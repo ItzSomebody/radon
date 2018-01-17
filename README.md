@@ -16,15 +16,20 @@ InvokeDynamic: Normal
 FlowObfuscation: Normal
 LocalVariableObfuscation: Remove
 LineNumberObfuscation: Remove
-SourceNameObfuscation: Remove
+SourceNameObfuscation: Obfuscate
 HideCode: True
 Crasher: True
 StringPool: True
 NumberObfuscation: True
-TrashClasses: 10
+TrashClasses: 50
 Renamer: True
+WatermarkType: ConstantPool
+WatermarkMessage: ItzSomebody
+WatermarkKey: PASSWORD
+ExpiryTime: 1/18/2018
+ExpiryMessage: "YOUR SOFTWARE TRIAL HAS ENDED!!! YOU MUST NOW PAY $100000000 FOR THE FULL VERSION LULZ"
 Libraries:
-    - "C:/Program Files/Java/jdk1.8.0_XXX/jre/lib/rt.jar"
+    - "C:/Program Files/Java/jdk1.8.0_131/jre/lib/rt.jar"
 Exempt:
     - "me/itzsomebody/clearchat/ClearChat"
     - "me/itzsomebody/clearchat/config/Config"
@@ -52,8 +57,11 @@ Valid config options you can use:
 | WatermarkMessage | String | Message to watermark into the output |
 | WatermarkType | String (ConstantPool/Signature) | Type of watermark to apply |
 | WatermarkKey | String | Key used to encrypt watermarks |
-| SpigotPlugin | String | Determines if input should be treated as a spigot/bungee plugin.
-| Renamer | Boolean | Determines if obfuscator should rename classes and methods.
+| SpigotPlugin | String | Determines if input should be treated as a spigot/bungee plugin |
+| Renamer | Boolean | Determines if obfuscator should rename classes and methods |
+| ExpiryTime | String | Determines if obfuscator insert expiry obfuscation (useful for trialware) |
+| ExpiryMessage | String | Message to show when set your trialware goes past expiration date (rip) |
+
 
 ## Credits
 
@@ -64,6 +72,8 @@ Valid config options you can use:
 * [VincBreaker](https://github.com/Vinc0682) - Author of Smoke obfuscator which I stole some stuff from xD.
 * [Coolman](https://github.com/c001man) - I stole his Zip-writing algorithm xD.
 * [WindowBuilder by Eclipse](https://www.eclipse.org/windowbuilder/) - Used to make GUI (yes I know it's Java Swing, I didn't feel like remaking it in JavaFX)
+* [Licel](https://licelus.com) - Makers of Stringer Java Obfuscator.
+* [Allatori Dev Team](http://www.allatori.com) - Makers of Allatori Java Obfuscator.
 
 ## License
 

@@ -1,5 +1,6 @@
 package me.itzsomebody.radon.utils;
 
+import me.itzsomebody.radon.asm.Label;
 import me.itzsomebody.radon.asm.Opcodes;
 import me.itzsomebody.radon.asm.Type;
 import me.itzsomebody.radon.asm.tree.*;
@@ -48,18 +49,12 @@ public class BytecodeUtils {
      * @return true if input is a known ICONST else return false.
      */
     public static boolean isIConst(AbstractInsnNode ain) {
-        switch (ain.getOpcode()) {
-            case Opcodes.ICONST_0:
-            case Opcodes.ICONST_1:
-            case Opcodes.ICONST_2:
-            case Opcodes.ICONST_3:
-            case Opcodes.ICONST_4:
-            case Opcodes.ICONST_5:
-            case Opcodes.ICONST_M1:
-                return true;
-            default:
-                return false;
+        int opcode = ain.getOpcode();
+        if (opcode >= Opcodes.ICONST_M1 && opcode <= Opcodes.ICONST_5) {
+            return true;
         }
+
+        return false;
     }
 
     /**
@@ -137,5 +132,76 @@ public class BytecodeUtils {
         if ((access & Opcodes.ACC_VARARGS) != 0) a |= Opcodes.ACC_VARARGS;
         if ((access & Opcodes.ACC_VOLATILE) != 0) a |= Opcodes.ACC_VOLATILE;
         return a;
+    }
+
+    /**
+     * Returns true if input is a return opcode, else false.
+     *
+     * @param ain {@link AbstractInsnNode} to check if return opcode.
+     * @return true if input is a return opcode, else false.
+     */
+    public static boolean isReturn(AbstractInsnNode ain) {
+        int opcode = ain.getOpcode();
+        if (opcode >= Opcodes.IRETURN && opcode <= Opcodes.RETURN) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Returns an {@link InsnList} with bytecode instructions for expiration.
+     *
+     * @param expiryTime a {@link Long} representation of the expiration date.
+     * @return an {@link InsnList} with bytecode instructions for expiration.
+     */
+    public static InsnList returnExpiry(long expiryTime, String expiredMsg) {
+        InsnList expiryCode = new InsnList();
+        LabelNode injectedLabel = new LabelNode(new Label());
+
+        expiryCode.add(new TypeInsnNode(Opcodes.NEW, "java/util/Date"));
+        expiryCode.add(new InsnNode(Opcodes.DUP));
+        expiryCode.add(new LdcInsnNode(expiryTime));
+        expiryCode.add(new MethodInsnNode(Opcodes.INVOKESPECIAL, "java/util/Date", "<init>", "(J)V", false));
+        expiryCode.add(new TypeInsnNode(Opcodes.NEW, "java/util/Date"));
+        expiryCode.add(new InsnNode(Opcodes.DUP));
+        expiryCode.add(new MethodInsnNode(Opcodes.INVOKESPECIAL, "java/util/Date", "<init>", "()V", false));
+        expiryCode.add(new InsnNode(Opcodes.SWAP));
+        expiryCode.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/util/Date", "after", "(Ljava/util/Date;)Z", false));
+        expiryCode.add(new JumpInsnNode(Opcodes.IFEQ, injectedLabel));
+        expiryCode.add(new TypeInsnNode(Opcodes.NEW, "java/lang/Throwable"));
+        expiryCode.add(new InsnNode(Opcodes.DUP));
+        expiryCode.add(new LdcInsnNode(expiredMsg));
+        expiryCode.add(new MethodInsnNode(Opcodes.INVOKESPECIAL, "java/lang/Throwable", "<init>", "(Ljava/lang/String;)V", false));
+        expiryCode.add(new InsnNode(Opcodes.ATHROW));
+        expiryCode.add(injectedLabel);
+
+        return expiryCode;
+    }
+
+    /**
+     * Returns an iconst corresponding to the input integer.
+     *
+     * @param number used as an input to determine correct output.
+     * @return an iconst corresponding to the input integer.
+     */
+    public static InsnNode getIConst(int number) {
+        return new InsnNode(number + 3);
+    }
+
+    /**
+     * Returns a bipush or sipush based on input integer.
+     *
+     * @param number used as an input to determine correct output.
+     * @return a bipush or sipush based on input integer.
+     */
+    public static IntInsnNode getIntInsn(int number) {
+        if (number >= -128 && number <= 127) {
+            return new IntInsnNode(Opcodes.BIPUSH, number);
+        } else if (number >= -32768 && number <= 32767) {
+            return new IntInsnNode(Opcodes.SIPUSH, number);
+        }
+
+        return null;
     }
 }

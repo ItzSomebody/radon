@@ -1,3 +1,11 @@
+## 0.0.12
+
+* Cleaned up StringPool and NumberObfuscation transformers.
+
+## 0.0.11
+
+* Added Expiry transformer.
+
 ## 0.0.10
 
 * Switched to ASM6 (FIELD RENAMING STILL NOT WORKING WHYYYYY)

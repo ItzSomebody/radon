@@ -5,10 +5,10 @@ import me.itzsomebody.radon.yaml.Yaml;
 
 import java.io.File;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.DateTimeException;
+import java.util.*;
 
 /**
  * Big config class that looks horrible and has lots of docs to make the
@@ -42,6 +42,8 @@ public class Config {
             add("WatermarkKey");
             add("SpigotPlugin");
             add("Renamer");
+            add("ExpiryTime");
+            add("ExpiryMessage");
         }
     };
 
@@ -637,5 +639,52 @@ public class Config {
         }
 
         return -1;
+    }
+
+    /**
+     * Returns the expiry time from {@link Config#map} as {@link Long}. Defaults to -1.
+     *
+     * @return the expiry time from {@link Config#map} as {@link Long}. Defaults to -1.
+     * @throws IllegalArgumentException if value from key is null or not a {@link String}, and/or is not a proper date format.
+     */
+    public long getExpiryTime() throws IllegalArgumentException {
+        if (map.containsKey("ExpiryTime")) {
+            Object value = map.get("ExpiryTime");
+            if (value != null) {
+                if (!(value instanceof String)) {
+                    throw new IllegalArgumentException("Expiry time must be a string in simple date format");
+                }
+
+                String time = (String) value;
+                try {
+                    SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy");
+                    Date date = format.parse(time);
+                    return date.getTime();
+                } catch (ParseException e) {
+                    throw new IllegalArgumentException("Could not parse date as MM/dd/yyyy");
+                }
+            }
+        }
+
+        return -1;
+    }
+
+    /**
+     * Returns the expiry message from {@link Config#map} as {@link Integer}. Defaults to null if null.
+     *
+     * @return Returns the crasher type from {@link Config#map} as {@link String}. Defaults to null if null.
+     * @throws IllegalArgumentException if value from key is null or not a {@link String}
+     */
+    public String getExpiryMsg() throws IllegalArgumentException {
+        if (map.containsKey("ExpiryMessage")) {
+            Object value = map.get("ExpiryMessage");
+            if (value != null) {
+                return value.toString();
+            } else {
+                throw new IllegalArgumentException("Expiry message is null");
+            }
+        }
+
+        return null;
     }
 }

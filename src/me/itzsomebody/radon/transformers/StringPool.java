@@ -3,6 +3,7 @@ package me.itzsomebody.radon.transformers;
 import me.itzsomebody.radon.asm.Label;
 import me.itzsomebody.radon.asm.Opcodes;
 import me.itzsomebody.radon.asm.tree.*;
+import me.itzsomebody.radon.utils.BytecodeUtils;
 import me.itzsomebody.radon.utils.LoggerUtils;
 import me.itzsomebody.radon.utils.StringUtils;
 
@@ -72,22 +73,14 @@ public class StringPool {
 
                     if (cst instanceof String) {
                         stringslist.add((String) cst);
-                        if (stringslist.size() - 1 == 0) {
-                            methodNode.instructions.insertBefore(insn, new InsnNode(Opcodes.ICONST_0));
-                        } else if (stringslist.size() - 1 == 1) {
-                            methodNode.instructions.insertBefore(insn, new InsnNode(Opcodes.ICONST_1));
-                        } else if (stringslist.size() - 1 == 2) {
-                            methodNode.instructions.insertBefore(insn, new InsnNode(Opcodes.ICONST_2));
-                        } else if (stringslist.size() - 1 == 3) {
-                            methodNode.instructions.insertBefore(insn, new InsnNode(Opcodes.ICONST_3));
-                        } else if (stringslist.size() - 1 == 4) {
-                            methodNode.instructions.insertBefore(insn, new InsnNode(Opcodes.ICONST_4));
-                        } else if (stringslist.size() - 1 > 4 && stringslist.size() - 1 < 127) {
-                            methodNode.instructions.insertBefore(insn, new IntInsnNode(Opcodes.BIPUSH, stringslist.size() - 1));
-                        } else if (stringslist.size() - 1 >= 127 && stringslist.size() - 1 < 32767) {
-                            methodNode.instructions.insertBefore(insn, new IntInsnNode(Opcodes.SIPUSH, stringslist.size() - 1));
+
+                        int indexNumber = stringslist.size() - 1;
+                        if (indexNumber >= 0 && indexNumber <= 5) {
+                            methodNode.instructions.insertBefore(insn, BytecodeUtils.getIConst(indexNumber));
+                        } else if (indexNumber >= 6 && indexNumber <= 32767) {
+                            methodNode.instructions.insertBefore(insn, BytecodeUtils.getIntInsn(indexNumber));
                         } else {
-                            methodNode.instructions.insertBefore(insn, new LdcInsnNode(stringslist.size() - 1));
+                            methodNode.instructions.insertBefore(insn, new LdcInsnNode(indexNumber));
                         }
 
                         methodNode.instructions.set(insn, new MethodInsnNode(Opcodes.INVOKESTATIC, classNode.name, randName, "(I)Ljava/lang/String;", false));
@@ -118,20 +111,13 @@ public class StringPool {
 
         Label l0 = new Label();
         method.visitLabel(l0);
-        if (strings.length > 5 && strings.length < 127) {
+        int numberOfStrings = strings.length;
+        if (numberOfStrings <= 5) {
+            method.visitInsn(numberOfStrings + 3);
+        } else if (numberOfStrings <= 127) {
             method.visitIntInsn(Opcodes.BIPUSH, strings.length);
-        } else if (strings.length >= 127 && strings.length < 32767) {
+        } else if (numberOfStrings <= 32767) {
             method.visitIntInsn(Opcodes.SIPUSH, strings.length);
-        } else if (strings.length == 1) {
-            method.visitInsn(Opcodes.ICONST_1);
-        } else if (strings.length == 2) {
-            method.visitInsn(Opcodes.ICONST_2);
-        } else if (strings.length == 3) {
-            method.visitInsn(Opcodes.ICONST_3);
-        } else if (strings.length == 4) {
-            method.visitInsn(Opcodes.ICONST_4);
-        } else if (strings.length == 5) {
-            method.visitInsn(Opcodes.ICONST_5);
         } else {
             method.visitLdcInsn(strings.length);
         }
@@ -139,22 +125,13 @@ public class StringPool {
         method.visitTypeInsn(Opcodes.ANEWARRAY, "java/lang/String");
 
         for (int i = 0; i < strings.length; i++) {
-
             method.visitInsn(Opcodes.DUP);
 
-            if (i == 0) {
-                method.visitInsn(Opcodes.ICONST_0);
-            } else if (i == 1) {
-                method.visitInsn(Opcodes.ICONST_1);
-            } else if (i == 2) {
-                method.visitInsn(Opcodes.ICONST_2);
-            } else if (i == 3) {
-                method.visitInsn(Opcodes.ICONST_3);
-            } else if (i == 4) {
-                method.visitInsn(Opcodes.ICONST_4);
-            } else if (i > 4 && i < 127) {
+            if (i <= 5) {
+                method.visitInsn(i + 3);
+            } else if (i <= 127) {
                 method.visitIntInsn(Opcodes.BIPUSH, i);
-            } else if (i >= 127 && i < 32767) {
+            } else if (i <= 32767) {
                 method.visitIntInsn(Opcodes.SIPUSH, i);
             } else {
                 method.visitLdcInsn(i);

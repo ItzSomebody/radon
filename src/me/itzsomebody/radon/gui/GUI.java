@@ -1101,7 +1101,9 @@ public class GUI {
                                     trashClasses,
                                     waterMarkMessageField.getText(),
                                     watermarkType,
-                                    new String(watermarkPassword.getPassword())
+                                    new String(watermarkPassword.getPassword()),
+                                    -1,
+                                    ""
                             );
                             bootstrap.startTheParty(false);
                             JOptionPane.showMessageDialog(null, "Successfully processed file!", "Done", JOptionPane.INFORMATION_MESSAGE);

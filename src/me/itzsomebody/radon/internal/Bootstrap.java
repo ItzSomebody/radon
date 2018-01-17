@@ -185,6 +185,16 @@ public class Bootstrap { // Eyyy bootstrap bill
     private String watermarkKey;
 
     /**
+     * Long to be used as an expiration date for software.
+     */
+    private long expiryTime;
+
+    /**
+     * String to be used to indicate the user's software expiration has sadly come. (lol)
+     */
+    private String expiryMsg;
+
+    /**
      * Strings to write to log.
      */
     private ArrayList<String> logStrings;
@@ -251,7 +261,9 @@ public class Bootstrap { // Eyyy bootstrap bill
             int trashClasses,
             String watermarkMsg,
             int watermarkType,
-            String watermarkKey) {
+            String watermarkKey,
+            long expiryTime,
+            String expiryMsg) {
         this.input = input;
         this.output = output;
         this.libs = libs;
@@ -276,6 +288,8 @@ public class Bootstrap { // Eyyy bootstrap bill
         this.watermarkMsg = watermarkMsg;
         this.watermarkType = watermarkType;
         this.watermarkKey = watermarkKey;
+        this.expiryMsg = expiryMsg;
+        this.expiryTime = expiryTime;
     }
 
     /**
@@ -380,15 +394,7 @@ public class Bootstrap { // Eyyy bootstrap bill
             // Maybe add String Pool to this as well.
             if (stringEncryptionType != -1
                     || invokeDynamicType != -1) {
-                /*
-                ArrayList<String> allClasses = new ArrayList<>();
-                for (ClassNode cn : classes.values()) {
-                    allClasses.add(cn.name);
-                }
-                String randomClass = allClasses.get(MiscUtils.getRandomInt(allClasses.size()));
-                String newClass = randomClass + "$" + StringUtils.crazyString();
-                */
-                String newClass = StringUtils.crazyString();
+                String newClass = StringUtils.randomClassName(classes);
                 ClassNode classNode = EmptyClass.emptyClass(newClass);
                 String decryptionMethodName = StringUtils.crazyString();
                 decryptionMethodPath = newClass + "." + decryptionMethodName;
@@ -429,6 +435,12 @@ public class Bootstrap { // Eyyy bootstrap bill
                 }
                 logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
                 logStrings.add(LoggerUtils.stdOut("Processing " + classNode.name));
+
+                if (expiryTime != -1) {
+                    Expiry expiry = new Expiry(classNode, expiryTime, expiryMsg, methodExempts);
+                    logStrings.addAll(expiry.getLogStrings());
+                }
+
                 if (stringEncryptionType == 0) {
                     LightStringEncryption lightStringEncryption = new LightStringEncryption(classNode, decryptionMethodPath, spigotMode, methodExempts);
                     logStrings.addAll(lightStringEncryption.getLogStrings());
@@ -501,7 +513,7 @@ public class Bootstrap { // Eyyy bootstrap bill
             if (trashClasses != -1) {
                 logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
                 for (int i = 0; i < trashClasses; i++) {
-                    TrashClasses trashClass = new TrashClasses(StringUtils.crazyString());
+                    TrashClasses trashClass = new TrashClasses(StringUtils.randomClassName(classes));
                     ClassNode classNode = trashClass.returnTrashClass();
                     extraClasses.put(classNode.name, classNode);
                 }
@@ -565,6 +577,7 @@ public class Bootstrap { // Eyyy bootstrap bill
             }
             output.delete();
             logStrings.add(LoggerUtils.stdOut("Deleted output."));
+            t.printStackTrace();
             throw new RuntimeException(t.getMessage());
         } finally {
             logStrings.add(LoggerUtils.stdOut("Writing log."));
@@ -604,6 +617,8 @@ public class Bootstrap { // Eyyy bootstrap bill
             watermarkMsg = config.getWatermarkMsg();
             watermarkType = config.getWatermarkType();
             watermarkKey = config.getWatermarkKey();
+            expiryTime = config.getExpiryTime();
+            expiryMsg = config.getExpiryMsg();
             if (output.exists()) {
                 logStrings.add(LoggerUtils.stdOut("Output already exists, renamed to " + FileUtils.renameExistingFile(output)));
             }
@@ -670,6 +685,7 @@ public class Bootstrap { // Eyyy bootstrap bill
                 } else {
                     ZipEntry newEntry = new ZipEntry(zipEntry);
                     newEntry.setTime(currentTime);
+                    newEntry.setCompressedSize(-1);
                     zos.putNextEntry(newEntry);
                     FileUtils.writeToZip(zos, zipFile.getInputStream(zipEntry));
                 }
