@@ -4,6 +4,7 @@ import me.itzsomebody.radon.asm.ClassReader;
 import me.itzsomebody.radon.asm.ClassWriter;
 import me.itzsomebody.radon.asm.Opcodes;
 import me.itzsomebody.radon.asm.commons.ClassRemapper;
+import me.itzsomebody.radon.asm.commons.Remapper;
 import me.itzsomebody.radon.asm.commons.SimpleRemapper;
 import me.itzsomebody.radon.asm.tree.ClassNode;
 import me.itzsomebody.radon.asm.tree.FieldNode;
@@ -321,7 +322,7 @@ public class Bootstrap { // Eyyy bootstrap bill
                     for (MethodNode methodNode : classNode.methods) {
                         if (BytecodeUtils.hasSameMethod(methodNode, classNode, classPath)
                                 || methodNode.name.startsWith("<")
-                                || (methodNode.access & Opcodes.ACC_NATIVE) != 0
+                                || BytecodeUtils.isNativeMethod(methodNode.access)
                                 || methodExempts.contains(classNode.name + "." + methodNode.name + methodNode.desc)
                                 || methodNode.name.equals("main")
                                 || methodNode.name.equals("premain")) continue;
@@ -332,8 +333,8 @@ public class Bootstrap { // Eyyy bootstrap bill
 
                     /*if (classNode.fields != null) {
                         for (FieldNode fieldNode : classNode.fields) {
-                            if (fieldExempts.contains(classNode.name + "." + fieldNode.name)) continue;
-                            String key = classNode.name + "." + fieldNode.name;
+                            if (fieldExempts.contains(classNode.name + "." + fieldNode.name + "." + fieldNode.desc)) continue;
+                            String key = classNode.name + "." + fieldNode.name + "." + fieldNode.desc;
                             mappings.put(key, StringUtils.crazyString());
                             logStrings.add(LoggerUtils.stdOut("Generated mapping " + key));
                         }
@@ -363,12 +364,10 @@ public class Bootstrap { // Eyyy bootstrap bill
                 }
 
                 // Apply mapping
-                SimpleRemapper simpleRemapper = new SimpleRemapper(mappings);
+                Remapper simpleRemapper = new SimpleRemapper(mappings);
                 for (ClassNode classNode : classesAsList) {
                     ClassNode copy = new ClassNode();
                     classNode.accept(new ClassRemapper(copy, simpleRemapper));
-                    Collections.shuffle(classNode.methods);
-                    Collections.shuffle(classNode.fields);
                     copy.access = BytecodeUtils.accessFixer(copy.access);
                     for (MethodNode methodNode : copy.methods) {
                         methodNode.access = BytecodeUtils.accessFixer(methodNode.access);
@@ -541,6 +540,8 @@ public class Bootstrap { // Eyyy bootstrap bill
             logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
             logStrings.add(LoggerUtils.stdOut("Writing classes to output"));
             for (ClassNode classNode : classes.values()) {
+                Collections.shuffle(classNode.methods);
+                Collections.shuffle(classNode.fields);
                 ClassWriter cw = new CustomClassWriter(ClassWriter.COMPUTE_FRAMES);
 
                 if (watermarkMsg != null) {
@@ -775,6 +776,7 @@ public class Bootstrap { // Eyyy bootstrap bill
                 // java/lang/Object has no superclass so checking for superclass = null
                 return true;
             }
+
             if (clazz1.superName.equals(clazz2.name)) {
                 return true;
             }

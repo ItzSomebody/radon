@@ -64,7 +64,7 @@ public class SimpleRemapper extends Remapper {
 
     @Override
     public String mapFieldName(String owner, String name, String desc) {
-        String s = map(owner + '.' + name);
+        String s = map(owner + '.' + name + '.' + desc);
         return s == null ? name : s;
     }
 

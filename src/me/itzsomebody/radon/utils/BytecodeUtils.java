@@ -204,4 +204,26 @@ public class BytecodeUtils {
 
         return null;
     }
+
+    /**
+     * Returns true if access has native modifier.
+     *
+     * @param access method access to check.
+     * @return true if access has native modifier.
+     */
+    public static boolean isNativeMethod(int access) {
+        return (access & Opcodes.ACC_NATIVE) != 0;
+    }
+
+    /**
+     * Returns true if access has abstract modifier.
+     *
+     * @param access method access to check.
+     * @return true if access has abstract modifier.
+     */
+    public static boolean isAbstractMethod(int access) {
+        return (access & Opcodes.ACC_ABSTRACT) != 0;
+    }
+
+
 }

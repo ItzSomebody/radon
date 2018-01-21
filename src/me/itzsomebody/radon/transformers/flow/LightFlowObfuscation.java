@@ -2,6 +2,7 @@ package me.itzsomebody.radon.transformers.flow;
 
 import me.itzsomebody.radon.asm.Opcodes;
 import me.itzsomebody.radon.asm.tree.*;
+import me.itzsomebody.radon.utils.BytecodeUtils;
 import me.itzsomebody.radon.utils.LoggerUtils;
 import me.itzsomebody.radon.utils.MiscUtils;
 
@@ -51,7 +52,7 @@ public class LightFlowObfuscation {
         int addedGotos = 0;
         for (MethodNode methodNode : classNode.methods) {
             if (exemptMethods.contains(classNode.name + "." + methodNode.name + methodNode.desc)) continue;
-            if (!((methodNode.access & Opcodes.ACC_ABSTRACT) == 0)) continue;
+            if (BytecodeUtils.isAbstractMethod(methodNode.access)) continue;
             if (methodNode.instructions.size() < 4) continue;
 
             for (AbstractInsnNode ain : methodNode.instructions.toArray()) {

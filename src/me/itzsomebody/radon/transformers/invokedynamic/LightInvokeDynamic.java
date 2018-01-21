@@ -6,7 +6,6 @@ import me.itzsomebody.radon.asm.Type;
 import me.itzsomebody.radon.asm.tree.*;
 import me.itzsomebody.radon.utils.BytecodeUtils;
 import me.itzsomebody.radon.utils.LoggerUtils;
-import me.itzsomebody.radon.utils.MiscUtils;
 import me.itzsomebody.radon.utils.StringUtils;
 
 import java.util.ArrayList;
@@ -72,11 +71,10 @@ public class LightInvokeDynamic {
         int count = 0;
         for (MethodNode methodNode : classNode.methods) {
             if (exemptMethods.contains(classNode.name + "." + methodNode.name + methodNode.desc)) continue;
-            if (!((methodNode.access & Opcodes.ACC_ABSTRACT) == 0)) continue;
+            if (BytecodeUtils.isAbstractMethod(methodNode.access)) continue;
 
             for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
-                if (insn instanceof MethodInsnNode
-                        && MiscUtils.getRandomInt(10) >= 7) {
+                if (insn instanceof MethodInsnNode) {
                     MethodInsnNode methodInsnNode = (MethodInsnNode) insn;
                     if (!methodInsnNode.owner.startsWith("java/lang/reflect")
                             && !methodInsnNode.owner.startsWith("java/lang/Class")) {

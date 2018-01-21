@@ -58,7 +58,7 @@ public class NormalFlowObfuscation {
         int count = 0;
         for (MethodNode methodNode : classNode.methods) {
             if (exemptMethods.contains(classNode.name + "." + methodNode.name + methodNode.desc)) continue;
-            if (!((methodNode.access & Opcodes.ACC_ABSTRACT) == 0)) continue;
+            if (BytecodeUtils.isAbstractMethod(methodNode.access)) continue;
 
             for (AbstractInsnNode ain : methodNode.instructions.toArray()) {
                 int op = ain.getOpcode();
@@ -88,7 +88,7 @@ public class NormalFlowObfuscation {
                         count++;
                     }
                 } else if (ain.getOpcode() == Opcodes.SIPUSH || ain.getOpcode() == Opcodes.BIPUSH) {
-                    /**
+                    /*
                      * (SI|BI)PUSH 255
                      * INEG
                      * INEG
@@ -100,14 +100,14 @@ public class NormalFlowObfuscation {
                      * INEG
                      */
                     InsnList insnList = new InsnList();
-                    int howMany = (MiscUtils.getRandomInt(4) + 1) * 2; // Odd number times even number = even number
+                    int howMany = (MiscUtils.getRandomInt(6) + 3) * 2; // Odd number times even number = even number
                     for (int i = 0; i < howMany; i++) {
                         insnList.add(new InsnNode(Opcodes.INEG));
                     }
                     methodNode.instructions.insert(ain, insnList);
                     count++;
                 } else if (ain instanceof LdcInsnNode) {
-                    /**
+                    /*
                      * LDC 1830289439
                      * INEG
                      * INEG
@@ -120,7 +120,7 @@ public class NormalFlowObfuscation {
                      */
                     if (((LdcInsnNode) ain).cst instanceof Integer) {
                         InsnList insnList = new InsnList();
-                        int howMany = (MiscUtils.getRandomInt(4) + 1) * 2; // Odd number times even number = even number
+                        int howMany = (MiscUtils.getRandomInt(6) + 3) * 2; // Odd number times even number = even number
                         for (int i = 0; i < howMany; i++) {
                             insnList.add(new InsnNode(Opcodes.INEG));
                         }
@@ -153,6 +153,19 @@ public class NormalFlowObfuscation {
                     AbstractInsnNode next = ain.getNext();
                     methodNode.instructions.insertBefore(next, new InsnNode(Opcodes.POP));
                     methodNode.instructions.insertBefore(next, new VarInsnNode(Opcodes.ASTORE, ((VarInsnNode) ain).var));
+                    count++;
+                } else if (ain.getOpcode() == Opcodes.NOP) {
+                    /*
+                     * NOP
+                     * NOP
+                     * NOP
+                     * NOP
+                     * NOP
+                     */
+                    int howMany = (MiscUtils.getRandomInt(5) + 1) * 2;
+                    for (int i = 0; i < howMany; i++) {
+                        methodNode.instructions.insert(ain, new InsnNode(Opcodes.NOP));
+                    }
                     count++;
                 }
             }
@@ -199,34 +212,36 @@ public class NormalFlowObfuscation {
             insnList.add(new JumpInsnNode(Opcodes.IFEQ, l0));
             insnList.add(new InsnNode(Opcodes.ACONST_NULL));
             insnList.add(l1);
-            insnList.add(new FrameNode(Opcodes.F_SAME1, 0, null, 1, new Object[]{"java/lang/Throwable"}));
+            //insnList.add(new FrameNode(Opcodes.F_SAME1, 0, null, 1, new Object[]{"java/lang/Throwable"}));
             insnList.add(new InsnNode(Opcodes.ATHROW));
             insnList.add(l2);
-            insnList.add(new FrameNode(Opcodes.F_SAME1, 0, null, 1, new Object[]{"java/lang/Throwable"}));
+            //insnList.add(new FrameNode(Opcodes.F_SAME1, 0, null, 1, new Object[]{"java/lang/Throwable"}));
             insnList.add(new InsnNode(Opcodes.ATHROW));
             insnList.add(l0);
-            insnList.add(new FrameNode(Opcodes.F_SAME, 0, null, 0, null));
+            //insnList.add(new FrameNode(Opcodes.F_SAME, 0, null, 0, null));
             insnList.add(new InsnNode(Opcodes.ICONST_5));
             insnList.add(new JumpInsnNode(Opcodes.IFGT, l3));
             insnList.add(l4);
-            insnList.add(new FrameNode(Opcodes.F_SAME, 0, null, 0, null));
+            //insnList.add(new FrameNode(Opcodes.F_SAME, 0, null, 0, null));
             insnList.add(new JumpInsnNode(Opcodes.GOTO, l4));
             insnList.add(l3);
-            insnList.add(new FrameNode(Opcodes.F_SAME, 0, null, 0, null));
+            //insnList.add(new FrameNode(Opcodes.F_SAME, 0, null, 0, null));
             insnList.add(new InsnNode(Opcodes.ICONST_M1));
             insnList.add(new JumpInsnNode(Opcodes.IFLT, l5));
             insnList.add(new InsnNode(Opcodes.ACONST_NULL));
             insnList.add(new InsnNode(Opcodes.ATHROW));
             insnList.add(l6);
-            insnList.add(new FrameNode(Opcodes.F_FULL, 0, new Object[]{}, 1, new Object[]{"java/lang/Throwable"}));
-            insnList.add(new InsnNode(Opcodes.NOP));
-            insnList.add(new InsnNode(Opcodes.NOP));
+            //insnList.add(new FrameNode(Opcodes.F_FULL, 0, new Object[]{}, 1, new Object[]{"java/lang/Throwable"}));
+            int howMany = (MiscUtils.getRandomInt(5) + 3) * 2;
+            for (int i = 0; i < howMany; i++) {
+                insnList.add(new InsnNode(Opcodes.NOP));
+            }
             insnList.add(new InsnNode(Opcodes.ATHROW));
             insnList.add(l7);
-            insnList.add(new FrameNode(Opcodes.F_FULL, 0, new Object[]{}, 1, new Object[]{"javax/crypto/BadPaddingException"}));
+            //insnList.add(new FrameNode(Opcodes.F_FULL, 0, new Object[]{}, 1, new Object[]{"javax/crypto/BadPaddingException"}));
             insnList.add(new InsnNode(Opcodes.ATHROW));
             insnList.add(l5);
-            insnList.add(new FrameNode(Opcodes.F_SAME, 0, null, 0, null));
+            //insnList.add(new FrameNode(Opcodes.F_SAME, 0, null, 0, null));
 
             methodNode.instructions.insertBefore(methodNode.instructions.getFirst(), insnList);
             methodNode.tryCatchBlocks.add(new TryCatchBlockNode(l1, l2, l2, "java/lang/Throwable"));

@@ -74,11 +74,10 @@ public class NormalInvokeDynamic {
         int count = 0;
         for (MethodNode methodNode : classNode.methods) {
             if (exemptMethods.contains(classNode.name + "." + methodNode.name + methodNode.desc)) continue;
-            if (!((methodNode.access & Opcodes.ACC_ABSTRACT) == 0)) continue;
+            if (BytecodeUtils.isAbstractMethod(methodNode.access)) continue;
 
             for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
-                if (insn instanceof MethodInsnNode
-                        && MiscUtils.getRandomInt(10) >= 7) {
+                if (insn instanceof MethodInsnNode) {
                     MethodInsnNode methodInsnNode = (MethodInsnNode) insn;
                     if (!methodInsnNode.owner.startsWith("java/lang/reflect")
                             && !methodInsnNode.owner.startsWith("java/lang/Class")) {

@@ -76,6 +76,11 @@ public class HideCode {
                 methodNode.access |= Opcodes.ACC_SYNTHETIC;
                 count++;
             } // TODO: Fix this from breaking org/bukkit/event/EventHandler
+            if (!methodNode.name.startsWith("<")) {
+                if ((methodNode.access & Opcodes.ACC_BRIDGE) == 0) {
+                    methodNode.access |= Opcodes.ACC_BRIDGE;
+                }
+            }
         }
 
         for (FieldNode fieldNode : classNode.fields) {

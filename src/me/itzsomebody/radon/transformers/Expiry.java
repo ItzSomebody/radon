@@ -1,6 +1,5 @@
 package me.itzsomebody.radon.transformers;
 
-import me.itzsomebody.radon.asm.Label;
 import me.itzsomebody.radon.asm.Opcodes;
 import me.itzsomebody.radon.asm.tree.*;
 import me.itzsomebody.radon.utils.BytecodeUtils;
@@ -65,25 +64,6 @@ public class Expiry {
             if (methodNode.name.equals("<init>")) {
                 for (AbstractInsnNode ain : methodNode.instructions.toArray()) {
                     if (BytecodeUtils.isReturn(ain)) {
-                        InsnList expiryCode = new InsnList();
-                        LabelNode injectedLabel = new LabelNode(new Label());
-
-                        expiryCode.add(new TypeInsnNode(Opcodes.NEW, "java/util/Date"));
-                        expiryCode.add(new InsnNode(Opcodes.DUP));
-                        expiryCode.add(new LdcInsnNode(expiryTime));
-                        expiryCode.add(new MethodInsnNode(Opcodes.INVOKESPECIAL, "java/util/Date", "<init>", "(J)V", false));
-                        expiryCode.add(new TypeInsnNode(Opcodes.NEW, "java/util/Date"));
-                        expiryCode.add(new InsnNode(Opcodes.DUP));
-                        expiryCode.add(new MethodInsnNode(Opcodes.INVOKESPECIAL, "java/util/Date", "<init>", "()V", false));
-                        expiryCode.add(new InsnNode(Opcodes.SWAP));
-                        expiryCode.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/util/Date", "after", "(Ljava/util/Date;)Z", false));
-                        expiryCode.add(new JumpInsnNode(Opcodes.IFEQ, injectedLabel));
-                        expiryCode.add(new TypeInsnNode(Opcodes.NEW, "java/lang/Throwable"));
-                        expiryCode.add(new InsnNode(Opcodes.DUP));
-                        expiryCode.add(new LdcInsnNode(expiryMsg));
-                        expiryCode.add(new MethodInsnNode(Opcodes.INVOKESPECIAL, "java/lang/Throwable", "<init>", "(Ljava/lang/String;)V", false));
-                        expiryCode.add(new InsnNode(Opcodes.ATHROW));
-                        expiryCode.add(injectedLabel);
                         methodNode.instructions.insertBefore(ain, BytecodeUtils.returnExpiry(expiryTime, expiryMsg));
                         methodNode.instructions.insertBefore(ain, new InsnNode(Opcodes.NOP));
                         count++;

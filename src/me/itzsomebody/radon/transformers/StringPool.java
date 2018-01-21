@@ -65,7 +65,7 @@ public class StringPool {
 
         for (MethodNode methodNode : classNode.methods) {
             if (exemptMethods.contains(classNode.name + "/" + methodNode.name)) continue;
-            if (!((methodNode.access & Opcodes.ACC_ABSTRACT) == 0)) continue;
+            if (BytecodeUtils.isAbstractMethod(methodNode.access)) continue;
 
             for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
                 if (insn instanceof LdcInsnNode) {

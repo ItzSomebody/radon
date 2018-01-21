@@ -2,6 +2,7 @@ package me.itzsomebody.radon.transformers.stringencryption;
 
 import me.itzsomebody.radon.asm.Opcodes;
 import me.itzsomebody.radon.asm.tree.*;
+import me.itzsomebody.radon.utils.BytecodeUtils;
 import me.itzsomebody.radon.utils.LoggerUtils;
 import me.itzsomebody.radon.utils.StringUtils;
 
@@ -65,7 +66,8 @@ public class LightStringEncryption {
         int count = 0;
         for (MethodNode methodNode : classNode.methods) {
             if (exemptMethods.contains(classNode.name + "." + methodNode.name + methodNode.desc)) continue;
-            if (methodNode.instructions.size() < 2) continue;
+            if (BytecodeUtils.isAbstractMethod(methodNode.access)) continue;
+            if (methodNode.instructions.size() < 4) continue;
 
             for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
                 if (insn instanceof LdcInsnNode) {
