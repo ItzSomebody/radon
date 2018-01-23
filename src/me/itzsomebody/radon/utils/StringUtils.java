@@ -27,7 +27,7 @@ public class StringUtils {
         char[] buildString = new char[numberOfChars];
 
         for (int i = 0; i < numberOfChars; i++) {
-            switch (MiscUtils.getRandomInt(16)) {
+            switch (NumberUtils.getRandomInt(16)) {
                 case 0:
                     buildString[i] = '\u2000';
                     break;
@@ -93,7 +93,7 @@ public class StringUtils {
         char[] buildString = new char[100];
 
         for (int i = 0; i < 100; i++) {
-            switch (MiscUtils.getRandomInt(8)) {
+            switch (NumberUtils.getRandomInt(8)) {
                 case 0:
                     buildString[i] = '\ua6ac';
                     break;
@@ -240,7 +240,7 @@ public class StringUtils {
         ArrayList<String> classNames = new ArrayList<>();
         classNames.addAll(classes.keySet());
 
-        String randomClass = classNames.get(MiscUtils.getRandomInt(classNames.size()));
+        String randomClass = classNames.get(NumberUtils.getRandomInt(classNames.size()));
         String[] split = randomClass.split("/");
         StringBuilder sb = new StringBuilder();
 

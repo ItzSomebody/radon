@@ -1,3 +1,7 @@
+## 0.0.13
+
+* Completely re-worked NumberObfuscation transformer and cleaned some stuff up in general.
+
 ## 0.0.12
 
 * Cleaned up StringPool and NumberObfuscation transformers.

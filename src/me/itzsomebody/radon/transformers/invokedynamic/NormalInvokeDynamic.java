@@ -6,7 +6,7 @@ import me.itzsomebody.radon.asm.Type;
 import me.itzsomebody.radon.asm.tree.*;
 import me.itzsomebody.radon.utils.BytecodeUtils;
 import me.itzsomebody.radon.utils.LoggerUtils;
-import me.itzsomebody.radon.utils.MiscUtils;
+import me.itzsomebody.radon.utils.NumberUtils;
 import me.itzsomebody.radon.utils.StringUtils;
 
 import java.util.ArrayList;
@@ -111,40 +111,40 @@ public class NormalInvokeDynamic {
                                 coreOpcode = 1;
                                 break;
                         }
-                        switch (MiscUtils.getRandomInt(5)) {
+                        switch (NumberUtils.getRandomInt(5)) {
                             case 0:
                                 opcode1 = String.valueOf(coreOpcode);
-                                opcode2 = String.valueOf(MiscUtils.getRandomInt(3) + 2);
-                                opcode3 = String.valueOf(MiscUtils.getRandomInt(3) + 2);
-                                opcode4 = String.valueOf(MiscUtils.getRandomInt(3) + 2);
-                                opcode5 = String.valueOf(MiscUtils.getRandomInt(3) + 2);
+                                opcode2 = String.valueOf(NumberUtils.getRandomInt(3) + 2);
+                                opcode3 = String.valueOf(NumberUtils.getRandomInt(3) + 2);
+                                opcode4 = String.valueOf(NumberUtils.getRandomInt(3) + 2);
+                                opcode5 = String.valueOf(NumberUtils.getRandomInt(3) + 2);
                                 break;
                             case 1:
-                                opcode1 = String.valueOf(MiscUtils.getRandomInt(3) + 2);
+                                opcode1 = String.valueOf(NumberUtils.getRandomInt(3) + 2);
                                 opcode2 = String.valueOf(coreOpcode);
-                                opcode3 = String.valueOf(MiscUtils.getRandomInt(3) + 2);
-                                opcode4 = String.valueOf(MiscUtils.getRandomInt(3) + 2);
-                                opcode5 = String.valueOf(MiscUtils.getRandomInt(3) + 2);
+                                opcode3 = String.valueOf(NumberUtils.getRandomInt(3) + 2);
+                                opcode4 = String.valueOf(NumberUtils.getRandomInt(3) + 2);
+                                opcode5 = String.valueOf(NumberUtils.getRandomInt(3) + 2);
                                 break;
                             case 2:
-                                opcode1 = String.valueOf(MiscUtils.getRandomInt(3) + 2);
-                                opcode2 = String.valueOf(MiscUtils.getRandomInt(3) + 2);
+                                opcode1 = String.valueOf(NumberUtils.getRandomInt(3) + 2);
+                                opcode2 = String.valueOf(NumberUtils.getRandomInt(3) + 2);
                                 opcode3 = String.valueOf(coreOpcode);
-                                opcode4 = String.valueOf(MiscUtils.getRandomInt(3) + 2);
-                                opcode5 = String.valueOf(MiscUtils.getRandomInt(3) + 2);
+                                opcode4 = String.valueOf(NumberUtils.getRandomInt(3) + 2);
+                                opcode5 = String.valueOf(NumberUtils.getRandomInt(3) + 2);
                                 break;
                             case 3:
-                                opcode1 = String.valueOf(MiscUtils.getRandomInt(3) + 2);
-                                opcode2 = String.valueOf(MiscUtils.getRandomInt(3) + 2);
-                                opcode3 = String.valueOf(MiscUtils.getRandomInt(3) + 2);
+                                opcode1 = String.valueOf(NumberUtils.getRandomInt(3) + 2);
+                                opcode2 = String.valueOf(NumberUtils.getRandomInt(3) + 2);
+                                opcode3 = String.valueOf(NumberUtils.getRandomInt(3) + 2);
                                 opcode4 = String.valueOf(coreOpcode);
-                                opcode5 = String.valueOf(MiscUtils.getRandomInt(3) + 2);
+                                opcode5 = String.valueOf(NumberUtils.getRandomInt(3) + 2);
                                 break;
                             default: // 4
-                                opcode1 = String.valueOf(MiscUtils.getRandomInt(3) + 2);
-                                opcode2 = String.valueOf(MiscUtils.getRandomInt(3) + 2);
-                                opcode3 = String.valueOf(MiscUtils.getRandomInt(3) + 2);
-                                opcode4 = String.valueOf(MiscUtils.getRandomInt(3) + 2);
+                                opcode1 = String.valueOf(NumberUtils.getRandomInt(3) + 2);
+                                opcode2 = String.valueOf(NumberUtils.getRandomInt(3) + 2);
+                                opcode3 = String.valueOf(NumberUtils.getRandomInt(3) + 2);
+                                opcode4 = String.valueOf(NumberUtils.getRandomInt(3) + 2);
                                 opcode5 = String.valueOf(coreOpcode);
                                 break;
                         }

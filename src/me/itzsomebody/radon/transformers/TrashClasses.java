@@ -4,7 +4,7 @@ import me.itzsomebody.radon.asm.Handle;
 import me.itzsomebody.radon.asm.MethodVisitor;
 import me.itzsomebody.radon.asm.Opcodes;
 import me.itzsomebody.radon.asm.tree.*;
-import me.itzsomebody.radon.utils.MiscUtils;
+import me.itzsomebody.radon.utils.NumberUtils;
 import me.itzsomebody.radon.utils.StringUtils;
 
 /**
@@ -34,7 +34,7 @@ public class TrashClasses {
      */
     public ClassNode returnTrashClass() {
         ClassNode classNode = createClass(trashClassName);
-        int methodsToGenerate = MiscUtils.getRandomInt(3) + 2; // At least two
+        int methodsToGenerate = NumberUtils.getRandomInt(3) + 2; // At least two
 
         for (int i = 0; i < methodsToGenerate; i++) {
             classNode.methods.add(methodGen());
@@ -75,7 +75,7 @@ public class TrashClasses {
     private MethodNode methodGen() {
         String randDesc = descGen();
         MethodNode method = new MethodNode(Opcodes.ACC_STATIC + Opcodes.ACC_PRIVATE, StringUtils.crazyString(), randDesc, null, null);
-        int instructions = MiscUtils.getRandomInt(30) + 30;
+        int instructions = NumberUtils.getRandomInt(30) + 30;
 
         InsnList insns = new InsnList();
 
@@ -84,10 +84,10 @@ public class TrashClasses {
         }
 
         if (randDesc.endsWith(")Ljava/lang/String;") || randDesc.endsWith(")Ljava/lang/Object;")) {
-            insns.add(new VarInsnNode(Opcodes.ALOAD, MiscUtils.getRandomInt(30)));
+            insns.add(new VarInsnNode(Opcodes.ALOAD, NumberUtils.getRandomInt(30)));
             insns.add(new InsnNode(Opcodes.ARETURN));
         } else if (randDesc.endsWith(")Z")) {
-            if (MiscUtils.getRandomInt(1) == 1) {
+            if (NumberUtils.getRandomInt(1) == 1) {
                 insns.add(new InsnNode(Opcodes.ICONST_0));
             } else {
                 insns.add(new InsnNode(Opcodes.ICONST_1));
@@ -108,7 +108,7 @@ public class TrashClasses {
      * @return generated description for a trash method.
      */
     private String descGen() {
-        switch (MiscUtils.getRandomInt(7)) {
+        switch (NumberUtils.getRandomInt(7)) {
             case 0:
                 return "(Ljava/lang/String;)Ljava/lang/String;";
             case 1:
@@ -133,48 +133,48 @@ public class TrashClasses {
      * @return a random opcode instruction to add to trash methods.
      */
     private static AbstractInsnNode junkInsns() {
-        int index = MiscUtils.getRandomInt(20);
+        int index = NumberUtils.getRandomInt(20);
         switch (index) {
             case 0:
                 return new MethodInsnNode(Opcodes.INVOKESTATIC, StringUtils.crazyString(), StringUtils.crazyString(), "(Ljava/lang/String;)V", false);
             case 1:
                 return new FieldInsnNode(Opcodes.GETFIELD, StringUtils.crazyString(), StringUtils.crazyString(), "I");
             case 2:
-                return new InsnNode(MiscUtils.getRandomInt(16));
+                return new InsnNode(NumberUtils.getRandomInt(16));
             case 3:
-                return new VarInsnNode(Opcodes.ALOAD, MiscUtils.getRandomInt(30));
+                return new VarInsnNode(Opcodes.ALOAD, NumberUtils.getRandomInt(30));
             case 4:
-                return new IntInsnNode(Opcodes.BIPUSH, MiscUtils.getRandomInt(255));
+                return new IntInsnNode(Opcodes.BIPUSH, NumberUtils.getRandomInt(255));
             case 5:
-                return new IntInsnNode(Opcodes.SIPUSH, MiscUtils.getRandomInt(25565));
+                return new IntInsnNode(Opcodes.SIPUSH, NumberUtils.getRandomInt(25565));
             case 6:
             case 7:
             case 8:
-                return new InsnNode(MiscUtils.getRandomInt(5));
+                return new InsnNode(NumberUtils.getRandomInt(5));
             case 9:
                 return new LdcInsnNode(StringUtils.crazyString());
             case 10:
-                return new IincInsnNode(MiscUtils.getRandomInt(16), MiscUtils.getRandomInt(16));
+                return new IincInsnNode(NumberUtils.getRandomInt(16), NumberUtils.getRandomInt(16));
             case 11:
                 return new MethodInsnNode(Opcodes.INVOKESPECIAL, StringUtils.crazyString(), StringUtils.crazyString(), "()V", false);
             case 12:
                 return new MethodInsnNode(Opcodes.INVOKEVIRTUAL, StringUtils.crazyString(), StringUtils.crazyString(), "(Ljava/lang/Object;)Ljava/lang/Object;", false);
             case 13:
-                return new VarInsnNode(Opcodes.ILOAD, MiscUtils.getRandomInt(30));
+                return new VarInsnNode(Opcodes.ILOAD, NumberUtils.getRandomInt(30));
             case 14:
                 return new InsnNode(Opcodes.ATHROW);
             case 15:
                 return new MethodInsnNode(Opcodes.INVOKEINTERFACE, StringUtils.crazyString(), StringUtils.crazyString(), "(I)I", false);
             case 16:
                 Handle handle = new Handle(6, StringUtils.crazyString(), StringUtils.crazyString(), StringUtils.crazyString(), false);
-                return new InvokeDynamicInsnNode(StringUtils.crazyString(), StringUtils.crazyString(), handle, MiscUtils.getRandomInt(5), MiscUtils.getRandomInt(5), MiscUtils.getRandomInt(5), MiscUtils.getRandomInt(5), MiscUtils.getRandomInt(5));
+                return new InvokeDynamicInsnNode(StringUtils.crazyString(), StringUtils.crazyString(), handle, NumberUtils.getRandomInt(5), NumberUtils.getRandomInt(5), NumberUtils.getRandomInt(5), NumberUtils.getRandomInt(5), NumberUtils.getRandomInt(5));
             case 17:
-                return new IntInsnNode(Opcodes.ANEWARRAY, MiscUtils.getRandomInt(30));
+                return new IntInsnNode(Opcodes.ANEWARRAY, NumberUtils.getRandomInt(30));
             case 18:
-                return new VarInsnNode(Opcodes.ASTORE, MiscUtils.getRandomInt(30));
+                return new VarInsnNode(Opcodes.ASTORE, NumberUtils.getRandomInt(30));
             case 19:
             default:
-                return new VarInsnNode(Opcodes.ISTORE, MiscUtils.getRandomInt(30));
+                return new VarInsnNode(Opcodes.ISTORE, NumberUtils.getRandomInt(30));
         }
     }
 }

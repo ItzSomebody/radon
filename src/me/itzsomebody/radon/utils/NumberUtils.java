@@ -7,7 +7,7 @@ import java.util.concurrent.ThreadLocalRandom;
  *
  * @author ItzSomebody
  */
-public class MiscUtils {
+public class NumberUtils {
     /**
      * Gets a random {@link Integer} from {@link ThreadLocalRandom#nextInt()}.
      *

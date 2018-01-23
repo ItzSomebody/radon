@@ -4,7 +4,7 @@ import me.itzsomebody.radon.asm.Opcodes;
 import me.itzsomebody.radon.asm.tree.*;
 import me.itzsomebody.radon.utils.BytecodeUtils;
 import me.itzsomebody.radon.utils.LoggerUtils;
-import me.itzsomebody.radon.utils.MiscUtils;
+import me.itzsomebody.radon.utils.NumberUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,7 +58,7 @@ public class LightFlowObfuscation {
             for (AbstractInsnNode ain : methodNode.instructions.toArray()) {
                 LabelNode labelNode = new LabelNode();
                 if (ain.getOpcode() != Opcodes.GOTO && !(ain instanceof LabelNode)
-                        && MiscUtils.getRandomInt(20) < 6) {
+                        && NumberUtils.getRandomInt(20) < 6) {
                     methodNode.instructions.add(new JumpInsnNode(Opcodes.GOTO, labelNode));
                     methodNode.instructions.add(labelNode);
                     addedGotos++;

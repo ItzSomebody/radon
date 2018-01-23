@@ -4,6 +4,8 @@ import me.itzsomebody.radon.asm.Opcodes;
 import me.itzsomebody.radon.asm.tree.*;
 import me.itzsomebody.radon.utils.BytecodeUtils;
 import me.itzsomebody.radon.utils.LoggerUtils;
+import me.itzsomebody.radon.utils.NumberUtils;
+import me.itzsomebody.radon.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +14,7 @@ import java.util.List;
  * Transformer that splits up integers into simple arithmetic evaluations.
  *
  * @author ItzSomebody
+ * @author VincBreaker (Sorry Vinc, I just had to steal the idea of Smoke's number obfuscation lol)
  */
 public class NumberObfuscation {
     /**
@@ -47,147 +50,42 @@ public class NumberObfuscation {
      */
     private void obfuscate() {
         logStrings.add(LoggerUtils.stdOut("Starting number obfuscation transformer"));
+        ArrayList<MethodNode> methods = new ArrayList<>();
         int count = 0;
         for (MethodNode methodNode : classNode.methods) {
             if (exemptMethods.contains(classNode.name + "/" + methodNode.name)) continue;
             if (BytecodeUtils.isAbstractMethod(methodNode.access)) continue;
 
             for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
-                if (insn.getOpcode() == Opcodes.BIPUSH || insn.getOpcode() == Opcodes.SIPUSH) {
-                    int newNumber;
-                    int number = ((IntInsnNode) insn).operand;
+                if (BytecodeUtils.isNumberNode(insn)) {
+                    int originalNum = Math.abs(BytecodeUtils.getNumber(insn));
 
-                    if (String.valueOf(number).endsWith("2")
-                            || String.valueOf(number).endsWith("4")
-                            || String.valueOf(number).endsWith("6")
-                            || String.valueOf(number).endsWith("8")
-                            || String.valueOf(number).endsWith("0")) { // Even number
-                        newNumber = number / 2;
+                    int value1 = NumberUtils.getRandomInt(90) + 20;
+                    int value2 = NumberUtils.getRandomInt(value1) + value1;
+                    int value3 = NumberUtils.getRandomInt(value2);
+                    int value4 = originalNum - (value1 - value2 + value3); // You kids say algebra is useless???
 
-                        methodNode.instructions.insert(insn, new InsnNode(Opcodes.IADD));
+                    InsnList insnList = new InsnList();
+                    insnList.add(BytecodeUtils.getNumberInsn(value1));
+                    insnList.add(BytecodeUtils.getNumberInsn(value2));
+                    insnList.add(new InsnNode(Opcodes.ISUB));
+                    insnList.add(BytecodeUtils.getNumberInsn(value3));
+                    insnList.add(new InsnNode(Opcodes.IADD));
+                    insnList.add(BytecodeUtils.getNumberInsn(value4));
+                    insnList.add(new InsnNode(Opcodes.IADD));
+                    String methodName = StringUtils.crazyString();
+                    MethodNode method = new MethodNode(Opcodes.ACC_PRIVATE + Opcodes.ACC_BRIDGE + Opcodes.ACC_SYNTHETIC + Opcodes.ACC_STATIC, methodName, "()I", null, null);
+                    method.instructions = insnList;
+                    method.instructions.add(new InsnNode(Opcodes.IRETURN));
+                    methods.add(method);
 
-                        if (newNumber >= -1 && newNumber <= 5) {
-                            methodNode.instructions.insert(insn, BytecodeUtils.getIConst(newNumber));
-                            methodNode.instructions.set(insn, BytecodeUtils.getIConst(newNumber));
-                        } else if (newNumber >= -32768 && newNumber <= 32767) {
-                            methodNode.instructions.insert(insn, BytecodeUtils.getIntInsn(newNumber));
-                            methodNode.instructions.set(insn, BytecodeUtils.getIntInsn(newNumber));
-                        } else {
-                            methodNode.instructions.insert(insn, new LdcInsnNode(newNumber));
-                            methodNode.instructions.set(insn, new LdcInsnNode(newNumber));
-                        }
-                        count++;
-                    } else if (String.valueOf(number).endsWith("1")
-                            || String.valueOf(number).endsWith("3")
-                            || String.valueOf(number).endsWith("5")
-                            || String.valueOf(number).endsWith("7")
-                            || String.valueOf(number).endsWith("9")) { // Odd number
-                        newNumber = number * 2;
-
-
-                        methodNode.instructions.insert(insn, new InsnNode(Opcodes.IDIV));
-
-                        if (newNumber >= -1 && newNumber <= 5) {
-                            methodNode.instructions.insert(insn, new InsnNode(Opcodes.ICONST_2));
-                            methodNode.instructions.set(insn, BytecodeUtils.getIConst(newNumber));
-                        } else if (newNumber >= -32768 && newNumber <= 32767) {
-                            methodNode.instructions.insert(insn, new InsnNode(Opcodes.ICONST_2));
-                            methodNode.instructions.set(insn, BytecodeUtils.getIntInsn(newNumber));
-                        } else {
-                            methodNode.instructions.insert(insn, new InsnNode(Opcodes.ICONST_2));
-                            methodNode.instructions.set(insn, new LdcInsnNode(newNumber));
-                        }
-                        count++;
-                    }
-                } else if (insn.getOpcode() == Opcodes.LDC) {
-                    int newNumber;
-                    Object cst = ((LdcInsnNode) insn).cst;
-                    if (cst instanceof Integer) {
-                        int number = (int) cst;
-                        if (String.valueOf(number).endsWith("2")
-                                || String.valueOf(number).endsWith("4")
-                                || String.valueOf(number).endsWith("6")
-                                || String.valueOf(number).endsWith("8")
-                                || String.valueOf(number).endsWith("0")) { // Even number
-                            newNumber = number / 2;
-
-                            methodNode.instructions.insert(insn, new InsnNode(Opcodes.IADD));
-
-                            if (newNumber >= -1 && newNumber <= 5) {
-                                methodNode.instructions.insert(insn, BytecodeUtils.getIConst(newNumber));
-                                methodNode.instructions.set(insn, BytecodeUtils.getIConst(newNumber));
-                            } else if (newNumber >= -32768 && newNumber <= 32767) {
-                                methodNode.instructions.insert(insn, BytecodeUtils.getIntInsn(newNumber));
-                                methodNode.instructions.set(insn, BytecodeUtils.getIntInsn(newNumber));
-                            } else {
-                                methodNode.instructions.insert(insn, new LdcInsnNode(newNumber));
-                                methodNode.instructions.set(insn, new LdcInsnNode(newNumber));
-                            }
-                            count++;
-                        } else if (String.valueOf(number).endsWith("1")
-                                || String.valueOf(number).endsWith("3")
-                                || String.valueOf(number).endsWith("5")
-                                || String.valueOf(number).endsWith("7")
-                                || String.valueOf(number).endsWith("9")) { // Odd number
-                            newNumber = number * 2;
-
-                            methodNode.instructions.insert(insn, new InsnNode(Opcodes.IDIV));
-
-                            if (newNumber >= -1 && newNumber <= 5) {
-                                methodNode.instructions.insert(insn, new InsnNode(Opcodes.ICONST_2));
-                                methodNode.instructions.set(insn, BytecodeUtils.getIConst(newNumber));
-                            } else if (newNumber >= -32768 && newNumber <= 32767) {
-                                methodNode.instructions.insert(insn, new InsnNode(Opcodes.ICONST_2));
-                                methodNode.instructions.set(insn, BytecodeUtils.getIntInsn(newNumber));
-                            } else {
-                                methodNode.instructions.insert(insn, new InsnNode(Opcodes.ICONST_2));
-                                methodNode.instructions.set(insn, new LdcInsnNode(newNumber));
-                            }
-                            count++;
-                        }
-                    }
-                } /*else if (BytecodeUtils.isIConst(insn)) {
-                    int newNumber;
-                    int number = insn.getOpcode() - 3;
-
-                    if (String.valueOf(number).endsWith("2")
-                            || String.valueOf(number).endsWith("4")
-                            || String.valueOf(number).endsWith("6")
-                            || String.valueOf(number).endsWith("8")) { // Even number
-                        newNumber = number / 2;
-
-                        methodNode.instructions.insert(insn, new InsnNode(Opcodes.IADD));
-
-                        if (newNumber >= -1 && newNumber <= 5) {
-                            methodNode.instructions.insert(insn, BytecodeUtils.getIConst(newNumber));
-                            methodNode.instructions.set(insn, BytecodeUtils.getIConst(newNumber));
-                        } else if (newNumber >= -128 && newNumber <= 127) {
-                            methodNode.instructions.insert(insn, new IntInsnNode(Opcodes.BIPUSH, number));
-                            methodNode.instructions.set(insn, new IntInsnNode(Opcodes.BIPUSH, number));
-                        }
-                        count++;
-                    } else if (String.valueOf(number).endsWith("1")
-                            || String.valueOf(number).endsWith("3")
-                            || String.valueOf(number).endsWith("5")
-                            || String.valueOf(number).endsWith("7")
-                            || String.valueOf(number).endsWith("9")) { // Odd number
-                        newNumber = number * 2;
-
-
-                        methodNode.instructions.insert(insn, new InsnNode(Opcodes.IDIV));
-
-                        if (newNumber >= -1 && newNumber <= 5) {
-                            methodNode.instructions.insert(insn, new InsnNode(Opcodes.ICONST_2));
-                            methodNode.instructions.set(insn, BytecodeUtils.getIConst(newNumber));
-                        } else if (newNumber >= -128 && newNumber <= 127) {
-                            methodNode.instructions.insert(insn, new InsnNode(Opcodes.ICONST_2));
-                            methodNode.instructions.set(insn, new IntInsnNode(Opcodes.BIPUSH, number));
-                        }
-                        count++;
-                    }
-                }*/ // This causes issues with normal flow obfuscation for some reason
+                    methodNode.instructions.set(insn, new MethodInsnNode(Opcodes.INVOKESTATIC, classNode.name, methodName, "()I", false));
+                    count++;
+                }
             }
         }
+        classNode.methods.addAll(methods);
+
         logStrings.add(LoggerUtils.stdOut("Finished obfuscating numbers"));
         logStrings.add(LoggerUtils.stdOut("Obfuscated " + String.valueOf(count) + " numbers"));
     }

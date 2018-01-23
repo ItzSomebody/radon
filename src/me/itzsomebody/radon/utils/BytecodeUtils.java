@@ -1,5 +1,6 @@
 package me.itzsomebody.radon.utils;
 
+import com.sun.org.apache.bcel.internal.generic.BIPUSH;
 import me.itzsomebody.radon.asm.Label;
 import me.itzsomebody.radon.asm.Opcodes;
 import me.itzsomebody.radon.asm.Type;
@@ -12,6 +13,7 @@ import java.util.HashMap;
  *
  * @author ItzSomebody
  * @author Stringer dev team (who made {@link BytecodeUtils#genericType(Type)})
+ * @author Caleb Whiting
  */
 public class BytecodeUtils {
     /**
@@ -34,12 +36,12 @@ public class BytecodeUtils {
     }
 
     /**
-     * Returns ICONST_0 or ICONST_1 based on {@link MiscUtils#getRandomInt(int)}.
+     * Returns ICONST_0 or ICONST_1 based on {@link NumberUtils#getRandomInt(int)}.
      *
-     * @return ICONST_0 or ICONST_1 based on {@link MiscUtils#getRandomInt(int)}.
+     * @return ICONST_0 or ICONST_1 based on {@link NumberUtils#getRandomInt(int)}.
      */
     public static InsnNode randTrueFalse() {
-        return (MiscUtils.getRandomInt(2) == 1) ? new InsnNode(Opcodes.ICONST_1) : new InsnNode(Opcodes.ICONST_0);
+        return (NumberUtils.getRandomInt(2) == 1) ? new InsnNode(Opcodes.ICONST_1) : new InsnNode(Opcodes.ICONST_0);
     }
 
     /**
@@ -180,29 +182,21 @@ public class BytecodeUtils {
     }
 
     /**
-     * Returns an iconst corresponding to the input integer.
+     * Returns a bytecode instruction representing a number.
      *
-     * @param number used as an input to determine correct output.
-     * @return an iconst corresponding to the input integer.
+     * @param number the {@link Integer} for the obfuscator to contemplate.
+     * @return a bytecode instruction representing a number.
      */
-    public static InsnNode getIConst(int number) {
-        return new InsnNode(number + 3);
-    }
-
-    /**
-     * Returns a bipush or sipush based on input integer.
-     *
-     * @param number used as an input to determine correct output.
-     * @return a bipush or sipush based on input integer.
-     */
-    public static IntInsnNode getIntInsn(int number) {
-        if (number >= -128 && number <= 127) {
+    public static AbstractInsnNode getNumberInsn(int number) {
+        if (number >= -1 && number <= 5) {
+            return new InsnNode(number + 3);
+        } else if (number >= -128 && number <= 127) {
             return new IntInsnNode(Opcodes.BIPUSH, number);
         } else if (number >= -32768 && number <= 32767) {
             return new IntInsnNode(Opcodes.SIPUSH, number);
+        } else {
+            return new LdcInsnNode(number);
         }
-
-        return null;
     }
 
     /**
@@ -225,5 +219,39 @@ public class BytecodeUtils {
         return (access & Opcodes.ACC_ABSTRACT) != 0;
     }
 
+    /**
+     * Returns true if input is an integer instruction.
+     *
+     * @param insn {@link AbstractInsnNode} to check.
+     * @return true if input is an integer instruction.
+     */
+    public static boolean isNumberNode(AbstractInsnNode insn) {
+        int opcode = insn.getOpcode();
+        return (opcode >= Opcodes.ICONST_M1 && opcode <= Opcodes.ICONST_5
+                || insn instanceof IntInsnNode && insn.getOpcode() != Opcodes.NEWARRAY
+                || insn instanceof LdcInsnNode
+                && ((LdcInsnNode) insn).cst instanceof Integer);
+    }
 
+    /**
+     * Returns {@link Integer} represented by bytecode instruction and/or operand.
+     *
+     * @param insn {@link AbstractInsnNode} to check.
+     * @return {@link Integer} represented by bytecode instruction and/or operand.
+     */
+    public static int getNumber(AbstractInsnNode insn) {
+        int opcode = insn.getOpcode();
+
+        if (opcode >= Opcodes.ICONST_M1 && opcode <= Opcodes.ICONST_5) {
+            return opcode - 3;
+        } else if (insn instanceof IntInsnNode
+                && insn.getOpcode() != Opcodes.NEWARRAY) {
+            return ((IntInsnNode) insn).operand;
+        } else if (insn instanceof LdcInsnNode
+                && ((LdcInsnNode) insn).cst instanceof Integer) {
+            return (Integer) ((LdcInsnNode) insn).cst;
+        }
+
+        throw new IllegalStateException("Unexpected instruction");
+    }
 }

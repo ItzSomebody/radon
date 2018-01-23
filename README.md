@@ -74,6 +74,7 @@ Valid config options you can use:
 * [WindowBuilder by Eclipse](https://www.eclipse.org/windowbuilder/) - Used to make GUI (yes I know it's Java Swing, I didn't feel like remaking it in JavaFX)
 * [Licel](https://licelus.com) - Makers of Stringer Java Obfuscator.
 * [Allatori Dev Team](http://www.allatori.com) - Makers of Allatori Java Obfuscator.
+* [Caleb Whiting](https://github.com/CalebWhiting/java-asm-obfuscator) - Author of Java ASM Obfuscator.
 
 ## License
 

@@ -2,7 +2,7 @@ package me.itzsomebody.radon.transformers.linenumbers;
 
 import me.itzsomebody.radon.asm.tree.*;
 import me.itzsomebody.radon.utils.LoggerUtils;
-import me.itzsomebody.radon.utils.MiscUtils;
+import me.itzsomebody.radon.utils.NumberUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,7 +54,7 @@ public class ObfuscateLineNumbers {
             for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
                 if (insn instanceof LineNumberNode) {
                     LineNumberNode lineNumberNode = (LineNumberNode) insn;
-                    methodNode.instructions.set(insn, new LineNumberNode(MiscUtils.getRandomInt(Integer.MAX_VALUE), lineNumberNode.start));
+                    methodNode.instructions.set(insn, new LineNumberNode(NumberUtils.getRandomInt(Integer.MAX_VALUE), lineNumberNode.start));
                     count++;
                 }
             }

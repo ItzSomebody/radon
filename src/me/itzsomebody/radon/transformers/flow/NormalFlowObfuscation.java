@@ -5,7 +5,7 @@ import me.itzsomebody.radon.asm.Opcodes;
 import me.itzsomebody.radon.asm.tree.*;
 import me.itzsomebody.radon.utils.BytecodeUtils;
 import me.itzsomebody.radon.utils.LoggerUtils;
-import me.itzsomebody.radon.utils.MiscUtils;
+import me.itzsomebody.radon.utils.NumberUtils;
 import me.itzsomebody.radon.utils.StringUtils;
 
 import java.util.ArrayList;
@@ -64,7 +64,7 @@ public class NormalFlowObfuscation {
                 int op = ain.getOpcode();
                 if (op == Opcodes.ALOAD || op == Opcodes.ILOAD || op == Opcodes.FLOAD) {
                     VarInsnNode vin = (VarInsnNode) ain;
-                    if (MiscUtils.getRandomInt(2) == 1) {
+                    if (NumberUtils.getRandomInt(2) == 1) {
                         /*
                          * ALOAD_X
                          * ALOAD_X
@@ -100,7 +100,7 @@ public class NormalFlowObfuscation {
                      * INEG
                      */
                     InsnList insnList = new InsnList();
-                    int howMany = (MiscUtils.getRandomInt(6) + 3) * 2; // Odd number times even number = even number
+                    int howMany = (NumberUtils.getRandomInt(6) + 3) * 2; // Odd number times even number = even number
                     for (int i = 0; i < howMany; i++) {
                         insnList.add(new InsnNode(Opcodes.INEG));
                     }
@@ -120,7 +120,7 @@ public class NormalFlowObfuscation {
                      */
                     if (((LdcInsnNode) ain).cst instanceof Integer) {
                         InsnList insnList = new InsnList();
-                        int howMany = (MiscUtils.getRandomInt(6) + 3) * 2; // Odd number times even number = even number
+                        int howMany = (NumberUtils.getRandomInt(6) + 3) * 2; // Odd number times even number = even number
                         for (int i = 0; i < howMany; i++) {
                             insnList.add(new InsnNode(Opcodes.INEG));
                         }
@@ -162,7 +162,7 @@ public class NormalFlowObfuscation {
                      * NOP
                      * NOP
                      */
-                    int howMany = (MiscUtils.getRandomInt(5) + 1) * 2;
+                    int howMany = (NumberUtils.getRandomInt(5) + 1) * 2;
                     for (int i = 0; i < howMany; i++) {
                         methodNode.instructions.insert(ain, new InsnNode(Opcodes.NOP));
                     }
@@ -170,7 +170,7 @@ public class NormalFlowObfuscation {
                 }
             }
 
-            if (MiscUtils.getRandomInt(10) < 6) {
+            if (NumberUtils.getRandomInt(10) < 6) {
                 for (int i = 0; i < 3; i++) {
                     /*
                      * LDC "BIGSTRING"
@@ -182,7 +182,7 @@ public class NormalFlowObfuscation {
                      * LDC "BIGSTRING"
                      * POP2
                      */
-                    if (MiscUtils.getRandomInt(10) < 6) continue;
+                    if (NumberUtils.getRandomInt(10) < 6) continue;
                     methodNode.instructions.insert(new InsnNode(Opcodes.POP2));
                     methodNode.instructions.insert(new LdcInsnNode(s));
                     methodNode.instructions.insert(new InsnNode(Opcodes.POP));
@@ -232,7 +232,7 @@ public class NormalFlowObfuscation {
             insnList.add(new InsnNode(Opcodes.ATHROW));
             insnList.add(l6);
             //insnList.add(new FrameNode(Opcodes.F_FULL, 0, new Object[]{}, 1, new Object[]{"java/lang/Throwable"}));
-            int howMany = (MiscUtils.getRandomInt(5) + 3) * 2;
+            int howMany = (NumberUtils.getRandomInt(5) + 3) * 2;
             for (int i = 0; i < howMany; i++) {
                 insnList.add(new InsnNode(Opcodes.NOP));
             }

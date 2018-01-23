@@ -453,6 +453,11 @@ public class Bootstrap { // Eyyy bootstrap bill
                     logStrings.addAll(stringPool.getLogStrings());
                 }
 
+                if (numberObfuscationType == 0) {
+                    NumberObfuscation numberObfuscation = new NumberObfuscation(classNode, methodExempts);
+                    logStrings.addAll(numberObfuscation.getLogStrings());
+                }
+
                 if (flowObfuscationType == 0) {
                     LightFlowObfuscation lightFlowObfuscation = new LightFlowObfuscation(classNode, methodExempts);
                     logStrings.addAll(lightFlowObfuscation.getLogStrings());
@@ -502,11 +507,6 @@ public class Bootstrap { // Eyyy bootstrap bill
                     HideCode hideCode = new HideCode(classNode, spigotMode, methodExempts, fieldExempts);
                     logStrings.addAll(hideCode.getLogStrings());
                 }
-
-                if (numberObfuscationType == 0) {
-                    NumberObfuscation numberObfuscation = new NumberObfuscation(classNode, methodExempts);
-                    logStrings.addAll(numberObfuscation.getLogStrings());
-                }
             }
 
             if (trashClasses != -1) {
@@ -546,11 +546,11 @@ public class Bootstrap { // Eyyy bootstrap bill
 
                 if (watermarkMsg != null) {
                     if (watermarkType == 0
-                            && MiscUtils.getRandomInt(10) >= 5) {
+                            && NumberUtils.getRandomInt(10) >= 5) {
                         cw.newUTF8("WMID: " + StringUtils.aesEncrypt(watermarkMsg, watermarkKey));
                         logStrings.add(LoggerUtils.stdOut("Watermarking " + watermarkMsg + " into " + classNode.name));
                     } else if (watermarkType == 1
-                            && MiscUtils.getRandomInt(10) >= 5) {
+                            && NumberUtils.getRandomInt(10) >= 5) {
                         classNode.signature = StringUtils.aesEncrypt("WMID: " + watermarkMsg, watermarkKey);
                         logStrings.add(LoggerUtils.stdOut("Watermarking " + watermarkMsg + " into " + classNode.name));
                     }

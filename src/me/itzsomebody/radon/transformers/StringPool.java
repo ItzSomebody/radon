@@ -75,14 +75,8 @@ public class StringPool {
                         stringslist.add((String) cst);
 
                         int indexNumber = stringslist.size() - 1;
-                        if (indexNumber >= 0 && indexNumber <= 5) {
-                            methodNode.instructions.insertBefore(insn, BytecodeUtils.getIConst(indexNumber));
-                        } else if (indexNumber >= 6 && indexNumber <= 32767) {
-                            methodNode.instructions.insertBefore(insn, BytecodeUtils.getIntInsn(indexNumber));
-                        } else {
-                            methodNode.instructions.insertBefore(insn, new LdcInsnNode(indexNumber));
-                        }
 
+                        methodNode.instructions.insertBefore(insn, BytecodeUtils.getNumberInsn(indexNumber));
                         methodNode.instructions.set(insn, new MethodInsnNode(Opcodes.INVOKESTATIC, classNode.name, randName, "(I)Ljava/lang/String;", false));
                     }
                 }
