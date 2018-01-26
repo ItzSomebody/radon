@@ -58,9 +58,9 @@ public class NumberObfuscation {
 
             for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
                 if (BytecodeUtils.isNumberNode(insn)) {
-                    int originalNum = Math.abs(BytecodeUtils.getNumber(insn));
+                    int originalNum = BytecodeUtils.getNumber(insn);
 
-                    int value1 = NumberUtils.getRandomInt(90) + 20;
+                    int value1 = NumberUtils.getRandomInt(255) + 20;
                     int value2 = NumberUtils.getRandomInt(value1) + value1;
                     int value3 = NumberUtils.getRandomInt(value2);
                     int value4 = originalNum - (value1 - value2 + value3); // You kids say algebra is useless???
@@ -73,13 +73,15 @@ public class NumberObfuscation {
                     insnList.add(new InsnNode(Opcodes.IADD));
                     insnList.add(BytecodeUtils.getNumberInsn(value4));
                     insnList.add(new InsnNode(Opcodes.IADD));
-                    String methodName = StringUtils.crazyString();
-                    MethodNode method = new MethodNode(Opcodes.ACC_PRIVATE + Opcodes.ACC_BRIDGE + Opcodes.ACC_SYNTHETIC + Opcodes.ACC_STATIC, methodName, "()I", null, null);
-                    method.instructions = insnList;
-                    method.instructions.add(new InsnNode(Opcodes.IRETURN));
-                    methods.add(method);
+                    //insnList.add(new InsnNode(Opcodes.IRETURN));
+                    //String methodName = StringUtils.crazyString();
+                    //MethodNode method = new MethodNode(Opcodes.ACC_PRIVATE + Opcodes.ACC_BRIDGE + Opcodes.ACC_SYNTHETIC + Opcodes.ACC_STATIC, methodName, "()I", null, null);
+                    //method.instructions = insnList;
+                    //methods.add(method);
 
-                    methodNode.instructions.set(insn, new MethodInsnNode(Opcodes.INVOKESTATIC, classNode.name, methodName, "()I", false));
+                    //methodNode.instructions.set(insn, new MethodInsnNode(Opcodes.INVOKESTATIC, classNode.name, methodName, "()I", false));
+                    methodNode.instructions.insertBefore(insn, insnList);
+                    methodNode.instructions.remove(insn);
                     count++;
                 }
             }
