@@ -1,3 +1,7 @@
+## 0.0.14
+
+* Squashed an annoying buggy in the new NumberObfuscation transformer thanks to https://github.com/JoachimVandersmissen/TestingProject
+
 ## 0.0.13
 
 * Completely re-worked NumberObfuscation transformer and cleaned some stuff up in general.
