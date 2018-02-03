@@ -5,10 +5,7 @@ import me.itzsomebody.radon.asm.tree.ClassNode;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.MessageDigest;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.HashMap;
+import java.util.*;
 
 /**
  * Utils for operating, and generating {@link String}s.
@@ -236,9 +233,9 @@ public class StringUtils {
      *
      * @return a generated classname based on current class packages.
      */
-    public static String randomClassName(HashMap<String, ClassNode> classes) {
-        ArrayList<String> classNames = new ArrayList<>();
-        classNames.addAll(classes.keySet());
+    public static String randomClassName(Collection<String> theClassNames) {
+        List<String> classNames = new ArrayList<>();
+        classNames.addAll(theClassNames);
 
         String randomClass = classNames.get(NumberUtils.getRandomInt(classNames.size()));
         String[] split = randomClass.split("/");
@@ -252,5 +249,18 @@ public class StringUtils {
         sb.append(crazyString());
 
         return new String(sb);
+    }
+
+    /**
+     * Returns a generated classname based on current class packages.
+     *
+     * @return a generated classname based on current class packages.
+     */
+    public static String randomClass(Collection<String> theClassNames) {
+        List<String> classNames = new ArrayList<>();
+        classNames.addAll(theClassNames);
+
+        String randomClass = classNames.get(NumberUtils.getRandomInt(classNames.size()));
+        return randomClass;
     }
 }

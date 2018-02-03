@@ -1,12 +1,11 @@
 package me.itzsomebody.radon.utils;
 
-import com.sun.org.apache.bcel.internal.generic.BIPUSH;
 import me.itzsomebody.radon.asm.Label;
 import me.itzsomebody.radon.asm.Opcodes;
 import me.itzsomebody.radon.asm.Type;
 import me.itzsomebody.radon.asm.tree.*;
 
-import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Utils used for operating on bytecode.
@@ -67,7 +66,7 @@ public class BytecodeUtils {
      * @param classes    the classpath to check.
      * @return true if input {@link MethodNode} name and description match another one in the classpath.
      */
-    public static boolean hasSameMethod(MethodNode methodNode, ClassNode clazz, HashMap<String, ClassNode> classes) {
+    public static boolean hasSameMethod(MethodNode methodNode, ClassNode clazz, Map<String, ClassNode> classes) {
         for (ClassNode classNode : classes.values()) {
             if (classNode.name.equals(clazz.name)) continue;
             for (MethodNode method : classNode.methods) {
@@ -85,17 +84,9 @@ public class BytecodeUtils {
      * Checks if the input class is a main method.
      *
      * @param clazz      {@link ClassNode} to check for main methods.
-     * @param spigotMode if obfuscator should consider the input {@link ClassNode} as a Spigot/Bukkit/Bungee plugin.
      * @return true if the input {@link ClassNode} contains a main method, false if not.
      */
-    public static boolean isMain(ClassNode clazz, boolean spigotMode) {
-        if (spigotMode) {
-            if (clazz.superName.equals("org/bukkit/plugin/java/JavaPlugin")
-                    || clazz.superName.equals("net/md_5/bungee/api/plugin/Plugin")) {
-                return true;
-            }
-        }
-
+    public static boolean isMain(ClassNode clazz) {
         for (MethodNode methodNode : clazz.methods) {
             if (methodNode.name.equals("main")
                     || methodNode.name.equals("premain")) {
@@ -220,6 +211,26 @@ public class BytecodeUtils {
     }
 
     /**
+     * Returns true if access has synthetic modifier.
+     *
+     * @param access method access to check.
+     * @return true if access has abstract modifier.
+     */
+    public static boolean isSyntheticMethod(int access) {
+        return (access & Opcodes.ACC_SYNTHETIC) != 0;
+    }
+
+    /**
+     * Returns true if access has bride modifier.
+     *
+     * @param access method access to check.
+     * @return true if access has abstract modifier.
+     */
+    public static boolean isBridgeMethod(int access) {
+        return (access & Opcodes.ACC_BRIDGE) != 0;
+    }
+
+    /**
      * Returns true if input is an integer instruction.
      *
      * @param insn {@link AbstractInsnNode} to check.
@@ -228,7 +239,8 @@ public class BytecodeUtils {
     public static boolean isNumberNode(AbstractInsnNode insn) {
         int opcode = insn.getOpcode();
         return (opcode >= Opcodes.ICONST_M1 && opcode <= Opcodes.ICONST_5
-                || insn instanceof IntInsnNode && insn.getOpcode() != Opcodes.NEWARRAY
+                || insn.getOpcode() == Opcodes.BIPUSH
+                || insn.getOpcode() == Opcodes.SIPUSH
                 || insn instanceof LdcInsnNode
                 && ((LdcInsnNode) insn).cst instanceof Integer);
     }

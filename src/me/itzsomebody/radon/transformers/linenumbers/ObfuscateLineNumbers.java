@@ -1,11 +1,14 @@
 package me.itzsomebody.radon.transformers.linenumbers;
 
 import me.itzsomebody.radon.asm.tree.*;
+import me.itzsomebody.radon.transformers.AbstractTransformer;
+import me.itzsomebody.radon.utils.BytecodeUtils;
 import me.itzsomebody.radon.utils.LoggerUtils;
 import me.itzsomebody.radon.utils.NumberUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Transformer that applies a line number obfuscation by changing the correspondng numbers linked to labels
@@ -13,54 +16,35 @@ import java.util.List;
  *
  * @author ItzSomebody
  */
-public class ObfuscateLineNumbers {
-    /**
-     * The {@link ClassNode} that will be obfuscated.
-     */
-    private ClassNode classNode;
-
-    /**
-     * Methods protected from obfuscation.
-     */
-    private ArrayList<String> exemptMethods;
-
+public class ObfuscateLineNumbers extends AbstractTransformer {
     /**
      * {@link List} of {@link String}s to add to log.
      */
     private List<String> logStrings;
 
     /**
-     * Constructor used to create an {@link ObfuscateLineNumbers} object.
-     *
-     * @param classNode     the {@link ClassNode} to be obfuscated.
-     * @param exemptMethods {@link ArrayList} of protected {@link MethodNode}s.
+     * Applies obfuscation.
      */
-    public ObfuscateLineNumbers(ClassNode classNode, ArrayList<String> exemptMethods) {
-        this.classNode = classNode;
-        this.exemptMethods = exemptMethods;
+    public void obfuscate() {
         logStrings = new ArrayList<>();
-        obfuscate();
-    }
-
-    /**
-     * Applies obfuscation to {@link ObfuscateLineNumbers#classNode}.
-     */
-    private void obfuscate() {
+        logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
         logStrings.add(LoggerUtils.stdOut("Starting line obfuscation transformer"));
-        int count = 0;
-        for (MethodNode methodNode : classNode.methods) {
-            if (exemptMethods.contains(classNode.name + "." + methodNode.name + methodNode.desc)) continue;
-
-            for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
-                if (insn instanceof LineNumberNode) {
-                    LineNumberNode lineNumberNode = (LineNumberNode) insn;
-                    methodNode.instructions.set(insn, new LineNumberNode(NumberUtils.getRandomInt(Integer.MAX_VALUE), lineNumberNode.start));
-                    count++;
+        AtomicInteger counter = new AtomicInteger();
+        long current = System.currentTimeMillis();
+        classNodes().stream().filter(classNode -> !classExempted(classNode.name)).forEach(classNode -> {
+            classNode.methods.stream().filter(methodNode -> !methodExempted(classNode.name + '.' + methodNode.name + methodNode.desc))
+                    .filter(methodNode -> !BytecodeUtils.isAbstractMethod(methodNode.access)).forEach(methodNode -> {
+                for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
+                    if (insn instanceof LineNumberNode) {
+                        LineNumberNode lineNumberNode = (LineNumberNode) insn;
+                        methodNode.instructions.set(insn, new LineNumberNode(NumberUtils.getRandomInt(Integer.MAX_VALUE), lineNumberNode.start));
+                        counter.incrementAndGet();
+                    }
                 }
-            }
-        }
-        logStrings.add(LoggerUtils.stdOut("Finished obfuscating line numbers"));
-        logStrings.add(LoggerUtils.stdOut("Obfuscated " + String.valueOf(count) + " line numbers"));
+            });
+        });
+        logStrings.add(LoggerUtils.stdOut("Obfuscated " + counter + " line numbers."));
+        logStrings.add(LoggerUtils.stdOut("Finished. [" + tookThisLong(current) + "ms]"));
     }
 
     /**

@@ -1,13 +1,11 @@
 package me.itzsomebody.radon.transformers;
 
-import me.itzsomebody.radon.asm.Opcodes;
-import me.itzsomebody.radon.asm.tree.ClassNode;
-import me.itzsomebody.radon.asm.tree.FieldNode;
-import me.itzsomebody.radon.asm.tree.MethodNode;
+import me.itzsomebody.radon.utils.BytecodeUtils;
 import me.itzsomebody.radon.utils.LoggerUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Transformer that applies a code hiding technique by applying synthetic modifiers to the class, fields, and methods.
@@ -15,26 +13,11 @@ import java.util.List;
  *
  * @author ItzSomebody
  */
-public class HideCode {
-    /**
-     * The {@link ClassNode} that will be obfuscated.
-     */
-    private ClassNode classNode;
-
+public class HideCode extends AbstractTransformer {
     /**
      * TODO: Indication to check for EventHandlers before attempting to add synthetic modifier.
      */
-    boolean spigotMode;
-
-    /**
-     * Methods protected from obfuscation.
-     */
-    private ArrayList<String> exemptMethods;
-
-    /**
-     * Fields protected from obfuscation.
-     */
-    private ArrayList<String> exemptFields;
+    private boolean spigotMode;
 
     /**
      * {@link List} of {@link String}s to add to log.
@@ -44,54 +27,54 @@ public class HideCode {
     /**
      * Constructor used to create a {@link HideCode} object.
      *
-     * @param classNode the {@link ClassNode} object to obfuscate.
      * @param spigotMode TODO: indication to check for EventHandlers.
-     * @param exemptMethods {@link ArrayList} of protected {@link MethodNode}s.
-     * @param exemptFields {@link ArrayList} of protected {@link FieldNode}s.
      */
-    public HideCode(ClassNode classNode, boolean spigotMode, ArrayList<String> exemptMethods, ArrayList<String> exemptFields) {
-        this.classNode = classNode;
+    public HideCode(boolean spigotMode) {
         this.spigotMode = spigotMode;
-        this.exemptMethods = exemptMethods;
-        this.exemptFields = exemptFields;
-        logStrings = new ArrayList<>();
-        obfuscate();
     }
 
     /**
-     * Applies obfuscation to {@link HideCode#classNode}.
+     * Applies obfuscation.
      */
-    private void obfuscate() {
+    public void obfuscate() {
+        logStrings = new ArrayList<>();
+        logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
         logStrings.add(LoggerUtils.stdOut("Starting hide code transformer"));
-        int count = 0;
-        if ((classNode.access & Opcodes.ACC_SYNTHETIC) == 0) {
-            classNode.access |= Opcodes.ACC_SYNTHETIC;
-            count++;
-        }
+        AtomicInteger counter = new AtomicInteger();
+        long current = System.currentTimeMillis();
+        classNodes().stream().filter(classNode -> !classExempted(classNode.name)).forEach(classNode -> {
+            if (!BytecodeUtils.isSyntheticMethod(classNode.access)) {
+                classNode.access |= ACC_SYNTHETIC;
+                counter.incrementAndGet();
+            }
 
-        for (MethodNode methodNode : classNode.methods) {
-            if (exemptMethods.contains(classNode.name + "." + methodNode.name + methodNode.desc)) continue;
-            if (!((methodNode.access & Opcodes.ACC_ABSTRACT) == 0)) continue;
-            if ((methodNode.access & Opcodes.ACC_SYNTHETIC) == 0) {
-                methodNode.access |= Opcodes.ACC_SYNTHETIC;
-                count++;
-            } // TODO: Fix this from breaking org/bukkit/event/EventHandler
-            if (!methodNode.name.startsWith("<")) {
-                if ((methodNode.access & Opcodes.ACC_BRIDGE) == 0) {
-                    methodNode.access |= Opcodes.ACC_BRIDGE;
+            classNode.methods.stream().filter(methodNode -> !methodExempted(classNode.name + '.' + methodNode.name + methodNode.desc))
+                    .forEach(methodNode -> {
+                boolean hidOnce = false;
+                if (!BytecodeUtils.isSyntheticMethod(methodNode.access)) {
+                    methodNode.access |= ACC_SYNTHETIC;
+                    hidOnce = true;
                 }
-            }
-        }
 
-        for (FieldNode fieldNode : classNode.fields) {
-            if (exemptFields.contains(classNode.name + "." + fieldNode.name)) continue;
-            if ((fieldNode.access & Opcodes.ACC_SYNTHETIC) == 0) {
-                fieldNode.access |= Opcodes.ACC_SYNTHETIC;
-                count++;
-            }
-        }
-        logStrings.add(LoggerUtils.stdOut("Finished hiding code"));
-        logStrings.add(LoggerUtils.stdOut("Hid " + String.valueOf(count) + " members"));
+                if (!BytecodeUtils.isBridgeMethod(methodNode.access)
+                        && !methodNode.name.startsWith("<")) {
+                    methodNode.access |= ACC_BRIDGE;
+                    hidOnce = true;
+                }
+
+                if (hidOnce) counter.incrementAndGet();
+            });
+
+            if (classNode.fields != null)
+                classNode.fields.stream().filter(fieldNode -> !fieldExempted(classNode.name + '.' + fieldNode.name)).forEach(fieldNode -> {
+                    if (!BytecodeUtils.isSyntheticMethod(fieldNode.access)) {
+                        fieldNode.access |= ACC_SYNTHETIC;
+                        counter.incrementAndGet();
+                    }
+                });
+        });
+        logStrings.add(LoggerUtils.stdOut("Hid " + counter + " members."));
+        logStrings.add(LoggerUtils.stdOut("Finished. [" + tookThisLong(current) + "ms]"));
     }
 
     /**

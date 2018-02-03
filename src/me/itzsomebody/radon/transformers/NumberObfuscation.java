@@ -5,10 +5,10 @@ import me.itzsomebody.radon.asm.tree.*;
 import me.itzsomebody.radon.utils.BytecodeUtils;
 import me.itzsomebody.radon.utils.LoggerUtils;
 import me.itzsomebody.radon.utils.NumberUtils;
-import me.itzsomebody.radon.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Transformer that splits up integers into simple arithmetic evaluations.
@@ -16,17 +16,7 @@ import java.util.List;
  * @author ItzSomebody
  * @author VincBreaker (Sorry Vinc, I just had to steal the idea of Smoke's number obfuscation lol)
  */
-public class NumberObfuscation {
-    /**
-     * The {@link ClassNode} that will be obfuscated.
-     */
-    private ClassNode classNode;
-
-    /**
-     * Methods protected from obfuscation.
-     */
-    private ArrayList<String> exemptMethods;
-
+public class NumberObfuscation extends AbstractTransformer {
     /**
      * {@link List} of {@link String}s to add to log.
      */
@@ -34,62 +24,50 @@ public class NumberObfuscation {
 
     /**
      * Constructor used to create a {@link NumberObfuscation} object.
-     *
-     * @param classNode     the {@link ClassNode} object to obfuscate.
-     * @param exemptMethods {@link ArrayList} of protected {@link MethodNode}s.
      */
-    public NumberObfuscation(ClassNode classNode, ArrayList<String> exemptMethods) {
-        this.classNode = classNode;
-        this.exemptMethods = exemptMethods;
-        logStrings = new ArrayList<>();
-        obfuscate();
+    public NumberObfuscation() {
+
     }
 
     /**
-     * Applies obfuscation to {@link NumberObfuscation#classNode}.
+     * Applies obfuscation.}.
      */
-    private void obfuscate() {
+    public void obfuscate() {
+        logStrings = new ArrayList<>();
+        logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
         logStrings.add(LoggerUtils.stdOut("Starting number obfuscation transformer"));
-        ArrayList<MethodNode> methods = new ArrayList<>();
-        int count = 0;
-        for (MethodNode methodNode : classNode.methods) {
-            if (exemptMethods.contains(classNode.name + "/" + methodNode.name)) continue;
-            if (BytecodeUtils.isAbstractMethod(methodNode.access)) continue;
+        AtomicInteger counter = new AtomicInteger();
+        long current = System.currentTimeMillis();
+        classNodes().stream().filter(classNode -> !classExempted(classNode.name)).forEach(classNode -> {
+            classNode.methods.stream().filter(methodNode -> !methodExempted(classNode.name + '.' + methodNode.name + methodNode.desc))
+                    .filter(methodNode -> BytecodeUtils.isAbstractMethod(methodNode.access)).forEach(methodNode -> {
+                for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
+                    if (BytecodeUtils.isNumberNode(insn)) {
+                        int originalNum = BytecodeUtils.getNumber(insn);
 
-            for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
-                if (BytecodeUtils.isNumberNode(insn)) {
-                    int originalNum = BytecodeUtils.getNumber(insn);
+                        int value1 = NumberUtils.getRandomInt(255) + 20;
+                        int value2 = NumberUtils.getRandomInt(value1) + value1;
+                        int value3 = NumberUtils.getRandomInt(value2);
+                        int value4 = originalNum - (value1 - value2 + value3); // You kids say algebra is useless???
 
-                    int value1 = NumberUtils.getRandomInt(255) + 20;
-                    int value2 = NumberUtils.getRandomInt(value1) + value1;
-                    int value3 = NumberUtils.getRandomInt(value2);
-                    int value4 = originalNum - (value1 - value2 + value3); // You kids say algebra is useless???
+                        InsnList insnList = new InsnList();
+                        insnList.add(BytecodeUtils.getNumberInsn(value1));
+                        insnList.add(BytecodeUtils.getNumberInsn(value2));
+                        insnList.add(new InsnNode(Opcodes.ISUB));
+                        insnList.add(BytecodeUtils.getNumberInsn(value3));
+                        insnList.add(new InsnNode(Opcodes.IADD));
+                        insnList.add(BytecodeUtils.getNumberInsn(value4));
+                        insnList.add(new InsnNode(Opcodes.IADD));
 
-                    InsnList insnList = new InsnList();
-                    insnList.add(BytecodeUtils.getNumberInsn(value1));
-                    insnList.add(BytecodeUtils.getNumberInsn(value2));
-                    insnList.add(new InsnNode(Opcodes.ISUB));
-                    insnList.add(BytecodeUtils.getNumberInsn(value3));
-                    insnList.add(new InsnNode(Opcodes.IADD));
-                    insnList.add(BytecodeUtils.getNumberInsn(value4));
-                    insnList.add(new InsnNode(Opcodes.IADD));
-                    //insnList.add(new InsnNode(Opcodes.IRETURN));
-                    //String methodName = StringUtils.crazyString();
-                    //MethodNode method = new MethodNode(Opcodes.ACC_PRIVATE + Opcodes.ACC_BRIDGE + Opcodes.ACC_SYNTHETIC + Opcodes.ACC_STATIC, methodName, "()I", null, null);
-                    //method.instructions = insnList;
-                    //methods.add(method);
-
-                    //methodNode.instructions.set(insn, new MethodInsnNode(Opcodes.INVOKESTATIC, classNode.name, methodName, "()I", false));
-                    methodNode.instructions.insertBefore(insn, insnList);
-                    methodNode.instructions.remove(insn);
-                    count++;
+                        methodNode.instructions.insertBefore(insn, insnList);
+                        methodNode.instructions.remove(insn);
+                        counter.incrementAndGet();
+                    }
                 }
-            }
-        }
-        classNode.methods.addAll(methods);
-
-        logStrings.add(LoggerUtils.stdOut("Finished obfuscating numbers"));
-        logStrings.add(LoggerUtils.stdOut("Obfuscated " + String.valueOf(count) + " numbers"));
+            });
+        });
+        logStrings.add(LoggerUtils.stdOut("Split  " + counter + " integers into math instructions."));
+        logStrings.add(LoggerUtils.stdOut("Finished. [" + tookThisLong(current) + "ms]"));
     }
 
     /**

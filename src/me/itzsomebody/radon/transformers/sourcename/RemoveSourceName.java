@@ -1,45 +1,41 @@
 package me.itzsomebody.radon.transformers.sourcename;
 
 import me.itzsomebody.radon.asm.tree.ClassNode;
+import me.itzsomebody.radon.transformers.AbstractTransformer;
 import me.itzsomebody.radon.utils.LoggerUtils;
+import me.itzsomebody.radon.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Transformer that obfuscates the source name attribute by removing the attribute entirely.
  *
  * @author ItzSomebody
  */
-public class RemoveSourceName {
-    /**
-     * The {@link ClassNode} that will be obfuscated.
-     */
-    private ClassNode classNode;
-
+public class RemoveSourceName extends AbstractTransformer {
     /**
      * {@link List} of {@link String}s to add to log.
      */
     private List<String> logStrings;
 
     /**
-     * Constructor used to create a {@link RemoveSourceName} object.
-     *
-     * @param classNode     the {@link ClassNode} to be obfuscated.
+     * Applies obfuscation to.
      */
-    public RemoveSourceName(ClassNode classNode) {
-        this.classNode = classNode;
+    public void obfuscate() {
         logStrings = new ArrayList<>();
-        obfuscate();
-    }
-
-    /**
-     * Applies obfuscation to {@link RemoveSourceName#classNode}.
-     */
-    private void obfuscate() {
+        logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
         logStrings.add(LoggerUtils.stdOut("Starting source name removal transformer"));
-        classNode.sourceFile = null;
-        logStrings.add(LoggerUtils.stdOut("Finished removing source name"));
+        AtomicInteger counter = new AtomicInteger();
+        long current = System.currentTimeMillis();
+        classNodes().stream().filter(classNode -> !classExempted(classNode.name))
+                .filter(classNode -> classNode.sourceFile != null).forEach(classNode -> {
+            classNode.sourceFile = null;
+            counter.incrementAndGet();
+        });
+        logStrings.add(LoggerUtils.stdOut("Removed " + counter + " source name attributes."));
+        logStrings.add(LoggerUtils.stdOut("Finished. [" + tookThisLong(current) + "ms]"));
     }
 
     /**

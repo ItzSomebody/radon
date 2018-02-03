@@ -1,3 +1,7 @@
+## 0.1.0
+
+* Completely redesigned transformer system.
+
 ## 0.0.14
 
 * Squashed an annoying buggy in the new NumberObfuscation transformer thanks to https://github.com/JoachimVandersmissen/TestingProject

@@ -4,6 +4,8 @@ import me.itzsomebody.radon.asm.Handle;
 import me.itzsomebody.radon.asm.Opcodes;
 import me.itzsomebody.radon.asm.Type;
 import me.itzsomebody.radon.asm.tree.*;
+import me.itzsomebody.radon.methods.InvokeDynamicBSM;
+import me.itzsomebody.radon.transformers.AbstractTransformer;
 import me.itzsomebody.radon.utils.BytecodeUtils;
 import me.itzsomebody.radon.utils.LoggerUtils;
 import me.itzsomebody.radon.utils.NumberUtils;
@@ -11,9 +13,10 @@ import me.itzsomebody.radon.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Transformer that applies an InvokeDynamic obfuscation to {@link NormalInvokeDynamic#classNode} that produces
+ * Transformer that applies an InvokeDynamic obfuscation to which produces
  * produces opcodes via an int lookup.
  * <p>
  * 0 = InvokeStatic
@@ -23,159 +26,135 @@ import java.util.List;
  * @author ItzSomebody
  * @author Licel (transformer based off of an old design of Stringer's)
  */
-public class NormalInvokeDynamic {
-    /**
-     * The {@link ClassNode} that will be obfuscated.
-     */
-    private ClassNode classNode;
-
-    /**
-     * The {@link Handle} used to produce an InvokeDynamic handle to the bootstrap method.
-     */
-    private Handle bsmHandle;
-
-    /**
-     * Methods protected from obfuscation.
-     */
-    private ArrayList<String> exemptMethods;
-
+public class NormalInvokeDynamic extends AbstractTransformer {
     /**
      * {@link List} of {@link String}s to add to log.
      */
     private List<String> logStrings;
 
     /**
-     * Constructor used to create a {@link NormalInvokeDynamic} object.
-     *
-     * @param classNode     the {@link ClassNode} object to obfuscate.
-     * @param bsmName       the path of the bootstrap method.
-     * @param spigotMode    indication to apply a handle that is compatible with Spigot.
-     * @param exemptMethods {@link ArrayList} of protected {@link MethodNode}s.
+     * Applies obfuscation.
      */
-    public NormalInvokeDynamic(ClassNode classNode, String bsmName, boolean spigotMode, ArrayList<String> exemptMethods) {
-        String[] split = bsmName.split("\\.");
-        this.classNode = classNode;
-        this.bsmHandle = new Handle(Opcodes.H_INVOKESTATIC,
-                (!spigotMode) ? "L" + split[0] + ";" : split[0],
-                split[1],
+    public void obfuscate() {
+        logStrings = new ArrayList<>();
+        logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
+        logStrings.add(LoggerUtils.stdOut("Starting normal invokedynamic transformer"));
+        AtomicInteger counter = new AtomicInteger();
+        long current = System.currentTimeMillis();
+        String[] bsmPath = new String[]{StringUtils.randomClass(classNames()), StringUtils.crazyString()};
+        Handle bsmHandle = new Handle(Opcodes.H_INVOKESTATIC,
+                bsmPath[0],
+                bsmPath[1],
                 "(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
                 false);
-        this.exemptMethods = exemptMethods;
-        logStrings = new ArrayList<>();
-        obfuscate();
-    }
+        classNodes().stream().filter(classNode -> !classExempted(classNode.name)).filter(classNode -> classNode.version >= 51).forEach(classNode -> {
+            classNode.methods.stream().filter(methodNode -> !methodExempted(classNode.name + '.' + methodNode.name + methodNode.desc))
+                    .filter(methodNode -> !BytecodeUtils.isAbstractMethod(methodNode.access)).forEach(methodNode -> {
+                for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
+                    if (insn instanceof MethodInsnNode) {
+                        MethodInsnNode methodInsnNode = (MethodInsnNode) insn;
+                        if (!methodInsnNode.owner.startsWith("java/lang/reflect")
+                                && !methodInsnNode.owner.startsWith("java/lang/Class")) {
+                            boolean isStatic = (methodInsnNode.getOpcode() == Opcodes.INVOKESTATIC);
+                            String newSig = isStatic ? methodInsnNode.desc : methodInsnNode.desc.replace("(", "(Ljava/lang/Object;");
+                            Type origReturnType = Type.getReturnType(newSig);
+                            Type[] args = Type.getArgumentTypes(newSig);
+                            for (int j = 0; j < args.length; j++) {
+                                args[j] = BytecodeUtils.genericType(args[j]);
+                            }
+                            newSig = Type.getMethodDescriptor(origReturnType, args);
+                            // 0 = invokestatic
+                            // -1 = invokevirtual
+                            // 1 = invokeinterface
 
-    /**
-     * Applies obfuscation to {@link NormalInvokeDynamic#classNode}.
-     */
-    private void obfuscate() {
-        if (classNode.version < 51) return; // Java 6 doesn't support InvokeDynamic
-        logStrings.add(LoggerUtils.stdOut("Starting light invokedynamic transformer"));
-        int count = 0;
-        for (MethodNode methodNode : classNode.methods) {
-            if (exemptMethods.contains(classNode.name + "." + methodNode.name + methodNode.desc)) continue;
-            if (BytecodeUtils.isAbstractMethod(methodNode.access)) continue;
+                            String opcode1;
+                            String opcode2;
+                            String opcode3;
+                            String opcode4;
+                            String opcode5;
+                            int coreOpcode;
+                            switch (insn.getOpcode()) {
+                                case 184: // InvokeStatic Opcode
+                                    coreOpcode = 0;
+                                    break;
+                                case 182: // InvokeVirtual Opcode
+                                    coreOpcode = -1;
+                                    break;
+                                case 185: // InvokeInterface Opcode
+                                default:
+                                    coreOpcode = 1;
+                                    break;
+                            }
+                            switch (NumberUtils.getRandomInt(5)) {
+                                case 0:
+                                    opcode1 = String.valueOf(coreOpcode);
+                                    opcode2 = String.valueOf(NumberUtils.getRandomInt(3) + 2);
+                                    opcode3 = String.valueOf(NumberUtils.getRandomInt(3) + 2);
+                                    opcode4 = String.valueOf(NumberUtils.getRandomInt(3) + 2);
+                                    opcode5 = String.valueOf(NumberUtils.getRandomInt(3) + 2);
+                                    break;
+                                case 1:
+                                    opcode1 = String.valueOf(NumberUtils.getRandomInt(3) + 2);
+                                    opcode2 = String.valueOf(coreOpcode);
+                                    opcode3 = String.valueOf(NumberUtils.getRandomInt(3) + 2);
+                                    opcode4 = String.valueOf(NumberUtils.getRandomInt(3) + 2);
+                                    opcode5 = String.valueOf(NumberUtils.getRandomInt(3) + 2);
+                                    break;
+                                case 2:
+                                    opcode1 = String.valueOf(NumberUtils.getRandomInt(3) + 2);
+                                    opcode2 = String.valueOf(NumberUtils.getRandomInt(3) + 2);
+                                    opcode3 = String.valueOf(coreOpcode);
+                                    opcode4 = String.valueOf(NumberUtils.getRandomInt(3) + 2);
+                                    opcode5 = String.valueOf(NumberUtils.getRandomInt(3) + 2);
+                                    break;
+                                case 3:
+                                    opcode1 = String.valueOf(NumberUtils.getRandomInt(3) + 2);
+                                    opcode2 = String.valueOf(NumberUtils.getRandomInt(3) + 2);
+                                    opcode3 = String.valueOf(NumberUtils.getRandomInt(3) + 2);
+                                    opcode4 = String.valueOf(coreOpcode);
+                                    opcode5 = String.valueOf(NumberUtils.getRandomInt(3) + 2);
+                                    break;
+                                default: // 4
+                                    opcode1 = String.valueOf(NumberUtils.getRandomInt(3) + 2);
+                                    opcode2 = String.valueOf(NumberUtils.getRandomInt(3) + 2);
+                                    opcode3 = String.valueOf(NumberUtils.getRandomInt(3) + 2);
+                                    opcode4 = String.valueOf(NumberUtils.getRandomInt(3) + 2);
+                                    opcode5 = String.valueOf(coreOpcode);
+                                    break;
+                            }
 
-            for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
-                if (insn instanceof MethodInsnNode) {
-                    MethodInsnNode methodInsnNode = (MethodInsnNode) insn;
-                    if (!methodInsnNode.owner.startsWith("java/lang/reflect")
-                            && !methodInsnNode.owner.startsWith("java/lang/Class")) {
-                        boolean isStatic = (methodInsnNode.getOpcode() == Opcodes.INVOKESTATIC);
-                        String newSig = isStatic ? methodInsnNode.desc : methodInsnNode.desc.replace("(", "(Ljava/lang/Object;");
-                        Type origReturnType = Type.getReturnType(newSig);
-                        Type[] args = Type.getArgumentTypes(newSig);
-                        for (int j = 0; j < args.length; j++) {
-                            args[j] = BytecodeUtils.genericType(args[j]);
-                        }
-                        newSig = Type.getMethodDescriptor(origReturnType, args);
-                        // 0 = invokestatic
-                        // -1 = invokevirtual
-                        // 1 = invokeinterface
-
-                        String opcode1;
-                        String opcode2;
-                        String opcode3;
-                        String opcode4;
-                        String opcode5;
-                        int coreOpcode;
-                        switch (insn.getOpcode()) {
-                            case 184: // InvokeStatic Opcode
-                                coreOpcode = 0;
-                                break;
-                            case 182: // InvokeVirtual Opcode
-                                coreOpcode = -1;
-                                break;
-                            case 185: // InvokeInterface Opcode
-                            default:
-                                coreOpcode = 1;
-                                break;
-                        }
-                        switch (NumberUtils.getRandomInt(5)) {
-                            case 0:
-                                opcode1 = String.valueOf(coreOpcode);
-                                opcode2 = String.valueOf(NumberUtils.getRandomInt(3) + 2);
-                                opcode3 = String.valueOf(NumberUtils.getRandomInt(3) + 2);
-                                opcode4 = String.valueOf(NumberUtils.getRandomInt(3) + 2);
-                                opcode5 = String.valueOf(NumberUtils.getRandomInt(3) + 2);
-                                break;
-                            case 1:
-                                opcode1 = String.valueOf(NumberUtils.getRandomInt(3) + 2);
-                                opcode2 = String.valueOf(coreOpcode);
-                                opcode3 = String.valueOf(NumberUtils.getRandomInt(3) + 2);
-                                opcode4 = String.valueOf(NumberUtils.getRandomInt(3) + 2);
-                                opcode5 = String.valueOf(NumberUtils.getRandomInt(3) + 2);
-                                break;
-                            case 2:
-                                opcode1 = String.valueOf(NumberUtils.getRandomInt(3) + 2);
-                                opcode2 = String.valueOf(NumberUtils.getRandomInt(3) + 2);
-                                opcode3 = String.valueOf(coreOpcode);
-                                opcode4 = String.valueOf(NumberUtils.getRandomInt(3) + 2);
-                                opcode5 = String.valueOf(NumberUtils.getRandomInt(3) + 2);
-                                break;
-                            case 3:
-                                opcode1 = String.valueOf(NumberUtils.getRandomInt(3) + 2);
-                                opcode2 = String.valueOf(NumberUtils.getRandomInt(3) + 2);
-                                opcode3 = String.valueOf(NumberUtils.getRandomInt(3) + 2);
-                                opcode4 = String.valueOf(coreOpcode);
-                                opcode5 = String.valueOf(NumberUtils.getRandomInt(3) + 2);
-                                break;
-                            default: // 4
-                                opcode1 = String.valueOf(NumberUtils.getRandomInt(3) + 2);
-                                opcode2 = String.valueOf(NumberUtils.getRandomInt(3) + 2);
-                                opcode3 = String.valueOf(NumberUtils.getRandomInt(3) + 2);
-                                opcode4 = String.valueOf(NumberUtils.getRandomInt(3) + 2);
-                                opcode5 = String.valueOf(coreOpcode);
-                                break;
-                        }
-
-                        switch (methodInsnNode.getOpcode()) {
-                            case Opcodes.INVOKESTATIC: // invokestatic opcode
-                            case Opcodes.INVOKEVIRTUAL: // invokevirtual opcode
-                            case Opcodes.INVOKEINTERFACE: // invokeinterface opcode
-                                methodNode.instructions.set(insn, new InvokeDynamicInsnNode(
-                                        StringUtils.crazyString(),
-                                        newSig,
-                                        bsmHandle,
-                                        opcode1,
-                                        opcode2,
-                                        opcode3,
-                                        opcode4,
-                                        opcode5,
-                                        methodInsnNode.owner.replaceAll("/", "."),
-                                        methodInsnNode.name,
-                                        methodInsnNode.desc));
-                                count++;
-                                break;
-                            default:
-                                break;
+                            switch (methodInsnNode.getOpcode()) {
+                                case Opcodes.INVOKESTATIC: // invokestatic opcode
+                                case Opcodes.INVOKEVIRTUAL: // invokevirtual opcode
+                                case Opcodes.INVOKEINTERFACE: // invokeinterface opcode
+                                    methodNode.instructions.set(insn, new InvokeDynamicInsnNode(
+                                            StringUtils.crazyString(),
+                                            newSig,
+                                            bsmHandle,
+                                            opcode1,
+                                            opcode2,
+                                            opcode3,
+                                            opcode4,
+                                            opcode5,
+                                            methodInsnNode.owner.replaceAll("/", "."),
+                                            methodInsnNode.name,
+                                            methodInsnNode.desc));
+                                    counter.incrementAndGet();
+                                    break;
+                                default:
+                                    break;
+                            }
                         }
                     }
                 }
-            }
-        }
-        logStrings.add(LoggerUtils.stdOut("Finished adding normal invokedynamics"));
-        logStrings.add(LoggerUtils.stdOut("Added normal invokedynamics " + String.valueOf(count) + " times"));
+            });
+        });
+
+        classNodes().stream().filter(classNode -> classNode.name.equals(bsmPath[0])).forEach(classNode -> {
+            classNode.methods.add(InvokeDynamicBSM.normalBSM(bsmPath[1], classNode.name));
+        });
+        logStrings.add(LoggerUtils.stdOut("Replaced " + counter + " method invocations with invokedynamics."));
+        logStrings.add(LoggerUtils.stdOut("Finished. [" + tookThisLong(current) + "ms]"));
     }
 
     /**

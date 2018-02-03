@@ -1,18 +1,20 @@
-package me.itzsomebody.radon.transformers.localvariables;
+package me.itzsomebody.radon.transformers.sourcedebug;
 
+import me.itzsomebody.radon.asm.tree.ClassNode;
 import me.itzsomebody.radon.transformers.AbstractTransformer;
 import me.itzsomebody.radon.utils.LoggerUtils;
+import me.itzsomebody.radon.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Transformer that applies a local variable obfuscation by removing t
+ * Transformer that obfuscates the source debug attribute by changing the corresponding value.
  *
  * @author ItzSomebody
  */
-public class RemoveLocalVariables extends AbstractTransformer {
+public class ObfuscateSourceDebug extends AbstractTransformer {
     /**
      * {@link List} of {@link String}s to add to log.
      */
@@ -24,17 +26,15 @@ public class RemoveLocalVariables extends AbstractTransformer {
     public void obfuscate() {
         logStrings = new ArrayList<>();
         logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
-        logStrings.add(LoggerUtils.stdOut("Starting local variable removal transformer"));
+        logStrings.add(LoggerUtils.stdOut("Starting source debug obfuscation transformer"));
         AtomicInteger counter = new AtomicInteger();
         long current = System.currentTimeMillis();
-        classNodes().stream().filter(classNode -> !classExempted(classNode.name)).forEach(classNode -> {
-            classNode.methods.stream().filter(methodNode -> !methodExempted(classNode.name + '.' + methodNode.name + methodNode.desc))
-                    .filter(methodNode -> methodNode.localVariables != null).forEach(methodNode -> {
-                counter.addAndGet(methodNode.localVariables.size());
-                methodNode.localVariables = null;
-            });
+        classNodes().stream().filter(classNode -> !classExempted(classNode.name))
+                .filter(classNode -> classNode.sourceDebug != null).forEach(classNode -> {
+            classNode.sourceDebug = StringUtils.crazyKey();
+            counter.incrementAndGet();
         });
-        logStrings.add(LoggerUtils.stdOut("Removed " + counter + " local variables."));
+        logStrings.add(LoggerUtils.stdOut("Obfuscated " + counter + " source debug attributes."));
         logStrings.add(LoggerUtils.stdOut("Finished. [" + tookThisLong(current) + "ms]"));
     }
 

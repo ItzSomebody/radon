@@ -1,65 +1,46 @@
 package me.itzsomebody.radon.transformers.localvariables;
 
-import me.itzsomebody.radon.asm.tree.ClassNode;
-import me.itzsomebody.radon.asm.tree.LocalVariableNode;
-import me.itzsomebody.radon.asm.tree.MethodNode;
+import me.itzsomebody.radon.asm.tree.*;
+import me.itzsomebody.radon.transformers.AbstractTransformer;
+import me.itzsomebody.radon.utils.BytecodeUtils;
 import me.itzsomebody.radon.utils.LoggerUtils;
 import me.itzsomebody.radon.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Transformer that applies a local variable obfuscation by changing the names.
  *
  * @author ItzSomebody
  */
-public class ObfuscateLocalVariables {
-    /**
-     * The {@link ClassNode} that will be obfuscated.
-     */
-    private ClassNode classNode;
-
-    /**
-     * Methods protected from obfuscation.
-     */
-    private ArrayList<String> exemptMethods;
-
+public class ObfuscateLocalVariables extends AbstractTransformer {
     /**
      * {@link List} of {@link String}s to add to log.
      */
     private List<String> logStrings;
 
     /**
-     * Constructor used to create an {@link ObfuscateLocalVariables} object.
-     *
-     * @param classNode     the {@link ClassNode} to be obfuscated.
-     * @param exemptMethods {@link ArrayList} of protected {@link MethodNode}s.
+     * Applies obfuscation.
      */
-    public ObfuscateLocalVariables(ClassNode classNode, ArrayList<String> exemptMethods) {
-        this.classNode = classNode;
-        this.exemptMethods = exemptMethods;
+    public void obfuscate() {
         logStrings = new ArrayList<>();
-        obfuscate();
-    }
-
-    /**
-     * Applies obfuscation to {@link ObfuscateLocalVariables#classNode}.
-     */
-    private void obfuscate() {
+        logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
         logStrings.add(LoggerUtils.stdOut("Starting local variable obfuscation transformer"));
-        int count = 0;
-        for (MethodNode methodNode : classNode.methods) {
-            if (methodNode.localVariables != null) {
-                if (exemptMethods.contains(classNode.name + "." + methodNode.name + methodNode.desc)) continue;
-                for (LocalVariableNode localVariableNode : methodNode.localVariables) {
+        AtomicInteger counter = new AtomicInteger();
+        long current = System.currentTimeMillis();
+        classNodes().stream().filter(classNode -> !classExempted(classNode.name)).forEach(classNode -> {
+            classNode.methods.stream().filter(methodNode -> !methodExempted(classNode.name + '.' + methodNode.name + methodNode.desc))
+                    .filter(methodNode -> methodNode.localVariables != null).forEach(methodNode -> {
+                methodNode.localVariables.forEach(localVariableNode -> {
                     localVariableNode.name = StringUtils.crazyString();
-                    count++;
-                }
-            }
-        }
-        logStrings.add(LoggerUtils.stdOut("Finished obfuscating local variables"));
-        logStrings.add(LoggerUtils.stdOut("Obfuscated " + String.valueOf(count) + " local variables"));
+                    counter.incrementAndGet();
+                });
+            });
+        });
+        logStrings.add(LoggerUtils.stdOut("Obfuscated " + counter + " local variables."));
+        logStrings.add(LoggerUtils.stdOut("Finished. [" + tookThisLong(current) + "ms]"));
     }
 
     /**

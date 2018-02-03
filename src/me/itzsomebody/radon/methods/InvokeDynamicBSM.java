@@ -21,10 +21,9 @@ public class InvokeDynamicBSM implements Opcodes {
      * @param bsmName used to determine the name of the generated {@link MethodNode}.
      * @return a {@link MethodNode} that returns a {@link ConstantCallSite} statically linked to a method for {@link LightInvokeDynamic}.
      */
-    public static MethodNode lightBSM(String bsmName) {
-        String[] split = bsmName.split("\\.");
+    public static MethodNode lightBSM(String bsmName, String className) {
         MethodNode mv = new MethodNode(Opcodes.ACC_PUBLIC + Opcodes.ACC_STATIC + Opcodes.ACC_SYNTHETIC + Opcodes.ACC_BRIDGE,
-                split[1],
+                bsmName,
                 "(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
                 null,
                 null);
@@ -44,7 +43,7 @@ public class InvokeDynamicBSM implements Opcodes {
         mv.visitVarInsn(ASTORE, 10);
         Label l4 = new Label();
         mv.visitLabel(l4);
-        mv.visitLdcInsn(Type.getType("L" + split[0] + ";.class"));
+        mv.visitLdcInsn(Type.getType("L" + className + ";.class"));
         mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Class", "getClassLoader", "()Ljava/lang/ClassLoader;", false);
         mv.visitVarInsn(ASTORE, 11);
         Label l5 = new Label();
@@ -155,10 +154,9 @@ public class InvokeDynamicBSM implements Opcodes {
      * @param bsmName used to determine the name of the generated {@link MethodNode}.
      * @return a {@link MethodNode} that returns a {@link ConstantCallSite} statically linked to a method for {@link NormalInvokeDynamic}.
      */
-    public static MethodNode normalBSM(String bsmName) {
-        String[] split = bsmName.split("\\.");
+    public static MethodNode normalBSM(String bsmName, String className) {
         MethodNode mv = new MethodNode(Opcodes.ACC_PUBLIC + Opcodes.ACC_STATIC + Opcodes.ACC_SYNTHETIC + Opcodes.ACC_BRIDGE,
-                split[1],
+                bsmName,
                 "(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
                 null,
                 null);
@@ -178,7 +176,7 @@ public class InvokeDynamicBSM implements Opcodes {
         mv.visitVarInsn(ASTORE, 12);
         Label l4 = new Label();
         mv.visitLabel(l4);
-        mv.visitLdcInsn(Type.getType("L" + split[0] + ";.class"));
+        mv.visitLdcInsn(Type.getType("L" + className + ";.class"));
         mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Class", "getClassLoader", "()Ljava/lang/ClassLoader;", false);
         mv.visitVarInsn(ASTORE, 13);
         Label l5 = new Label();

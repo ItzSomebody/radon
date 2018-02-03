@@ -1,23 +1,24 @@
 package me.itzsomebody.radon.transformers;
 
-import me.itzsomebody.radon.asm.Opcodes;
 import me.itzsomebody.radon.asm.tree.*;
 import me.itzsomebody.radon.utils.BytecodeUtils;
 import me.itzsomebody.radon.utils.LoggerUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Transformer that adds an expiration block of code to <init> methods.
  *
  * @author ItzSomebody
+ * @author Allatori Dev Team
  */
-public class Expiry {
+public class Expiry extends AbstractTransformer {
     /**
-     * The {@link ClassNode} that will be obfuscated.
+     * {@link List} of {@link String}s to add to log.
      */
-    private ClassNode classNode;
+    private List<String> logStrings;
 
     /**
      * The expiry time as a {@link Long}.
@@ -30,49 +31,36 @@ public class Expiry {
     private String expiryMsg;
 
     /**
-     * Methods protected from obfuscation.
-     */
-    private ArrayList<String> exemptMethods;
-
-    /**
-     * {@link List} of {@link String}s to add to log.
-     */
-    private List<String> logStrings;
-
-    /**
      * Constructor used to create an {@link Expiry} object.
      *
-     * @param classNode     the {@link ClassNode} object to obfuscate.
+     * @param expiryTime expiration time as a {@link Long}.
+     * @param expiryMsg expiration message as a {@link String}.
      */
-    public Expiry(ClassNode classNode, long expiryTime, String expiryMsg, ArrayList<String> exemptMethods) {
-        this.classNode = classNode;
+    public Expiry(long expiryTime, String expiryMsg) {
         this.expiryTime = expiryTime;
         this.expiryMsg = expiryMsg;
-        this.exemptMethods = exemptMethods;
-        logStrings = new ArrayList<>();
-        obfuscate();
     }
 
     /**
-     * Applies obfuscation to {@link Expiry#classNode}.
+     * Applies obfuscation.
      */
-    private void obfuscate() {
+    public void obfuscate() {
+        logStrings = new ArrayList<>();
+        logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
         logStrings.add(LoggerUtils.stdOut("Starting expiry transformer"));
-        int count = 0;
-        for (MethodNode methodNode : classNode.methods) {
-            if (exemptMethods.contains(classNode.name + "/" + methodNode.name)) continue;
-            if (methodNode.name.equals("<init>")) {
-                for (AbstractInsnNode ain : methodNode.instructions.toArray()) {
-                    if (BytecodeUtils.isReturn(ain)) {
-                        methodNode.instructions.insertBefore(ain, BytecodeUtils.returnExpiry(expiryTime, expiryMsg));
-                        methodNode.instructions.insertBefore(ain, new InsnNode(Opcodes.NOP));
-                        count++;
-                    }
+        AtomicInteger counter = new AtomicInteger();
+        long current = System.currentTimeMillis();
+        classNodes().stream().filter(classNode -> !classExempted(classNode.name)).forEach(classNode -> {
+            classNode.methods.stream().filter(methodNode -> !methodExempted(classNode.name + '.' + methodNode.name + methodNode.desc))
+                    .filter(methodNode -> methodNode.name.equals("<init>")).forEach(methodNode -> {
+                for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
+                    methodNode.instructions.insertBefore(insn, BytecodeUtils.returnExpiry(expiryTime, expiryMsg));
+                    counter.incrementAndGet();
                 }
-            }
-        }
-        logStrings.add(LoggerUtils.stdOut("Finished applying expiry code"));
-        logStrings.add(LoggerUtils.stdOut("Inserted " + count + " expiration code blocks"));
+            });
+        });
+        logStrings.add(LoggerUtils.stdOut("Added " + counter + " expiration code blocks."));
+        logStrings.add(LoggerUtils.stdOut("Finished. [" + tookThisLong(current) + "ms]"));
     }
 
     /**

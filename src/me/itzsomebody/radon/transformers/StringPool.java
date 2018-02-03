@@ -1,7 +1,6 @@
 package me.itzsomebody.radon.transformers;
 
 import me.itzsomebody.radon.asm.Label;
-import me.itzsomebody.radon.asm.Opcodes;
 import me.itzsomebody.radon.asm.tree.*;
 import me.itzsomebody.radon.utils.BytecodeUtils;
 import me.itzsomebody.radon.utils.LoggerUtils;
@@ -9,6 +8,7 @@ import me.itzsomebody.radon.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Transformer that takes all the strings in a class and pools them into a method. When the string is needed, the
@@ -16,9 +16,9 @@ import java.util.List;
  *
  * @author ItzSomebody
  */
-public class StringPool {
+public class StringPool extends AbstractTransformer {
     /**
-     * The name the pool method will have.
+     * Path to pool method.
      */
     private String randName;
 
@@ -28,69 +28,50 @@ public class StringPool {
     private String[] strings;
 
     /**
-     * The {@link ClassNode} that will be obfuscated.
-     */
-    private ClassNode classNode;
-
-    /**
-     * Methods protected from obfuscation.
-     */
-    private ArrayList<String> exemptMethods;
-
-    /**
      * {@link List} of {@link String}s to add to log.
      */
     private List<String> logStrings;
 
     /**
-     * Constructor used to create a {@link StringPool} object.
-     *
-     * @param classNode     the {@link ClassNode} object to obfuscate.
-     * @param exemptMethods {@link ArrayList} of protected {@link MethodNode}s.
+     * Applies obfuscation.
      */
-    public StringPool(ClassNode classNode, ArrayList<String> exemptMethods) {
-        this.classNode = classNode;
-        this.exemptMethods = exemptMethods;
+    public void obfuscate() {
         logStrings = new ArrayList<>();
-        obfuscate();
-    }
-
-    /**
-     * Applies obfuscation to {@link StringPool#classNode}.
-     */
-    private void obfuscate() {
-        logStrings.add(LoggerUtils.stdOut("Starting source name removal transformer"));
+        logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
+        logStrings.add(LoggerUtils.stdOut("Starting string pool transformer."));
+        long current = System.currentTimeMillis();
+        AtomicInteger counter = new AtomicInteger();
         randName = StringUtils.crazyString();
-        ArrayList<String> stringslist = new ArrayList<>();
+        classNodes().stream().filter(classNode -> !classExempted(classNode.name)).forEach(classNode -> {
+            List<String> stringslist = new ArrayList<>();
+            classNode.methods.stream().filter(methodNode -> !methodExempted(classNode.name + '.' + methodNode.name + methodNode.desc))
+                    .filter(methodNode -> !BytecodeUtils.isAbstractMethod(methodNode.access)).forEach(methodNode -> {
+                for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
+                    if (insn instanceof LdcInsnNode) {
+                        Object cst = ((LdcInsnNode) insn).cst;
 
-        for (MethodNode methodNode : classNode.methods) {
-            if (exemptMethods.contains(classNode.name + "/" + methodNode.name)) continue;
-            if (BytecodeUtils.isAbstractMethod(methodNode.access)) continue;
+                        if (cst instanceof String) {
+                            stringslist.add((String) cst);
 
-            for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
-                if (insn instanceof LdcInsnNode) {
-                    Object cst = ((LdcInsnNode) insn).cst;
+                            int indexNumber = stringslist.size() - 1;
 
-                    if (cst instanceof String) {
-                        stringslist.add((String) cst);
-
-                        int indexNumber = stringslist.size() - 1;
-
-                        methodNode.instructions.insertBefore(insn, BytecodeUtils.getNumberInsn(indexNumber));
-                        methodNode.instructions.set(insn, new MethodInsnNode(Opcodes.INVOKESTATIC, classNode.name, randName, "(I)Ljava/lang/String;", false));
+                            methodNode.instructions.insertBefore(insn, BytecodeUtils.getNumberInsn(indexNumber));
+                            methodNode.instructions.set(insn, new MethodInsnNode(INVOKESTATIC, classNode.name, randName, "(I)Ljava/lang/String;", false));
+                            counter.incrementAndGet();
+                        }
                     }
                 }
+            });
+            if (stringslist.size() != 0) {
+                strings = new String[stringslist.size()];
+                for (int i = 0; i < stringslist.size(); i++) {
+                    strings[i] = stringslist.get(i);
+                }
+                classNode.methods.add(stringPool());
             }
-        }
-        if (stringslist.size() != 0) {
-            strings = new String[stringslist.size()];
-            for (int i = 0; i < stringslist.size(); i++) {
-                strings[i] = stringslist.get(i);
-            }
-            classNode.methods.add(stringPool());
-        }
-        logStrings.add(LoggerUtils.stdOut("Finished pooling strings"));
-        logStrings.add(LoggerUtils.stdOut("Pooled " + stringslist.size() + " strings"));
+        });
+        logStrings.add(LoggerUtils.stdOut("Pooled  " + counter + " strings."));
+        logStrings.add(LoggerUtils.stdOut("Finished. [" + tookThisLong(current) + "ms]"));
     }
 
     /**
@@ -99,7 +80,7 @@ public class StringPool {
      * @return string pool method which contains all the strings.
      */
     private MethodNode stringPool() {
-        MethodNode method = new MethodNode(Opcodes.ACC_PRIVATE + Opcodes.ACC_STATIC, randName, "(I)Ljava/lang/String;", null, null);
+        MethodNode method = new MethodNode(ACC_PUBLIC + ACC_STATIC + ACC_SYNTHETIC + ACC_BRIDGE, randName, "(I)Ljava/lang/String;", null, null);
 
         method.visitCode();
 
@@ -109,42 +90,42 @@ public class StringPool {
         if (numberOfStrings <= 5) {
             method.visitInsn(numberOfStrings + 3);
         } else if (numberOfStrings <= 127) {
-            method.visitIntInsn(Opcodes.BIPUSH, strings.length);
+            method.visitIntInsn(BIPUSH, strings.length);
         } else if (numberOfStrings <= 32767) {
-            method.visitIntInsn(Opcodes.SIPUSH, strings.length);
+            method.visitIntInsn(SIPUSH, strings.length);
         } else {
             method.visitLdcInsn(strings.length);
         }
 
-        method.visitTypeInsn(Opcodes.ANEWARRAY, "java/lang/String");
+        method.visitTypeInsn(ANEWARRAY, "java/lang/String");
 
         for (int i = 0; i < strings.length; i++) {
-            method.visitInsn(Opcodes.DUP);
+            method.visitInsn(DUP);
 
             if (i <= 5) {
                 method.visitInsn(i + 3);
             } else if (i <= 127) {
-                method.visitIntInsn(Opcodes.BIPUSH, i);
+                method.visitIntInsn(BIPUSH, i);
             } else if (i <= 32767) {
-                method.visitIntInsn(Opcodes.SIPUSH, i);
+                method.visitIntInsn(SIPUSH, i);
             } else {
                 method.visitLdcInsn(i);
             }
 
             method.visitLdcInsn(strings[i]);
-            method.visitInsn(Opcodes.AASTORE);
+            method.visitInsn(AASTORE);
         }
-        method.visitVarInsn(Opcodes.ASTORE, 1);
+        method.visitVarInsn(ASTORE, 1);
         Label l1 = new Label();
         method.visitLabel(l1);
-        method.visitVarInsn(Opcodes.ALOAD, 1);
-        method.visitVarInsn(Opcodes.ILOAD, 0);
-        method.visitInsn(Opcodes.AALOAD);
-        method.visitVarInsn(Opcodes.ASTORE, 2);
+        method.visitVarInsn(ALOAD, 1);
+        method.visitVarInsn(ILOAD, 0);
+        method.visitInsn(AALOAD);
+        method.visitVarInsn(ASTORE, 2);
         Label l2 = new Label();
         method.visitLabel(l2);
-        method.visitVarInsn(Opcodes.ALOAD, 2);
-        method.visitInsn(Opcodes.ARETURN);
+        method.visitVarInsn(ALOAD, 2);
+        method.visitInsn(ARETURN);
 
         method.visitMaxs(4, 3);
 

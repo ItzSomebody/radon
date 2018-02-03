@@ -2,71 +2,52 @@ package me.itzsomebody.radon.transformers.flow;
 
 import me.itzsomebody.radon.asm.Opcodes;
 import me.itzsomebody.radon.asm.tree.*;
+import me.itzsomebody.radon.transformers.AbstractTransformer;
 import me.itzsomebody.radon.utils.BytecodeUtils;
 import me.itzsomebody.radon.utils.LoggerUtils;
 import me.itzsomebody.radon.utils.NumberUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Transformer that adds random GOTO->Label to {@link LightFlowObfuscation#classNode}.
+ * Transformer that adds random GOTO->Label.
  * This is total trash, consider using it as a last resort if at all.
  *
  * @author ItzSomebody
  */
-public class LightFlowObfuscation {
-    /**
-     * The {@link ClassNode} that will be obfuscated.
-     */
-    private ClassNode classNode;
-
-    /**
-     * Methods protected from obfuscation.
-     */
-    private ArrayList<String> exemptMethods;
-
+public class LightFlowObfuscation extends AbstractTransformer {
     /**
      * {@link List} of {@link String}s to add to log.
      */
     private List<String> logStrings;
 
     /**
-     * Constructor used to create a {@link LightFlowObfuscation} object.
-     *
-     * @param classNode     the {@link ClassNode} object to obfuscate.
-     * @param exemptMethods {@link ArrayList} of protected {@link MethodNode}s.
+     * Applies obfuscation.
      */
-    public LightFlowObfuscation(ClassNode classNode, ArrayList<String> exemptMethods) {
-        this.classNode = classNode;
-        this.exemptMethods = exemptMethods;
+    public void obfuscate() {
         logStrings = new ArrayList<>();
-        obfuscate();
-    }
-
-    /**
-     * Applies obfuscation to {@link LightFlowObfuscation#classNode}.
-     */
-    private void obfuscate() {
-        logStrings.add(LoggerUtils.stdOut("Starting light flow obfuscation transformer"));
-        int addedGotos = 0;
-        for (MethodNode methodNode : classNode.methods) {
-            if (exemptMethods.contains(classNode.name + "." + methodNode.name + methodNode.desc)) continue;
-            if (BytecodeUtils.isAbstractMethod(methodNode.access)) continue;
-            if (methodNode.instructions.size() < 4) continue;
-
-            for (AbstractInsnNode ain : methodNode.instructions.toArray()) {
-                LabelNode labelNode = new LabelNode();
-                if (ain.getOpcode() != Opcodes.GOTO && !(ain instanceof LabelNode)
-                        && NumberUtils.getRandomInt(20) < 6) {
-                    methodNode.instructions.add(new JumpInsnNode(Opcodes.GOTO, labelNode));
-                    methodNode.instructions.add(labelNode);
-                    addedGotos++;
+        logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
+        logStrings.add(LoggerUtils.stdOut("Starting light flow obfuscation transformer."));
+        AtomicInteger counter = new AtomicInteger();
+        long current = System.currentTimeMillis();
+        classNodes().stream().filter(classNode -> !classExempted(classNode.name)).forEach(classNode -> {
+            classNode.methods.stream().filter(methodNode -> !BytecodeUtils.isAbstractMethod(methodNode.access))
+                    .filter(methodNode -> !methodExempted(classNode.name + '.' + methodNode.name + methodNode.desc)).forEach(methodNode -> {
+                for (AbstractInsnNode ain : methodNode.instructions.toArray()) {
+                    LabelNode labelNode = new LabelNode();
+                    if (ain.getOpcode() != Opcodes.GOTO && !(ain instanceof LabelNode)
+                            && NumberUtils.getRandomInt(20) < 10) {
+                        methodNode.instructions.add(new JumpInsnNode(Opcodes.GOTO, labelNode));
+                        methodNode.instructions.add(labelNode);
+                        counter.incrementAndGet();
+                    }
                 }
-            }
-        }
-        logStrings.add(LoggerUtils.stdOut("Finished adding light flow obfuscation"));
-        logStrings.add(LoggerUtils.stdOut("Added light flow obfuscation " + String.valueOf(addedGotos) + " times"));
+            });
+        });
+        logStrings.add(LoggerUtils.stdOut("Added " + counter + " instruction sets."));
+        logStrings.add(LoggerUtils.stdOut("Finished. [" + tookThisLong(current) + "ms]"));
     }
 
     /**

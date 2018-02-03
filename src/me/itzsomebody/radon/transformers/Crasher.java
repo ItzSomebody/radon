@@ -5,6 +5,7 @@ import me.itzsomebody.radon.utils.LoggerUtils;
 import me.itzsomebody.radon.utils.StringUtils;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Transformer that applies a crashing technique by exploiting class signature parsing.
@@ -17,36 +18,28 @@ import java.util.*;
  *
  * @author ItzSomebody
  */
-public class Crasher {
-    /**
-     * The {@link ClassNode} that will be obfuscated.
-     */
-    private ClassNode classNode;
-
+public class Crasher extends AbstractTransformer {
     /**
      * {@link List} of {@link String}s to add to log.
      */
     private List<String> logStrings;
 
     /**
-     * Constructor used to create a {@link Crasher} object.
-     *
-     * @param classNode     the {@link ClassNode} object to obfuscate.
+     * Applies obfuscation.
      */
-    public Crasher(ClassNode classNode) {
-        this.classNode = classNode;
+    public void obfuscate() {
         logStrings = new ArrayList<>();
-        obfuscate();
-    }
-
-    /**
-     * Applies obfuscation to {@link Crasher#classNode}.
-     */
-    private void obfuscate() {
-        if (classNode.signature == null) {
+        logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
+        logStrings.add(LoggerUtils.stdOut("Starting crasher transformer."));
+        AtomicInteger counter = new AtomicInteger();
+        long current = System.currentTimeMillis();
+        classNodes().stream().filter(classNode -> !classExempted(classNode.name)).filter(classNode -> classNode.signature == null)
+                .forEach(classNode -> {
             classNode.signature = StringUtils.crazyString();
-            logStrings.add(LoggerUtils.stdOut("Added crasher"));
-        }
+            counter.incrementAndGet();
+        });
+        logStrings.add(LoggerUtils.stdOut("Added " + counter + " crashers."));
+        logStrings.add(LoggerUtils.stdOut("Finished. [" + tookThisLong(current) + "ms]"));
     }
 
     /**

@@ -60,22 +60,22 @@ public class Config {
     /**
      * The exempt list as {@link ArrayList}.
      */
-    private ArrayList<String> exempts;
+    private List<String> exempts;
 
     /**
      * Exempted classes from {@link Config#exempts} as {@link ArrayList}.
      */
-    private ArrayList<String> classExempts;
+    private List<String> classExempts;
 
     /**
      * Exempted methods from {@link Config#exempts} as {@link ArrayList}.
      */
-    private ArrayList<String> methodExempts;
+    private List<String> methodExempts;
 
     /**
      * Exempted fields from {@link Config#exempts} as {@link ArrayList}.
      */
-    private ArrayList<String> fieldExempts;
+    private List<String> fieldExempts;
 
     /**
      * Constructs a new {@link Config}
@@ -215,7 +215,7 @@ public class Config {
      *
      * @return Returns the class exempts from {@link Config#exempts} as {@link ArrayList}
      */
-    public ArrayList<String> getClassExempts() {
+    public List<String> getClassExempts() {
         return classExempts;
     }
 
@@ -224,7 +224,7 @@ public class Config {
      *
      * @return Returns the method exempts from {@link Config#exempts} as {@link ArrayList}.
      */
-    public ArrayList<String> getMethodExempts() {
+    public List<String> getMethodExempts() {
         return methodExempts;
     }
 
@@ -233,7 +233,7 @@ public class Config {
      *
      * @return Returns the field exempts from {@link Config#exempts} as {@link ArrayList}.
      */
-    public ArrayList<String> getFieldExempts() {
+    public List<String> getFieldExempts() {
         return fieldExempts;
     }
 

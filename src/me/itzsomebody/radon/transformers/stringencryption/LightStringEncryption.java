@@ -2,23 +2,26 @@ package me.itzsomebody.radon.transformers.stringencryption;
 
 import me.itzsomebody.radon.asm.Opcodes;
 import me.itzsomebody.radon.asm.tree.*;
+import me.itzsomebody.radon.methods.StringEncryption;
+import me.itzsomebody.radon.transformers.AbstractTransformer;
 import me.itzsomebody.radon.utils.BytecodeUtils;
 import me.itzsomebody.radon.utils.LoggerUtils;
 import me.itzsomebody.radon.utils.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Transformer that encrypts strings with a known XOR-Key algorithm.
  *
  * @author ItzSomebody
  */
-public class LightStringEncryption {
+public class LightStringEncryption extends AbstractTransformer {
     /**
-     * The {@link ClassNode} that will be obfuscated.
+     * {@link List} of {@link String}s to add to log.
      */
-    private ClassNode classNode;
+    private List<String> logStrings;
 
     /**
      * Indication to not encrypt strings containing Spigot placeholders (%%__USER__%%, %%__RESOURCE__%% and %%__NONCE__%%).
@@ -26,70 +29,53 @@ public class LightStringEncryption {
     private boolean spigotMode;
 
     /**
-     * Path to the decryption method.
-     */
-    private String decryptMethodName;
-
-    /**
-     * Methods protected from obfuscation.
-     */
-    private ArrayList<String> exemptMethods;
-
-    /**
-     * {@link List} of {@link String}s to add to log.
-     */
-    private List<String> logStrings;
-
-    /**
      * Constructor used to create a {@link LightStringEncryption} object.
      *
-     * @param classNode         the {@link ClassNode} object to obfuscate.
-     * @param decryptMethodName the path to the decryption method.
-     * @param spigotMode        indication to not encrypt strings containing Spigot placeholders (%%__USER__%%, %%__RESOURCE__%% and %%__NONCE__%%).
-     * @param exemptMethods     {@link ArrayList} of protected {@link MethodNode}s.
+     * @param spigotMode indication to not encrypt strings containing Spigot placeholders (%%__USER__%%, %%__RESOURCE__%% and %%__NONCE__%%).
      */
-    public LightStringEncryption(ClassNode classNode, String decryptMethodName, boolean spigotMode, ArrayList<String> exemptMethods) {
-        this.classNode = classNode;
-        this.decryptMethodName = decryptMethodName;
+    public LightStringEncryption(boolean spigotMode) {
         this.spigotMode = spigotMode;
-        this.exemptMethods = exemptMethods;
-        logStrings = new ArrayList<>();
-        obfuscate();
     }
 
     /**
-     * Applies obfuscation to {@link LightStringEncryption#classNode}.
+     * Applies obfuscation.
      */
-    private void obfuscate() {
-        String[] split = decryptMethodName.split("\\.");
+    public void obfuscate() {
+        logStrings = new ArrayList<>();
+        logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
         logStrings.add(LoggerUtils.stdOut("Starting light string encryption transformer"));
-        int count = 0;
-        for (MethodNode methodNode : classNode.methods) {
-            if (exemptMethods.contains(classNode.name + "." + methodNode.name + methodNode.desc)) continue;
-            if (BytecodeUtils.isAbstractMethod(methodNode.access)) continue;
-            if (methodNode.instructions.size() < 4) continue;
+        AtomicInteger counter = new AtomicInteger();
+        long current = System.currentTimeMillis();
+        String[] decryptorPath = new String[]{StringUtils.randomClass(classNames()), StringUtils.crazyString()};
+        classNodes().stream().filter(classNode -> !classExempted(classNode.name)).forEach(classNode -> {
+            classNode.methods.stream().filter(methodNode -> !methodExempted(classNode.name + '.' + methodNode.name + methodNode.desc))
+                    .filter(methodNode -> !BytecodeUtils.isAbstractMethod(methodNode.access)).forEach(methodNode -> {
+                for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
+                    if (insn instanceof LdcInsnNode) {
+                        Object cst = ((LdcInsnNode) insn).cst;
 
-            for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
-                if (insn instanceof LdcInsnNode) {
-                    Object cst = ((LdcInsnNode) insn).cst;
+                        if (cst instanceof String) {
+                            if (spigotMode &&
+                                    ((String) cst).contains("%%__USER__%%")
+                                    || ((String) cst).contains("%%__RESOURCE__%%")
+                                    || ((String) cst).contains("%%__NONCE__%%")) continue;
 
-                    if (cst instanceof String) {
-                        if (spigotMode &&
-                                ((String) cst).contains("%%__USER__%%")
-                                || ((String) cst).contains("%%__RESOURCE__%%")
-                                || ((String) cst).contains("%%__NONCE__%%")) continue;
-
-                        String keyLdc = StringUtils.crazyString();
-                        ((LdcInsnNode) insn).cst = StringUtils.encrypt(((String) ((LdcInsnNode) insn).cst), keyLdc);
-                        methodNode.instructions.insert(insn, new MethodInsnNode(Opcodes.INVOKESTATIC, split[0], split[1], "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;", false));
-                        methodNode.instructions.insert(insn, new LdcInsnNode(keyLdc));
-                        count++;
+                            String keyLdc = StringUtils.crazyString();
+                            ((LdcInsnNode) insn).cst = StringUtils.encrypt(((String) ((LdcInsnNode) insn).cst), keyLdc);
+                            methodNode.instructions.insert(insn, new MethodInsnNode(Opcodes.INVOKESTATIC, decryptorPath[0], decryptorPath[1], "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;", false));
+                            methodNode.instructions.insert(insn, new LdcInsnNode(keyLdc));
+                            counter.incrementAndGet();
+                        }
                     }
                 }
-            }
-        }
-        logStrings.add(LoggerUtils.stdOut("Finished encrypting strings"));
-        logStrings.add(LoggerUtils.stdOut("Encrypted " + String.valueOf(count) + " strings"));
+            });
+        });
+
+        classNodes().stream().filter(classNode -> classNode.name.equals(decryptorPath[0])).forEach(classNode -> {
+            classNode.methods.add(StringEncryption.lightMethod(decryptorPath[1]));
+        });
+        logStrings.add(LoggerUtils.stdOut("Encrypted " + counter + " strings."));
+        logStrings.add(LoggerUtils.stdOut("Finished. [" + tookThisLong(current) + "ms]"));
     }
 
     /**
