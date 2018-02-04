@@ -307,7 +307,7 @@ public class Bootstrap { // Eyyy bootstrap bill
 
             // 0 = true; -1 = false
             if (renamerType == 0) {
-                Renamer renamer = new Renamer();
+                Renamer renamer = new Renamer(spigotMode);
                 renamer.init(classes, classPath, classExempts, methodExempts, fieldExempts);
                 renamer.obfuscate();
                 logStrings.addAll(renamer.getLogStrings());

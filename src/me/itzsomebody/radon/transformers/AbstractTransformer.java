@@ -3,6 +3,7 @@ package me.itzsomebody.radon.transformers;
 import me.itzsomebody.radon.asm.Opcodes;
 import me.itzsomebody.radon.asm.tree.ClassNode;
 import me.itzsomebody.radon.asm.tree.MethodNode;
+import me.itzsomebody.radon.utils.CustomRegexUtils;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -61,7 +62,7 @@ public abstract class AbstractTransformer implements Opcodes {
 
     public boolean classExempted(String name) {
         for (String string : exemptClasses) {
-            if (name.matches(string)) {
+            if (CustomRegexUtils.isMatched(string, name)) {
                 return true;
             }
         }
@@ -71,7 +72,7 @@ public abstract class AbstractTransformer implements Opcodes {
 
     public boolean methodExempted(String name) {
         for (String string : exemptMethods) {
-            if (name.matches(string)) {
+            if (CustomRegexUtils.isMatched(string, name)) {
                 return true;
             }
         }
@@ -81,7 +82,7 @@ public abstract class AbstractTransformer implements Opcodes {
 
     public boolean fieldExempted(String name) {
         for (String string : exemptFields) {
-            if (name.matches(string)) {
+            if (CustomRegexUtils.isMatched(string, name)) {
                 return true;
             }
         }
