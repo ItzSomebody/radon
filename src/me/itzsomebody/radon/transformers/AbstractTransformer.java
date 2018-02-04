@@ -9,7 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public abstract class AbstractTransformer extends Thread implements Opcodes {
+public abstract class AbstractTransformer implements Opcodes {
     private Map<String, ClassNode> classes;
     private Map<String, ClassNode> classPath;
     private Map<String, ClassNode> libraryClasses;

@@ -1,3 +1,7 @@
+## 0.1.1
+
+* Fixed renaming bug with Bukkit/Bungee plugins.
+
 ## 0.1.0
 
 * Completely redesigned transformer system.

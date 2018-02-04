@@ -84,9 +84,17 @@ public class BytecodeUtils {
      * Checks if the input class is a main method.
      *
      * @param clazz      {@link ClassNode} to check for main methods.
+     * @param spigotMode if obfuscator should consider the input {@link ClassNode} as a Spigot/Bukkit/Bungee plugin.
      * @return true if the input {@link ClassNode} contains a main method, false if not.
      */
-    public static boolean isMain(ClassNode clazz) {
+    public static boolean isMain(ClassNode clazz, boolean spigotMode) {
+        if (spigotMode) {
+            if (clazz.superName.equals("org/bukkit/plugin/java/JavaPlugin")
+                    || clazz.superName.equals("net/md_5/bungee/api/plugin/Plugin")) {
+                return true;
+            }
+        }
+
         for (MethodNode methodNode : clazz.methods) {
             if (methodNode.name.equals("main")
                     || methodNode.name.equals("premain")) {

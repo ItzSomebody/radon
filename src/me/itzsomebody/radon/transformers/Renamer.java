@@ -34,6 +34,18 @@ public class Renamer extends AbstractTransformer {
     private Map<String, String> mappings = new HashMap<>();
 
     /**
+     * Indication to look for Bukkit/Bungee main methods.
+     */
+    private boolean spigotMode;
+
+    /**
+     * Constructor used to create a {@link Renamer} object.
+     */
+    public Renamer(boolean spigotMode) {
+        this.spigotMode = spigotMode;
+    }
+
+    /**
      * Applies obfuscation.
      */
     public void obfuscate() {
@@ -42,7 +54,7 @@ public class Renamer extends AbstractTransformer {
         logStrings.add(LoggerUtils.stdOut("Generating mappings."));
         long current = System.currentTimeMillis();
         AtomicInteger counter = new AtomicInteger();
-        classNodes().stream().filter(classNode -> !classExempted(classNode.name) && !BytecodeUtils.isMain(classNode)).forEach(classNode -> {
+        classNodes().stream().filter(classNode -> !classExempted(classNode.name)).forEach(classNode -> {
             classNode.methods.stream().filter(methodNode -> !methodExempted(classNode.name + '.' + methodNode.name + '.' + methodNode.desc))
                     .filter(methodNode -> !methodNode.name.startsWith("<"))
                     .filter(methodNode -> !BytecodeUtils.isNativeMethod(methodNode.access))
@@ -58,7 +70,9 @@ public class Renamer extends AbstractTransformer {
                         counter.incrementAndGet();
                     });
 
-            mappings.put(classNode.name, StringUtils.crazyString());
+            if (!BytecodeUtils.isMain(classNode, spigotMode)) {
+                mappings.put(classNode.name, StringUtils.crazyString());
+            }
             counter.incrementAndGet();
         });
         logStrings.add(LoggerUtils.stdOut("Finished generated mappings. [" + String.valueOf(System.currentTimeMillis() - current) + "ms]"));
