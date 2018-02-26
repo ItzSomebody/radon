@@ -1,6 +1,6 @@
 package me.itzsomebody.radon.utils;
 
-import me.itzsomebody.radon.asm.tree.ClassNode;
+import org.objectweb.asm.tree.ClassNode;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
@@ -87,9 +87,10 @@ public class StringUtils {
      * @return a {@link String} to use as a key for string encryption.
      */
     public static String crazyKey() {
-        char[] buildString = new char[100];
+        int numberOfChars = 10; // Just so I can do a quick switch.
+        char[] buildString = new char[numberOfChars];
 
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < numberOfChars; i++) {
             switch (NumberUtils.getRandomInt(8)) {
                 case 0:
                     buildString[i] = '\ua6ac';
@@ -178,7 +179,7 @@ public class StringUtils {
         try {
             SecretKeySpec secretKey;
             byte[] key = secret.getBytes("UTF-8");
-            MessageDigest sha = MessageDigest.getInstance("SHA-256");
+            MessageDigest sha = MessageDigest.getInstance("SHA-1");
             key = sha.digest(key);
             key = Arrays.copyOf(key, 16);
             secretKey = new SecretKeySpec(key, "AES");
@@ -202,7 +203,7 @@ public class StringUtils {
         try {
             SecretKeySpec secretKey;
             byte[] key = secret.getBytes("UTF-8");
-            MessageDigest sha = MessageDigest.getInstance("SHA-256");
+            MessageDigest sha = MessageDigest.getInstance("SHA-1");
             key = sha.digest(key);
             key = Arrays.copyOf(key, 16);
             secretKey = new SecretKeySpec(key, "AES");
@@ -262,5 +263,15 @@ public class StringUtils {
 
         String randomClass = classNames.get(NumberUtils.getRandomInt(classNames.size()));
         return randomClass;
+    }
+
+    public static String heavyEncrypt(String className, String methodName, int key3, String msg) {
+        char[] chars = msg.toCharArray();
+        char[] returnThis = new char[chars.length];
+        for (int i = 0; i < chars.length; i++) {
+            returnThis[i] = (char) (key3 ^ methodName.hashCode() ^ className.hashCode() ^ chars[i]);
+        }
+
+        return new String(returnThis);
     }
 }

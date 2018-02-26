@@ -65,8 +65,8 @@ Valid config options you can use:
 
 ## Credits
 
-* [OW2 ASM](http://asm.ow2.org) - Refactored as me/itzsomebody/radon/asm.
-* [SnakeYaml](http://www.snakeyaml.org) - Refactored as me/itzsomebody/radon/yaml.
+* [OW2 ASM](http://asm.ow2.org) - ObjectWeb ASM.
+* [SnakeYaml](http://www.snakeyaml.org) - SnameYAML.
 * [LordPancake](https://www.youtube.com/user/LordPankake) - Maker of SkidSuite
 * [samczsun](https://github.com/samczsun) - Author of Java-Deobfuscator and the 20 (or so) ways to crash the various decompilers which is no longer open-source.
 * [VincBreaker](https://github.com/Vinc0682) - Author of Smoke obfuscator which I stole some stuff from xD.

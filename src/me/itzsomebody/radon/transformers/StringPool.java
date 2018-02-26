@@ -1,7 +1,7 @@
 package me.itzsomebody.radon.transformers;
 
-import me.itzsomebody.radon.asm.Label;
-import me.itzsomebody.radon.asm.tree.*;
+import org.objectweb.asm.Label;
+import org.objectweb.asm.tree.*;
 import me.itzsomebody.radon.utils.BytecodeUtils;
 import me.itzsomebody.radon.utils.LoggerUtils;
 import me.itzsomebody.radon.utils.StringUtils;
@@ -28,15 +28,9 @@ public class StringPool extends AbstractTransformer {
     private String[] strings;
 
     /**
-     * {@link List} of {@link String}s to add to log.
-     */
-    private List<String> logStrings;
-
-    /**
      * Applies obfuscation.
      */
     public void obfuscate() {
-        logStrings = new ArrayList<>();
         logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
         logStrings.add(LoggerUtils.stdOut("Starting string pool transformer."));
         long current = System.currentTimeMillis();
@@ -44,8 +38,8 @@ public class StringPool extends AbstractTransformer {
         randName = StringUtils.crazyString();
         classNodes().stream().filter(classNode -> !classExempted(classNode.name)).forEach(classNode -> {
             List<String> stringslist = new ArrayList<>();
-            classNode.methods.stream().filter(methodNode -> !methodExempted(classNode.name + '.' + methodNode.name + methodNode.desc))
-                    .filter(methodNode -> !BytecodeUtils.isAbstractMethod(methodNode.access)).forEach(methodNode -> {
+            classNode.methods.stream().filter(methodNode -> !methodExempted(classNode.name + '.' + methodNode.name + methodNode.desc)
+                    && !BytecodeUtils.isAbstractMethod(methodNode.access)).forEach(methodNode -> {
                 for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
                     if (insn instanceof LdcInsnNode) {
                         Object cst = ((LdcInsnNode) insn).cst;
@@ -132,14 +126,5 @@ public class StringPool extends AbstractTransformer {
         method.visitEnd();
 
         return method;
-    }
-
-    /**
-     * Returns {@link String}s to add to log.
-     *
-     * @return {@link String}s to add to log.
-     */
-    public List<String> getLogStrings() {
-        return this.logStrings;
     }
 }

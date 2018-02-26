@@ -1,9 +1,9 @@
 package me.itzsomebody.radon.utils;
 
-import me.itzsomebody.radon.asm.Label;
-import me.itzsomebody.radon.asm.Opcodes;
-import me.itzsomebody.radon.asm.Type;
-import me.itzsomebody.radon.asm.tree.*;
+import org.objectweb.asm.Label;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
+import org.objectweb.asm.tree.*;
 
 import java.util.Map;
 
@@ -273,5 +273,15 @@ public class BytecodeUtils {
         }
 
         throw new IllegalStateException("Unexpected instruction");
+    }
+
+    public static boolean isPrimitiveType(String desc) {
+        String rawDesc = desc.replace("[", "");
+        return (rawDesc.equals("I")
+                || rawDesc.equals("B")
+                || rawDesc.equals("C")
+                || rawDesc.equals("S")
+                || rawDesc.equals("J")
+                || rawDesc.equals("Z"));
     }
 }

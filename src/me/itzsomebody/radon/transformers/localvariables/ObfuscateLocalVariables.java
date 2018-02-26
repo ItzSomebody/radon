@@ -1,8 +1,6 @@
 package me.itzsomebody.radon.transformers.localvariables;
 
-import me.itzsomebody.radon.asm.tree.*;
 import me.itzsomebody.radon.transformers.AbstractTransformer;
-import me.itzsomebody.radon.utils.BytecodeUtils;
 import me.itzsomebody.radon.utils.LoggerUtils;
 import me.itzsomebody.radon.utils.StringUtils;
 
@@ -17,15 +15,9 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class ObfuscateLocalVariables extends AbstractTransformer {
     /**
-     * {@link List} of {@link String}s to add to log.
-     */
-    private List<String> logStrings;
-
-    /**
      * Applies obfuscation.
      */
     public void obfuscate() {
-        logStrings = new ArrayList<>();
         logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
         logStrings.add(LoggerUtils.stdOut("Starting local variable obfuscation transformer"));
         AtomicInteger counter = new AtomicInteger();
@@ -41,14 +33,5 @@ public class ObfuscateLocalVariables extends AbstractTransformer {
         });
         logStrings.add(LoggerUtils.stdOut("Obfuscated " + counter + " local variables."));
         logStrings.add(LoggerUtils.stdOut("Finished. [" + tookThisLong(current) + "ms]"));
-    }
-
-    /**
-     * Returns {@link String}s to add to log.
-     *
-     * @return {@link String}s to add to log.
-     */
-    public List<String> getLogStrings() {
-        return this.logStrings;
     }
 }

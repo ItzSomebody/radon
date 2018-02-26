@@ -15,7 +15,7 @@ public class Radon {
      * Static abuse variables xD
      */
     public static String PREFIX = "[Radon]";
-    public static String VERSION = "0.1.2";
+    public static String VERSION = "0.2.2";
     public static String AUTHORS = "ItzSomebody";
 
     /**
@@ -53,6 +53,6 @@ public class Radon {
         System.out.println("");
         System.out.println("");
         LoggerUtils.stdOut("Version: " + Radon.VERSION);
-        LoggerUtils.stdOut("Author: " + Radon.AUTHORS);
+        LoggerUtils.stdOut("Authors: " + Radon.AUTHORS);
     }
 }

@@ -3,7 +3,22 @@ package me.itzsomebody.radon.gui;
 import me.itzsomebody.radon.Radon;
 import me.itzsomebody.radon.config.Config;
 import me.itzsomebody.radon.internal.Bootstrap;
-import me.itzsomebody.radon.utils.FileUtils;
+import me.itzsomebody.radon.transformers.*;
+import me.itzsomebody.radon.transformers.flow.LightFlowObfuscation;
+import me.itzsomebody.radon.transformers.flow.NormalFlowObfuscation;
+import me.itzsomebody.radon.transformers.invokedynamic.HeavyInvokeDynamic;
+import me.itzsomebody.radon.transformers.invokedynamic.LightInvokeDynamic;
+import me.itzsomebody.radon.transformers.invokedynamic.NormalInvokeDynamic;
+import me.itzsomebody.radon.transformers.linenumbers.ObfuscateLineNumbers;
+import me.itzsomebody.radon.transformers.linenumbers.RemoveLineNumbers;
+import me.itzsomebody.radon.transformers.localvariables.ObfuscateLocalVariables;
+import me.itzsomebody.radon.transformers.localvariables.RemoveLocalVariables;
+import me.itzsomebody.radon.transformers.sourcedebug.ObfuscateSourceDebug;
+import me.itzsomebody.radon.transformers.sourcedebug.RemoveSourceDebug;
+import me.itzsomebody.radon.transformers.sourcename.ObfuscateSourceName;
+import me.itzsomebody.radon.transformers.sourcename.RemoveSourceName;
+import me.itzsomebody.radon.transformers.stringencryption.LightStringEncryption;
+import me.itzsomebody.radon.transformers.stringencryption.NormalStringEncryption;
 import me.itzsomebody.radon.utils.WatermarkUtils;
 
 import javax.swing.*;
@@ -17,6 +32,7 @@ import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -37,9 +53,12 @@ public class GUI {
     private JTextField exemptField;
     private JTextField trashChanceField;
     private JTextField waterMarkMessageField;
+    private JTextField expirationDateField;
+    private JTextField expirationMessageField;
     private JPasswordField watermarkPassword;
     private JTextField extractorInput;
     private JPasswordField extractorKey;
+    private String lastPath;
 
     /*
      * Launch the application.
@@ -213,9 +232,14 @@ public class GUI {
         gbc_scrollPane_2.gridy = 4;
         panel_4.add(scrollPane_2, gbc_scrollPane_2);
 
-        DefaultListModel<String> libList = new DefaultListModel<String>();
+        DefaultListModel<String> libList = new DefaultListModel<>();
+        String jreHome = System.getProperty("java.home");
+        if (jreHome != null) {
+            libList.addElement(jreHome + "/lib/rt.jar");
+            libList.addElement(jreHome + "/lib/jce.jar");
+        }
 
-        JList<String> list_2 = new JList<String>(libList);
+        JList<String> list_2 = new JList<>(libList);
         list_2.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         scrollPane_2.setViewportView(list_2);
 
@@ -318,7 +342,7 @@ public class GUI {
         gbc_comboBox_1.insets = new Insets(0, 0, 5, 5);
         gbc_comboBox_1.gridx = 9;
         gbc_comboBox_1.gridy = 1;
-        String[] invokeDynamics = {"Light", "Normal"};
+        String[] invokeDynamics = {"Light", "Normal", "Heavy"};
         for (String s : invokeDynamics) {
             comboBox_1.addItem(s);
         }
@@ -448,15 +472,6 @@ public class GUI {
         });
         panel.add(chckbxTrashClasses, gbc_chckbxNewCheckBox_3);
 
-        /*JSeparator separator = new JSeparator();
-        GridBagConstraints gbc_separator = new GridBagConstraints();
-        gbc_separator.fill = GridBagConstraints.HORIZONTAL;
-        gbc_separator.gridwidth = 10;
-        gbc_separator.insets = new Insets(0, 0, 5, 0);
-        gbc_separator.gridx = 0;
-        gbc_separator.gridy = 5;
-        panel.add(separator, gbc_separator);*/
-
         JComboBox<String> comboBox_123 = new JComboBox<>();
         comboBox_123.setEnabled(false);
         GridBagConstraints gbc_comboBox_4 = new GridBagConstraints();
@@ -490,13 +505,45 @@ public class GUI {
         });
         panel.add(chckbxSourceName, gbc_chckbxNewCheckBox_123);
 
+        JComboBox<String> comboBox_1234 = new JComboBox<>();
+        comboBox_1234.setEnabled(false);
+        GridBagConstraints gbc_comboBox1234 = new GridBagConstraints();
+        gbc_comboBox1234.fill = GridBagConstraints.HORIZONTAL;
+        gbc_comboBox1234.insets = new Insets(0, 0, 5, 5);
+        gbc_comboBox1234.gridx = 9;
+        gbc_comboBox1234.gridy = 6;
+
+        String[] sourceDebugTypes = {"Obfuscate", "Remove"};
+        for (String s : sourceNameTypes) {
+            comboBox_1234.addItem(s);
+        }
+        panel.add(comboBox_1234, gbc_comboBox1234);
+
+        JCheckBox chckbxSourceDebug = new JCheckBox("Source Debug");
+        GridBagConstraints gbc_SourceDebug = new GridBagConstraints();
+        gbc_SourceDebug.anchor = GridBagConstraints.WEST;
+        gbc_SourceDebug.insets = new Insets(0, 0, 5, 5);
+        gbc_SourceDebug.gridx = 0;
+        gbc_SourceDebug.gridy = 6;
+        chckbxSourceDebug.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (chckbxSourceDebug.isSelected()) {
+                    comboBox_1234.setEnabled(true);
+                } else {
+                    comboBox_1234.setEnabled(false);
+                }
+            }
+        });
+        panel.add(chckbxSourceDebug, gbc_SourceDebug);
+
         JComboBox<String> comboBox_5 = new JComboBox<>();
         comboBox_5.setEnabled(false);
         GridBagConstraints gbc_comboBox_5 = new GridBagConstraints();
         gbc_comboBox_5.fill = GridBagConstraints.HORIZONTAL;
         gbc_comboBox_5.insets = new Insets(0, 0, 5, 5);
         gbc_comboBox_5.gridx = 9;
-        gbc_comboBox_5.gridy = 6;
+        gbc_comboBox_5.gridy = 7;
 
         String[] lineTypes = {"Obfuscate", "Remove"};
         for (String s : lineTypes) {
@@ -510,7 +557,7 @@ public class GUI {
         gbc_chckbxNewCheckBox_10.anchor = GridBagConstraints.WEST;
         gbc_chckbxNewCheckBox_10.insets = new Insets(0, 0, 5, 5);
         gbc_chckbxNewCheckBox_10.gridx = 0;
-        gbc_chckbxNewCheckBox_10.gridy = 6;
+        gbc_chckbxNewCheckBox_10.gridy = 7;
         chckbxLineObfuscation.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -528,7 +575,7 @@ public class GUI {
         gbc_chckbxNewCheckBox.insets = new Insets(0, 0, 5, 5);
         gbc_chckbxNewCheckBox.anchor = GridBagConstraints.NORTHWEST;
         gbc_chckbxNewCheckBox.gridx = 0;
-        gbc_chckbxNewCheckBox.gridy = 7;
+        gbc_chckbxNewCheckBox.gridy = 8;
         panel.add(chckbxSpringPool, gbc_chckbxNewCheckBox);
 
         JCheckBox chckbxCrasher = new JCheckBox("Crasher");
@@ -536,7 +583,7 @@ public class GUI {
         gbc_chckbxAntidecompiler.anchor = GridBagConstraints.WEST;
         gbc_chckbxAntidecompiler.insets = new Insets(0, 0, 5, 5);
         gbc_chckbxAntidecompiler.gridx = 0;
-        gbc_chckbxAntidecompiler.gridy = 8;
+        gbc_chckbxAntidecompiler.gridy = 9;
         panel.add(chckbxCrasher, gbc_chckbxAntidecompiler);
 
         JCheckBox chckbxHidecode = new JCheckBox("Hide Code");
@@ -544,7 +591,7 @@ public class GUI {
         gbc_chckbxNewCheckBox_4.anchor = GridBagConstraints.WEST;
         gbc_chckbxNewCheckBox_4.insets = new Insets(0, 0, 5, 5);
         gbc_chckbxNewCheckBox_4.gridx = 0;
-        gbc_chckbxNewCheckBox_4.gridy = 9;
+        gbc_chckbxNewCheckBox_4.gridy = 10;
         panel.add(chckbxHidecode, gbc_chckbxNewCheckBox_4);
 
         JCheckBox chckbxNumberObfuscation = new JCheckBox("Number Obfuscation");
@@ -552,7 +599,7 @@ public class GUI {
         gbc_chckbxNewCheckBox_9.anchor = GridBagConstraints.WEST;
         gbc_chckbxNewCheckBox_9.insets = new Insets(0, 0, 5, 5);
         gbc_chckbxNewCheckBox_9.gridx = 0;
-        gbc_chckbxNewCheckBox_9.gridy = 10;
+        gbc_chckbxNewCheckBox_9.gridy = 11;
         panel.add(chckbxNumberObfuscation, gbc_chckbxNewCheckBox_9);
 
         JCheckBox chckbxSpigotPlugin = new JCheckBox("Spigot Plugin");
@@ -561,15 +608,15 @@ public class GUI {
         gbc_chckbxNewCheckBox_7.anchor = GridBagConstraints.WEST;
         gbc_chckbxNewCheckBox_7.insets = new Insets(0, 0, 5, 5);
         gbc_chckbxNewCheckBox_7.gridx = 0;
-        gbc_chckbxNewCheckBox_7.gridy = 11;
+        gbc_chckbxNewCheckBox_7.gridy = 12;
         panel.add(chckbxSpigotPlugin, gbc_chckbxNewCheckBox_7);
 
-        JCheckBox chckbxClassRenammer = new JCheckBox("Rename Classes");
+        JCheckBox chckbxClassRenammer = new JCheckBox("Member Renamer");
         GridBagConstraints gbc_chckbxClassRenammer = new GridBagConstraints();
         gbc_chckbxClassRenammer.anchor = GridBagConstraints.WEST;
         gbc_chckbxClassRenammer.insets = new Insets(0, 0, 5, 5);
         gbc_chckbxClassRenammer.gridx = 0;
-        gbc_chckbxClassRenammer.gridy = 12;
+        gbc_chckbxClassRenammer.gridy = 13;
         panel.add(chckbxClassRenammer, gbc_chckbxClassRenammer);
 
         JPanel panel_2 = new JPanel();
@@ -798,6 +845,82 @@ public class GUI {
         });
         panel_2.add(btnNewButton_5, gbc_btnNewButton_5);
 
+        JPanel expirePanel = new JPanel();
+        tabbedPane.addTab("Expiration", null, expirePanel, null);
+        GridBagLayout gbl_expirePanel = new GridBagLayout();
+        gbl_expirePanel.columnWidths = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 59, 0, 0};
+        gbl_expirePanel.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+        gbl_expirePanel.columnWeights = new double[]{0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+        gbl_expirePanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
+        expirePanel.setLayout(gbl_expirePanel);
+
+        JLabel expireMessageLabel = new JLabel("Message:");
+        GridBagConstraints gbc_expireMessageLabel = new GridBagConstraints();
+        gbc_expireMessageLabel.insets = new Insets(0, 0, 5, 5);
+        gbc_expireMessageLabel.anchor = GridBagConstraints.EAST;
+        gbc_expireMessageLabel.gridx = 0;
+        gbc_expireMessageLabel.gridy = 2;
+        expirePanel.add(expireMessageLabel, gbc_expireMessageLabel);
+
+        expirationMessageField = new JTextField();
+        expirationMessageField.setEnabled(false);
+        GridBagConstraints gbc_messageField = new GridBagConstraints();
+        gbc_messageField.gridwidth = 11;
+        gbc_messageField.insets = new Insets(0, 0, 5, 5);
+        gbc_messageField.fill = GridBagConstraints.HORIZONTAL;
+        gbc_messageField.gridx = 1;
+        gbc_messageField.gridy = 2;
+        expirePanel.add(expirationMessageField, gbc_messageField);
+        expirationMessageField.setColumns(10);
+
+        JLabel expiresLabel = new JLabel("Expires:");
+        GridBagConstraints gbc_expiresLabel = new GridBagConstraints();
+        gbc_expiresLabel.insets = new Insets(0, 0, 5, 5);
+        gbc_expiresLabel.anchor = GridBagConstraints.EAST;
+        gbc_expiresLabel.gridx = 0;
+        gbc_expiresLabel.gridy = 3;
+        expirePanel.add(expiresLabel, gbc_expiresLabel);
+
+        expirationDateField = new JTextField();
+        expirationDateField.setEnabled(false);
+        GridBagConstraints gbc_dateField = new GridBagConstraints();
+        gbc_dateField.gridwidth = 11;
+        gbc_dateField.insets = new Insets(0, 0, 5, 5);
+        gbc_dateField.fill = GridBagConstraints.HORIZONTAL;
+        gbc_dateField.gridx = 1;
+        gbc_dateField.gridy = 3;
+        expirePanel.add(expirationDateField, gbc_dateField);
+
+        JCheckBox chckbxAddExpiration = new JCheckBox("Expiration");
+        GridBagConstraints gbc_AddExpiration = new GridBagConstraints();
+        gbc_AddExpiration.insets = new Insets(0, 0, 5, 5);
+        gbc_AddExpiration.gridx = 0;
+        gbc_AddExpiration.gridy = 0;
+        chckbxAddExpiration.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent arg0) {
+                if (chckbxAddExpiration.isSelected()) {
+                    expirationDateField.setEnabled(true);
+                    expirationMessageField.setEnabled(true);
+                } else if (!chckbxAddExpiration.isSelected()) {
+                    expirationDateField.setEnabled(false);
+                    expirationMessageField.setEnabled(false);
+                }
+            }
+
+        });
+        expirePanel.add(chckbxAddExpiration, gbc_AddExpiration);
+
+        JSeparator expireSeparator = new JSeparator();
+        GridBagConstraints gbc_expireSeparator = new GridBagConstraints();
+        gbc_expireSeparator.insets = new Insets(0, 0, 5, 0);
+        gbc_expireSeparator.fill = GridBagConstraints.HORIZONTAL;
+        gbc_expireSeparator.gridwidth = 13;
+        gbc_expireSeparator.gridx = 0;
+        gbc_expireSeparator.gridy = 4;
+        expirePanel.add(expireSeparator, gbc_expireSeparator);
+
         JPanel panel_3 = new JPanel();
         tabbedPane.addTab("Exempt", null, panel_3, null);
         GridBagLayout gbl_panel_3 = new GridBagLayout();
@@ -996,77 +1119,120 @@ public class GUI {
                                 JOptionPane.showMessageDialog(null, "Please only enter numbers as a chance for trash classes.", "Error", JOptionPane.ERROR_MESSAGE);
                                 return;
                             }
-                            ArrayList<String> exemptClasses = new ArrayList<>();
+                            List<String> exemptClasses = new ArrayList<>();
                             for (int i = 0; i < exemptList.size(); i++) {
                                 if (exemptList.get(i).endsWith("(METHOD)")) continue;
                                 exemptClasses.add(exemptList.get(i));
                             }
-                            ArrayList<String> exemptMethods = new ArrayList<>();
+                            List<String> exemptMethods = new ArrayList<>();
                             for (int i = 0; i < exemptList.size(); i++) {
                                 if (exemptList.get(i).endsWith("(METHOD)")) {
                                     exemptMethods.add(exemptList.get(i).substring(0, exemptList.get(i).length() - 8));
                                 }
                             }
-                            ArrayList<String> exemptFields = new ArrayList<>();
+                            List<String> exemptFields = new ArrayList<>();
                             for (int i = 0; i < exemptList.size(); i++) {
                                 if (exemptList.get(i).endsWith("(FIELD)")) {
                                     exemptMethods.add(exemptList.get(i).substring(0, exemptList.get(i).length() - 7));
                                 }
                             }
+                            boolean spigotMode = chckbxSpigotPlugin.isSelected();
+                            List<AbstractTransformer> transformers = new ArrayList<>();
 
-                            int stringEncryptionType = -1;
-                            if (chckbxStringEncryption.isSelected()) {
-                                stringEncryptionType = comboBox.getSelectedIndex();
-                            }
-
-                            int invokeDynamicType = -1;
-                            if (chckbxInvokeDynamic.isSelected()) {
-                                invokeDynamicType = comboBox_1.getSelectedIndex();
-                            }
-
-                            int flowObfuscationType = -1;
-                            if (chckbxFlow.isSelected()) {
-                                flowObfuscationType = comboBox_2.getSelectedIndex();
-                            }
-
-                            int localVariableType = -1;
-                            if (chckbxLocalVariables.isSelected()) {
-                                localVariableType = comboBox_3.getSelectedIndex();
-                            }
-
-                            int lineNumberType = -1;
-                            if (chckbxLineObfuscation.isSelected()) {
-                                lineNumberType = comboBox_5.getSelectedIndex();
-                            }
-
-                            int sourceNameType = -1;
-                            if (chckbxSourceName.isSelected()) {
-                                sourceNameType = comboBox_123.getSelectedIndex();
-                            }
-
-                            int crasherType = -1;
-                            if (chckbxCrasher.isSelected()) {
-                                crasherType = 0;
-                            }
-
-                            int hideCodeType = -1;
-                            if (chckbxHidecode.isSelected()) {
-                                hideCodeType = 0;
-                            }
-
-                            int numberObfuscationType = -1;
-                            if (chckbxNumberObfuscation.isSelected()) {
-                                numberObfuscationType = 0;
-                            }
-
-                            int stringPoolType = -1;
-                            if (chckbxSpringPool.isSelected()) {
-                                stringPoolType = 0;
-                            }
-
-                            int renamerType = -1;
                             if (chckbxClassRenammer.isSelected()) {
-                                renamerType = 0;
+                                transformers.add(new Renamer(spigotMode));
+                            }
+                            if (chckbxNumberObfuscation.isSelected()) {
+                                transformers.add(new NumberObfuscation());
+                            }
+                            if (chckbxInvokeDynamic.isSelected()) {
+                                switch (comboBox_1.getSelectedIndex()) {
+                                    case 0:
+                                        transformers.add(new LightInvokeDynamic());
+                                        break;
+                                    case 1:
+                                        transformers.add(new NormalInvokeDynamic());
+                                        break;
+                                    case 2:
+                                        transformers.add(new HeavyInvokeDynamic());
+                                        break;
+                                }
+                            }
+                            if (chckbxAddExpiration.isSelected()) {
+                                if (!expirationDateField.getText().isEmpty()
+                                        && !expirationMessageField.getText().isEmpty()) {
+                                    long expireTime = new SimpleDateFormat("MM/dd/yyyy").parse(expirationDateField.getText()).getTime();
+                                    transformers.add(new Expiry(expireTime, expirationMessageField.getText()));
+                                }
+                            }
+                            if (chckbxStringEncryption.isSelected()) {
+                                switch (comboBox.getSelectedIndex()) {
+                                    case 0:
+                                        transformers.add(new LightStringEncryption(spigotMode));
+                                        break;
+                                    case 1:
+                                        transformers.add(new NormalStringEncryption(spigotMode));
+                                        break;
+                                }
+                            }
+                            if (chckbxFlow.isSelected()) {
+                                switch (comboBox_2.getSelectedIndex()) {
+                                    case 0:
+                                        transformers.add(new LightFlowObfuscation());
+                                        break;
+                                    case 1:
+                                        transformers.add(new NormalFlowObfuscation());
+                                        break;
+                                }
+                            }
+                            if (chckbxSpringPool.isSelected()) {
+                                transformers.add(new StringPool());
+                            }
+                            if (chckbxLocalVariables.isSelected()) {
+                                switch (comboBox_3.getSelectedIndex()) {
+                                    case 0:
+                                        transformers.add(new ObfuscateLocalVariables());
+                                        break;
+                                    case 1:
+                                        transformers.add(new RemoveLocalVariables());
+                                        break;
+                                }
+                            }
+                            if (chckbxLineObfuscation.isSelected()) {
+                                switch (comboBox_5.getSelectedIndex()) {
+                                    case 0:
+                                        transformers.add(new ObfuscateLineNumbers());
+                                        break;
+                                    case 1:
+                                        transformers.add(new RemoveLineNumbers());
+                                        break;
+                                }
+                            }
+                            if (chckbxSourceName.isSelected()) {
+                                switch (comboBox_123.getSelectedIndex()) {
+                                    case 0:
+                                        transformers.add(new ObfuscateSourceName());
+                                        break;
+                                    case 1:
+                                        transformers.add(new RemoveSourceName());
+                                        break;
+                                }
+                            }
+                            if (chckbxSourceDebug.isSelected()) {
+                                switch (comboBox_1234.getSelectedIndex()) {
+                                    case 0:
+                                        transformers.add(new ObfuscateSourceDebug());
+                                        break;
+                                    case 1:
+                                        transformers.add(new RemoveSourceDebug());
+                                        break;
+                                }
+                            }
+                            if (chckbxCrasher.isSelected()) {
+                                transformers.add(new Crasher());
+                            }
+                            if (chckbxHidecode.isSelected()) {
+                                transformers.add(new HideCode(spigotMode));
                             }
 
                             int trashClasses = -1;
@@ -1078,7 +1244,6 @@ public class GUI {
                             if (chckbxAddWatermark.isSelected()) {
                                 watermarkType = comboBox_5.getSelectedIndex();
                             }
-                            boolean spigotMode = chckbxSpigotPlugin.isSelected();
                             Bootstrap bootstrap = new Bootstrap(
                                     input,
                                     output,
@@ -1086,25 +1251,11 @@ public class GUI {
                                     exemptClasses,
                                     exemptMethods,
                                     exemptFields,
-                                    stringEncryptionType,
-                                    invokeDynamicType,
-                                    flowObfuscationType,
-                                    localVariableType,
-                                    lineNumberType,
-                                    sourceNameType,
-                                    crasherType,
-                                    hideCodeType,
-                                    numberObfuscationType,
-                                    stringPoolType,
-                                    renamerType,
-                                    spigotMode,
+                                    transformers,
                                     trashClasses,
                                     waterMarkMessageField.getText(),
                                     watermarkType,
-                                    new String(watermarkPassword.getPassword()),
-                                    -1,
-                                    ""
-                            );
+                                    new String(watermarkPassword.getPassword()));
                             bootstrap.startTheParty(false);
                             JOptionPane.showMessageDialog(null, "Successfully processed file!", "Done", JOptionPane.INFORMATION_MESSAGE);
                         } catch (Throwable t) {
@@ -1166,107 +1317,121 @@ public class GUI {
                                     }
                                 }
 
-                                int stringEncryptionMode = configParser.getStringEncryptionType();
-                                if (stringEncryptionMode == -1) {
+                                AbstractTransformer stringEncryptionMode = configParser.getStringEncryptionType();
+                                if (stringEncryptionMode == null) {
                                     chckbxStringEncryption.setSelected(false);
-                                } else if (stringEncryptionMode == 0) {
+                                } else if (stringEncryptionMode instanceof LightStringEncryption) {
                                     chckbxStringEncryption.setSelected(true);
                                     comboBox.setSelectedIndex(0);
                                     comboBox.setEnabled(true);
-                                } else if (stringEncryptionMode == 1) {
+                                } else if (stringEncryptionMode instanceof NormalStringEncryption) {
                                     chckbxStringEncryption.setSelected(true);
                                     comboBox.setSelectedIndex(1);
                                     comboBox.setEnabled(true);
                                 }
 
-                                int flowObfuscationMode = configParser.getFlowObfuscationType();
-                                if (flowObfuscationMode == -1) {
+                                AbstractTransformer flowObfuscationMode = configParser.getFlowObfuscationType();
+                                if (flowObfuscationMode == null) {
                                     chckbxFlow.setSelected(false);
-                                } else if (flowObfuscationMode == 0) {
+                                } else if (flowObfuscationMode instanceof LightFlowObfuscation) {
                                     chckbxFlow.setSelected(true);
                                     comboBox_2.setSelectedIndex(0);
                                     comboBox_2.setEnabled(true);
-                                } else if (flowObfuscationMode == 1) {
+                                } else if (flowObfuscationMode instanceof NormalFlowObfuscation) {
                                     chckbxFlow.setSelected(true);
                                     comboBox_2.setSelectedIndex(1);
                                     comboBox_2.setEnabled(true);
                                 }
 
-                                int invokeDynamicMode = configParser.getInvokeDynamicType();
-                                if (invokeDynamicMode == -1) {
+                                AbstractTransformer invokeDynamicMode = configParser.getInvokeDynamicType();
+                                if (invokeDynamicMode == null) {
                                     chckbxInvokeDynamic.setSelected(false);
-                                } else if (invokeDynamicMode == 0) {
+                                } else if (invokeDynamicMode instanceof LightFlowObfuscation) {
                                     chckbxInvokeDynamic.setSelected(true);
                                     comboBox_1.setSelectedIndex(0);
                                     comboBox_1.setEnabled(true);
-                                } else if (invokeDynamicMode == 1) {
+                                } else if (invokeDynamicMode instanceof NormalFlowObfuscation) {
                                     chckbxInvokeDynamic.setSelected(true);
                                     comboBox_1.setSelectedIndex(1);
                                     comboBox_1.setEnabled(true);
                                 }
 
-                                int localVariablesMode = configParser.getInvokeDynamicType();
-                                if (localVariablesMode == -1) {
+                                AbstractTransformer localVariablesMode = configParser.getInvokeDynamicType();
+                                if (localVariablesMode == null) {
                                     chckbxLocalVariables.setSelected(false);
-                                } else if (localVariablesMode == 0) {
+                                } else if (localVariablesMode instanceof ObfuscateLocalVariables) {
                                     chckbxLocalVariables.setSelected(true);
                                     comboBox_3.setSelectedIndex(0);
                                     comboBox_3.setEnabled(true);
-                                } else if (localVariablesMode == 1) {
+                                } else if (localVariablesMode instanceof RemoveLocalVariables) {
                                     chckbxLocalVariables.setSelected(true);
                                     comboBox_3.setSelectedIndex(1);
                                     comboBox_3.setEnabled(true);
                                 }
 
-                                int crasherMode = configParser.getCrasherType();
-                                if (crasherMode == 0) {
+                                AbstractTransformer crasherMode = configParser.getCrasherType();
+                                if (crasherMode instanceof Crasher) {
                                     chckbxCrasher.setSelected(true);
                                 } else {
                                     chckbxCrasher.setSelected(false);
                                 }
 
-                                int hideCodeMode = configParser.getHideCodeType();
-                                if (hideCodeMode == 0) {
+                                AbstractTransformer hideCodeMode = configParser.getHideCodeType();
+                                if (hideCodeMode instanceof HideCode) {
                                     chckbxHidecode.setSelected(true);
                                 } else {
                                     chckbxHidecode.setSelected(false);
                                 }
 
-                                int lineRemoverMode = configParser.getLineNumberObfuscationType();
-                                if (lineRemoverMode == -1) {
+                                AbstractTransformer lineRemoverMode = configParser.getLineNumberObfuscationType();
+                                if (lineRemoverMode == null) {
                                     chckbxLineObfuscation.setSelected(false);
-                                } else if (localVariablesMode == 0) {
+                                } else if (lineRemoverMode instanceof ObfuscateLineNumbers) {
                                     chckbxLineObfuscation.setSelected(true);
                                     comboBox_5.setSelectedIndex(0);
                                     comboBox_5.setEnabled(true);
-                                } else if (localVariablesMode == 1) {
+                                } else if (lineRemoverMode instanceof RemoveLineNumbers) {
                                     chckbxLineObfuscation.setSelected(true);
                                     comboBox_5.setSelectedIndex(1);
                                     comboBox_5.setEnabled(true);
                                 }
 
-                                int numberObfuscationMode = configParser.getNumberObfuscationType();
-                                if (numberObfuscationMode == 0) {
+                                AbstractTransformer numberObfuscationMode = configParser.getNumberObfuscationType();
+                                if (numberObfuscationMode instanceof NumberObfuscation) {
                                     chckbxNumberObfuscation.setSelected(true);
                                 } else {
                                     chckbxNumberObfuscation.setSelected(false);
                                 }
 
-                                int sourceNameObfuscationMode = configParser.getSourceNameObfuscationType();
-                                if (sourceNameObfuscationMode == -1) {
+                                AbstractTransformer sourceNameObfuscationMode = configParser.getSourceNameObfuscationType();
+                                if (sourceNameObfuscationMode == null) {
                                     chckbxSourceName.setSelected(false);
-                                } else if (localVariablesMode == 0) {
+                                } else if (sourceNameObfuscationMode instanceof ObfuscateSourceName) {
                                     chckbxSourceName.setSelected(true);
                                     comboBox_123.setSelectedIndex(0);
                                     comboBox_123.setEnabled(true);
-                                } else if (localVariablesMode == 1) {
+                                } else if (sourceNameObfuscationMode instanceof RemoveSourceName) {
                                     chckbxSourceName.setSelected(true);
                                     comboBox_123.setSelectedIndex(1);
                                     comboBox_123.setEnabled(true);
                                 }
 
-                                int stringPoolMode = configParser.getStringPoolType();
-                                if (stringPoolMode == 0) {
+                                AbstractTransformer sourceDebugObfuscationMode = configParser.getSourceDebugObfuscationType();
+                                if (sourceDebugObfuscationMode == null) {
+                                    chckbxSourceDebug.setSelected(false);
+                                } else if (sourceDebugObfuscationMode instanceof ObfuscateSourceDebug) {
+                                    chckbxSourceDebug.setSelected(true);
+                                    comboBox_1234.setSelectedIndex(0);
+                                    comboBox_1234.setEnabled(true);
+                                } else if (sourceDebugObfuscationMode instanceof RemoveSourceDebug) {
+                                    chckbxSourceDebug.setSelected(true);
+                                    comboBox_1234.setSelectedIndex(1);
+                                    comboBox_1234.setEnabled(true);
+                                }
+
+
+                                AbstractTransformer stringPoolMode = configParser.getStringPoolType();
+                                if (stringPoolMode instanceof StringPool) {
                                     chckbxSpringPool.setSelected(true);
                                 } else {
                                     chckbxSpringPool.setSelected(false);
@@ -1296,8 +1461,17 @@ public class GUI {
                                     watermarkPassword.setEnabled(true);
                                     comboBox_05.setEnabled(true);
                                 }
+
+                                if (configParser.getExpiryMsg() != null
+                                        && configParser.getExpiryTime() != -1) {
+                                    expirationMessageField.setText(configParser.getExpiryMsg());
+                                    expirationMessageField.setEnabled(true);
+                                    expirationDateField.setText(String.valueOf(new SimpleDateFormat("MM/dd/yyyy").format(configParser.getExpiryTime())));
+                                    expirationDateField.setEnabled(true);
+                                    chckbxAddExpiration.setSelected(true);
+                                }
                             } catch (Throwable t) {
-                                JOptionPane.showMessageDialog(null, t.getMessage(), "Error", 0);
+                                JOptionPane.showMessageDialog(null, t.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                                 t.printStackTrace();
                             }
                         }

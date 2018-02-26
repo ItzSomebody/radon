@@ -1,16 +1,14 @@
 package me.itzsomebody.radon.transformers.flow;
 
-import me.itzsomebody.radon.asm.Label;
-import me.itzsomebody.radon.asm.Opcodes;
-import me.itzsomebody.radon.asm.tree.*;
+import org.objectweb.asm.Label;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.tree.*;
 import me.itzsomebody.radon.transformers.AbstractTransformer;
 import me.itzsomebody.radon.utils.BytecodeUtils;
 import me.itzsomebody.radon.utils.LoggerUtils;
 import me.itzsomebody.radon.utils.NumberUtils;
 import me.itzsomebody.radon.utils.StringUtils;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -24,24 +22,19 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class NormalFlowObfuscation extends AbstractTransformer {
     /**
-     * {@link List} of {@link String}s to add to log.
-     */
-    private List<String> logStrings;
-
-    /**
      * Applies obfuscation.
      */
     public void obfuscate() {
-        String s = StringUtils.bigLDC();
-        logStrings = new ArrayList<>();
         logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
         logStrings.add(LoggerUtils.stdOut("Starting normal flow obfuscation transformer"));
         AtomicInteger counter = new AtomicInteger();
         long current = System.currentTimeMillis();
+        String s = StringUtils.bigLDC();
         classNodes().stream().filter(classNode -> !classExempted(classNode.name)).forEach(classNode -> {
             classNode.methods.stream().filter(methodNode -> !methodExempted(classNode.name + '.' + methodNode.name + methodNode.desc))
                     .filter(methodNode -> !BytecodeUtils.isAbstractMethod(methodNode.access)).forEach(methodNode -> {
                 for (AbstractInsnNode ain : methodNode.instructions.toArray()) {
+                    if (methodSize(methodNode) > 40000) break;
                     int op = ain.getOpcode();
                     if (op == Opcodes.ALOAD || op == Opcodes.ILOAD || op == Opcodes.FLOAD) {
                         VarInsnNode vin = (VarInsnNode) ain;
@@ -70,7 +63,7 @@ public class NormalFlowObfuscation extends AbstractTransformer {
                         }
                     } else if (BytecodeUtils.isNumberNode(ain)) {
                         /*
-                         * (SI|BI)PUSH 255
+                         * ((SI|BI)PUSH|LDC) 123
                          * INEG
                          * INEG
                          * INEG
@@ -81,7 +74,7 @@ public class NormalFlowObfuscation extends AbstractTransformer {
                          * INEG
                          */
                         InsnList insnList = new InsnList();
-                        int howMany = (NumberUtils.getRandomInt(6) + 3) * 2; // Odd number times even number = even number
+                        int howMany = (NumberUtils.getRandomInt(2) + 2) * 2; // Odd number times even number = even number
                         for (int i = 0; i < howMany; i++) {
                             insnList.add(new InsnNode(Opcodes.INEG));
                         }
@@ -113,19 +106,6 @@ public class NormalFlowObfuscation extends AbstractTransformer {
                         AbstractInsnNode next = ain.getNext();
                         methodNode.instructions.insertBefore(next, new InsnNode(Opcodes.POP));
                         methodNode.instructions.insertBefore(next, new VarInsnNode(Opcodes.ASTORE, ((VarInsnNode) ain).var));
-                        counter.incrementAndGet();
-                    } else if (ain.getOpcode() == Opcodes.NOP) {
-                        /*
-                         * NOP
-                         * NOP
-                         * NOP
-                         * NOP
-                         * NOP
-                         */
-                        int howMany = (NumberUtils.getRandomInt(5) + 1) * 2;
-                        for (int i = 0; i < howMany; i++) {
-                            methodNode.instructions.insert(ain, new InsnNode(Opcodes.NOP));
-                        }
                         counter.incrementAndGet();
                     }
                 }
@@ -192,13 +172,13 @@ public class NormalFlowObfuscation extends AbstractTransformer {
                 insnList.add(new InsnNode(Opcodes.ATHROW));
                 insnList.add(l6);
                 //insnList.add(new FrameNode(Opcodes.F_FULL, 0, new Object[]{}, 1, new Object[]{"java/lang/Throwable"}));
-                int howMany = (NumberUtils.getRandomInt(5) + 3) * 2;
-                for (int i = 0; i < howMany; i++) {
-                    insnList.add(new InsnNode(Opcodes.NOP));
-                }
+                //int howMany = (NumberUtils.getRandomInt(5) + 3) * 2;
+                //for (int i = 0; i < howMany; i++) {
+                //    insnList.add(new InsnNode(Opcodes.NOP));
+                //}
                 insnList.add(new InsnNode(Opcodes.ATHROW));
                 insnList.add(l7);
-                //insnList.add(new FrameNode(Opcodes.F_FULL, 0, new Object[]{}, 1, new Object[]{"javax/crypto/BadPaddingException"}));
+                //insnList.add(new FrameNode(Opcodes.F_FULL, 0, new Object[]{}, 1, new Object[]{"java/lang/Throwable"}));
                 insnList.add(new InsnNode(Opcodes.ATHROW));
                 insnList.add(l5);
                 //insnList.add(new FrameNode(Opcodes.F_SAME, 0, null, 0, null));
@@ -206,20 +186,11 @@ public class NormalFlowObfuscation extends AbstractTransformer {
                 methodNode.instructions.insertBefore(methodNode.instructions.getFirst(), insnList);
                 methodNode.tryCatchBlocks.add(new TryCatchBlockNode(l1, l2, l2, "java/lang/Throwable"));
                 methodNode.tryCatchBlocks.add(new TryCatchBlockNode(l2, l0, l1, "java/lang/Throwable"));
-                methodNode.tryCatchBlocks.add(new TryCatchBlockNode(l3, l6, l7, "javax/crypto/BadPaddingException"));
+                methodNode.tryCatchBlocks.add(new TryCatchBlockNode(l3, l6, l7, "java/lang/Throwable"));
                 counter.incrementAndGet();
             });
         });
         logStrings.add(LoggerUtils.stdOut("Added " + counter + " instruction sets."));
         logStrings.add(LoggerUtils.stdOut("Finished. [" + tookThisLong(current) + "ms]"));
-    }
-
-    /**
-     * Returns {@link String}s to add to log.
-     *
-     * @return {@link String}s to add to log.
-     */
-    public List<String> getLogStrings() {
-        return this.logStrings;
     }
 }

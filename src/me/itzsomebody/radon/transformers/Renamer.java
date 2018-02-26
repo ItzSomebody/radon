@@ -1,11 +1,11 @@
 package me.itzsomebody.radon.transformers;
 
-import me.itzsomebody.radon.asm.commons.ClassRemapper;
-import me.itzsomebody.radon.asm.commons.Remapper;
-import me.itzsomebody.radon.asm.commons.SimpleRemapper;
-import me.itzsomebody.radon.asm.tree.ClassNode;
-import me.itzsomebody.radon.asm.tree.FieldNode;
-import me.itzsomebody.radon.asm.tree.MethodNode;
+import org.objectweb.asm.commons.ClassRemapper;
+import org.objectweb.asm.commons.Remapper;
+import org.objectweb.asm.commons.SimpleRemapper;
+import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.FieldNode;
+import org.objectweb.asm.tree.MethodNode;
 import me.itzsomebody.radon.utils.BytecodeUtils;
 import me.itzsomebody.radon.utils.LoggerUtils;
 import me.itzsomebody.radon.utils.NumberUtils;
@@ -19,15 +19,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Transformer that renames classes and their members.
+ * TODO: Very inefficient method of generating method names, work on it.
  *
  * @author ItzSomebody
  */
 public class Renamer extends AbstractTransformer {
-    /**
-     * {@link List} of {@link String}s to add to log.
-     */
-    private List<String> logStrings;
-
     /**
      * Used for class, method and field renamming. Format is oldName -> newName.
      */
@@ -49,7 +45,6 @@ public class Renamer extends AbstractTransformer {
      * Applies obfuscation.
      */
     public void obfuscate() {
-        logStrings = new ArrayList<>();
         logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
         logStrings.add(LoggerUtils.stdOut("Generating mappings."));
         long current = System.currentTimeMillis();
@@ -71,7 +66,17 @@ public class Renamer extends AbstractTransformer {
                     });
 
             if (!BytecodeUtils.isMain(classNode, spigotMode)) {
-                mappings.put(classNode.name, StringUtils.crazyString());
+                switch (NumberUtils.getRandomInt(3)) {
+                    case 0:
+                        mappings.put(classNode.name, StringUtils.crazyString());
+                        break;
+                    case 1:
+                        mappings.put(classNode.name, StringUtils.crazyString() + '/' + StringUtils.crazyString());
+                        break;
+                    case 2:
+                        mappings.put(classNode.name, StringUtils.crazyString() + '/' + StringUtils.crazyString() + '/' + StringUtils.crazyString());
+                        break;
+                }
             }
             counter.incrementAndGet();
         });
@@ -102,14 +107,5 @@ public class Renamer extends AbstractTransformer {
 
         logStrings.add(LoggerUtils.stdOut("Renamed " + counter + " members."));
         logStrings.add(LoggerUtils.stdOut("Finished applying mappings. [" + String.valueOf(System.currentTimeMillis() - current) + "ms]"));
-    }
-
-    /**
-     * Returns {@link String}s to add to log.
-     *
-     * @return {@link String}s to add to log.
-     */
-    public List<String> getLogStrings() {
-        return this.logStrings;
     }
 }

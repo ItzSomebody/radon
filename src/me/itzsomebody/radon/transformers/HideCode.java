@@ -20,11 +20,6 @@ public class HideCode extends AbstractTransformer {
     private boolean spigotMode;
 
     /**
-     * {@link List} of {@link String}s to add to log.
-     */
-    private List<String> logStrings;
-
-    /**
      * Constructor used to create a {@link HideCode} object.
      *
      * @param spigotMode TODO: indication to check for EventHandlers.
@@ -37,7 +32,6 @@ public class HideCode extends AbstractTransformer {
      * Applies obfuscation.
      */
     public void obfuscate() {
-        logStrings = new ArrayList<>();
         logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
         logStrings.add(LoggerUtils.stdOut("Starting hide code transformer"));
         AtomicInteger counter = new AtomicInteger();
@@ -75,14 +69,5 @@ public class HideCode extends AbstractTransformer {
         });
         logStrings.add(LoggerUtils.stdOut("Hid " + counter + " members."));
         logStrings.add(LoggerUtils.stdOut("Finished. [" + tookThisLong(current) + "ms]"));
-    }
-
-    /**
-     * Returns {@link String}s to add to log.
-     *
-     * @return {@link String}s to add to log.
-     */
-    public List<String> getLogStrings() {
-        return this.logStrings;
     }
 }

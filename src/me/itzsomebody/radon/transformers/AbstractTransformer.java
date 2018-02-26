@@ -1,23 +1,57 @@
 package me.itzsomebody.radon.transformers;
 
-import me.itzsomebody.radon.asm.Opcodes;
-import me.itzsomebody.radon.asm.tree.ClassNode;
-import me.itzsomebody.radon.asm.tree.MethodNode;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.commons.CodeSizeEvaluator;
+import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.MethodNode;
 import me.itzsomebody.radon.utils.CustomRegexUtils;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+/**
+ * Abstract class used to make transformers.
+ *
+ * @author ItzSomebody
+ */
 public abstract class AbstractTransformer implements Opcodes {
+    /**
+     * The classes in the input.
+     */
     private Map<String, ClassNode> classes;
+
+    /**
+     * The almighty classpath.
+     */
     private Map<String, ClassNode> classPath;
-    private Map<String, ClassNode> libraryClasses;
+
+    /**
+     * Classes exempted from obfuscation.
+     */
     private List<String> exemptClasses;
+
+    /**
+     * Methods exempted from obfuscation.
+     */
     private List<String> exemptMethods;
+
+    /**
+     * Fields exempted from obfuscation.
+     */
     private List<String> exemptFields;
 
+    /**
+     * Logged strings from transformer console output.
+     */
+    protected List<String> logStrings;
+
+    /**
+     * Init method.
+     *
+     * @param classes       the classes.
+     * @param exemptClasses the exempted classes.
+     * @param exemptMethods the exempted methods.
+     * @param exemptFields  the exempted fields.
+     */
     public void init(Map<String, ClassNode> classes,
                      List<String> exemptClasses,
                      List<String> exemptMethods,
@@ -26,8 +60,18 @@ public abstract class AbstractTransformer implements Opcodes {
         this.exemptClasses = exemptClasses;
         this.exemptMethods = exemptMethods;
         this.exemptFields = exemptFields;
+        this.logStrings = new ArrayList<>();
     }
 
+    /**
+     * The other init method.
+     *
+     * @param classes       the classes.
+     * @param classPath     the almighty classpath. (Bow down to it)
+     * @param exemptClasses the exempted classes.
+     * @param exemptMethods the exempted methods.
+     * @param exemptFields  the exempted fields.
+     */
     public void init(Map<String, ClassNode> classes,
                      Map<String, ClassNode> classPath,
                      List<String> exemptClasses,
@@ -38,29 +82,62 @@ public abstract class AbstractTransformer implements Opcodes {
         this.exemptClasses = exemptClasses;
         this.exemptMethods = exemptMethods;
         this.exemptFields = exemptFields;
+        this.logStrings = new ArrayList<>();
     }
 
-    public Map<String, ClassNode> getClassMap() {
+    /**
+     * Returns {@link AbstractTransformer#classes}.
+     *
+     * @return {@link AbstractTransformer#classes}.
+     */
+    protected Map<String, ClassNode> getClassMap() {
         return this.classes;
     }
 
-    public Map<String, ClassNode> getClassPathMap() {
+    /**
+     * Returns {@link AbstractTransformer#classPath}.
+     *
+     * @return {@link AbstractTransformer#classPath}.
+     */
+    protected Map<String, ClassNode> getClassPathMap() {
         return this.classPath;
     }
 
-    public Collection<ClassNode> classNodes() {
+    /**
+     * Returns the values of {@link AbstractTransformer#classes}.
+     *
+     * @return the values of {@link AbstractTransformer#classes}.
+     */
+    protected Collection<ClassNode> classNodes() {
         return this.classes.values();
     }
 
-    public Collection<String> classNames() {
+    /**
+     * Returns the keyset of {@link AbstractTransformer#classes}.
+     *
+     * @return the keyset of {@link AbstractTransformer#classes}.
+     */
+    protected Collection<String> classNames() {
         return this.classes.keySet();
     }
 
-    public long tookThisLong(long started) {
+    /**
+     * Returns a {@link Long} which indicates how long a transformer processed the classes.
+     *
+     * @param started time started.
+     * @return a {@link Long} which indicates how long a transformer processed the classes
+     */
+    protected long tookThisLong(long started) {
         return System.currentTimeMillis() - started;
     }
 
-    public boolean classExempted(String name) {
+    /**
+     * Returns true/false based on if the input is listed in {@link AbstractTransformer#exemptClasses}.
+     *
+     * @param name the name of the class to check.
+     * @return true/false based on if the input is listed in {@link AbstractTransformer#exemptClasses}.
+     */
+    protected boolean classExempted(String name) {
         for (String string : exemptClasses) {
             if (CustomRegexUtils.isMatched(string, name)) {
                 return true;
@@ -70,7 +147,13 @@ public abstract class AbstractTransformer implements Opcodes {
         return false;
     }
 
-    public boolean methodExempted(String name) {
+    /**
+     * Returns true/false based on if the input is listed in {@link AbstractTransformer#exemptMethods}.
+     *
+     * @param name the path (and description) of the method to check.
+     * @return true/false based on if the input is listed in {@link AbstractTransformer#exemptMethods}.
+     */
+    protected boolean methodExempted(String name) {
         for (String string : exemptMethods) {
             if (CustomRegexUtils.isMatched(string, name)) {
                 return true;
@@ -80,7 +163,13 @@ public abstract class AbstractTransformer implements Opcodes {
         return false;
     }
 
-    public boolean fieldExempted(String name) {
+    /**
+     * Returns true/false based on if the input is listed in {@link AbstractTransformer#exemptFields}.
+     *
+     * @param name the path of the field to check.
+     * @return true/false based on if the input is listed in {@link AbstractTransformer#exemptFields}.
+     */
+    protected boolean fieldExempted(String name) {
         for (String string : exemptFields) {
             if (CustomRegexUtils.isMatched(string, name)) {
                 return true;
@@ -90,38 +179,29 @@ public abstract class AbstractTransformer implements Opcodes {
         return false;
     }
 
-    public ClassNode getClass(String name) {
-        if (!classPath.containsKey(name)) throw new RuntimeException("Class " + name + " not in classpath.");
-        return classPath.get(name);
+    /**
+     * Get's the current size of the method.
+     *
+     * @param methodNode the input method to evaluate the size of.
+     * @return the current size of the method.
+     */
+    protected int methodSize(MethodNode methodNode) {
+        CodeSizeEvaluator cse = new CodeSizeEvaluator(null);
+        methodNode.accept(cse);
+        return cse.getMaxSize();
     }
 
-    public ClassNode getClassViaJar(String name) {
-        if (!classes.containsKey(name)) throw new RuntimeException("Class " + name + " not in classpath.");
-        return classes.get(name);
+    /**
+     * Returns a {@link List} of {@link String}s that were outputted into the console by transformer.
+     *
+     * @return a {@link List} of {@link String}s that were outputted into the console by transformer.
+     */
+    public List<String> getLogStrings() {
+        return this.logStrings;
     }
 
-    public Map<String, ClassNode> getLibraryClasses() {
-        Map<String, ClassNode> classNodes = new HashMap<>();
-        classNodes.putAll(classPath);
-        classNodes.keySet().removeAll(classes.keySet());
-
-        return classNodes;
-    }
-
-    public boolean isInherited(ClassNode clazz, MethodNode checkMethod) {
-        for (MethodNode methodNode : clazz.methods) {
-            if (methodNode.name.equals(checkMethod.name)
-                    && methodNode.desc.equals(checkMethod.desc)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    public void addMethod(String className, MethodNode methodNode) {
-        classes.get(className).methods.add(methodNode);
-    }
-
+    /**
+     * Obfuscation time.
+     */
     public abstract void obfuscate();
 }

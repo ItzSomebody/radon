@@ -14,15 +14,9 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class RemoveLocalVariables extends AbstractTransformer {
     /**
-     * {@link List} of {@link String}s to add to log.
-     */
-    private List<String> logStrings;
-
-    /**
      * Applies obfuscation.
      */
     public void obfuscate() {
-        logStrings = new ArrayList<>();
         logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
         logStrings.add(LoggerUtils.stdOut("Starting local variable removal transformer"));
         AtomicInteger counter = new AtomicInteger();
@@ -36,14 +30,5 @@ public class RemoveLocalVariables extends AbstractTransformer {
         });
         logStrings.add(LoggerUtils.stdOut("Removed " + counter + " local variables."));
         logStrings.add(LoggerUtils.stdOut("Finished. [" + tookThisLong(current) + "ms]"));
-    }
-
-    /**
-     * Returns {@link String}s to add to log.
-     *
-     * @return {@link String}s to add to log.
-     */
-    public List<String> getLogStrings() {
-        return this.logStrings;
     }
 }

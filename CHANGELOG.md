@@ -1,6 +1,49 @@
+## 0.2.2
+
+* Completely change light flow obfuscation transformer.
+
+## 0.2.1
+
+* Stuck some more hand-made flow obfuscation into the heavy string encryption transformer.
+
+## 0.2.0
+
+* Added the "heavy" string encryption transformer.
+
+## 0.1.9
+
+* GUI now attempts to auto-fetch rt.jar and jce.jar (stole this idea from ZKM).
+
+## 0.1.8
+
+* Added rest of transformers to GUI.
+
+## 0.1.7
+
+* Un-refactored SnakeYAML and ASM.
+* Changed the way transformers are enabled.
+* Added more JavaDocs (whoooo).
+
+## 0.1.6
+
+* Added a super buggy heavy invokedynamic transformer that hides not only methods, but fields as well.
+
+## 0.1.5
+
+* Added method size checking to prevent adding too many bytecode instructions to the point where the JVM refuses to run methods for being too big.
+
+## 0.1.4
+
+* Added field signatures and method signatures to crasher.
+* Toned down normal flow obfuscation transformer so that it doesn't make method ridiculously huge over useless bytecode transformations.
+
+## 0.1.3
+
+* Changed up Number Obfuscation transformer a bit.
+
 ## 0.1.2
 
-* Added custom regex matching system.
+* Added custom regex matching system for exempts.
 
 ## 0.1.1
 

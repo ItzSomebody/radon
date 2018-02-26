@@ -1,13 +1,28 @@
 package me.itzsomebody.radon.config;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
-import me.itzsomebody.radon.yaml.Yaml;
+import me.itzsomebody.radon.transformers.*;
+import me.itzsomebody.radon.transformers.flow.LightFlowObfuscation;
+import me.itzsomebody.radon.transformers.flow.NormalFlowObfuscation;
+import me.itzsomebody.radon.transformers.invokedynamic.HeavyInvokeDynamic;
+import me.itzsomebody.radon.transformers.invokedynamic.LightInvokeDynamic;
+import me.itzsomebody.radon.transformers.invokedynamic.NormalInvokeDynamic;
+import me.itzsomebody.radon.transformers.linenumbers.ObfuscateLineNumbers;
+import me.itzsomebody.radon.transformers.linenumbers.RemoveLineNumbers;
+import me.itzsomebody.radon.transformers.localvariables.ObfuscateLocalVariables;
+import me.itzsomebody.radon.transformers.localvariables.RemoveLocalVariables;
+import me.itzsomebody.radon.transformers.sourcedebug.ObfuscateSourceDebug;
+import me.itzsomebody.radon.transformers.sourcedebug.RemoveSourceDebug;
+import me.itzsomebody.radon.transformers.sourcename.ObfuscateSourceName;
+import me.itzsomebody.radon.transformers.sourcename.RemoveSourceName;
+import me.itzsomebody.radon.transformers.stringencryption.HeavyStringEncryption;
+import me.itzsomebody.radon.transformers.stringencryption.LightStringEncryption;
+import me.itzsomebody.radon.transformers.stringencryption.NormalStringEncryption;
+import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
 import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.DateTimeException;
 import java.util.*;
 
 /**
@@ -36,6 +51,7 @@ public class Config {
             add("LineNumberObfuscation");
             add("NumberObfuscation");
             add("SourceNameObfuscation");
+            add("SourceDebugObfuscation");
             add("TrashClasses");
             add("WatermarkMessage");
             add("WatermarkType");
@@ -129,11 +145,11 @@ public class Config {
     public File getOutput() throws IllegalArgumentException {
         Object path = map.get("Output");
         if (path == null) {
-            if (!(path instanceof String)) throw new IllegalArgumentException("Output arg must be a string");
             return new File(getInput().getName().replace(".jar", "-OBF.jar"));
+        } else {
+            if (!(path instanceof String)) throw new IllegalArgumentException("Output arg must be a string");
+            return new File((String) path);
         }
-
-        return new File((String) path);
     }
 
     /**
@@ -238,12 +254,12 @@ public class Config {
     }
 
     /**
-     * Returns the string encryption type from {@link Config#map} as {@link Integer}. Defaults to -1 if null.
+     * Returns the string encryption type from {@link Config#map} as an {@link AbstractTransformer}. Defaults to null if null.
      *
-     * @return Returns the string encryption type from {@link Config#map} as {@link Integer}. Defaults to -1 if null.
+     * @return Returns the string encryption type from {@link Config#map} as an {@link AbstractTransformer}. Defaults to null if null.
      * @throws IllegalArgumentException if value from key is unexpected, null or not a {@link String}
      */
-    public int getStringEncryptionType() throws IllegalArgumentException {
+    public AbstractTransformer getStringEncryptionType() throws IllegalArgumentException {
         if (map.containsKey("StringEncryption")) {
             Object value = map.get("StringEncryption");
             if (value != null) {
@@ -251,9 +267,11 @@ public class Config {
                     throw new IllegalArgumentException("String encryption arg must be a string");
                 String s = (String) value;
                 if (s.equalsIgnoreCase("Light")) {
-                    return 0;
+                    return new LightStringEncryption(getSpigotBool());
                 } else if (s.equalsIgnoreCase("Normal")) {
-                    return 1;
+                    return new NormalStringEncryption(getSpigotBool());
+                } else if (s.equalsIgnoreCase("Heavy")) {
+                    return new HeavyStringEncryption(getSpigotBool());
                 } else {
                     throw new IllegalArgumentException("Invalid string encryption type: " + s);
                 }
@@ -262,16 +280,16 @@ public class Config {
             }
         }
 
-        return -1;
+        return null;
     }
 
     /**
-     * Returns the invokedynamic type from {@link Config#map} as {@link Integer}. Defaults to -1 if null.
+     * Returns the invokedynamic type from {@link Config#map} as an {@link AbstractTransformer}. Defaults to null if null.
      *
-     * @return Returns the invokedynamic type from {@link Config#map} as {@link Integer}. Defaults to -1 if null.
+     * @return Returns the invokedynamic type from {@link Config#map} as an {@link AbstractTransformer}. Defaults to null if null.
      * @throws IllegalArgumentException if value from key is unexpected, null or not a {@link String}
      */
-    public int getInvokeDynamicType() throws IllegalArgumentException {
+    public AbstractTransformer getInvokeDynamicType() throws IllegalArgumentException {
         if (map.containsKey("InvokeDynamic")) {
             Object value = map.get("InvokeDynamic");
             if (value != null) {
@@ -279,9 +297,11 @@ public class Config {
                     throw new IllegalArgumentException("InvokeDynamic arg must be a string");
                 String s = (String) value;
                 if (s.equalsIgnoreCase("Light")) {
-                    return 0;
+                    return new LightInvokeDynamic();
                 } else if (s.equalsIgnoreCase("Normal")) {
-                    return 1;
+                    return new NormalInvokeDynamic();
+                } else if (s.equalsIgnoreCase("Heavy")) {
+                    return new HeavyInvokeDynamic();
                 } else {
                     throw new IllegalArgumentException("Invalid invokedynamic type: " + s);
                 }
@@ -290,16 +310,16 @@ public class Config {
             }
         }
 
-        return -1;
+        return null;
     }
 
     /**
-     * Returns the flow obfuscation type from {@link Config#map} as {@link Integer}. Defaults to -1 if null.
+     * Returns the flow obfuscation type from {@link Config#map} as an {@link AbstractTransformer}. Defaults to null if null.
      *
-     * @return Returns the flow obfuscation type from {@link Config#map} as {@link Integer}. Defaults to -1 if null.
+     * @return Returns the flow obfuscation type from {@link Config#map} as an {@link AbstractTransformer}. Defaults to null if null.
      * @throws IllegalArgumentException if value from key is unexpected, null or not a {@link String}
      */
-    public int getFlowObfuscationType() throws IllegalArgumentException {
+    public AbstractTransformer getFlowObfuscationType() throws IllegalArgumentException {
         if (map.containsKey("FlowObfuscation")) {
             Object value = map.get("FlowObfuscation");
             if (value != null) {
@@ -307,9 +327,9 @@ public class Config {
                     throw new IllegalArgumentException("Flow obfuscation arg must be a string");
                 String s = (String) value;
                 if (s.equalsIgnoreCase("Light")) {
-                    return 0;
+                    return new LightFlowObfuscation();
                 } else if (s.equalsIgnoreCase("Normal")) {
-                    return 1;
+                    return new NormalFlowObfuscation();
                 } else {
                     throw new IllegalArgumentException("Invalid flow obfuscation type: " + s);
                 }
@@ -318,16 +338,16 @@ public class Config {
             }
         }
 
-        return -1;
+        return null;
     }
 
     /**
-     * Returns the local variable obfuscation type from {@link Config#map} as {@link Integer}. Defaults to -1 if null.
+     * Returns the local variable obfuscation type from {@link Config#map} as an {@link AbstractTransformer}. Defaults to null if null.
      *
-     * @return Returns the local variable obfuscation type from {@link Config#map} as {@link Integer}. Defaults to -1 if null.
+     * @return Returns the local variable obfuscation type from {@link Config#map} as an {@link AbstractTransformer}. Defaults to null if null.
      * @throws IllegalArgumentException if value from key is unexpected, null or not a {@link String}
      */
-    public int getLocalVariableObfuscationType() throws IllegalArgumentException {
+    public AbstractTransformer getLocalVariableObfuscationType() throws IllegalArgumentException {
         if (map.containsKey("LocalVariableObfuscation")) {
             Object value = map.get("LocalVariableObfuscation");
             if (value != null) {
@@ -335,9 +355,9 @@ public class Config {
                     throw new IllegalArgumentException("Local variable obfuscation arg must be a string");
                 String s = (String) value;
                 if (s.equalsIgnoreCase("Obfuscate")) {
-                    return 0;
+                    return new ObfuscateLocalVariables();
                 } else if (s.equalsIgnoreCase("Remove")) {
-                    return 1;
+                    return new RemoveLocalVariables();
                 } else {
                     throw new IllegalArgumentException("Invalid local variable obfuscation type: " + s);
                 }
@@ -346,16 +366,16 @@ public class Config {
             }
         }
 
-        return -1;
+        return null;
     }
 
     /**
-     * Returns the line number obfuscation type from {@link Config#map} as {@link Integer}. Defaults to -1 if null.
+     * Returns the line number obfuscation type from {@link Config#map} as an {@link AbstractTransformer}. Defaults to null if null.
      *
-     * @return Returns the line number obfuscation type from {@link Config#map} as {@link Integer}. Defaults to -1 if null.
+     * @return Returns the line number obfuscation type from {@link Config#map} as an {@link AbstractTransformer}. Defaults to null if null.
      * @throws IllegalArgumentException if value from key is unexpected, null or not a {@link String}
      */
-    public int getLineNumberObfuscationType() throws IllegalArgumentException {
+    public AbstractTransformer getLineNumberObfuscationType() throws IllegalArgumentException {
         if (map.containsKey("LineNumberObfuscation")) {
             Object value = map.get("LineNumberObfuscation");
             if (value != null) {
@@ -363,9 +383,9 @@ public class Config {
                     throw new IllegalArgumentException("Line number obfuscation arg must be a string");
                 String s = (String) value;
                 if (s.equalsIgnoreCase("Obfuscate")) {
-                    return 0;
+                    return new ObfuscateLineNumbers();
                 } else if (s.equalsIgnoreCase("Remove")) {
-                    return 1;
+                    return new RemoveLineNumbers();
                 } else {
                     throw new IllegalArgumentException("Invalid line number obfuscation type: " + s);
                 }
@@ -374,16 +394,16 @@ public class Config {
             }
         }
 
-        return -1;
+        return null;
     }
 
     /**
-     * Returns the source name obfuscation type from {@link Config#map} as {@link Integer}. Defaults to -1 if null.
+     * Returns the source name obfuscation type from {@link Config#map} as an {@link AbstractTransformer}. Defaults to null if null.
      *
-     * @return Returns the source name obfuscation type from {@link Config#map} as {@link Integer}. Defaults to -1 if null.
+     * @return Returns the source name obfuscation type from {@link Config#map} as an {@link AbstractTransformer}. Defaults to null if null.
      * @throws IllegalArgumentException if value from key is unexpected, null or not a {@link String}
      */
-    public int getSourceNameObfuscationType() throws IllegalArgumentException {
+    public AbstractTransformer getSourceNameObfuscationType() throws IllegalArgumentException {
         if (map.containsKey("SourceNameObfuscation")) {
             Object value = map.get("SourceNameObfuscation");
             if (value != null) {
@@ -391,9 +411,9 @@ public class Config {
                     throw new IllegalArgumentException("Source name obfuscation arg must be a string");
                 String s = (String) value;
                 if (s.equalsIgnoreCase("Obfuscate")) {
-                    return 0;
+                    return new ObfuscateSourceName();
                 } else if (s.equalsIgnoreCase("Remove")) {
-                    return 1;
+                    return new RemoveSourceName();
                 } else {
                     throw new IllegalArgumentException("Invalid source name obfuscation type: " + s);
                 }
@@ -402,63 +422,87 @@ public class Config {
             }
         }
 
-        return -1;
+        return null;
     }
 
     /**
-     * Returns the crasher type from {@link Config#map} as {@link Integer}. Defaults to -1 if null
+     * Returns the source debug obfuscation type from {@link Config#map} as an {@link AbstractTransformer}. Defaults to null if null.
      *
-     * @return Returns the crasher type from {@link Config#map} as {@link Integer}. Defaults to -1 if null.
+     * @return Returns the source debug obfuscation type from {@link Config#map} as an {@link AbstractTransformer}. Defaults to null if null.
+     * @throws IllegalArgumentException if value from key is unexpected, null or not a {@link String}
+     */
+    public AbstractTransformer getSourceDebugObfuscationType() throws IllegalArgumentException {
+        if (map.containsKey("SourceDebugObfuscation")) {
+            Object value = map.get("SourceDebugObfuscation");
+            if (value != null) {
+                if (!(value instanceof String))
+                    throw new IllegalArgumentException("Source debug obfuscation arg must be a string");
+                String s = (String) value;
+                if (s.equalsIgnoreCase("Obfuscate")) {
+                    return new ObfuscateSourceDebug();
+                } else if (s.equalsIgnoreCase("Remove")) {
+                    return new RemoveSourceDebug();
+                } else {
+                    throw new IllegalArgumentException("Invalid source debug obfuscation type: " + s);
+                }
+            } else {
+                throw new IllegalArgumentException("Source debug obfuscation type is null");
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Returns the crasher type from {@link Config#map} as an {@link AbstractTransformer}. Defaults to null if null or false
+     *
+     * @return Returns the crasher type from {@link Config#map} as an {@link AbstractTransformer}. Defaults to null if null or false.
      * @throws IllegalArgumentException if value from key is null or not a {@link Boolean}
      */
-    public int getCrasherType() throws IllegalArgumentException {
+    public AbstractTransformer getCrasherType() throws IllegalArgumentException {
         if (map.containsKey("Crasher")) {
             Object value = map.get("Crasher");
             if (value != null) {
                 if (!(value instanceof Boolean)) throw new IllegalArgumentException("Crasher arg must be true/false");
                 boolean s = (Boolean) value;
                 if (s) {
-                    return 0;
-                } else {
-                    return -1;
+                    return new Crasher();
                 }
             } else {
                 throw new IllegalArgumentException("Crasher arg is null");
             }
         }
 
-        return -1;
+        return null;
     }
 
     /**
-     * Returns the hide code type from {@link Config#map} as {@link Integer}. Defaults to -1 if null.
+     * Returns the hide code type from {@link Config#map} as an {@link AbstractTransformer}. Defaults to null if null or false.
      *
-     * @return Returns the hide code type from {@link Config#map} as {@link Integer}. Defaults to -1 if null.
+     * @return Returns the hide code type from {@link Config#map} as an {@link AbstractTransformer}. Defaults to null if null or false.
      * @throws IllegalArgumentException if value from key is null or not a {@link Boolean}
      */
-    public int getHideCodeType() throws IllegalArgumentException {
+    public AbstractTransformer getHideCodeType() throws IllegalArgumentException {
         if (map.containsKey("HideCode")) {
             Object value = map.get("HideCode");
             if (value != null) {
                 if (!(value instanceof Boolean)) throw new IllegalArgumentException("HideCode arg must be true/false");
                 boolean s = (Boolean) value;
                 if (s) {
-                    return 0;
-                } else {
-                    return -1;
+                    return new HideCode(getSpigotBool());
                 }
             } else {
                 throw new IllegalArgumentException("HideCode arg is null");
             }
         }
 
-        return -1;
+        return null;
     }
 
     /**
-     * Returns the number of trash classes from {@link Config#map} as {@link Integer}. Defaults to -1 if null.
+     * Returns the number of trash classes from {@link Config#map} as {@link Integer}. Defaults to null if null.
      *
-     * @return Returns the number of trash classes from {@link Config#map} as {@link Integer}. Defaults to -1 if null.
+     * @return Returns the number of trash classes from {@link Config#map} as {@link Integer}. Defaults to null if null.
      * @throws IllegalArgumentException if value from key is null or not a {@link Integer}
      */
     public int getTrashClasses() throws IllegalArgumentException {
@@ -478,9 +522,9 @@ public class Config {
 
 
     /**
-     * Returns the watermark message from {@link Config#map} as {@link Integer}. Defaults to null if null.
+     * Returns the watermark message from {@link Config#map} as a {@link String}. Defaults to null if null.
      *
-     * @return Returns the crasher type from {@link Config#map} as {@link String}. Defaults to null if null.
+     * @return Returns the crasher type from {@link Config#map} as a {@link String}. Defaults to null if null.
      * @throws IllegalArgumentException if value from key is null or not a {@link String}
      */
     public String getWatermarkMsg() throws IllegalArgumentException {
@@ -497,9 +541,9 @@ public class Config {
     }
 
     /**
-     * Returns the watermark type from {@link Config#map} as {@link Integer}. Defaults to -1 if null.
+     * Returns the watermark type from {@link Config#map} as an {@link Integer}. Defaults to -1 if null.
      *
-     * @return Returns the crasher type from {@link Config#map} as {@link Integer}. Defaults to -1 if null.
+     * @return Returns the crasher type from {@link Config#map} as an {@link Integer}. Defaults to -1 if null.
      * @throws IllegalArgumentException if value from key is unexpected, null or not a {@link String}
      */
     public int getWatermarkType() throws IllegalArgumentException {
@@ -525,9 +569,9 @@ public class Config {
     }
 
     /**
-     * Returns the watermark key from {@link Config#map} as {@link Integer}. Defaults to null if null.
+     * Returns the watermark key from {@link Config#map} as a {@link String}. Defaults to null if null.
      *
-     * @return Returns the crasher type from {@link Config#map} as {@link String}. Defaults to null if null.
+     * @return Returns the crasher type from {@link Config#map} as a {@link String}. Defaults to null if null.
      * @throws IllegalArgumentException if value from key is null or not a {@link String}
      */
     public String getWatermarkKey() throws IllegalArgumentException {
@@ -544,9 +588,9 @@ public class Config {
     }
 
     /**
-     * Returns the boolean value of a spigot plugin from {@link Config#map} as {@link Boolean}. Defaults to false if null.
+     * Returns the boolean value of a spigot plugin from {@link Config#map} as a {@link Boolean}. Defaults to false if null.
      *
-     * @return Returns the boolean value of a spigot plugin from {@link Config#map} as {@link Boolean}. Defaults to false if null.
+     * @return Returns the boolean value of a spigot plugin from {@link Config#map} as a {@link Boolean}. Defaults to false if null.
      * @throws IllegalArgumentException if value from key is null or not a {@link Boolean}
      */
     public boolean getSpigotBool() throws IllegalArgumentException {
@@ -565,37 +609,35 @@ public class Config {
     }
 
     /**
-     * Returns the renamer type from {@link Config#map} as {@link Integer}. Defaults to -1 if null.
+     * Returns the renamer type from {@link Config#map} as an {@link AbstractTransformer}. Defaults to null if null or false.
      *
-     * @return Returns the renamer type from {@link Config#map} as {@link Integer}. Defaults to -1 if null.
+     * @return Returns the renamer type from {@link Config#map} as an {@link AbstractTransformer}. Defaults to null if null or false.
      * @throws IllegalArgumentException if value from key is null or not a {@link Boolean}
      */
-    public int getRenamerType() throws IllegalArgumentException {
+    public AbstractTransformer getRenamerType() throws IllegalArgumentException {
         if (map.containsKey("Renamer")) {
             Object value = map.get("Renamer");
             if (value != null) {
                 if (!(value instanceof Boolean)) throw new IllegalArgumentException("Renamer arg must be true/false");
                 boolean s = (Boolean) value;
                 if (s) {
-                    return 0;
-                } else {
-                    return -1;
+                    return new Renamer(getSpigotBool());
                 }
             } else {
                 throw new IllegalArgumentException("Renamer arg is null");
             }
         }
 
-        return -1;
+        return null;
     }
 
     /**
-     * Returns the hide code type from {@link Config#map} as {@link Integer}. Defaults to -1 if null.
+     * Returns the hide code type from {@link Config#map} as an {@link AbstractTransformer}. Defaults to null if null or false.
      *
-     * @return Returns the hide code type from {@link Config#map} as {@link Integer}. Defaults to -1 if null.
+     * @return Returns the hide code type from {@link Config#map} as an {@link AbstractTransformer}. Defaults to null if null or false.
      * @throws IllegalArgumentException if value from key is null or not a {@link Boolean}
      */
-    public int getStringPoolType() throws IllegalArgumentException {
+    public AbstractTransformer getStringPoolType() throws IllegalArgumentException {
         if (map.containsKey("StringPool")) {
             Object value = map.get("StringPool");
             if (value != null) {
@@ -603,25 +645,23 @@ public class Config {
                     throw new IllegalArgumentException("String pool arg must be true/false");
                 boolean s = (Boolean) value;
                 if (s) {
-                    return 0;
-                } else {
-                    return -1;
+                    return new StringPool();
                 }
             } else {
                 throw new IllegalArgumentException("String pool arg is null");
             }
         }
 
-        return -1;
+        return null;
     }
 
     /**
-     * Returns the number obfuscation type from {@link Config#map} as {@link Integer}. Defaults to -1 if null.
+     * Returns the number obfuscation type from {@link Config#map} as an {@link AbstractTransformer}. Defaults to null if null or false.
      *
-     * @return Returns the number obfuscation type from {@link Config#map} as {@link Integer}. Defaults to -1 if null.
+     * @return Returns the number obfuscation type from {@link Config#map} as an {@link AbstractTransformer}. Defaults to null if null or false.
      * @throws IllegalArgumentException if value from key is null or not a {@link Boolean}
      */
-    public int getNumberObfuscationType() throws IllegalArgumentException {
+    public AbstractTransformer getNumberObfuscationType() throws IllegalArgumentException {
         if (map.containsKey("NumberObfuscation")) {
             Object value = map.get("NumberObfuscation");
             if (value != null) {
@@ -629,16 +669,14 @@ public class Config {
                     throw new IllegalArgumentException("Number obfuscation arg must be true/false");
                 boolean s = (Boolean) value;
                 if (s) {
-                    return 0;
-                } else {
-                    return -1;
+                    return new NumberObfuscation();
                 }
             } else {
                 throw new IllegalArgumentException("Number obfuscation arg is null");
             }
         }
 
-        return -1;
+        return null;
     }
 
     /**

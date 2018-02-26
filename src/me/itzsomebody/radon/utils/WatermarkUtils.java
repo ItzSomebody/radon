@@ -1,7 +1,7 @@
 package me.itzsomebody.radon.utils;
 
-import me.itzsomebody.radon.asm.ClassReader;
-import me.itzsomebody.radon.asm.tree.ClassNode;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.tree.ClassNode;
 
 import java.io.File;
 import java.io.InputStream;

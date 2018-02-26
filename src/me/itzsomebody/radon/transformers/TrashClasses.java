@@ -1,9 +1,9 @@
 package me.itzsomebody.radon.transformers;
 
-import me.itzsomebody.radon.asm.Handle;
-import me.itzsomebody.radon.asm.MethodVisitor;
-import me.itzsomebody.radon.asm.Opcodes;
-import me.itzsomebody.radon.asm.tree.*;
+import org.objectweb.asm.Handle;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.tree.*;
 import me.itzsomebody.radon.utils.NumberUtils;
 import me.itzsomebody.radon.utils.StringUtils;
 

@@ -1,8 +1,8 @@
 package me.itzsomebody.radon.classes;
 
-import me.itzsomebody.radon.asm.MethodVisitor;
-import me.itzsomebody.radon.asm.Opcodes;
-import me.itzsomebody.radon.asm.tree.ClassNode;
+import org.objectweb.asm.MethodVisitor;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.tree.ClassNode;
 
 /**
  * Class that statically returns a ClassNode as an empty class.

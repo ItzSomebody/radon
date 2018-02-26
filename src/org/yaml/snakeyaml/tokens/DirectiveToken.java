@@ -1,0 +1,58 @@
+/**
+ * Copyright (c) 2008, http://www.snakeyaml.org
+ * <p>
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * <p>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p>
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.yaml.snakeyaml.tokens;
+
+import java.util.List;
+
+import org.yaml.snakeyaml.error.Mark;
+import org.yaml.snakeyaml.error.YAMLException;
+
+public final class DirectiveToken<T> extends Token {
+    private final String name;
+    private final List<T> value;
+
+    public DirectiveToken(String name, List<T> value, Mark startMark, Mark endMark) {
+        super(startMark, endMark);
+        this.name = name;
+        if (value != null && value.size() != 2) {
+            throw new YAMLException("Two strings must be provided instead of "
+                    + String.valueOf(value.size()));
+        }
+        this.value = value;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public List<T> getValue() {
+        return this.value;
+    }
+
+    @Override
+    protected String getArguments() {
+        if (value != null) {
+            return "name=" + name + ", value=[" + value.get(0) + ", " + value.get(1) + "]";
+        } else {
+            return "name=" + name;
+        }
+    }
+
+    @Override
+    public Token.ID getTokenId() {
+        return ID.Directive;
+    }
+}

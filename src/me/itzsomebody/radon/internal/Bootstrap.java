@@ -1,26 +1,11 @@
 package me.itzsomebody.radon.internal;
 
-import me.itzsomebody.radon.asm.ClassReader;
-import me.itzsomebody.radon.asm.ClassWriter;
-import me.itzsomebody.radon.asm.Opcodes;
-import me.itzsomebody.radon.asm.commons.ClassRemapper;
-import me.itzsomebody.radon.asm.commons.Remapper;
-import me.itzsomebody.radon.asm.commons.SimpleRemapper;
-import me.itzsomebody.radon.asm.tree.*;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.tree.*;
 import me.itzsomebody.radon.config.Config;
 import me.itzsomebody.radon.transformers.*;
-import me.itzsomebody.radon.transformers.flow.LightFlowObfuscation;
-import me.itzsomebody.radon.transformers.flow.NormalFlowObfuscation;
-import me.itzsomebody.radon.transformers.invokedynamic.LightInvokeDynamic;
-import me.itzsomebody.radon.transformers.invokedynamic.NormalInvokeDynamic;
-import me.itzsomebody.radon.transformers.linenumbers.ObfuscateLineNumbers;
-import me.itzsomebody.radon.transformers.linenumbers.RemoveLineNumbers;
-import me.itzsomebody.radon.transformers.localvariables.ObfuscateLocalVariables;
-import me.itzsomebody.radon.transformers.localvariables.RemoveLocalVariables;
-import me.itzsomebody.radon.transformers.sourcename.ObfuscateSourceName;
-import me.itzsomebody.radon.transformers.sourcename.RemoveSourceName;
-import me.itzsomebody.radon.transformers.stringencryption.LightStringEncryption;
-import me.itzsomebody.radon.transformers.stringencryption.NormalStringEncryption;
 import me.itzsomebody.radon.utils.*;
 
 import java.io.ByteArrayInputStream;
@@ -96,64 +81,9 @@ public class Bootstrap { // Eyyy bootstrap bill
     private List<String> fieldExempts;
 
     /**
-     * Integer that determines which kind of string encryption to apply if any at all.
+     * Transformers that will be used.
      */
-    private int stringEncryptionType;
-
-    /**
-     * Integer that determines which kind of invokedynamic to apply if any at all.
-     */
-    private int invokeDynamicType;
-
-    /**
-     * Integer that determines which kind of flow obfuscation to apply if any at all.
-     */
-    private int flowObfuscationType;
-
-    /**
-     * Integer that determines which kind of local variable obfuscation to apply if any at all.
-     */
-    private int localVariableType;
-
-    /**
-     * Integer that determines which kind of line number obfuscation to apply if any at all.
-     */
-    private int lineNumberType;
-
-    /**
-     * Integer that determines which kind of source name obfuscation to apply if any at all.
-     */
-    private int sourceNameType;
-
-    /**
-     * Integer that determines if the obfuscator should apply a decompiler crashing technique.
-     */
-    private int crasherType;
-
-    /**
-     * Integer that determines if the obfuscator should apply synthetic modifiers.
-     */
-    private int hideCodeType;
-
-    /**
-     * Integer that determines if the obfuscator should apply number obfuscator.
-     */
-    private int numberObfuscationType;
-
-    /**
-     * Integer that determines if the obfuscator should pool strings into a method.
-     */
-    private int stringPoolType;
-
-    /**
-     * Integer that determines if the obfuscator should apply a decompiler crashing technique.
-     */
-    private int renamerType;
-
-    /**
-     * Boolean that determines if the obfuscator should consider the input as a Spigot/Bukkit/Bungee plugin.
-     */
-    private boolean spigotMode;
+    private List<AbstractTransformer> transformers;
 
     /**
      * Integer that determines how many trash classes to generate if any at all.
@@ -174,16 +104,6 @@ public class Bootstrap { // Eyyy bootstrap bill
      * String to encrypt {@link Bootstrap#watermarkMsg} if any at all.
      */
     private String watermarkKey;
-
-    /**
-     * Long to be used as an expiration date for software.
-     */
-    private long expiryTime;
-
-    /**
-     * String to be used to indicate the user's software expiration has sadly come. (lol)
-     */
-    private String expiryMsg;
 
     /**
      * Strings to write to log.
@@ -207,28 +127,17 @@ public class Bootstrap { // Eyyy bootstrap bill
     /**
      * Constructor used for GUI to create a {@link Bootstrap} object.
      *
-     * @param input                 the input {@link File}.
-     * @param output                the output {@link File}.
-     * @param libs                  the {@link HashMap} of libraries.
-     * @param classExempts          classes protected from obfuscation as {@link ArrayList}.
-     * @param methodExempts         methods protected from obfuscation as {@link ArrayList}.
-     * @param fieldExempts          fields protected from obfuscation as {@link ArrayList}.
-     * @param stringEncryptionType  string encryption type as {@link Integer}.
-     * @param invokeDynamicType     invokedynamic obfuscation type as {@link Integer}.
-     * @param flowObfuscationType   flow obfuscation type as {@link Integer}.
-     * @param localVariableType     local variable obfuscation type as {@link Integer}.
-     * @param lineNumberType        line number obfuscation type as {@link Integer}.
-     * @param sourceNameType        source name obfuscation type as {@link Integer}.
-     * @param crasherType           crasher type as {@link Integer}.
-     * @param hideCodeType          hidecode type as {@link Integer}.
-     * @param numberObfuscationType number obfuscation type as {@link Integer}.
-     * @param stringPoolType        string pool type as {@link Integer}.
-     * @param renamerType           renaming type as {@link Integer}.
-     * @param spigotMode            states if plugin be considered a Spigot/Bukkit/Bungee plugin as {@link Boolean}.
-     * @param trashClasses          number of trash classes to generate as {@link Integer}.
-     * @param watermarkMsg          {@link String} to watermark into the output.
-     * @param watermarkType         watermark type as {@link Integer}.
-     * @param watermarkKey          {@link String} to encrypt watermark message.
+     * @param input         the input {@link File}.
+     * @param output        the output {@link File}.
+     * @param libs          the {@link HashMap} of libraries.
+     * @param classExempts  classes protected from obfuscation as {@link ArrayList}.
+     * @param methodExempts methods protected from obfuscation as {@link ArrayList}.
+     * @param fieldExempts  fields protected from obfuscation as {@link ArrayList}.
+     * @param transformers  transformers that will be run.
+     * @param trashClasses  number of trash classes to generate as {@link Integer}.
+     * @param watermarkMsg  {@link String} to watermark into the output.
+     * @param watermarkType watermark type as {@link Integer}.
+     * @param watermarkKey  {@link String} to encrypt watermark message.
      */
     public Bootstrap(
             File input,
@@ -237,50 +146,22 @@ public class Bootstrap { // Eyyy bootstrap bill
             List<String> classExempts,
             List<String> methodExempts,
             List<String> fieldExempts,
-            int stringEncryptionType,
-            int invokeDynamicType,
-            int flowObfuscationType,
-            int localVariableType,
-            int lineNumberType,
-            int sourceNameType,
-            int crasherType,
-            int hideCodeType,
-            int numberObfuscationType,
-            int stringPoolType,
-            int renamerType,
-            boolean spigotMode,
+            List<AbstractTransformer> transformers,
             int trashClasses,
             String watermarkMsg,
             int watermarkType,
-            String watermarkKey,
-            long expiryTime,
-            String expiryMsg) {
+            String watermarkKey) {
         this.input = input;
         this.output = output;
         this.libs = libs;
         this.classExempts = classExempts;
         this.methodExempts = methodExempts;
         this.fieldExempts = fieldExempts;
-        this.stringEncryptionType = stringEncryptionType;
-        this.invokeDynamicType = invokeDynamicType;
-        this.flowObfuscationType = flowObfuscationType;
-        this.localVariableType = localVariableType;
-        this.lineNumberType = lineNumberType;
-        this.sourceNameType = sourceNameType;
-        this.crasherType = crasherType;
-        this.hideCodeType = hideCodeType;
-        this.numberObfuscationType = numberObfuscationType;
-        this.stringPoolType = stringPoolType;
-        this.numberObfuscationType = numberObfuscationType;
-        this.stringPoolType = stringPoolType;
-        this.renamerType = renamerType;
-        this.spigotMode = spigotMode;
+        this.transformers = transformers;
         this.trashClasses = trashClasses;
         this.watermarkMsg = watermarkMsg;
         this.watermarkType = watermarkType;
         this.watermarkKey = watermarkKey;
-        this.expiryMsg = expiryMsg;
-        this.expiryTime = expiryTime;
     }
 
     /**
@@ -305,122 +186,11 @@ public class Bootstrap { // Eyyy bootstrap bill
             loadClassPath();
             loadInput();
 
-            // 0 = true; -1 = false
-            if (renamerType == 0) {
-                Renamer renamer = new Renamer(spigotMode);
-                renamer.init(classes, classPath, classExempts, methodExempts, fieldExempts);
-                renamer.obfuscate();
-                logStrings.addAll(renamer.getLogStrings());
-            }
-
-            /*
-             * Specific order. Feel free to change if you wish
-             */
-            if (expiryTime != -1) {
-                Expiry expiry = new Expiry(expiryTime, expiryMsg);
-                expiry.init(classes, classExempts, methodExempts, fieldExempts);
-                expiry.obfuscate();
-                logStrings.addAll(expiry.getLogStrings());
-            }
-
-            if (stringEncryptionType == 0) {
-                LightStringEncryption lightStringEncryption = new LightStringEncryption(spigotMode);
-                lightStringEncryption.init(classes, classExempts, methodExempts, fieldExempts);
-                lightStringEncryption.obfuscate();
-                logStrings.addAll(lightStringEncryption.getLogStrings());
-            } else if (stringEncryptionType == 1) {
-                NormalStringEncryption normalStringEncryption = new NormalStringEncryption(spigotMode);
-                normalStringEncryption.init(classes, classExempts, methodExempts, fieldExempts);
-                normalStringEncryption.obfuscate();
-                logStrings.addAll(normalStringEncryption.getLogStrings());
-            }
-
-            if (stringPoolType == 0) {
-                StringPool stringPool = new StringPool();
-                stringPool.init(classes, classExempts, methodExempts, fieldExempts);
-                stringPool.obfuscate();
-                logStrings.addAll(stringPool.getLogStrings());
-            }
-
-            if (numberObfuscationType == 0) {
-                NumberObfuscation numberObfuscation = new NumberObfuscation();
-                numberObfuscation.init(classes, classExempts, methodExempts, fieldExempts);
-                numberObfuscation.obfuscate();
-                logStrings.addAll(numberObfuscation.getLogStrings());
-            }
-
-            if (flowObfuscationType == 0) {
-                LightFlowObfuscation lightFlowObfuscation = new LightFlowObfuscation();
-                lightFlowObfuscation.init(classes, classExempts, methodExempts, fieldExempts);
-                lightFlowObfuscation.obfuscate();
-                logStrings.addAll(lightFlowObfuscation.getLogStrings());
-            } else if (flowObfuscationType == 1) {
-                NormalFlowObfuscation normalFlowObfuscation = new NormalFlowObfuscation();
-                normalFlowObfuscation.init(classes, classExempts, methodExempts, fieldExempts);
-                normalFlowObfuscation.obfuscate();
-                logStrings.addAll(normalFlowObfuscation.getLogStrings());
-            }
-
-            if (invokeDynamicType == 0) {
-                LightInvokeDynamic lightInvokeDynamic = new LightInvokeDynamic();
-                lightInvokeDynamic.init(classes, classExempts, methodExempts, fieldExempts);
-                lightInvokeDynamic.obfuscate();
-                logStrings.addAll(lightInvokeDynamic.getLogStrings());
-            } else if (invokeDynamicType == 1) {
-                NormalInvokeDynamic normalInvokeDynamic = new NormalInvokeDynamic();
-                normalInvokeDynamic.init(classes, classExempts, methodExempts, fieldExempts);
-                normalInvokeDynamic.obfuscate();
-                logStrings.addAll(normalInvokeDynamic.getLogStrings());
-            }
-
-            if (localVariableType == 0) {
-                ObfuscateLocalVariables obfuscateLocalVariables = new ObfuscateLocalVariables();
-                obfuscateLocalVariables.init(classes, classExempts, methodExempts, fieldExempts);
-                obfuscateLocalVariables.obfuscate();
-                logStrings.addAll(obfuscateLocalVariables.getLogStrings());
-            } else if (localVariableType == 1) {
-                RemoveLocalVariables removeLocalVariables = new RemoveLocalVariables();
-                removeLocalVariables.init(classes, classExempts, methodExempts, fieldExempts);
-                removeLocalVariables.obfuscate();
-                logStrings.addAll(removeLocalVariables.getLogStrings());
-            }
-
-            if (lineNumberType == 0) {
-                ObfuscateLineNumbers obfuscateLineNumbers = new ObfuscateLineNumbers();
-                obfuscateLineNumbers.init(classes, classExempts, methodExempts, fieldExempts);
-                obfuscateLineNumbers.obfuscate();
-                logStrings.addAll(obfuscateLineNumbers.getLogStrings());
-            } else if (lineNumberType == 1) {
-                RemoveLineNumbers removeLineNumbers = new RemoveLineNumbers();
-                removeLineNumbers.init(classes, classExempts, methodExempts, fieldExempts);
-                removeLineNumbers.obfuscate();
-                logStrings.addAll(removeLineNumbers.getLogStrings());
-            }
-
-            if (sourceNameType == 0) {
-                ObfuscateSourceName obfuscateSourceName = new ObfuscateSourceName();
-                obfuscateSourceName.init(classes, classExempts, methodExempts, fieldExempts);
-                obfuscateSourceName.obfuscate();
-                logStrings.addAll(obfuscateSourceName.getLogStrings());
-            } else if (sourceNameType == 1) {
-                RemoveSourceName removeSourceName = new RemoveSourceName();
-                removeSourceName.init(classes, classExempts, methodExempts, fieldExempts);
-                removeSourceName.obfuscate();
-                logStrings.addAll(removeSourceName.getLogStrings());
-            }
-
-            if (crasherType == 0) {
-                Crasher crasher = new Crasher();
-                crasher.init(classes, classExempts, methodExempts, fieldExempts);
-                crasher.obfuscate();
-                logStrings.addAll(crasher.getLogStrings());
-            }
-
-            if (hideCodeType == 0) {
-                HideCode hideCode = new HideCode(spigotMode);
-                hideCode.init(classes, classExempts, methodExempts, fieldExempts);
-                hideCode.obfuscate();
-                logStrings.addAll(hideCode.getLogStrings());
+            for (AbstractTransformer transformer : transformers) {
+                transformer.init(classes, classPath, classExempts, methodExempts, fieldExempts);
+                transformer.init(classes, classPath, classExempts, methodExempts, fieldExempts);
+                transformer.obfuscate();
+                logStrings.addAll(transformer.getLogStrings());
             }
 
             if (trashClasses != -1) {
@@ -511,37 +281,69 @@ public class Bootstrap { // Eyyy bootstrap bill
      */
     private void init() throws RuntimeException {
         try {
-            config.loadIntoMap();
-            config.sortExempts();
-            config.checkConfig();
-            input = config.getInput();
-            output = config.getOutput();
-            libs = config.getLibraries();
-            classExempts = config.getClassExempts();
-            methodExempts = config.getMethodExempts();
-            fieldExempts = config.getFieldExempts();
-            stringEncryptionType = config.getStringEncryptionType();
-            invokeDynamicType = config.getInvokeDynamicType();
-            flowObfuscationType = config.getFlowObfuscationType();
-            localVariableType = config.getLocalVariableObfuscationType();
-            lineNumberType = config.getLineNumberObfuscationType();
-            sourceNameType = config.getSourceNameObfuscationType();
-            crasherType = config.getCrasherType();
-            hideCodeType = config.getHideCodeType();
-            numberObfuscationType = config.getNumberObfuscationType();
-            stringPoolType = config.getStringPoolType();
-            renamerType = config.getRenamerType();
-            spigotMode = config.getSpigotBool();
-            trashClasses = config.getTrashClasses();
-            watermarkMsg = config.getWatermarkMsg();
-            watermarkType = config.getWatermarkType();
-            watermarkKey = config.getWatermarkKey();
-            expiryTime = config.getExpiryTime();
-            expiryMsg = config.getExpiryMsg();
-            if (output.exists()) {
-                logStrings.add(LoggerUtils.stdOut("Output already exists, renamed to " + FileUtils.renameExistingFile(output)));
+            this.config.loadIntoMap();
+            this.config.sortExempts();
+            this.config.checkConfig();
+            this.input = this.config.getInput();
+            this.output = this.config.getOutput();
+            this.libs = this.config.getLibraries();
+            this.classExempts = this.config.getClassExempts();
+            this.methodExempts = this.config.getMethodExempts();
+            this.fieldExempts = this.config.getFieldExempts();
+            transformers = new ArrayList<>();
+            AbstractTransformer transformer;
+            // Specific order of adding transformers, feel free to change if you wish.
+            if ((transformer = this.config.getRenamerType()) != null) {
+                transformers.add(transformer);
             }
-            zos = new ZipOutputStream(new FileOutputStream(output));
+            if ((transformer = this.config.getNumberObfuscationType()) != null) {
+                transformers.add(transformer);
+            }
+            if ((transformer = this.config.getInvokeDynamicType()) != null) {
+                transformers.add(transformer);
+            }
+            String expireMsg;
+            long expireTime;
+            if ((expireMsg = this.config.getExpiryMsg()) != null
+                    && (expireTime = this.config.getExpiryTime()) != -1) {
+                transformer = new Expiry(expireTime, expireMsg);
+                transformers.add(transformer);
+            }
+            if ((transformer = this.config.getStringEncryptionType()) != null) {
+                transformers.add(transformer);
+            }
+            if ((transformer = this.config.getFlowObfuscationType()) != null) {
+                transformers.add(transformer);
+            }
+            if ((transformer = this.config.getStringPoolType()) != null) {
+                transformers.add(transformer);
+            }
+            if ((transformer = this.config.getLocalVariableObfuscationType()) != null) {
+                transformers.add(transformer);
+            }
+            if ((transformer = this.config.getLineNumberObfuscationType()) != null) {
+                transformers.add(transformer);
+            }
+            if ((transformer = this.config.getSourceNameObfuscationType()) != null) {
+                transformers.add(transformer);
+            }
+            if ((transformer = this.config.getSourceDebugObfuscationType()) != null) {
+                transformers.add(transformer);
+            }
+            if ((transformer = this.config.getCrasherType()) != null) {
+                transformers.add(transformer);
+            }
+            if ((transformer = this.config.getHideCodeType()) != null) {
+                transformers.add(transformer);
+            }
+            this.trashClasses = this.config.getTrashClasses();
+            this.watermarkMsg = this.config.getWatermarkMsg();
+            this.watermarkType = this.config.getWatermarkType();
+            this.watermarkKey = this.config.getWatermarkKey();
+            if (this.output.exists()) {
+                this.logStrings.add(LoggerUtils.stdOut("Output already exists, renamed to " + FileUtils.renameExistingFile(this.output)));
+            }
+            this.zos = new ZipOutputStream(new FileOutputStream(this.output));
         } catch (Throwable t) {
             throw new RuntimeException("Error while loading config: " + t.getMessage());
         }
@@ -556,9 +358,9 @@ public class Bootstrap { // Eyyy bootstrap bill
         ZipFile zipFile;
         Enumeration<? extends ZipEntry> entries;
         ZipEntry zipEntry;
-        for (File lib : libs.values()) {
+        for (File lib : this.libs.values()) {
             try {
-                logStrings.add(LoggerUtils.stdOut("Loading library " + lib.getAbsolutePath()));
+                this.logStrings.add(LoggerUtils.stdOut("Loading library " + lib.getAbsolutePath()));
                 zipFile = new ZipFile(lib);
                 entries = zipFile.entries();
                 while (entries.hasMoreElements()) {
@@ -568,7 +370,7 @@ public class Bootstrap { // Eyyy bootstrap bill
                         ClassNode classNode = new ClassNode();
                         cr.accept(classNode, ClassReader.SKIP_DEBUG | ClassReader.SKIP_FRAMES | ClassReader.SKIP_CODE); // Only need class name
 
-                        classPath.put(classNode.name, classNode);
+                        this.classPath.put(classNode.name, classNode);
                     }
                 }
                 zipFile.close();
@@ -590,8 +392,8 @@ public class Bootstrap { // Eyyy bootstrap bill
         Enumeration<? extends ZipEntry> entries;
         ZipEntry zipEntry;
         try {
-            logStrings.add(LoggerUtils.stdOut("Loading classes of " + input.getAbsolutePath()));
-            zipFile = new ZipFile(input);
+            this.logStrings.add(LoggerUtils.stdOut("Loading classes of " + this.input.getAbsolutePath()));
+            zipFile = new ZipFile(this.input);
             entries = zipFile.entries();
             while (entries.hasMoreElements()) {
                 zipEntry = entries.nextElement();
@@ -600,20 +402,20 @@ public class Bootstrap { // Eyyy bootstrap bill
                     ClassNode classNode = new ClassNode();
                     cr.accept(classNode, ClassReader.SKIP_FRAMES); // We will manually compute stack frames later
 
-                    classes.put(classNode.name, classNode);
+                    this.classes.put(classNode.name, classNode);
                 } else {
                     ZipEntry newEntry = new ZipEntry(zipEntry);
-                    newEntry.setTime(currentTime);
+                    newEntry.setTime(this.currentTime);
                     newEntry.setCompressedSize(-1);
-                    zos.putNextEntry(newEntry);
+                    this.zos.putNextEntry(newEntry);
                     FileUtils.writeToZip(zos, zipFile.getInputStream(zipEntry));
                 }
             }
             zipFile.close();
         } catch (ZipException ze) {
-            throw new RuntimeException("There was an error opening " + input.getAbsolutePath() + " as a zip!");
+            throw new RuntimeException("There was an error opening " + this.input.getAbsolutePath() + " as a zip!");
         } catch (IOException ioe) {
-            throw new RuntimeException("Input " + input.getAbsolutePath() + " does not exist!");
+            throw new RuntimeException("Input " + this.input.getAbsolutePath() + " does not exist!");
         }
 
         classPath.putAll(classes);
