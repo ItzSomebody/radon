@@ -1080,7 +1080,7 @@ public class GUI {
                                 !chckbxLineObfuscation.isSelected() && // Line remover
                                 !chckbxSourceName.isSelected() // SRC Name
                         ) {
-                    JOptionPane.showMessageDialog(null, "Please select an obfuscation setting!\nAnti-Tamper and Spigot-Plugin alone are not counted as options.", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Please select an obfuscation setting!\nSpigot-Plugin setting alone is not counted as an option.", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 

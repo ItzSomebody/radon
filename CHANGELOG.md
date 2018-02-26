@@ -1,10 +1,14 @@
+## 0.2.4
+
+* Added more JavaDocs + removed debugging code from heavy invokedynamic.
+
 ## 0.2.3
 
 * Added heavy string encryption to gui.
 
 ## 0.2.2
 
-* Completely change light flow obfuscation transformer.
+* Completely changed light flow obfuscation transformer.
 
 ## 0.2.1
 

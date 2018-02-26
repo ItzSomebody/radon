@@ -347,6 +347,12 @@ public class StringEncryption implements Opcodes {
         return methodNode;
     }
 
+    /**
+     * Returns a {@link MethodNode} that returns a {@link String} needed to decrypt strings encrypted by {@link HeavyStringEncryption}.
+     *
+     * @param decryptionMethodName used to determine the name of the generated {@link MethodNode}.
+     * @return a {@link MethodNode} that returns a {@link String} needed to decrypt strings encrypted by {@link HeavyStringEncryption}.
+     */
     public static MethodNode heavyMethod(String decryptionMethodName) {
         MethodNode mv = new MethodNode(ACC_PUBLIC + ACC_STATIC + ACC_BRIDGE + ACC_SYNTHETIC, decryptionMethodName, "(Ljava/lang/Object;Ljava/lang/Object;I)Ljava/lang/String;", null, null);
         mv.visitCode();

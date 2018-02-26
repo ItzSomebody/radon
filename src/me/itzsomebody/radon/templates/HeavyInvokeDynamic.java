@@ -6,7 +6,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 
 class HeavyInvokeDynamic {
-    private static Object bsmMethod(Object lookupName,
+    public static Object bsmMethod(Object lookupName,
                                     Object callerName,
                                     Object callerType,
                                     Object handleType,
@@ -90,7 +90,6 @@ class HeavyInvokeDynamic {
             methodHandle = ((MethodHandle) methodHandle).asType((MethodType) callerType);
             return new ConstantCallSite((MethodHandle) methodHandle);
         } catch (Throwable t) {
-            t.printStackTrace();
             throw new BootstrapMethodError();
         }
     }
