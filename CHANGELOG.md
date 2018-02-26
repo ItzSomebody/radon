@@ -1,3 +1,7 @@
+## 0.2.3
+
+* Added heavy string encryption to gui.
+
 ## 0.2.2
 
 * Completely change light flow obfuscation transformer.

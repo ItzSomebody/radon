@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Transformer that sets GOTO->LABEL instructions as a condition which is always true.
- * 
+ *
  * getstatic injectedBool (true)
  * iconst_1
  * if_icmpeq LABEL

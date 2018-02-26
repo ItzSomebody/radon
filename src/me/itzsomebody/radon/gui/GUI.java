@@ -17,6 +17,7 @@ import me.itzsomebody.radon.transformers.sourcedebug.ObfuscateSourceDebug;
 import me.itzsomebody.radon.transformers.sourcedebug.RemoveSourceDebug;
 import me.itzsomebody.radon.transformers.sourcename.ObfuscateSourceName;
 import me.itzsomebody.radon.transformers.sourcename.RemoveSourceName;
+import me.itzsomebody.radon.transformers.stringencryption.HeavyStringEncryption;
 import me.itzsomebody.radon.transformers.stringencryption.LightStringEncryption;
 import me.itzsomebody.radon.transformers.stringencryption.NormalStringEncryption;
 import me.itzsomebody.radon.utils.WatermarkUtils;
@@ -308,7 +309,7 @@ public class GUI {
         gbc_comboBox.insets = new Insets(0, 0, 5, 5);
         gbc_comboBox.gridx = 9;
         gbc_comboBox.gridy = 0;
-        String[] encryptions = {"Light", "Normal"};
+        String[] encryptions = {"Light", "Normal", "Heavy"};
         for (String s : encryptions) {
             comboBox.addItem(s);
         }
@@ -1172,6 +1173,9 @@ public class GUI {
                                         break;
                                     case 1:
                                         transformers.add(new NormalStringEncryption(spigotMode));
+                                        break;
+                                    case 2:
+                                        transformers.add(new HeavyStringEncryption(spigotMode));
                                         break;
                                 }
                             }
