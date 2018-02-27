@@ -192,6 +192,16 @@ public abstract class AbstractTransformer implements Opcodes {
     }
 
     /**
+     * Grabs {@link ClassNode} via {@link AbstractTransformer#classPath}.
+     *
+     * @param className the key to use to get corresponding classnode.
+     * @return {@link ClassNode} via {@link AbstractTransformer#classPath}.
+     */
+    protected ClassNode getClassNode(String className) {
+        return this.classPath.get(className);
+    }
+
+    /**
      * Returns a {@link List} of {@link String}s that were outputted into the console by transformer.
      *
      * @return a {@link List} of {@link String}s that were outputted into the console by transformer.

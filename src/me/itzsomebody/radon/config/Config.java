@@ -60,6 +60,8 @@ public class Config {
             add("Renamer");
             add("ExpiryTime");
             add("ExpiryMessage");
+            add("Shuffler");
+            add("InnerClassRemover");
         }
     };
 
@@ -454,6 +456,52 @@ public class Config {
     }
 
     /**
+     * Returns the shuffler type from {@link Config#map} as an {@link AbstractTransformer}. Defaults to null if null or false
+     *
+     * @return Returns the shuffler type from {@link Config#map} as an {@link AbstractTransformer}. Defaults to null if null or false.
+     * @throws IllegalArgumentException if value from key is null or not a {@link Boolean}
+     */
+    public AbstractTransformer getShufflerType() throws IllegalArgumentException {
+        if (map.containsKey("Shuffler")) {
+            Object value = map.get("Shuffler");
+            if (value != null) {
+                if (!(value instanceof Boolean)) throw new IllegalArgumentException("Shuffler arg must be true/false");
+                boolean s = (Boolean) value;
+                if (s) {
+                    return new Shuffler();
+                }
+            } else {
+                throw new IllegalArgumentException("Shuffler arg is null");
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Returns the inner class remover type from {@link Config#map} as an {@link AbstractTransformer}. Defaults to null if null or false
+     *
+     * @return Returns the inner class remover type from {@link Config#map} as an {@link AbstractTransformer}. Defaults to null if null or false.
+     * @throws IllegalArgumentException if value from key is null or not a {@link Boolean}
+     */
+    public AbstractTransformer getInnerClassRemoverType() throws IllegalArgumentException {
+        if (map.containsKey("InnerClassRemover")) {
+            Object value = map.get("InnerClassRemover");
+            if (value != null) {
+                if (!(value instanceof Boolean)) throw new IllegalArgumentException("InnerClassRemover arg must be true/false");
+                boolean s = (Boolean) value;
+                if (s) {
+                    return new InnerClassRemover();
+                }
+            } else {
+                throw new IllegalArgumentException("InnerClassRemover arg is null");
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Returns the crasher type from {@link Config#map} as an {@link AbstractTransformer}. Defaults to null if null or false
      *
      * @return Returns the crasher type from {@link Config#map} as an {@link AbstractTransformer}. Defaults to null if null or false.
@@ -632,9 +680,9 @@ public class Config {
     }
 
     /**
-     * Returns the hide code type from {@link Config#map} as an {@link AbstractTransformer}. Defaults to null if null or false.
+     * Returns the string pool type from {@link Config#map} as an {@link AbstractTransformer}. Defaults to null if null or false.
      *
-     * @return Returns the hide code type from {@link Config#map} as an {@link AbstractTransformer}. Defaults to null if null or false.
+     * @return Returns the string pool type from {@link Config#map} as an {@link AbstractTransformer}. Defaults to null if null or false.
      * @throws IllegalArgumentException if value from key is null or not a {@link Boolean}
      */
     public AbstractTransformer getStringPoolType() throws IllegalArgumentException {

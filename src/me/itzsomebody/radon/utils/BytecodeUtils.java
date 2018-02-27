@@ -275,6 +275,12 @@ public class BytecodeUtils {
         throw new IllegalStateException("Unexpected instruction");
     }
 
+    /**
+     * Determines if description is a primitive int.
+     *
+     * @param desc the description to check.
+     * @return true if description is a primitive int.
+     */
     public static boolean isPrimitiveType(String desc) {
         String rawDesc = desc.replace("[", "");
         return (rawDesc.equals("I")
@@ -283,5 +289,22 @@ public class BytecodeUtils {
                 || rawDesc.equals("S")
                 || rawDesc.equals("J")
                 || rawDesc.equals("Z"));
+    }
+
+    /**
+     * Checks if input methodNode contains goto opcode.
+     *
+     * @param methodNode input methodNode.
+     * @return true if input methodNode contains goto opcode.
+     */
+    public static boolean containsGoto(MethodNode methodNode) {
+        for (int i = 0; i < methodNode.instructions.size(); i++) {
+            AbstractInsnNode insn = methodNode.instructions.get(i);
+            if (insn instanceof JumpInsnNode && insn.getOpcode() == Opcodes.GOTO) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

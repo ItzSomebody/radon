@@ -1,3 +1,8 @@
+## 0.2.5
+
+* Added Shuffler and InnerClassRemover transformers.
+* Updated GUI.
+
 ## 0.2.4
 
 * Added more JavaDocs + removed debugging code from heavy invokedynamic.

@@ -187,8 +187,11 @@ public class Bootstrap { // Eyyy bootstrap bill
             loadInput();
 
             for (AbstractTransformer transformer : transformers) {
-                transformer.init(classes, classPath, classExempts, methodExempts, fieldExempts);
-                transformer.init(classes, classPath, classExempts, methodExempts, fieldExempts);
+                if (transformer instanceof Renamer) {
+                    transformer.init(classes, classPath, classExempts, methodExempts, fieldExempts);
+                } else {
+                    transformer.init(classes, classExempts, methodExempts, fieldExempts);
+                }
                 transformer.obfuscate();
                 logStrings.addAll(transformer.getLogStrings());
             }
@@ -224,8 +227,6 @@ public class Bootstrap { // Eyyy bootstrap bill
             logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
             logStrings.add(LoggerUtils.stdOut("Writing classes to output"));
             for (ClassNode classNode : classes.values()) {
-                Collections.shuffle(classNode.methods);
-                Collections.shuffle(classNode.fields);
                 ClassWriter cw = new CustomClassWriter(ClassWriter.COMPUTE_FRAMES);
 
                 if (watermarkMsg != null) {
@@ -290,51 +291,57 @@ public class Bootstrap { // Eyyy bootstrap bill
             this.classExempts = this.config.getClassExempts();
             this.methodExempts = this.config.getMethodExempts();
             this.fieldExempts = this.config.getFieldExempts();
-            transformers = new ArrayList<>();
+            this.transformers = new ArrayList<>();
             AbstractTransformer transformer;
             // Specific order of adding transformers, feel free to change if you wish.
+            if ((transformer = this.config.getShufflerType()) != null) {
+                this.transformers.add(transformer);
+            }
+            if ((transformer = this.config.getInnerClassRemoverType()) != null) {
+                this.transformers.add(transformer);
+            }
             if ((transformer = this.config.getRenamerType()) != null) {
-                transformers.add(transformer);
+                this.transformers.add(transformer);
             }
             if ((transformer = this.config.getNumberObfuscationType()) != null) {
-                transformers.add(transformer);
+                this.transformers.add(transformer);
             }
             if ((transformer = this.config.getInvokeDynamicType()) != null) {
-                transformers.add(transformer);
+                this.transformers.add(transformer);
             }
             String expireMsg;
             long expireTime;
             if ((expireMsg = this.config.getExpiryMsg()) != null
                     && (expireTime = this.config.getExpiryTime()) != -1) {
                 transformer = new Expiry(expireTime, expireMsg);
-                transformers.add(transformer);
+                this.transformers.add(transformer);
             }
             if ((transformer = this.config.getStringEncryptionType()) != null) {
-                transformers.add(transformer);
+                this.transformers.add(transformer);
             }
             if ((transformer = this.config.getFlowObfuscationType()) != null) {
-                transformers.add(transformer);
+                this.transformers.add(transformer);
             }
             if ((transformer = this.config.getStringPoolType()) != null) {
-                transformers.add(transformer);
+                this.transformers.add(transformer);
             }
             if ((transformer = this.config.getLocalVariableObfuscationType()) != null) {
-                transformers.add(transformer);
+                this.transformers.add(transformer);
             }
             if ((transformer = this.config.getLineNumberObfuscationType()) != null) {
-                transformers.add(transformer);
+                this.transformers.add(transformer);
             }
             if ((transformer = this.config.getSourceNameObfuscationType()) != null) {
-                transformers.add(transformer);
+                this.transformers.add(transformer);
             }
             if ((transformer = this.config.getSourceDebugObfuscationType()) != null) {
-                transformers.add(transformer);
+                this.transformers.add(transformer);
             }
             if ((transformer = this.config.getCrasherType()) != null) {
-                transformers.add(transformer);
+                this.transformers.add(transformer);
             }
             if ((transformer = this.config.getHideCodeType()) != null) {
-                transformers.add(transformer);
+                this.transformers.add(transformer);
             }
             this.trashClasses = this.config.getTrashClasses();
             this.watermarkMsg = this.config.getWatermarkMsg();

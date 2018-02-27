@@ -620,6 +620,22 @@ public class GUI {
         gbc_chckbxClassRenammer.gridy = 13;
         panel.add(chckbxClassRenammer, gbc_chckbxClassRenammer);
 
+        JCheckBox chckbxShuffler = new JCheckBox("Member Shuffler");
+        GridBagConstraints gbc_chckbxShuffler = new GridBagConstraints();
+        gbc_chckbxShuffler.anchor = GridBagConstraints.WEST;
+        gbc_chckbxShuffler.insets = new Insets(0, 0, 5, 5);
+        gbc_chckbxShuffler.gridx = 0;
+        gbc_chckbxShuffler.gridy = 14;
+        panel.add(chckbxShuffler, gbc_chckbxShuffler);
+
+        JCheckBox chckbxInnerClasses = new JCheckBox("InnerClasses Remover");
+        GridBagConstraints gbc_chckbxInnerClasses = new GridBagConstraints();
+        gbc_chckbxInnerClasses.anchor = GridBagConstraints.WEST;
+        gbc_chckbxInnerClasses.insets = new Insets(0, 0, 5, 5);
+        gbc_chckbxInnerClasses.gridx = 0;
+        gbc_chckbxInnerClasses.gridy = 15;
+        panel.add(chckbxInnerClasses, gbc_chckbxInnerClasses);
+
         JPanel panel_2 = new JPanel();
         tabbedPane.addTab("Watermark", null, panel_2, null);
         GridBagLayout gbl_panel_2 = new GridBagLayout();
@@ -1064,33 +1080,44 @@ public class GUI {
                     return;
                 }
 
-                if (
-                        !chckbxStringEncryption.isSelected() && /* String Encryption */
-                                !chckbxInvokeDynamic.isSelected() && /* InvokeDynamic */
-                                !chckbxFlow.isSelected() && /* Flow */
-                                !chckbxLocalVariables.isSelected() && /* Localvariables */
-                                !chckbxTrashClasses.isSelected() && /* trashclasses */
-                                !chckbxSpringPool.isSelected() && /* String pool */
-                                !chckbxCrasher.isSelected() && /* antidecompiler */
-                                !chckbxHidecode.isSelected() && /* Hidecode */
-                                !chckbxClassRenammer.isSelected() && /* Class Renamers */
-                                !chckbxNumberObfuscation.isSelected() && /* Messy Numbers */
-                                //!chckbxSpigotPlugin.isSelected() && /* Spigot Plugin */
-                                !chckbxAddWatermark.isSelected() &&/* Watermark */
-                                !chckbxLineObfuscation.isSelected() && // Line remover
-                                !chckbxSourceName.isSelected() // SRC Name
-                        ) {
+                if (!chckbxStringEncryption.isSelected() &&
+                        !chckbxInvokeDynamic.isSelected() &&
+                        !chckbxFlow.isSelected() &&
+                        !chckbxLocalVariables.isSelected() &&
+                        !chckbxTrashClasses.isSelected() &&
+                        !chckbxSpringPool.isSelected() &&
+                        !chckbxCrasher.isSelected() &&
+                        !chckbxHidecode.isSelected() &&
+                        !chckbxClassRenammer.isSelected() &&
+                        !chckbxNumberObfuscation.isSelected() &&
+                        !chckbxAddWatermark.isSelected() &&
+                        !chckbxLineObfuscation.isSelected() &&
+                        !chckbxSourceName.isSelected() &&
+                        !chckbxSourceDebug.isSelected() &&
+                        !chckbxShuffler.isSelected() &&
+                        !chckbxAddExpiration.isSelected() &&
+                        !chckbxInnerClasses.isSelected()) {
                     JOptionPane.showMessageDialog(null, "Please select an obfuscation setting!\nSpigot-Plugin setting alone is not counted as an option.", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
-                if (chckbxAddWatermark.isSelected() && waterMarkMessageField.getText().isEmpty() || waterMarkMessageField.getText() == null) {
+                if (chckbxAddWatermark.isSelected() && waterMarkMessageField.getText().isEmpty()) {
                     JOptionPane.showMessageDialog(null, "You must enter a message to be watermarked.", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
-                if (chckbxAddWatermark.isSelected() && watermarkPassword.getText().isEmpty() || watermarkPassword.getText() == null) {
+                if (chckbxAddWatermark.isSelected() && watermarkPassword.getText().isEmpty()) {
                     JOptionPane.showMessageDialog(null, "You must enter a key to encrypt the watermark message.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                if (chckbxAddExpiration.isSelected() && expirationMessageField.getText().isEmpty()) {
+                    JOptionPane.showMessageDialog(null, "You must enter an expiration message.", "Error", JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+
+                if (chckbxAddExpiration.isSelected() && expirationDateField.getText().isEmpty()) {
+                    JOptionPane.showMessageDialog(null, "You must enter an expiration date.", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
                 btnObfuscate.setText("Processing...");
@@ -1140,6 +1167,12 @@ public class GUI {
                             boolean spigotMode = chckbxSpigotPlugin.isSelected();
                             List<AbstractTransformer> transformers = new ArrayList<>();
 
+                            if (chckbxShuffler.isSelected()) {
+                                transformers.add(new Shuffler());
+                            }
+                            if (chckbxInnerClasses.isSelected()) {
+                                transformers.add(new InnerClassRemover());
+                            }
                             if (chckbxClassRenammer.isSelected()) {
                                 transformers.add(new Renamer(spigotMode));
                             }
@@ -1439,6 +1472,20 @@ public class GUI {
                                     chckbxSpringPool.setSelected(true);
                                 } else {
                                     chckbxSpringPool.setSelected(false);
+                                }
+
+                                AbstractTransformer shufflerMode = configParser.getShufflerType();
+                                if (shufflerMode instanceof Shuffler) {
+                                    chckbxShuffler.setSelected(true);
+                                } else {
+                                    chckbxShuffler.setSelected(false);
+                                }
+
+                                AbstractTransformer innerClassMode = configParser.getInnerClassRemoverType();
+                                if (innerClassMode instanceof InnerClassRemover) {
+                                    chckbxInnerClasses.setSelected(true);
+                                } else {
+                                    chckbxInnerClasses.setSelected(false);
                                 }
 
                                 if (configParser.getSpigotBool()) {

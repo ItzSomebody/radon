@@ -46,6 +46,7 @@ import org.objectweb.asm.TypePath;
  * A node that represents a class.
  *
  * @author Eric Bruneton
+ * @author ItzSomebody
  */
 public class ClassNode extends ClassVisitor {
 
@@ -188,6 +189,11 @@ public class ClassNode extends ClassVisitor {
      * @associates org.objectweb.asm.tree.MethodNode
      */
     public List<MethodNode> methods;
+
+    /**
+     * Indicator of class being a library classnode.
+     */
+    public boolean libraryNode;
 
     /**
      * Constructs a new {@link ClassNode}. <i>Subclasses must not use this

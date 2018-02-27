@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Transformer that sets GOTO->LABEL instructions as a condition which is always true.
- *
+ * <p>
  * getstatic injectedBool (true)
  * iconst_1
  * if_icmpeq LABEL
@@ -32,7 +32,7 @@ public class LightFlowObfuscation extends AbstractTransformer {
             String fieldName = StringUtils.crazyString();
             classNode.methods.stream().filter(methodNode -> !BytecodeUtils.isAbstractMethod(methodNode.access)
                     && !methodExempted(classNode.name + '.' + methodNode.name + methodNode.desc)
-                    && containsJumpNodes(methodNode)
+                    && BytecodeUtils.containsGoto(methodNode)
                     && methodNode.localVariables != null && methodNode.localVariables.size() >= 1).forEach(methodNode -> {
                 for (AbstractInsnNode ain : methodNode.instructions.toArray()) {
                     if (methodSize(methodNode) > 60000) break;
@@ -50,16 +50,5 @@ public class LightFlowObfuscation extends AbstractTransformer {
         });
         logStrings.add(LoggerUtils.stdOut("Added " + counter + " instruction sets."));
         logStrings.add(LoggerUtils.stdOut("Finished. [" + tookThisLong(current) + "ms]"));
-    }
-
-    private boolean containsJumpNodes(MethodNode methodNode) {
-        for (int i = 0; i < methodNode.instructions.size(); i++) {
-            AbstractInsnNode insn = methodNode.instructions.get(i);
-            if (insn instanceof JumpInsnNode && insn.getOpcode() == GOTO) {
-                return true;
-            }
-        }
-
-        return false;
     }
 }
