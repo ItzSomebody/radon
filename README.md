@@ -59,7 +59,9 @@ Valid config options you can use:
 | WatermarkKey | String | Key used to encrypt watermarks |
 | SpigotPlugin | String | Determines if input should be treated as a spigot/bungee plugin |
 | Renamer | Boolean | Determines if obfuscator should rename classes and methods |
-| ExpiryTime | String | Determines if obfuscator insert expiry obfuscation (useful for trialware) |
+| Shuffler | Boolean | Determines if obfuscator should re-arrange class members |
+| InnerClassRemover | Boolean | Determines if obfuscator should remove inner-class information |
+| ExpiryTime | String | Message to insert for expiry obfuscation (useful for trialware) |
 | ExpiryMessage | String | Message to show when set your trialware goes past expiration date (rip) |
 
 
