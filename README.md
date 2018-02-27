@@ -8,7 +8,7 @@ Usage: ```java -jar Radon.jar --config exampleconfig.yml```
 Alternatively, you can also use ```java -jar Radon.jar --help``` for help.
 
 Example config:
-```
+```yaml
 Input: ClearChat.jar
 Output: ClearChat-OBF.jar
 StringEncryption: Light
@@ -17,10 +17,13 @@ FlowObfuscation: Normal
 LocalVariableObfuscation: Remove
 LineNumberObfuscation: Remove
 SourceNameObfuscation: Obfuscate
+SourceDebugObfuscation: Obfuscate
 HideCode: True
 Crasher: True
 StringPool: True
 NumberObfuscation: True
+Shuffler: True
+InnerClassRemover: True
 TrashClasses: 50
 Renamer: True
 WatermarkType: ConstantPool
@@ -53,6 +56,7 @@ Valid config options you can use:
 | LineNumberObfuscation | String (Obfuscate/Remove) | Type of line number obfuscation to apply |
 | NumberObfuscation | Boolean | Determines if integers should be split into simple math expressions |
 | SourceNameObfuscation | String (Obfuscate/Remove) | Type of source name obfuscation to apply |
+| SourceDebugObfuscation | String (Obfuscate/Remove) | Type of source debug obfuscation to apply |
 | TrashClasses | Integer | Number of trash classes to generate |
 | WatermarkMessage | String | Message to watermark into the output |
 | WatermarkType | String (ConstantPool/Signature) | Type of watermark to apply |
