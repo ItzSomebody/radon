@@ -1,11 +1,14 @@
 package me.itzsomebody.radon.transformers.flow;
 
+import me.itzsomebody.radon.utils.NumberUtils;
 import me.itzsomebody.radon.utils.StringUtils;
 import org.objectweb.asm.tree.*;
 import me.itzsomebody.radon.transformers.AbstractTransformer;
 import me.itzsomebody.radon.utils.BytecodeUtils;
 import me.itzsomebody.radon.utils.LoggerUtils;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -32,8 +35,7 @@ public class LightFlowObfuscation extends AbstractTransformer {
             String fieldName = StringUtils.crazyString();
             classNode.methods.stream().filter(methodNode -> !BytecodeUtils.isAbstractMethod(methodNode.access)
                     && !methodExempted(classNode.name + '.' + methodNode.name + methodNode.desc)
-                    && BytecodeUtils.containsGoto(methodNode)
-                    && methodNode.localVariables != null && methodNode.localVariables.size() >= 1).forEach(methodNode -> {
+                    && BytecodeUtils.containsGoto(methodNode)).forEach(methodNode -> {
                 for (AbstractInsnNode ain : methodNode.instructions.toArray()) {
                     if (methodSize(methodNode) > 60000) break;
                     if (ain.getOpcode() == GOTO) {

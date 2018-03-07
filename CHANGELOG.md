@@ -1,3 +1,7 @@
+## 0.3.1
+
+* Quick GUI fix causing Field exempts not to work.
+
 ## 0.3.0
 
 * Completely rewrote Renamer transformer.

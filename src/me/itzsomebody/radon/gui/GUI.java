@@ -1148,20 +1148,15 @@ public class GUI {
                                 return;
                             }
                             List<String> exemptClasses = new ArrayList<>();
-                            for (int i = 0; i < exemptList.size(); i++) {
-                                if (exemptList.get(i).endsWith("(METHOD)")) continue;
-                                exemptClasses.add(exemptList.get(i));
-                            }
                             List<String> exemptMethods = new ArrayList<>();
-                            for (int i = 0; i < exemptList.size(); i++) {
-                                if (exemptList.get(i).endsWith("(METHOD)")) {
-                                    exemptMethods.add(exemptList.get(i).substring(0, exemptList.get(i).length() - 8));
-                                }
-                            }
                             List<String> exemptFields = new ArrayList<>();
                             for (int i = 0; i < exemptList.size(); i++) {
                                 if (exemptList.get(i).endsWith("(FIELD)")) {
-                                    exemptMethods.add(exemptList.get(i).substring(0, exemptList.get(i).length() - 7));
+                                    exemptFields.add(exemptList.get(i).substring(0, exemptList.get(i).length() - 7));
+                                } else if (exemptList.get(i).endsWith("(METHOD)")) {
+                                    exemptMethods.add(exemptList.get(i).substring(0, exemptList.get(i).length() - 8));
+                                } else {
+                                    exemptClasses.add(exemptList.get(i));
                                 }
                             }
                             boolean spigotMode = chckbxSpigotPlugin.isSelected();
