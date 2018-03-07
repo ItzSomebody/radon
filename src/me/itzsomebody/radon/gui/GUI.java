@@ -1165,9 +1165,6 @@ public class GUI {
                             if (chckbxClassRenammer.isSelected()) {
                                 transformers.add(new Renamer(spigotMode));
                             }
-                            if (chckbxShuffler.isSelected()) {
-                                transformers.add(new Shuffler());
-                            }
                             if (chckbxInnerClasses.isSelected()) {
                                 transformers.add(new InnerClassRemover());
                             }
@@ -1219,6 +1216,9 @@ public class GUI {
                             }
                             if (chckbxSpringPool.isSelected()) {
                                 transformers.add(new StringPool());
+                            }
+                            if (chckbxShuffler.isSelected()) {
+                                transformers.add(new Shuffler());
                             }
                             if (chckbxLocalVariables.isSelected()) {
                                 switch (comboBox_3.getSelectedIndex()) {
@@ -1274,7 +1274,7 @@ public class GUI {
 
                             int watermarkType = -1;
                             if (chckbxAddWatermark.isSelected()) {
-                                watermarkType = comboBox_5.getSelectedIndex();
+                                watermarkType = comboBox_05.getSelectedIndex();
                             }
                             Bootstrap bootstrap = new Bootstrap(
                                     input,
@@ -1360,6 +1360,10 @@ public class GUI {
                                     chckbxStringEncryption.setSelected(true);
                                     comboBox.setSelectedIndex(1);
                                     comboBox.setEnabled(true);
+                                } else if (stringEncryptionMode instanceof HeavyStringEncryption) {
+                                    chckbxStringEncryption.setSelected(true);
+                                    comboBox.setSelectedIndex(2);
+                                    comboBox.setEnabled(true);
                                 }
 
                                 AbstractTransformer flowObfuscationMode = configParser.getFlowObfuscationType();
@@ -1378,17 +1382,21 @@ public class GUI {
                                 AbstractTransformer invokeDynamicMode = configParser.getInvokeDynamicType();
                                 if (invokeDynamicMode == null) {
                                     chckbxInvokeDynamic.setSelected(false);
-                                } else if (invokeDynamicMode instanceof LightFlowObfuscation) {
+                                } else if (invokeDynamicMode instanceof LightInvokeDynamic) {
                                     chckbxInvokeDynamic.setSelected(true);
                                     comboBox_1.setSelectedIndex(0);
                                     comboBox_1.setEnabled(true);
-                                } else if (invokeDynamicMode instanceof NormalFlowObfuscation) {
+                                } else if (invokeDynamicMode instanceof NormalInvokeDynamic) {
                                     chckbxInvokeDynamic.setSelected(true);
                                     comboBox_1.setSelectedIndex(1);
                                     comboBox_1.setEnabled(true);
+                                } else if (invokeDynamicMode instanceof HeavyInvokeDynamic) {
+                                    chckbxInvokeDynamic.setSelected(true);
+                                    comboBox_1.setSelectedIndex(2);
+                                    comboBox_1.setEnabled(true);
                                 }
 
-                                AbstractTransformer localVariablesMode = configParser.getInvokeDynamicType();
+                                AbstractTransformer localVariablesMode = configParser.getLocalVariableObfuscationType();
                                 if (localVariablesMode == null) {
                                     chckbxLocalVariables.setSelected(false);
                                 } else if (localVariablesMode instanceof ObfuscateLocalVariables) {
@@ -1481,6 +1489,13 @@ public class GUI {
                                     chckbxInnerClasses.setSelected(true);
                                 } else {
                                     chckbxInnerClasses.setSelected(false);
+                                }
+
+                                AbstractTransformer renamer = configParser.getRenamerType();
+                                if (renamer instanceof Renamer) {
+                                    chckbxClassRenammer.setSelected(true);
+                                } else {
+                                    chckbxClassRenammer.setSelected(false);
                                 }
 
                                 if (configParser.getSpigotBool()) {

@@ -297,9 +297,6 @@ public class Bootstrap { // Eyyy bootstrap bill
             if ((transformer = this.config.getRenamerType()) != null) {
                 this.transformers.add(transformer);
             }
-            if ((transformer = this.config.getShufflerType()) != null) {
-                this.transformers.add(transformer);
-            }
             if ((transformer = this.config.getInnerClassRemoverType()) != null) {
                 this.transformers.add(transformer);
             }
@@ -323,6 +320,9 @@ public class Bootstrap { // Eyyy bootstrap bill
                 this.transformers.add(transformer);
             }
             if ((transformer = this.config.getStringPoolType()) != null) {
+                this.transformers.add(transformer);
+            }
+            if ((transformer = this.config.getShufflerType()) != null) {
                 this.transformers.add(transformer);
             }
             if ((transformer = this.config.getLocalVariableObfuscationType()) != null) {
