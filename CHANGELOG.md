@@ -1,3 +1,7 @@
+## 0.3.2
+
+* Lots of GUI fixes.
+
 ## 0.3.1
 
 * Quick GUI fix causing Field exempts not to work.
