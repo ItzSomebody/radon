@@ -1,3 +1,8 @@
+## 0.3.0
+
+* Completely rewrote Renamer transformer.
+* Radon now depends on some edits to org/objectweb/asm/ClassNode.
+
 ## 0.2.5
 
 * Added Shuffler and InnerClassRemover transformers.

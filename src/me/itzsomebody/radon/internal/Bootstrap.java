@@ -294,13 +294,13 @@ public class Bootstrap { // Eyyy bootstrap bill
             this.transformers = new ArrayList<>();
             AbstractTransformer transformer;
             // Specific order of adding transformers, feel free to change if you wish.
+            if ((transformer = this.config.getRenamerType()) != null) {
+                this.transformers.add(transformer);
+            }
             if ((transformer = this.config.getShufflerType()) != null) {
                 this.transformers.add(transformer);
             }
             if ((transformer = this.config.getInnerClassRemoverType()) != null) {
-                this.transformers.add(transformer);
-            }
-            if ((transformer = this.config.getRenamerType()) != null) {
                 this.transformers.add(transformer);
             }
             if ((transformer = this.config.getNumberObfuscationType()) != null) {
@@ -375,6 +375,7 @@ public class Bootstrap { // Eyyy bootstrap bill
                     if (zipEntry.getName().endsWith(".class")) {
                         ClassReader cr = new ClassReader(zipFile.getInputStream(zipEntry));
                         ClassNode classNode = new ClassNode();
+                        classNode.libraryNode = true;
                         cr.accept(classNode, ClassReader.SKIP_DEBUG | ClassReader.SKIP_FRAMES | ClassReader.SKIP_CODE); // Only need class name
 
                         this.classPath.put(classNode.name, classNode);
@@ -407,6 +408,7 @@ public class Bootstrap { // Eyyy bootstrap bill
                 if (zipEntry.getName().endsWith(".class")) {
                     ClassReader cr = new ClassReader(zipFile.getInputStream(zipEntry));
                     ClassNode classNode = new ClassNode();
+                    classNode.libraryNode = false;
                     cr.accept(classNode, ClassReader.SKIP_FRAMES); // We will manually compute stack frames later
 
                     this.classes.put(classNode.name, classNode);

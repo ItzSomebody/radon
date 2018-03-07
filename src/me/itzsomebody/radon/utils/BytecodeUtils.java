@@ -66,6 +66,7 @@ public class BytecodeUtils {
      * @param classes    the classpath to check.
      * @return true if input {@link MethodNode} name and description match another one in the classpath.
      */
+    @Deprecated
     public static boolean hasSameMethod(MethodNode methodNode, ClassNode clazz, Map<String, ClassNode> classes) {
         for (ClassNode classNode : classes.values()) {
             if (classNode.name.equals(clazz.name)) continue;

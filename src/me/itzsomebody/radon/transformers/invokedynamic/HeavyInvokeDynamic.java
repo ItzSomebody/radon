@@ -95,10 +95,8 @@ public class HeavyInvokeDynamic extends AbstractTransformer {
                             boolean isSetter = (fieldInsnNode.getOpcode() == Opcodes.PUTFIELD || fieldInsnNode.getOpcode() == Opcodes.PUTSTATIC);
                             String newSig = (isSetter) ? "(" + fieldInsnNode.desc + ")V" : "()" + fieldInsnNode.desc;
                             if (!isStatic) newSig = newSig.replace("(", "(Ljava/lang/Object;");
-                            String wrappedDescription = null;
-                            if (fieldInsnNode.desc.startsWith("L") && fieldInsnNode.desc.endsWith(";")) {
-                                wrappedDescription = fieldInsnNode.desc.substring(1, fieldInsnNode.desc.length() - 1).replace("/", ".");
-                            }
+                            Type type = Type.getType(fieldInsnNode.desc);
+                            String wrappedDescription = type.getClassName();
                             switch (fieldInsnNode.getOpcode()) {
                                 case Opcodes.GETFIELD:
                                     methodNode.instructions.set(insn, new InvokeDynamicInsnNode(

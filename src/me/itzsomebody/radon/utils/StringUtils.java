@@ -1,7 +1,5 @@
 package me.itzsomebody.radon.utils;
 
-import org.objectweb.asm.tree.ClassNode;
-
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.MessageDigest;
@@ -265,6 +263,15 @@ public class StringUtils {
         return randomClass;
     }
 
+    /**
+     * Returns encrypted {@link String} used by {@link me.itzsomebody.radon.transformers.stringencryption.HeavyStringEncryption}.
+     *
+     * @param className the className to get hashcode from.
+     * @param methodName the methodName to get hashcode from.
+     * @param key3 the extra key to ensure a different encryption each time.
+     * @param msg the string to encrypt
+     * @return encrypted {@link String} used by {@link me.itzsomebody.radon.transformers.stringencryption.HeavyStringEncryption}.
+     */
     public static String heavyEncrypt(String className, String methodName, int key3, String msg) {
         char[] chars = msg.toCharArray();
         char[] returnThis = new char[chars.length];

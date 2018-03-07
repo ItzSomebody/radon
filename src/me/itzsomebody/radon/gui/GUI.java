@@ -1167,14 +1167,14 @@ public class GUI {
                             boolean spigotMode = chckbxSpigotPlugin.isSelected();
                             List<AbstractTransformer> transformers = new ArrayList<>();
 
+                            if (chckbxClassRenammer.isSelected()) {
+                                transformers.add(new Renamer(spigotMode));
+                            }
                             if (chckbxShuffler.isSelected()) {
                                 transformers.add(new Shuffler());
                             }
                             if (chckbxInnerClasses.isSelected()) {
                                 transformers.add(new InnerClassRemover());
-                            }
-                            if (chckbxClassRenammer.isSelected()) {
-                                transformers.add(new Renamer(spigotMode));
                             }
                             if (chckbxNumberObfuscation.isSelected()) {
                                 transformers.add(new NumberObfuscation());

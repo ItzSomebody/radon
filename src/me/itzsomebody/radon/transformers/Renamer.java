@@ -51,13 +51,78 @@ public class Renamer extends AbstractTransformer {
         AtomicInteger counter = new AtomicInteger();
         classNodes().stream().filter(classNode -> !classExempted(classNode.name)).forEach(classNode -> {
             classNode.methods.stream().filter(methodNode -> !methodExempted(classNode.name + '.' + methodNode.name + '.' + methodNode.desc))
-                    .filter(methodNode -> !methodNode.name.startsWith("<"))
-                    .filter(methodNode -> !BytecodeUtils.isNativeMethod(methodNode.access))
-                    .filter(methodNode -> !methodNode.name.equals("main") && !methodNode.name.equals("premain"))
-                    .filter(methodNode -> !BytecodeUtils.hasSameMethod(methodNode, classNode, getClassPathMap()))
-                    .forEach(methodNode -> {
-                        mappings.put(classNode.name + '.' + methodNode.name + methodNode.desc, StringUtils.crazyString());
-                    });
+                    .filter(methodNode -> !BytecodeUtils.isNativeMethod(methodNode.access)
+                                    && !methodNode.name.equals("main") && !methodNode.name.equals("premain")
+                                    && !methodNode.name.startsWith("<")
+                            /*&& !mappings.containsKey(classNode.name + '.' + methodNode.name + methodNode.desc)*/).forEach(methodNode -> {
+
+                boolean doNotRename = false;
+                if (classNode.superName != null) {
+                    ClassNode superClass = getClassNode(classNode.superName);
+                    for (MethodNode superMethod : superClass.methods) {
+                        if (methodNode.name.equals(superMethod.name)
+                                && methodNode.desc.equals(superMethod.desc)) {
+                            if (superClass.libraryNode) {
+                                doNotRename = true;
+                                continue;
+                            }
+                            String newName = StringUtils.crazyString();
+                            mappings.put(classNode.name + '.' + methodNode.name + methodNode.desc, newName);
+
+                            for (ClassNode cn : classNodes()) {
+                                if (cn.name.equals(classNode.superName)
+                                        || classNode.interfaces.contains(cn.name)
+                                        || cn.superName.equals(classNode.name)
+                                        || cn.interfaces.contains(classNode.name)) {
+                                    for (MethodNode mn : cn.methods) {
+                                        if (mn.name.equals(methodNode.name)
+                                                && mn.desc.equals(methodNode.desc)) {
+                                            mappings.put(cn.name + '.' + mn.name + mn.desc, newName);
+                                            doNotRename = true;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (classNode.interfaces != null) {
+                    for (String className : classNode.interfaces) {
+                        ClassNode interfaceClass = getClassNode(className);
+                        for (MethodNode interfaceMethod : interfaceClass.methods) {
+                            if (methodNode.name.equals(interfaceMethod.name)
+                                    && methodNode.desc.equals(interfaceMethod.desc)) {
+                                if (interfaceClass.libraryNode) {
+                                    doNotRename = true;
+                                    continue;
+                                }
+                                String newName = StringUtils.crazyString();
+                                mappings.put(classNode.name + '.' + methodNode.name + methodNode.desc, newName);
+
+                                for (ClassNode cn : classNodes()) {
+                                    if (cn.name.equals(classNode.superName)
+                                            || classNode.interfaces.contains(cn.name)
+                                            || cn.superName.equals(classNode.name)
+                                            || cn.interfaces.contains(classNode.name)) {
+                                        for (MethodNode mn : cn.methods) {
+                                            if (mn.name.equals(methodNode.name)
+                                                    && mn.desc.equals(methodNode.desc)) {
+                                                mappings.put(cn.name + '.' + mn.name + mn.desc, newName);
+                                                doNotRename = true;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if (!doNotRename) {
+                    mappings.put(classNode.name + '.' + methodNode.name + methodNode.desc, StringUtils.crazyString());
+                }
+            });
 
             if (classNode.fields != null) classNode.fields.stream()
                     .filter(fieldNode -> !fieldExempted(classNode.name + '.' + fieldNode.name)).forEach(fieldNode -> {
