@@ -74,6 +74,11 @@ public class StringUtils {
             }
         }
 
+        //char[] alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".toCharArray();
+        //for (int i = 0; i < numberOfChars; i++) {
+        //    buildString[i] = alpha[NumberUtils.getRandomInt(alpha.length)];
+        //} Testing Purposes
+
         return new String(buildString);
     }
 

@@ -308,4 +308,26 @@ public class BytecodeUtils {
 
         return false;
     }
+
+    public static boolean containsMethod(String name, String desc, ClassNode classNode) {
+        for (MethodNode methodNode : classNode.methods) {
+            if (methodNode.name.equals(name) && methodNode.desc.equals(desc)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public static boolean containsField(String name, String desc, ClassNode classNode) {
+        if (classNode.fields != null) {
+            for (FieldNode fieldNode : classNode.fields) {
+                if (fieldNode.name.equals(name) && fieldNode.desc.equals(desc)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
 }

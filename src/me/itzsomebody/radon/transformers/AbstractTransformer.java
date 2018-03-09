@@ -202,6 +202,24 @@ public abstract class AbstractTransformer implements Opcodes {
     }
 
     /**
+     * Grabs {@link MethodNode} from input using arguments as parameters for searching.
+     *
+     * @param name      the name of the {@link MethodNode}
+     * @param desc      the desc of the {@link MethodNode}
+     * @param classNode the {@link ClassNode} to search
+     * @return {@link MethodNode} from input using arguments as parameters for searching.
+     */
+    protected MethodNode getMethodNode(String name, String desc, ClassNode classNode) {
+        for (MethodNode methodNode : classNode.methods) {
+            if (methodNode.name.equals(name) && methodNode.desc.equals(desc)) {
+                return methodNode;
+            }
+        }
+
+        throw new IllegalStateException("Could not find the method with info " + classNode.name + '.' + name + desc);
+    }
+
+    /**
      * Returns a {@link List} of {@link String}s that were outputted into the console by transformer.
      *
      * @return a {@link List} of {@link String}s that were outputted into the console by transformer.
