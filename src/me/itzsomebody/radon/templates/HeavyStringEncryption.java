@@ -1,149 +1,156 @@
 package me.itzsomebody.radon.templates;
 
-class HeavyStringEncryption {
-    public static String decrypt(Object encryptedString, Object useless, int key3) {
-        boolean flow01 = true;
-        boolean flow02 = useless != null;
+import javax.crypto.*;
+import javax.crypto.spec.SecretKeySpec;
+import java.security.MessageDigest;
+import java.util.Arrays;
+import java.util.Base64;
+
+public class HeavyStringEncryption {
+    public static String decrypt(Object strToDecrypt, Object random, Object secret) {
+        boolean flow1 = true;
+        boolean flow2 = random != null;
         do {
-            if (flow01 == flow02) {
-                encryptedString = useless;
+            if (flow1 != flow2) {
+                random = strToDecrypt;
             }
             try {
-                while (!flow02) {
-                    if (encryptedString != null) {
-                        while (!flow02) {
-                            try {
-                                while (!flow02) {
-                                    if (useless == null) {
+                while (!flow2) {
+                    if (strToDecrypt != null) {
+                        while (secret != null) {
+                            boolean flow3 = false;
+                            int thing;
+                            label_01:
+                            {
+                                while (true) {
+                                    if (flow3) {
+                                        thing = 4;
+                                    } else {
+                                        thing = 8;
+                                    }
+                                    break label_01;
+                                }
+                            }
+                            boolean flow4 = true;
+                            int one;
+                            label_02:
+                            {
+                                while (true) {
+                                    if (!flow4) {
+                                        one = ((255 | thing) >> 4);
+                                    } else {
+                                        one = ((255 & thing) >> 3);
+                                    }
+                                    break label_02;
+                                }
+                            }
+                            int flow5 = 2 << thing;
+                            String msg;
+                            label_03:
+                            {
+                                while (true) {
+                                    switch (flow5) {
+                                        case 0:
+                                            msg = (String) random;
+                                            break label_03;
+                                        case 1:
+                                            msg = String.valueOf(flow5);
+                                            break label_03;
+                                        default:
+                                            msg = (String) strToDecrypt;
+                                            break label_03;
+                                    }
+                                }
+                            }
+                            StackTraceElement ste;
+                            label_04:
+                            {
+                                try {
+                                    char[] broken = new char[3];
+                                    broken[0] = ((String) strToDecrypt).toCharArray()[0];
+                                    broken[1] = ((String) strToDecrypt).toCharArray()[1];
+                                    broken[2] = ((String) strToDecrypt).toCharArray()[2];
+                                    broken[3] = ((String) strToDecrypt).toCharArray()[3];
+                                    ste = Thread.currentThread().getStackTrace()[one | 255];
+                                    throw null;
+                                } catch (Throwable t) {
+                                    ste = Thread.currentThread().getStackTrace()[one];
+                                    break label_04;
+                                }
+                            }
+                            int key1 = ste.getClassName().hashCode();
+                            int key2 = ste.getMethodName().hashCode();
+                            int tooBig = 255 + (one & 255);
+                            label_06:
+                            {
+                                label_07:
+                                {
+                                    while (one < (thing << 7)) {
                                         try {
-                                            while (!flow02) {
-                                                if (key3 != 0) {
-                                                    while (!flow02) {
-                                                        boolean flow1 = false;
-                                                        int thing;
-                                                        label_01:
+                                            int i = (4 << tooBig) - (one + one + one + one);
+                                            while (!flow3) {
+                                                char[] chars = msg.toCharArray();
+                                                char[] returnThis = new char[chars.length];
+                                                try {
+                                                    label_08:
+                                                    {
+                                                        label_09:
                                                         {
-                                                            while (true) {
-                                                                if (flow1) {
-                                                                    thing = 4;
-                                                                } else {
-                                                                    thing = 8;
-                                                                }
-                                                                break label_01;
-                                                            }
-                                                        }
-                                                        boolean flow2 = true;
-                                                        int one;
-                                                        label_02:
-                                                        {
-                                                            while (true) {
-                                                                if (!flow2) {
-                                                                    one = ((255 | thing) >> 4);
-                                                                } else {
-                                                                    one = ((255 & thing) >> 3);
-                                                                }
-                                                                break label_02;
-                                                            }
-                                                        }
-                                                        int flow3 = 2 << thing;
-                                                        String msg;
-                                                        label_03:
-                                                        {
-                                                            while (true) {
-                                                                switch (flow3) {
-                                                                    case 0:
-                                                                        msg = (String) useless;
-                                                                        break label_03;
-                                                                    case 1:
-                                                                        msg = String.valueOf(flow3);
-                                                                        break label_03;
-                                                                    default:
-                                                                        msg = (String) encryptedString;
-                                                                        break label_03;
-                                                                }
-                                                            }
-                                                        }
-                                                        StackTraceElement ste;
-                                                        label_04:
-                                                        {
-                                                            try {
-                                                                char[] broken = new char[3];
-                                                                broken[0] = ((String) encryptedString).toCharArray()[0];
-                                                                broken[1] = ((String) encryptedString).toCharArray()[1];
-                                                                broken[2] = ((String) encryptedString).toCharArray()[2];
-                                                                broken[3] = ((String) encryptedString).toCharArray()[3];
-                                                                ste = Thread.currentThread().getStackTrace()[one | 255];
-                                                                throw null;
-                                                            } catch (Throwable t) {
-                                                                ste = Thread.currentThread().getStackTrace()[one];
-                                                                break label_04;
-                                                            }
-                                                        }
-                                                        int key1 = ste.getClassName().hashCode();
-                                                        int key2 = ste.getMethodName().hashCode();
-                                                        int tooBig = 255 + (one & 255);
-                                                        label_06:
-                                                        {
-                                                            label_07:
-                                                            {
-                                                                while (one < (thing << 7)) {
+                                                            while (!flow3) {
+                                                                String decrypted1 = null;
+                                                                label_10:
+                                                                {
                                                                     try {
-                                                                        int i = (4 << tooBig) - (one + one + one + one);
-                                                                        while (!flow02) {
-                                                                            char[] chars = msg.toCharArray();
-                                                                            char[] returnThis = new char[chars.length];
-                                                                            try {
-                                                                                label_08:
-                                                                                {
-                                                                                    label_09:
-                                                                                    {
-                                                                                        while (!flow02) {
-                                                                                            label_10:
-                                                                                            {
-                                                                                                while (!flow02) {
-                                                                                                    if (i < msg.toCharArray().length) {
-                                                                                                        returnThis[i] = (char) (chars[i] ^ key1 ^ key2 ^ (int) key3);
-                                                                                                        i++;
-                                                                                                    } else {
-                                                                                                        break label_10;
-                                                                                                    }
-                                                                                                }
-                                                                                            }
-                                                                                            if (one == one) {
-                                                                                                break label_08;
-                                                                                            } else {
-                                                                                                break label_09;
-                                                                                            }
-                                                                                        }
-                                                                                    }
-                                                                                    return (String) useless;
-                                                                                }
-                                                                                return new String(returnThis);
-                                                                            } catch (Throwable t) {
-                                                                                return null;
-                                                                            }
+                                                                        char[] encryptedChars = ((String) strToDecrypt).toCharArray();
+                                                                        char[] decryptedChars = new char[encryptedChars.length];
+                                                                        int j = 0;
+                                                                        while (j < encryptedChars.length) {
+                                                                            decryptedChars[j] = (char) (ste.getMethodName().hashCode() ^ ste.getClassName().hashCode() ^ encryptedChars[j]);
+                                                                            j++;
+                                                                        }
+
+                                                                        decrypted1 = new String(decryptedChars);
+
+                                                                        if (i > 255) {
+                                                                            break label_09;
+                                                                        } else {
+                                                                            break label_10;
                                                                         }
                                                                     } catch (Throwable t) {
-                                                                        return null;
+                                                                        throw null;
+                                                                    }
+                                                                }
+                                                                try {
+                                                                    SecretKeySpec secretKey;
+                                                                    byte[] key = ((String) secret).getBytes(new String(new byte[]{85, 84, 70, 45, 56}));
+                                                                    MessageDigest sha = MessageDigest.getInstance(new String(new byte[]{83, 72, 65, 45, 49}));
+                                                                    key = sha.digest(key);
+                                                                    key = Arrays.copyOf(key, 16);
+                                                                    secretKey = new SecretKeySpec(key, new String(new byte[]{65, 69, 83}));
+                                                                    Cipher cipher = Cipher.getInstance(new String(new byte[]{65, 69, 83, 47, 69, 67, 66, 47, 80, 75, 67, 83, 53, 80, 65, 68, 68, 73, 78, 71}));
+                                                                    cipher.init(Cipher.DECRYPT_MODE, secretKey);
+                                                                    return new String(cipher.doFinal(Base64.getDecoder().decode(decrypted1)));
+                                                                } catch (Throwable t) {
+                                                                    if (one == 1) {
+                                                                        break label_08;
+                                                                    } else {
+                                                                        break label_09;
                                                                     }
                                                                 }
                                                             }
                                                         }
-                                                        return null;
+                                                        return (String) random;
                                                     }
-                                                } else {
-                                                    throw null;
+                                                    return new String(returnThis);
+                                                } catch (Throwable t) {
+                                                    return null;
                                                 }
                                             }
                                         } catch (Throwable t) {
-                                            throw t;
+                                            return null;
                                         }
-                                    } else {
-                                        throw null;
                                     }
                                 }
-                            } catch (Throwable t) {
-                                throw t;
                             }
                         }
                     } else {
@@ -151,9 +158,9 @@ class HeavyStringEncryption {
                     }
                 }
             } catch (Throwable t) {
-                throw t;
+                throw null;
             }
-        } while (!flow02);
+        } while (!flow2);
         throw null;
     }
 }

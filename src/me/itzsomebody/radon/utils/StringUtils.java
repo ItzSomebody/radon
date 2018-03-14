@@ -126,49 +126,24 @@ public class StringUtils {
     }
 
     /**
-     * A known XOR-KEY symmetrical encryption algorithm to encrypt {@link String}s.
+     * Returns an encrypted string used by {@link me.itzsomebody.radon.transformers.stringencryption.LightStringEncryption}.
      *
-     * @param message {@link String} to encrypt.
-     * @param junkLDC {@link String} to use as a key.
-     * @return encrypted {@link String}
+     * @param msg        string to encrypt.
+     * @param className  name of the class the msg is in.
+     * @param methodName name of the method the msg is in.
+     * @param key3       random integer
+     * @return an encrypted string used by {@link me.itzsomebody.radon.transformers.stringencryption.LightStringEncryption}.
      */
-    public static String encrypt(String message, String junkLDC) {
-        try {
-            char[] junk = junkLDC.toCharArray(); // Just a UUID
-            char[] keys = new char[]{
-                    (char) 9833,
-                    (char) 9834,
-                    (char) 9835,
-                    (char) 9836,
-                    (char) 9200,
-                    (char) 8987,
-                    (char) 9201,
-                    (char) 9203,
-                    (char) 14898,
-                    (char) 16086,
-                    (char) 8721,
-                    (char) 8747,
-                    (char) 5072,
-                    (char) 9986,
-                    (char) 9993
-            };
-            char[] encrypted1 = message.toCharArray();
-
-            int messageLength = encrypted1.length;
-            char[] encrypted2 = new char[encrypted1.length];
-
-            for (int i = 0; i < messageLength; i++) {
-                encrypted1[i] = (char) (encrypted1[i] ^ junk[i % junk.length]);
-            }
-
-            for (int i = 0; i < encrypted1.length; i++) {
-                encrypted2[i] = (char) (encrypted1[i] ^ keys[i % keys.length]);
-            }
-
-            return new String(encrypted2);
-        } catch (Throwable t) {
-            return message;
+    public static String lightEncrypt(String msg, String className, String methodName, int key3) {
+        char[] chars = msg.toCharArray();
+        char[] returnThis = new char[chars.length];
+        for (int i = 0; i < returnThis.length; i++) {
+            char key2 = (char) methodName.hashCode();
+            char key1 = (char) className.hashCode();
+            returnThis[i] = (char) (key3 ^ key2 ^ key1 ^ chars[i]);
         }
+
+        return new String(returnThis);
     }
 
     /**
@@ -269,19 +244,51 @@ public class StringUtils {
     }
 
     /**
-     * Returns encrypted {@link String} used by {@link me.itzsomebody.radon.transformers.stringencryption.HeavyStringEncryption}.
+     * Returns encrypted {@link String} used by {@link me.itzsomebody.radon.transformers.stringencryption.NormalStringEncryption}.
      *
-     * @param className the className to get hashcode from.
+     * @param className  the className to get hashcode from.
      * @param methodName the methodName to get hashcode from.
-     * @param key3 the extra key to ensure a different encryption each time.
-     * @param msg the string to encrypt
-     * @return encrypted {@link String} used by {@link me.itzsomebody.radon.transformers.stringencryption.HeavyStringEncryption}.
+     * @param key3       the extra key to ensure a different encryption each time.
+     * @param msg        the string to encrypt
+     * @return encrypted {@link String} used by {@link me.itzsomebody.radon.transformers.stringencryption.NormalStringEncryption}.
      */
-    public static String heavyEncrypt(String className, String methodName, int key3, String msg) {
+    public static String normalEncrypt(String className, String methodName, int key3, String msg) {
         char[] chars = msg.toCharArray();
         char[] returnThis = new char[chars.length];
         for (int i = 0; i < chars.length; i++) {
             returnThis[i] = (char) (key3 ^ methodName.hashCode() ^ className.hashCode() ^ chars[i]);
+        }
+
+        return new String(returnThis);
+    }
+
+    /**
+     * Returns encrypted {@link String} used by {@link me.itzsomebody.radon.transformers.stringencryption.HeavyStringEncryption}.
+     *
+     * @param msg        the string to encrypt.
+     * @param secret     the key for AES to use.
+     * @param className  the class name the string is contained in.
+     * @param methodName the method name the string is contained in.
+     * @return encrypted {@link String} used by {@link me.itzsomebody.radon.transformers.stringencryption.HeavyStringEncryption}.
+     */
+    public static String heavyEncrypt(String msg, String secret, String className, String methodName) {
+        char[] base64Chars;
+        try {
+            SecretKeySpec secretKey;
+            byte[] key = secret.getBytes("UTF-8");
+            MessageDigest sha = MessageDigest.getInstance("SHA-1");
+            key = sha.digest(key);
+            key = Arrays.copyOf(key, 16);
+            secretKey = new SecretKeySpec(key, "AES");
+            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+            cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+            base64Chars = Base64.getEncoder().encodeToString(cipher.doFinal(msg.getBytes("UTF-8"))).toCharArray();
+        } catch (Throwable t) {
+            throw null;
+        }
+        char[] returnThis = new char[base64Chars.length];
+        for (int i = 0; i < returnThis.length; i++) {
+            returnThis[i] = (char) (base64Chars[i] ^ className.hashCode() ^ methodName.hashCode());
         }
 
         return new String(returnThis);

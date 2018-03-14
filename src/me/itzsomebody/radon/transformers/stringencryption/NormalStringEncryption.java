@@ -1,5 +1,6 @@
 package me.itzsomebody.radon.transformers.stringencryption;
 
+import me.itzsomebody.radon.utils.NumberUtils;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.*;
 import me.itzsomebody.radon.methods.StringEncryption;
@@ -55,10 +56,11 @@ public class NormalStringEncryption extends AbstractTransformer {
                                     || ((String) cst).contains("%%__RESOURCE__%%")
                                     || ((String) cst).contains("%%__NONCE__%%")) continue;
 
-                            String junkLDC = StringUtils.crazyString();
-                            ((LdcInsnNode) insn).cst = StringUtils.aesEncrypt(((String) ((LdcInsnNode) insn).cst), junkLDC);
-                            methodNode.instructions.insert(insn, new MethodInsnNode(Opcodes.INVOKESTATIC, decryptorPath[0], decryptorPath[1], "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;", false));
-                            methodNode.instructions.insert(insn, new LdcInsnNode(junkLDC));
+                            int key3 = NumberUtils.getRandomInt(25000) + 25000;
+                            ((LdcInsnNode) insn).cst = StringUtils.normalEncrypt(decryptorPath[0].replace("/", "."), decryptorPath[1], key3, ((String) ((LdcInsnNode) insn).cst));
+                            methodNode.instructions.insert(insn, new MethodInsnNode(Opcodes.INVOKESTATIC, decryptorPath[0], decryptorPath[1], "(Ljava/lang/Object;Ljava/lang/Object;I)Ljava/lang/String;", false));
+                            methodNode.instructions.insert(insn, BytecodeUtils.getNumberInsn(key3));
+                            methodNode.instructions.insert(insn, new InsnNode(ACONST_NULL));
                             counter.incrementAndGet();
                         }
                     }

@@ -1,5 +1,6 @@
 package me.itzsomebody.radon.transformers.stringencryption;
 
+import me.itzsomebody.radon.utils.NumberUtils;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.*;
 import me.itzsomebody.radon.methods.StringEncryption;
@@ -55,10 +56,10 @@ public class LightStringEncryption extends AbstractTransformer {
                                     || ((String) cst).contains("%%__RESOURCE__%%")
                                     || ((String) cst).contains("%%__NONCE__%%")) continue;
 
-                            String keyLdc = StringUtils.crazyString();
-                            ((LdcInsnNode) insn).cst = StringUtils.encrypt(((String) ((LdcInsnNode) insn).cst), keyLdc);
-                            methodNode.instructions.insert(insn, new MethodInsnNode(Opcodes.INVOKESTATIC, decryptorPath[0], decryptorPath[1], "(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;", false));
-                            methodNode.instructions.insert(insn, new LdcInsnNode(keyLdc));
+                            int key3 = NumberUtils.getRandomInt();
+                            ((LdcInsnNode) insn).cst = StringUtils.lightEncrypt(((String) ((LdcInsnNode) insn).cst), decryptorPath[0].replace("/", "."), decryptorPath[1], key3);
+                            methodNode.instructions.insert(insn, new MethodInsnNode(Opcodes.INVOKESTATIC, decryptorPath[0], decryptorPath[1], "(Ljava/lang/Object;I)Ljava/lang/String;", false));
+                            methodNode.instructions.insert(insn, BytecodeUtils.getNumberInsn(key3));
                             counter.incrementAndGet();
                         }
                     }

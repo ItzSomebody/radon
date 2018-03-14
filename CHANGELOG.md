@@ -1,3 +1,7 @@
+## 0.3.4
+
+* Heavy string encryption transformer is now the normal string encryption transformer. The normal string encryption transformer is now the heavy string encryption transformer with some flow and an extra layer of encryption. The light string encryption got changed completely.
+
 ## 0.3.3
 
 * Changed both the Light invokedynamic and normal invokedynamic transformers so they are less ripped-off from IndyProtector.

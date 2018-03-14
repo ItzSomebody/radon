@@ -52,10 +52,10 @@ public class HeavyStringEncryption extends AbstractTransformer {
                                     || ((String) cst).contains("%%__RESOURCE__%%")
                                     || ((String) cst).contains("%%__NONCE__%%")) continue;
 
-                            int key3 = NumberUtils.getRandomInt(25000) + 25000;
-                            ((LdcInsnNode) insn).cst = StringUtils.heavyEncrypt(decryptorPath[0].replace("/", "."), decryptorPath[1], key3, ((String) ((LdcInsnNode) insn).cst));
-                            methodNode.instructions.insert(insn, new MethodInsnNode(Opcodes.INVOKESTATIC, decryptorPath[0], decryptorPath[1], "(Ljava/lang/Object;Ljava/lang/Object;I)Ljava/lang/String;", false));
-                            methodNode.instructions.insert(insn, BytecodeUtils.getNumberInsn(key3));
+                            String junkLDC = StringUtils.crazyString();
+                            ((LdcInsnNode) insn).cst = StringUtils.heavyEncrypt(((String) ((LdcInsnNode) insn).cst), junkLDC, decryptorPath[0].replace("/", "."), decryptorPath[1]);
+                            methodNode.instructions.insert(insn, new MethodInsnNode(Opcodes.INVOKESTATIC, decryptorPath[0], decryptorPath[1], "(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/String;", false));
+                            methodNode.instructions.insert(insn, new LdcInsnNode(junkLDC));
                             methodNode.instructions.insert(insn, new InsnNode(ACONST_NULL));
                             counter.incrementAndGet();
                         }
