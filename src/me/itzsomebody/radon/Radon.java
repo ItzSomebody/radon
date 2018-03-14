@@ -15,7 +15,7 @@ public class Radon {
      * Static abuse variables xD
      */
     public static String PREFIX = "[Radon]";
-    public static String VERSION = "0.3.2";
+    public static String VERSION = "0.3.3";
     public static String AUTHORS = "ItzSomebody";
 
     /**

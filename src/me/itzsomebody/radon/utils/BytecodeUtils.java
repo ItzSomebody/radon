@@ -5,6 +5,8 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -309,6 +311,14 @@ public class BytecodeUtils {
         return false;
     }
 
+    /**
+     * Checks if provided {@link ClassNode} contains a {@link MethodNode} based on info given.
+     *
+     * @param name      name to check.
+     * @param desc      description to check.
+     * @param classNode classNode to look in.
+     * @return true if provided {@link ClassNode} contains a {@link MethodNode} based on info given.
+     */
     public static boolean containsMethod(String name, String desc, ClassNode classNode) {
         for (MethodNode methodNode : classNode.methods) {
             if (methodNode.name.equals(name) && methodNode.desc.equals(desc)) {
@@ -319,6 +329,14 @@ public class BytecodeUtils {
         return false;
     }
 
+    /**
+     * Checks if provided {@link ClassNode} contains a {@link FieldNode} based on info given.
+     *
+     * @param name      name to check.
+     * @param desc      description to check.
+     * @param classNode classNode to look in.
+     * @return true if provided {@link ClassNode} contains a {@link FieldNode} based on info given.
+     */
     public static boolean containsField(String name, String desc, ClassNode classNode) {
         if (classNode.fields != null) {
             for (FieldNode fieldNode : classNode.fields) {
@@ -329,5 +347,23 @@ public class BytecodeUtils {
         }
 
         return false;
+    }
+
+    /**
+     * Returns true if last not-label and not-line number instruction is an iinc.
+     *
+     * @param insn {@link AbstractInsnNode} to use as the current opcode.
+     * @return true if last not-label and not-line number instruction is an iinc.
+     */
+    public static boolean lastInsnIInc(AbstractInsnNode insn) {
+        AbstractInsnNode before = insn.getPrevious();
+        if (before instanceof LabelNode || before instanceof LineNumberNode) {
+            do {
+                if (before == null) return false;
+                before = before.getPrevious();
+            } while (!(before instanceof LabelNode) && !(before instanceof LineNumberNode));
+        }
+
+        return (before.getOpcode() == Opcodes.IINC);
     }
 }

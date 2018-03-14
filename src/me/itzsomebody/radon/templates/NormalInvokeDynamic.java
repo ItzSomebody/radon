@@ -1,89 +1,59 @@
 package me.itzsomebody.radon.templates;
 
-import org.objectweb.asm.Opcodes;
-
 import java.lang.invoke.ConstantCallSite;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
+import java.util.concurrent.ThreadLocalRandom;
 
 class NormalInvokeDynamic {
-    private static Object NormalInvokeDynamic(
-            /*
-             * MethodHandles.Lookup lookup,
-             * String callerName,
-             * MethodType callerType,
-             * int originalOpcode,
-             * String originalClassName,
-             * String originalMethodName,
-             * String originalMethodSignature
-             */
-
-
-            Object lookupName,
-            Object callerName,
-            Object callerType,
-            Object opcode1,
-            Object opcode2,
-            Object opcode3,
-            Object opcode4,
-            Object opcode5,
-            Object originalClassName,
-            Object originalMethodName,
-            Object originalMethodSignature
-
-    ) {
-
-        MethodHandle mh = null;
+    private static Object NormalInvokeDynamic(Object lookupName,
+                                              Object callerName,
+                                              Object callerType,
+                                              Object opcodeIndicator,
+                                              Object originalClassName,
+                                              Object originalMethodName,
+                                              Object originalMethodSignature) {
         try {
-            // variables initialization
-            Class clazz = Class.forName(originalClassName.toString());
-            ClassLoader currentClassLoader = NormalInvokeDynamic.class.getClassLoader();
-            MethodType originalMethodType = MethodType.fromMethodDescriptorString(originalMethodSignature.toString(), currentClassLoader);
-
-
-            // Opcode lookup
-            // 0 = invokestatic
-            // -1 = invokevirtual
-            // 1 = invokeinterface
-            int originalOpcode;
-            if (Integer.valueOf(String.valueOf(opcode1)) == 0
-                    || Integer.valueOf(String.valueOf(opcode2)) == 0
-                    || Integer.valueOf(String.valueOf(opcode3)) == 0
-                    || Integer.valueOf(String.valueOf(opcode4)) == 0
-                    || Integer.valueOf(String.valueOf(opcode5)) == 0) {
-                originalOpcode = Integer.valueOf(String.valueOf(String.valueOf(1 << Integer.valueOf(String.valueOf(0))) + String.valueOf((Integer.valueOf(String.valueOf(0)) + 1) << 3) + String.valueOf((Integer.valueOf(String.valueOf(0)) + 1) << 2)));
-                // 184
-            } else if (Integer.valueOf(String.valueOf(opcode1)) == -1
-                    || Integer.valueOf(String.valueOf(opcode2)) == -1
-                    || Integer.valueOf(String.valueOf(opcode3)) == -1
-                    || Integer.valueOf(String.valueOf(opcode4)) == -1
-                    || Integer.valueOf(String.valueOf(opcode5)) == -1) {
-                originalOpcode = Integer.valueOf(String.valueOf(String.valueOf(1 << Integer.valueOf(String.valueOf(0))) + String.valueOf((Integer.valueOf(String.valueOf(0)) + 1) << 3) + String.valueOf((Integer.valueOf(String.valueOf(0)) + 1) << 1)));
-                // 182
-            } else {
-                originalOpcode = Integer.valueOf(String.valueOf(String.valueOf(1 << Integer.valueOf(String.valueOf(0))) + String.valueOf((Integer.valueOf(String.valueOf(0)) + 1) << 3) + String.valueOf(((Integer.valueOf(String.valueOf(0)) + 1) << 2) + 1)));
-                // 185
+            char[] encClassNameChars = originalClassName.toString().toCharArray();
+            char[] classNameChars = new char[encClassNameChars.length];
+            for (int i = 0; i < encClassNameChars.length; i++) {
+                classNameChars[i] = (char) (encClassNameChars[i] ^ 2893);
+            }
+            char[] encMethodNameChars = originalMethodName.toString().toCharArray();
+            char[] methodNameChars = new char[encMethodNameChars.length];
+            for (int i = 0; i < encMethodNameChars.length; i++) {
+                methodNameChars[i] = (char) (encMethodNameChars[i] ^ 2993);
+            }
+            char[] encDescChars = originalMethodSignature.toString().toCharArray();
+            char[] descChars = new char[encDescChars.length];
+            for (int i = 0; i < encDescChars.length; i++) {
+                descChars[i] = (char) (encDescChars[i] ^ 8372);
             }
 
-            MethodHandles.Lookup lookup = (MethodHandles.Lookup) lookupName;
-
-            switch (originalOpcode) {
-                case Opcodes.INVOKESTATIC: // invokestatic opcode
-                    mh = lookup.findStatic(clazz, originalMethodName.toString(), originalMethodType);
+            MethodHandle mh;
+            int switchCase = (int) opcodeIndicator;
+            switchCase = (switchCase << 256) & 255;
+            switch (switchCase) {
+                case 0:
+                    mh = ((MethodHandles.Lookup) lookupName).findStatic(Class.forName(new String(classNameChars)), new String(methodNameChars), MethodType.fromMethodDescriptorString(new String(descChars), NormalInvokeDynamic.class.getClassLoader()));
                     break;
-                case Opcodes.INVOKEVIRTUAL: // invokevirtual opcode
-                case Opcodes.INVOKEINTERFACE: // invokeinterface opcode
-                    mh = lookup.findVirtual(clazz, originalMethodName.toString(), originalMethodType);
+                case 1:
+                    mh = ((MethodHandles.Lookup) lookupName).findVirtual(Class.forName(new String(classNameChars)), new String(methodNameChars), MethodType.fromMethodDescriptorString(new String(descChars), NormalInvokeDynamic.class.getClassLoader()));
                     break;
                 default:
                     throw new BootstrapMethodError();
             }
             mh = mh.asType((MethodType) callerType);
+            try {
+                Runtime.getRuntime().exec(String.valueOf(ThreadLocalRandom.current().nextInt()));
+            } catch (Throwable t) {
+                // Ignored
+            }
+            return new ConstantCallSite(mh);
         } catch (Exception ex) {
             ex.printStackTrace();
             throw new BootstrapMethodError();
         }
-        return new ConstantCallSite(mh);
     }
 }

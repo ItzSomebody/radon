@@ -1,3 +1,8 @@
+## 0.3.3
+
+* Changed both the Light invokedynamic and normal invokedynamic transformers so they are less ripped-off from IndyProtector.
+* Some other edits here and there that I completely forgot.
+
 ## 0.3.2
 
 * Lots of GUI fixes.

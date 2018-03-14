@@ -1,5 +1,9 @@
 package me.itzsomebody.radon.internal;
 
+import me.itzsomebody.radon.Radon;
+import me.itzsomebody.radon.transformers.misc.Expiry;
+import me.itzsomebody.radon.transformers.misc.TrashClasses;
+import me.itzsomebody.radon.transformers.renamer.Renamer;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
@@ -241,6 +245,7 @@ public class Bootstrap { // Eyyy bootstrap bill
                     }
                 }
 
+                cw.newUTF8("RADON" + Radon.VERSION); // :D
                 classNode.accept(cw);
 
                 ZipEntry newEntry = new ZipEntry(classNode.name + ".class");

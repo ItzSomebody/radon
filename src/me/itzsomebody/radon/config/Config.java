@@ -1,6 +1,7 @@
 package me.itzsomebody.radon.config;
 
 import me.itzsomebody.radon.transformers.*;
+import me.itzsomebody.radon.transformers.flow.HeavyFlowObfuscation;
 import me.itzsomebody.radon.transformers.flow.LightFlowObfuscation;
 import me.itzsomebody.radon.transformers.flow.NormalFlowObfuscation;
 import me.itzsomebody.radon.transformers.invokedynamic.HeavyInvokeDynamic;
@@ -10,6 +11,8 @@ import me.itzsomebody.radon.transformers.linenumbers.ObfuscateLineNumbers;
 import me.itzsomebody.radon.transformers.linenumbers.RemoveLineNumbers;
 import me.itzsomebody.radon.transformers.localvariables.ObfuscateLocalVariables;
 import me.itzsomebody.radon.transformers.localvariables.RemoveLocalVariables;
+import me.itzsomebody.radon.transformers.misc.*;
+import me.itzsomebody.radon.transformers.renamer.Renamer;
 import me.itzsomebody.radon.transformers.sourcedebug.ObfuscateSourceDebug;
 import me.itzsomebody.radon.transformers.sourcedebug.RemoveSourceDebug;
 import me.itzsomebody.radon.transformers.sourcename.ObfuscateSourceName;
@@ -332,6 +335,8 @@ public class Config {
                     return new LightFlowObfuscation();
                 } else if (s.equalsIgnoreCase("Normal")) {
                     return new NormalFlowObfuscation();
+                } else if (s.equalsIgnoreCase("Heavy")) {
+                    return new HeavyFlowObfuscation();
                 } else {
                     throw new IllegalArgumentException("Invalid flow obfuscation type: " + s);
                 }
@@ -488,7 +493,8 @@ public class Config {
         if (map.containsKey("InnerClassRemover")) {
             Object value = map.get("InnerClassRemover");
             if (value != null) {
-                if (!(value instanceof Boolean)) throw new IllegalArgumentException("InnerClassRemover arg must be true/false");
+                if (!(value instanceof Boolean))
+                    throw new IllegalArgumentException("InnerClassRemover arg must be true/false");
                 boolean s = (Boolean) value;
                 if (s) {
                     return new InnerClassRemover();

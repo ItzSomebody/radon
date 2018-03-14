@@ -13,6 +13,8 @@ import me.itzsomebody.radon.transformers.linenumbers.ObfuscateLineNumbers;
 import me.itzsomebody.radon.transformers.linenumbers.RemoveLineNumbers;
 import me.itzsomebody.radon.transformers.localvariables.ObfuscateLocalVariables;
 import me.itzsomebody.radon.transformers.localvariables.RemoveLocalVariables;
+import me.itzsomebody.radon.transformers.misc.*;
+import me.itzsomebody.radon.transformers.renamer.Renamer;
 import me.itzsomebody.radon.transformers.sourcedebug.ObfuscateSourceDebug;
 import me.itzsomebody.radon.transformers.sourcedebug.RemoveSourceDebug;
 import me.itzsomebody.radon.transformers.sourcename.ObfuscateSourceName;

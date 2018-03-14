@@ -3,7 +3,7 @@ package me.itzsomebody.radon.utils;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
- * Utils that I can't figure out how to categorize.
+ * Number utils.
  *
  * @author ItzSomebody
  */

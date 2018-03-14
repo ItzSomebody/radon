@@ -1,13 +1,14 @@
-package me.itzsomebody.radon.transformers;
+package me.itzsomebody.radon.transformers.renamer;
 
-import org.objectweb.asm.commons.ClassRemapper;
-import org.objectweb.asm.commons.Remapper;
-import org.objectweb.asm.commons.SimpleRemapper;
-import org.objectweb.asm.tree.*;
+import me.itzsomebody.radon.transformers.AbstractTransformer;
 import me.itzsomebody.radon.utils.BytecodeUtils;
 import me.itzsomebody.radon.utils.LoggerUtils;
 import me.itzsomebody.radon.utils.NumberUtils;
 import me.itzsomebody.radon.utils.StringUtils;
+import org.objectweb.asm.commons.ClassRemapper;
+import org.objectweb.asm.commons.Remapper;
+import org.objectweb.asm.commons.SimpleRemapper;
+import org.objectweb.asm.tree.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,6 +17,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Transformer that renames classes and their members.
+ * TODO: FIX THIS
  *
  * @author ItzSomebody
  */
@@ -140,11 +142,11 @@ public class Renamer extends AbstractTransformer {
                         for (String className : superClass.interfaces) {
                             ClassNode interfaceClass = getClassNode(className);
                             //while (interfaceClass != null && interfaceClass.interfaces != null) {
-                                for (MethodNode interfaceMethod : interfaceClass.methods) {
-                                    if (methodNode.name.equals(interfaceMethod.name)
-                                            && methodNode.desc.equals(interfaceMethod.desc)) {
-                                        mappings.put(interfaceClass.name + '.' + methodNode.name + methodNode.desc, newName);
-                                    }
+                            for (MethodNode interfaceMethod : interfaceClass.methods) {
+                                if (methodNode.name.equals(interfaceMethod.name)
+                                        && methodNode.desc.equals(interfaceMethod.desc)) {
+                                    mappings.put(interfaceClass.name + '.' + methodNode.name + methodNode.desc, newName);
+                                }
                                 //}
                             }
                         }
@@ -156,12 +158,12 @@ public class Renamer extends AbstractTransformer {
                         for (String className : classNode.interfaces) {
                             ClassNode interfaceClass = getClassNode(className);
                             //while (interfaceClass != null && interfaceClass.interfaces != null) {
-                                for (MethodNode interfaceMethod : interfaceClass.methods) {
-                                    if (methodNode.name.equals(interfaceMethod.name)
-                                            && methodNode.desc.equals(interfaceMethod.desc)) {
-                                        mappings.put(interfaceClass.name + '.' + methodNode.name + methodNode.desc, newName);
-                                    }
+                            for (MethodNode interfaceMethod : interfaceClass.methods) {
+                                if (methodNode.name.equals(interfaceMethod.name)
+                                        && methodNode.desc.equals(interfaceMethod.desc)) {
+                                    mappings.put(interfaceClass.name + '.' + methodNode.name + methodNode.desc, newName);
                                 }
+                            }
                             //  }
                         }
                     }

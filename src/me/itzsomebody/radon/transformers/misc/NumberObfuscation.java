@@ -1,5 +1,6 @@
-package me.itzsomebody.radon.transformers;
+package me.itzsomebody.radon.transformers.misc;
 
+import me.itzsomebody.radon.transformers.AbstractTransformer;
 import org.objectweb.asm.tree.*;
 import me.itzsomebody.radon.utils.BytecodeUtils;
 import me.itzsomebody.radon.utils.LoggerUtils;

@@ -1,4 +1,4 @@
-package me.itzsomebody.radon.transformers;
+package me.itzsomebody.radon.transformers.misc;
 
 import org.objectweb.asm.Handle;
 import org.objectweb.asm.MethodVisitor;

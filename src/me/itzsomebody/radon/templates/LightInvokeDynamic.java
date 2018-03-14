@@ -1,62 +1,51 @@
 package me.itzsomebody.radon.templates;
 
-import org.objectweb.asm.Opcodes;
-
 import java.lang.invoke.ConstantCallSite;
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 
 class LightInvokeDynamic {
-    private static Object LightInvokeDynamic(
-            /*
-             * MethodHandles.Lookup lookup,
-             * String callerName,
-             * MethodType callerType,
-             * int originalOpcode,
-             * String originalClassName,
-             * String originalMethodName,
-             * String originalMethodSignature
-             */
-
-            Object lookupName,
-            Object callerName,
-            Object callerType,
-            Object opcode1,
-            Object opcode2,
-            Object opcode3,
-            Object originalClassName,
-            Object originalMethodName,
-            Object originalMethodSignature
-
-    ) {
-
-        MethodHandle mh = null;
+    public static Object LightInvokeDynamic(Object lookupName,
+                                             Object callerName,
+                                             Object callerType,
+                                             Object opcodeIndicator,
+                                             Object originalClassName,
+                                             Object originalMethodName,
+                                             Object originalMethodSignature) {
         try {
-            // variables initialization
-            Class clazz = Class.forName(originalClassName.toString());
-            ClassLoader currentClassLoader = LightInvokeDynamic.class.getClassLoader();
-            MethodType originalMethodType = MethodType.fromMethodDescriptorString(originalMethodSignature.toString(), currentClassLoader);
-            // lookup method handle
-            int originalOpcode = Integer.valueOf(String.valueOf(opcode1) + String.valueOf(opcode2) + String.valueOf(opcode3));
+            char[] encClassNameChars = originalClassName.toString().toCharArray();
+            char[] classNameChars = new char[encClassNameChars.length];
+            for (int i = 0; i < encClassNameChars.length; i++) {
+                classNameChars[i] = (char) (encClassNameChars[i] ^ 1029);
+            }
+            char[] encMethodNameChars = originalMethodName.toString().toCharArray();
+            char[] methodNameChars = new char[encMethodNameChars.length];
+            for (int i = 0; i < encMethodNameChars.length; i++) {
+                methodNameChars[i] = (char) (encMethodNameChars[i] ^ 2038);
+            }
+            char[] encDescChars = originalMethodSignature.toString().toCharArray();
+            char[] descChars = new char[encDescChars.length];
+            for (int i = 0; i < encDescChars.length; i++) {
+                descChars[i] = (char) (encDescChars[i] ^ 1928);
+            }
 
-            MethodHandles.Lookup lookup = (MethodHandles.Lookup) lookupName;
-
-            switch (originalOpcode) {
-                case Opcodes.INVOKESTATIC: // invokestatic opcode
-                    mh = lookup.findStatic(clazz, originalMethodName.toString(), originalMethodType);
+            MethodHandle mh;
+            int switchCase = (int) opcodeIndicator;
+            switch (switchCase) {
+                case 0:
+                    mh = ((MethodHandles.Lookup) lookupName).findStatic(Class.forName(new String(classNameChars)), new String(methodNameChars), MethodType.fromMethodDescriptorString(new String(descChars), LightInvokeDynamic.class.getClassLoader()));
                     break;
-                case Opcodes.INVOKEVIRTUAL: // invokevirtual opcode
-                case Opcodes.INVOKEINTERFACE: // invokeinterface opcode
-                    mh = lookup.findVirtual(clazz, originalMethodName.toString(), originalMethodType);
+                case 1:
+                    mh = ((MethodHandles.Lookup) lookupName).findVirtual(Class.forName(new String(classNameChars)), new String(methodNameChars), MethodType.fromMethodDescriptorString(new String(descChars), LightInvokeDynamic.class.getClassLoader()));
                     break;
                 default:
                     throw new BootstrapMethodError();
             }
-            mh = mh.asType((MethodType)callerType);
+            mh = mh.asType((MethodType) callerType);
+            return new ConstantCallSite(mh);
         } catch (Exception ex) {
             throw new BootstrapMethodError();
         }
-        return new ConstantCallSite(mh);
     }
 }
