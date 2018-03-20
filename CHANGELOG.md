@@ -1,3 +1,7 @@
+## 0.3.8
+
+* Added super light string encryption setting to GUI.
+
 ## 0.3.7
 
 * Renamer transformer kind of works now. There are still cases where it causes abstraction errors and exempting doesn't work at the moment.

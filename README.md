@@ -46,7 +46,7 @@ Valid config options you can use:
 | Output | String | Output file to dump result of obfuscation |
 | Libraries | String List | Libraries used to compile the input |
 | Exempts | String List | Exempted classes, methods, or fields from obfuscation |
-| StringEncryption | String (Light/Normal/Heavy) | Type of string encryption to apply |
+| StringEncryption | String (SuperLight/Light/Normal/Heavy) | Type of string encryption to apply |
 | FlowObfuscation | String (Light/Normal) | Type of flow obfuscation to apply |
 | InvokeDynamic | String (Light/Normal/Heavy) | Type of invokedynamic obfuscation to apply |
 | LocalVariableObfuscation | String (Obfuscate/Remove) | Type of local variable obfuscation to apply |

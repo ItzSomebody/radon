@@ -22,6 +22,7 @@ import me.itzsomebody.radon.transformers.sourcename.RemoveSourceName;
 import me.itzsomebody.radon.transformers.stringencryption.HeavyStringEncryption;
 import me.itzsomebody.radon.transformers.stringencryption.LightStringEncryption;
 import me.itzsomebody.radon.transformers.stringencryption.NormalStringEncryption;
+import me.itzsomebody.radon.transformers.stringencryption.SuperLightStringEncryption;
 import me.itzsomebody.radon.utils.WatermarkUtils;
 
 import javax.swing.*;
@@ -311,7 +312,7 @@ public class GUI {
         gbc_comboBox.insets = new Insets(0, 0, 5, 5);
         gbc_comboBox.gridx = 9;
         gbc_comboBox.gridy = 0;
-        String[] encryptions = {"Light", "Normal", "Heavy"};
+        String[] encryptions = {"SuperLight", "Light", "Normal", "Heavy"};
         for (String s : encryptions) {
             comboBox.addItem(s);
         }
@@ -1196,12 +1197,15 @@ public class GUI {
                             if (chckbxStringEncryption.isSelected()) {
                                 switch (comboBox.getSelectedIndex()) {
                                     case 0:
-                                        transformers.add(new LightStringEncryption(spigotMode));
+                                        transformers.add(new SuperLightStringEncryption(spigotMode));
                                         break;
                                     case 1:
-                                        transformers.add(new NormalStringEncryption(spigotMode));
+                                        transformers.add(new LightStringEncryption(spigotMode));
                                         break;
                                     case 2:
+                                        transformers.add(new NormalStringEncryption(spigotMode));
+                                        break;
+                                    case 3:
                                         transformers.add(new HeavyStringEncryption(spigotMode));
                                         break;
                                 }
@@ -1354,17 +1358,21 @@ public class GUI {
                                 AbstractTransformer stringEncryptionMode = configParser.getStringEncryptionType();
                                 if (stringEncryptionMode == null) {
                                     chckbxStringEncryption.setSelected(false);
-                                } else if (stringEncryptionMode instanceof LightStringEncryption) {
+                                } else if (stringEncryptionMode instanceof SuperLightStringEncryption) {
                                     chckbxStringEncryption.setSelected(true);
                                     comboBox.setSelectedIndex(0);
                                     comboBox.setEnabled(true);
-                                } else if (stringEncryptionMode instanceof NormalStringEncryption) {
+                                } else if (stringEncryptionMode instanceof LightStringEncryption) {
                                     chckbxStringEncryption.setSelected(true);
                                     comboBox.setSelectedIndex(1);
                                     comboBox.setEnabled(true);
-                                } else if (stringEncryptionMode instanceof HeavyStringEncryption) {
+                                } else if (stringEncryptionMode instanceof NormalStringEncryption) {
                                     chckbxStringEncryption.setSelected(true);
                                     comboBox.setSelectedIndex(2);
+                                    comboBox.setEnabled(true);
+                                } else if (stringEncryptionMode instanceof HeavyStringEncryption) {
+                                    chckbxStringEncryption.setSelected(true);
+                                    comboBox.setSelectedIndex(3);
                                     comboBox.setEnabled(true);
                                 }
 
