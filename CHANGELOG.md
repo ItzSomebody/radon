@@ -1,3 +1,16 @@
+## 0.3.7
+
+* Renamer transformer kind of works now. There are still cases where it causes abstraction errors and exempting doesn't work at the moment.
+
+## 0.3.6
+
+* Changed number obfuscation transformer so that it splits integers into a xor expression. This is far faster than the old transformer.
+* Renamer transformer is still broken, so don't use it expecting it to work each time.
+
+## 0.3.5
+
+* Added super light string encryption transformer which is intended for performance. Note that this transformer is very insecure and is not recommended in code which requires security.
+
 ## 0.3.4
 
 * Heavy string encryption transformer is now the normal string encryption transformer. The normal string encryption transformer is now the heavy string encryption transformer with some flow and an extra layer of encryption. The light string encryption got changed completely.

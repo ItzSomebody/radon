@@ -5,6 +5,7 @@ import me.itzsomebody.radon.utils.BytecodeUtils;
 import me.itzsomebody.radon.utils.LoggerUtils;
 import me.itzsomebody.radon.utils.NumberUtils;
 import me.itzsomebody.radon.utils.StringUtils;
+import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -25,29 +26,35 @@ public class HeavyFlowObfuscation extends AbstractTransformer {
         AtomicInteger counter = new AtomicInteger();
         long current = System.currentTimeMillis();
         classNodes().stream().filter(classNode -> !classExempted(classNode.name)).forEach(classNode -> {
-            FieldNode field = new FieldNode(ACC_PUBLIC + ACC_STATIC, StringUtils.crazyString(), "Z", null, true);
+            FieldNode field = new FieldNode(ACC_PUBLIC + ACC_STATIC + ACC_FINAL, StringUtils.crazyString(), "Z", null, true);
             classNode.fields.add(field);
-            classNode.methods.stream().filter(methodNode -> !methodExempted(classNode.name + '.' + methodNode.name + methodNode.desc) && !BytecodeUtils.isAbstractMethod(methodNode.access))
-                    .forEach(methodNode -> {
-                        for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
-                            if (insn instanceof JumpInsnNode
-                                    && insn.getOpcode() == GOTO) {
-                                if (BytecodeUtils.lastInsnIInc(insn)) {
-                                    methodNode.instructions.insertBefore(insn, new FieldInsnNode(GETSTATIC, classNode.name, field.name, "Z"));
-                                    methodNode.instructions.insertBefore(insn, new InsnNode(ICONST_1));
-                                    methodNode.instructions.set(insn, new JumpInsnNode(IF_ICMPEQ, ((JumpInsnNode) insn).label));
-                                } else {
-                                    methodNode.instructions.insertBefore(insn, new FieldInsnNode(GETSTATIC, classNode.name, field.name, "Z"));
-                                    methodNode.instructions.insertBefore(insn, new InsnNode(ICONST_1));
-                                    methodNode.instructions.insert(insn, new InsnNode(ATHROW));
-                                    methodNode.instructions.insert(insn, new InsnNode(ACONST_NULL));
-                                    methodNode.instructions.set(insn, new JumpInsnNode(IF_ICMPEQ, ((JumpInsnNode) insn).label));
-                                }
-                                counter.incrementAndGet();
+            classNode.methods.stream().filter(methodNode -> !methodExempted(classNode.name + '.' + methodNode.name + methodNode.desc)
+                    && !BytecodeUtils.isAbstractMethod(methodNode.access)).forEach(methodNode -> {
+                int varIndex = methodNode.maxLocals;
+                methodNode.maxLocals++;
+                methodNode.instructions.insertBefore(methodNode.instructions.getFirst(), new VarInsnNode(ISTORE, varIndex));
+                methodNode.instructions.insertBefore(methodNode.instructions.getFirst(), new FieldInsnNode(GETSTATIC, classNode.name, field.name, "Z"));
+                for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
+                    if (insn instanceof JumpInsnNode) {
+                        if (insn.getOpcode() == GOTO) {
+                            if (BytecodeUtils.lastInsnIInc(insn)) {
+                                methodNode.instructions.insertBefore(insn, new VarInsnNode(ILOAD, varIndex));
+                                methodNode.instructions.insertBefore(insn, new InsnNode(ICONST_1));
+                                methodNode.instructions.set(insn, new JumpInsnNode(IF_ICMPEQ, ((JumpInsnNode) insn).label));
+                            } else {
+                                methodNode.instructions.insertBefore(insn, new VarInsnNode(ILOAD, varIndex));
+                                methodNode.instructions.insertBefore(insn, new InsnNode(ICONST_1));
+                                methodNode.instructions.insert(insn, new InsnNode(ATHROW));
+                                methodNode.instructions.insert(insn, new InsnNode(ACONST_NULL));
+                                methodNode.instructions.set(insn, new JumpInsnNode(IF_ICMPEQ, ((JumpInsnNode) insn).label));
                             }
-                            // Add more stuff
+                            counter.incrementAndGet();
                         }
-                    });
+                    }
+
+                    // TODO: Do this
+                }
+            });
         });
         logStrings.add(LoggerUtils.stdOut("Added " + counter + " instruction sets."));
         logStrings.add(LoggerUtils.stdOut("Finished. [" + tookThisLong(current) + "ms]"));

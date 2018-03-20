@@ -249,7 +249,7 @@ public class Bootstrap { // Eyyy bootstrap bill
                 classNode.accept(cw);
 
                 ZipEntry newEntry = new ZipEntry(classNode.name + ".class");
-                newEntry.setTime(currentTime);
+                newEntry.setTime(this.currentTime);
                 newEntry.setCompressedSize(-1);
                 zos.putNextEntry(newEntry);
                 FileUtils.writeToZip(zos, new ByteArrayInputStream(cw.toByteArray()));
@@ -381,7 +381,7 @@ public class Bootstrap { // Eyyy bootstrap bill
                         ClassReader cr = new ClassReader(zipFile.getInputStream(zipEntry));
                         ClassNode classNode = new ClassNode();
                         classNode.libraryNode = true;
-                        cr.accept(classNode, ClassReader.SKIP_DEBUG | ClassReader.SKIP_FRAMES | ClassReader.SKIP_CODE); // Only need class name
+                        cr.accept(classNode, ClassReader.SKIP_DEBUG | ClassReader.SKIP_FRAMES | ClassReader.SKIP_CODE); // We don't need code in methods for libs
 
                         this.classPath.put(classNode.name, classNode);
                     }

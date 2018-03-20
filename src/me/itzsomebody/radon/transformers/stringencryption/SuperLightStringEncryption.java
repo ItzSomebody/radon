@@ -14,22 +14,22 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Transformer that encrypts strings the same way {@link LightStringEncryption} does, but with flow obfuscation in the decryption method.
+ * Transformer that encrypts strings using an extremely simple XOR algorithm.
  *
  * @author ItzSomebody
  */
-public class NormalStringEncryption extends AbstractTransformer {
+public class SuperLightStringEncryption extends AbstractTransformer {
     /**
      * Indication to not encrypt strings containing Spigot placeholders (%%__USER__%%, %%__RESOURCE__%% and %%__NONCE__%%).
      */
     private boolean spigotMode;
 
     /**
-     * Constructor used to create a {@link NormalStringEncryption} object.
+     * Constructor used to create a {@link LightStringEncryption} object.
      *
      * @param spigotMode indication to not encrypt strings containing Spigot placeholders (%%__USER__%%, %%__RESOURCE__%% and %%__NONCE__%%).
      */
-    public NormalStringEncryption(boolean spigotMode) {
+    public SuperLightStringEncryption(boolean spigotMode) {
         this.spigotMode = spigotMode;
     }
 
@@ -38,7 +38,7 @@ public class NormalStringEncryption extends AbstractTransformer {
      */
     public void obfuscate() {
         logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
-        logStrings.add(LoggerUtils.stdOut("Starting normal string encryption transformer"));
+        logStrings.add(LoggerUtils.stdOut("Starting super light string encryption transformer"));
         AtomicInteger counter = new AtomicInteger();
         long current = System.currentTimeMillis();
         String[] decryptorPath = new String[]{StringUtils.randomClass(classNames()), StringUtils.crazyString()};
@@ -56,11 +56,10 @@ public class NormalStringEncryption extends AbstractTransformer {
                                     || ((String) cst).contains("%%__RESOURCE__%%")
                                     || ((String) cst).contains("%%__NONCE__%%")) continue;
 
-                            int key3 = NumberUtils.getRandomInt(25000) + 25000;
-                            ((LdcInsnNode) insn).cst = StringUtils.normalEncrypt(decryptorPath[0].replace("/", "."), decryptorPath[1], key3, ((String) ((LdcInsnNode) insn).cst));
-                            methodNode.instructions.insert(insn, new MethodInsnNode(Opcodes.INVOKESTATIC, decryptorPath[0], decryptorPath[1], "(Ljava/lang/Object;Ljava/lang/Object;I)Ljava/lang/String;", false));
-                            methodNode.instructions.insert(insn, BytecodeUtils.getNumberInsn(key3));
-                            methodNode.instructions.insert(insn, new InsnNode(ACONST_NULL));
+                            int key = NumberUtils.getRandomInt();
+                            ((LdcInsnNode) insn).cst = StringUtils.superLightEncrypt(((String) ((LdcInsnNode) insn).cst), key);
+                            methodNode.instructions.insert(insn, new MethodInsnNode(Opcodes.INVOKESTATIC, decryptorPath[0], decryptorPath[1], "(Ljava/lang/String;I)Ljava/lang/String;", false));
+                            methodNode.instructions.insert(insn, BytecodeUtils.getNumberInsn(key));
                             counter.incrementAndGet();
                         }
                     }
@@ -69,7 +68,7 @@ public class NormalStringEncryption extends AbstractTransformer {
         });
 
         classNodes().stream().filter(classNode -> classNode.name.equals(decryptorPath[0])).forEach(classNode -> {
-            classNode.methods.add(StringEncryption.normalMethod(decryptorPath[1]));
+            classNode.methods.add(StringEncryption.superLightMethod(decryptorPath[1]));
             classNode.access = BytecodeUtils.accessFixer(classNode.access);
         });
         logStrings.add(LoggerUtils.stdOut("Encrypted " + counter + " strings."));

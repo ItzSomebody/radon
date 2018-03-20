@@ -119,6 +119,11 @@ public class FieldNode extends FieldVisitor {
     public List<Attribute> attrs;
 
     /**
+     * Name of the class node which contains this field node
+     */
+    public String owner;
+
+    /**
      * Constructs a new {@link FieldNode}. <i>Subclasses must not use this
      * constructor</i>. Instead, they must use the
      * {@link #FieldNode(int, int, String, String, String, Object)} version.

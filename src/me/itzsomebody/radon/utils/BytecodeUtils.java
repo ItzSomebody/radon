@@ -5,9 +5,7 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Utils used for operating on bytecode.
@@ -65,12 +63,12 @@ public class BytecodeUtils {
      *
      * @param methodNode the {@link MethodNode} to check.
      * @param clazz      the {@link ClassNode} in which the input {@link MethodNode} is contained.
-     * @param classes    the classpath to check.
+     * @param classes    the class collection to check.
      * @return true if input {@link MethodNode} name and description match another one in the classpath.
      */
     @Deprecated
-    public static boolean hasSameMethod(MethodNode methodNode, ClassNode clazz, Map<String, ClassNode> classes) {
-        for (ClassNode classNode : classes.values()) {
+    public static boolean hasSameMethod(MethodNode methodNode, ClassNode clazz, Collection<ClassNode> classes) {
+        for (ClassNode classNode : classes) {
             if (classNode.name.equals(clazz.name)) continue;
             for (MethodNode method : classNode.methods) {
                 if (methodNode.name.equals(method.name)) {

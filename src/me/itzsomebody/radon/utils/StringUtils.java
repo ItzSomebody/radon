@@ -74,10 +74,10 @@ public class StringUtils {
             }
         }
 
-        //char[] alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".toCharArray();
-        //for (int i = 0; i < numberOfChars; i++) {
-        //    buildString[i] = alpha[NumberUtils.getRandomInt(alpha.length)];
-        //} Testing Purposes
+        /*char[] alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".toCharArray();
+        for (int i = 0; i < numberOfChars; i++) {
+            buildString[i] = alpha[NumberUtils.getRandomInt(alpha.length)];
+        }*/
 
         return new String(buildString);
     }
@@ -123,6 +123,24 @@ public class StringUtils {
         }
 
         return new String(buildString);
+    }
+
+    /**
+     * Returns an encrypted string used by {@link me.itzsomebody.radon.transformers.stringencryption.SuperLightStringEncryption}.
+     *
+     * @param msg string to encrypt.
+     * @param key random integer
+     * @return an encrypted string used by {@link me.itzsomebody.radon.transformers.stringencryption.SuperLightStringEncryption}.
+     */
+    public static String superLightEncrypt(String msg, int key) {
+        char[] encryptedArray = msg.toCharArray();
+        char[] returnThis = new char[encryptedArray.length];
+
+        for (int i = 0; i < returnThis.length; i++) {
+            returnThis[i] = (char) (encryptedArray[i] ^ key);
+        }
+
+        return new String(returnThis);
     }
 
     /**

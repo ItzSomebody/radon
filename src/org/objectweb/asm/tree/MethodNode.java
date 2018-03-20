@@ -212,6 +212,11 @@ public class MethodNode extends MethodVisitor {
     private boolean visited;
 
     /**
+     * The class node which this method node is contained in
+     */
+    public String owner;
+
+    /**
      * Constructs an uninitialized {@link MethodNode}. <i>Subclasses must not
      * use this constructor</i>. Instead, they must use the
      * {@link #MethodNode(int)} version.

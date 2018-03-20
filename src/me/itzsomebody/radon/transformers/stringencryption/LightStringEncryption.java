@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Transformer that encrypts strings with a known XOR-Key algorithm.
+ * Transformer that encrypts strings using a stacktrace-backed method.
  *
  * @author ItzSomebody
  */

@@ -32,7 +32,7 @@ public class NumberObfuscation extends AbstractTransformer {
                     if (methodSize(methodNode) > 60000) break;
                     if (BytecodeUtils.isNumberNode(insn)) {
                         int originalNum = BytecodeUtils.getNumber(insn);
-                        switch (NumberUtils.getRandomInt(3)) {
+                        /*switch (NumberUtils.getRandomInt(3)) {
                             case 0: {
                                 int value1 = NumberUtils.getRandomInt(255) + 20;
                                 int value2 = NumberUtils.getRandomInt(value1) + value1;
@@ -93,12 +93,23 @@ public class NumberObfuscation extends AbstractTransformer {
                                 counter.incrementAndGet();
                                 break;
                             }
-                        }
+                        }*/
+                        int value1 = NumberUtils.getRandomInt(255) + 20;
+                        int value2 = originalNum ^ value1;
+
+                        InsnList insnList = new InsnList();
+                        insnList.add(BytecodeUtils.getNumberInsn(value1));
+                        insnList.add(BytecodeUtils.getNumberInsn(value2));
+                        insnList.add(new InsnNode(IXOR));
+
+                        methodNode.instructions.insertBefore(insn, insnList);
+                        methodNode.instructions.remove(insn);
+                        counter.incrementAndGet();
                     }
                 }
             });
         });
-        logStrings.add(LoggerUtils.stdOut("Split " + counter + " integers into math instructions."));
+        logStrings.add(LoggerUtils.stdOut("Split " + counter + " integers into bitwise xor instructions."));
         logStrings.add(LoggerUtils.stdOut("Finished. [" + tookThisLong(current) + "ms]"));
     }
 }

@@ -72,10 +72,10 @@ class NormalStringEncryption {
                                                                 broken[1] = ((String) encryptedString).toCharArray()[1];
                                                                 broken[2] = ((String) encryptedString).toCharArray()[2];
                                                                 broken[3] = ((String) encryptedString).toCharArray()[3];
-                                                                ste = Thread.currentThread().getStackTrace()[one | 255];
+                                                                ste = new Throwable().getStackTrace()[one | 255];
                                                                 throw null;
                                                             } catch (Throwable t) {
-                                                                ste = Thread.currentThread().getStackTrace()[one];
+                                                                ste = new Throwable().getStackTrace()[one - 1];
                                                                 break label_04;
                                                             }
                                                         }

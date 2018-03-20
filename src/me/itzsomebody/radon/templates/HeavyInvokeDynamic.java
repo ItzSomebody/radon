@@ -52,7 +52,7 @@ class HeavyInvokeDynamic {
                 case 0: // Field
                     Object opcodeSwitch = opcodeLookup;
                     switch ((int) opcodeSwitch) {
-                        case 0: // Getter
+                        case 0:
                             methodHandle = ((MethodHandles.Lookup) lookup).findGetter(Class.forName(className.toString()), memberName.toString(), Class.forName(memberDescription.toString()));
                             break;
                         case 1:
@@ -72,10 +72,10 @@ class HeavyInvokeDynamic {
                 case 1: // Method
                     Object opcodeSwitch2 = opcodeLookup;
                     switch ((int) opcodeSwitch2) {
-                        case 0: // Virtual
+                        case 0:
                             methodHandle = ((MethodHandles.Lookup) lookup).findVirtual(Class.forName(className.toString()), memberName.toString(), MethodType.fromMethodDescriptorString(memberDescription.toString(), HeavyInvokeDynamic.class.getClassLoader()));
                             break;
-                        case 1: // Static
+                        case 1:
                             methodHandle = ((MethodHandles.Lookup) lookup).findStatic(Class.forName(className.toString()), memberName.toString(), MethodType.fromMethodDescriptorString(memberDescription.toString(), HeavyInvokeDynamic.class.getClassLoader()));
                             break;
                         default:

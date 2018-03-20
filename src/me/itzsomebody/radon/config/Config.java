@@ -20,6 +20,7 @@ import me.itzsomebody.radon.transformers.sourcename.RemoveSourceName;
 import me.itzsomebody.radon.transformers.stringencryption.HeavyStringEncryption;
 import me.itzsomebody.radon.transformers.stringencryption.LightStringEncryption;
 import me.itzsomebody.radon.transformers.stringencryption.NormalStringEncryption;
+import me.itzsomebody.radon.transformers.stringencryption.SuperLightStringEncryption;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
@@ -271,7 +272,9 @@ public class Config {
                 if (!(value instanceof String))
                     throw new IllegalArgumentException("String encryption arg must be a string");
                 String s = (String) value;
-                if (s.equalsIgnoreCase("Light")) {
+                if (s.equalsIgnoreCase("SuperLight")) {
+                    return new SuperLightStringEncryption(getSpigotBool());
+                } else if (s.equalsIgnoreCase("Light")) {
                     return new LightStringEncryption(getSpigotBool());
                 } else if (s.equalsIgnoreCase("Normal")) {
                     return new NormalStringEncryption(getSpigotBool());
