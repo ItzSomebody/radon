@@ -2,10 +2,7 @@ package me.itzsomebody.radon.utils;
 
 import org.objectweb.asm.Label;
 import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
-
-import java.util.*;
 
 /**
  * Utils used for operating on bytecode.

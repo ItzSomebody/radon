@@ -2,17 +2,13 @@ package me.itzsomebody.radon.transformers.invokedynamic;
 
 import org.objectweb.asm.Handle;
 import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
 import me.itzsomebody.radon.methods.InvokeDynamicBSM;
 import me.itzsomebody.radon.transformers.AbstractTransformer;
 import me.itzsomebody.radon.utils.BytecodeUtils;
 import me.itzsomebody.radon.utils.LoggerUtils;
-import me.itzsomebody.radon.utils.NumberUtils;
 import me.itzsomebody.radon.utils.StringUtils;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -60,13 +56,6 @@ public class NormalInvokeDynamic extends AbstractTransformer {
 
                         String newSig =
                                 isStatic ? methodInsnNode.desc : methodInsnNode.desc.replace("(", "(Ljava/lang/Object;");
-                        Type origReturnType = Type.getReturnType(newSig);
-                        Type[] args = Type.getArgumentTypes(newSig);
-                        for (int j = 0; j < args.length; j++) {
-                            args[j] = BytecodeUtils.genericType(args[j]);
-                        }
-
-                        newSig = Type.getMethodDescriptor(origReturnType, args);
                         int opcode = (isStatic) ? this.STATIC_INVOCATION : this.VIRTUAL_INVOCATION;
 
                         methodNode.instructions.set(insn, new InvokeDynamicInsnNode(
