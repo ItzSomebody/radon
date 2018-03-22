@@ -1,3 +1,8 @@
+## 0.4.2
+
+* Added UTF-8 source-encoding to Maven.
+* Made some changes to the normal flow obfuscation transformer that might make it (ver slightly) hard to understand.
+
 ## 0.4.1
 
 * Maven-ized the project.

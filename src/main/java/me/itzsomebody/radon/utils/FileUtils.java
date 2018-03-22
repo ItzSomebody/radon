@@ -9,7 +9,6 @@ import java.util.zip.ZipOutputStream;
  * Utils for operating on files in general.
  *
  * @author ItzSomebody
- * @author c001man
  */
 public class FileUtils {
     /**

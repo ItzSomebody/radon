@@ -17,10 +17,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Transformer that applies multiple (skidded) flow obfuscations.
  *
  * @author ItzSomebody
- * @author LordPancake (author of Skidfuscator)
- * @author Allatori Developers
- * @author VincBreaker (author of Smoke)
- * @author samczsun (author of the many ways to crash the various decompilers)
  */
 public class NormalFlowObfuscation extends AbstractTransformer {
     /**
@@ -34,7 +30,7 @@ public class NormalFlowObfuscation extends AbstractTransformer {
         String s = StringUtils.bigLDC();
         classNodes().stream().filter(classNode -> !this.classExempted(classNode.name)).forEach(classNode -> {
             FieldNode field = new FieldNode(ACC_PUBLIC + ACC_STATIC +
-                    ACC_FINAL, StringUtils.crazyString(), "Z", null, true);
+                    ACC_FINAL, StringUtils.crazyString(), "Z", null, null);
             classNode.fields.add(field);
             classNode.methods.stream().filter(methodNode ->
                     !this.methodExempted(classNode.name + '.' + methodNode.name + methodNode.desc)
@@ -67,36 +63,33 @@ public class NormalFlowObfuscation extends AbstractTransformer {
                         Stack<Object> stack = sa.returnStackAtBreak();
                         if (stack.isEmpty()) { // We need to make sure stack is empty before making jumps
                             methodNode.instructions.insertBefore(insn, new VarInsnNode(ILOAD, varIndex));
-                            methodNode.instructions.insertBefore(insn, new JumpInsnNode(IFEQ, labelNode));
+                            methodNode.instructions.insertBefore(insn,
+                                    new JumpInsnNode(IFNE, labelNode));
                             counter.incrementAndGet();
                         }
                     }
                     if (insn instanceof JumpInsnNode) {
                         if (insn.getOpcode() == GOTO) {
-                            /*if (BytecodeUtils.lastInsnIInc(insn)) {
-                                methodNode.instructions.insertBefore(insn, new VarInsnNode(ILOAD, varIndex));
-                                //methodNode.instructions.insertBefore(insn, new InsnNode(ICONST_1));
-                                //methodNode.instructions.set(insn, new JumpInsnNode(IF_ICMPEQ, ((JumpInsnNode) insn).label));
-                                methodNode.instructions.set(insn, new JumpInsnNode(IFEQ, ((JumpInsnNode) insn).label));
-                            } else {
-                                methodNode.instructions.insertBefore(insn, new VarInsnNode(ILOAD, varIndex));
-                                methodNode.instructions.insertBefore(insn, new InsnNode(ICONST_1));
-                                methodNode.instructions.insert(insn, new InsnNode(ATHROW));
-                                methodNode.instructions.insert(insn, new InsnNode(ACONST_NULL));
-                                methodNode.instructions.set(insn, new JumpInsnNode(IF_ICMPEQ, ((JumpInsnNode) insn).label));
-                            }*/
-                            methodNode.instructions.insertBefore(insn, new VarInsnNode(ILOAD, varIndex));
-                            methodNode.instructions.insertBefore(insn, new InsnNode(ICONST_1));
-                            methodNode.instructions.insert(insn, new InsnNode(ATHROW));
-                            methodNode.instructions.insert(insn, new InsnNode(ACONST_NULL));
-                            methodNode.instructions.set(insn, new JumpInsnNode(IF_ICMPEQ, ((JumpInsnNode) insn).label));
+                            methodNode.instructions.insertBefore(insn,
+                                    new VarInsnNode(ILOAD, varIndex));
+                            methodNode.instructions.insertBefore(insn,
+                                    new InsnNode(ICONST_0));
+                            methodNode.instructions.insert(insn,
+                                    new InsnNode(ATHROW));
+                            methodNode.instructions.insert(insn,
+                                    new InsnNode(ACONST_NULL));
+                            methodNode.instructions.set(insn,
+                                    new JumpInsnNode(IF_ICMPEQ,
+                                            ((JumpInsnNode) insn).label));
                             counter.incrementAndGet();
                         }
                     }
                 }
-                methodNode.instructions.insertBefore(methodNode.instructions.getFirst(), new VarInsnNode(ISTORE, varIndex));
-                methodNode.instructions.insertBefore(methodNode.instructions.getFirst(),
-                        new FieldInsnNode(GETSTATIC, classNode.name, field.name, "Z"));
+                methodNode.instructions.insertBefore(methodNode.instructions
+                        .getFirst(), new VarInsnNode(ISTORE, varIndex));
+                methodNode.instructions.insertBefore(methodNode.instructions
+                        .getFirst(), new FieldInsnNode(GETSTATIC,
+                        classNode.name, field.name, "Z"));
             });
         });
         this.logStrings.add(LoggerUtils.stdOut("Added " + counter + " instruction sets."));
