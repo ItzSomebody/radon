@@ -1526,11 +1526,13 @@ public class GUI {
                                 waterMarkMessageField.setText(configParser.getWatermarkMsg());
                                 watermarkPassword.setText(configParser.getWatermarkKey());
 
+                                int watermarkType = configParser.getWatermarkType();
                                 if (configParser.getWatermarkType() != -1) {
                                     chckbxAddWatermark.setSelected(true);
                                     waterMarkMessageField.setEnabled(true);
                                     watermarkPassword.setEnabled(true);
                                     comboBox_05.setEnabled(true);
+                                    comboBox_05.setSelectedIndex(watermarkType);
                                 }
 
                                 if (configParser.getExpiryMsg() != null
