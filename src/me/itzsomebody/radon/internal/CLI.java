@@ -29,15 +29,15 @@ public class CLI {
      */
     public CLI(String[] args) {
         this.args = args;
-        startTheParty();
+        this.startTheParty();
     }
 
     /**
      * Parses {@link CLI#args}.
      */
     private void startTheParty() {
-        if (args.length == 1) {
-            switch (args[0].toLowerCase()) {
+        if (this.args.length == 1) {
+            switch (this.args[0].toLowerCase()) {
                 case "--version":
                 case "-version":
                 case "version":
@@ -52,13 +52,13 @@ public class CLI {
                 default:
                     CLIMessages.usageMsg();
             }
-        } else if (args.length == 2) {
-            switch (args[0].toLowerCase()) {
+        } else if (this.args.length == 2) {
+            switch (this.args[0].toLowerCase()) {
                 case "--config":
                 case "-config":
                 case "config":
                 case "/config":
-                    File file = new File(args[1]);
+                    File file = new File(this.args[1]);
                     Config config;
                     try {
                         config = new Config(new FileInputStream(file));
@@ -77,19 +77,19 @@ public class CLI {
                     CLIMessages.usageMsg();
                     break;
             }
-        } else if (args.length == 3) {
-            switch (args[0].toLowerCase()) {
+        } else if (this.args.length == 3) {
+            switch (this.args[0].toLowerCase()) {
                 case "--extract":
                 case "-extract":
                 case "extract":
                 case "/extract":
-                    File leaked = new File(args[1]);
+                    File leaked = new File(this.args[1]);
                     if (!leaked.exists()) {
                         LoggerUtils.stdOut("Input file not found");
                     }
 
                     try {
-                        List<String> ids = WatermarkUtils.extractWatermark(leaked, args[2]);
+                        List<String> ids = WatermarkUtils.extractWatermark(leaked, this.args[2]);
                         for (String id : ids) {
                             LoggerUtils.stdOut(id);
                         }

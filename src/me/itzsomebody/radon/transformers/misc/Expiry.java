@@ -38,18 +38,18 @@ public class Expiry extends AbstractTransformer {
      * Applies obfuscation.
      */
     public void obfuscate() {
-        logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
-        logStrings.add(LoggerUtils.stdOut("Starting expiry transformer"));
         AtomicInteger counter = new AtomicInteger();
         long current = System.currentTimeMillis();
-        classNodes().stream().filter(classNode -> !classExempted(classNode.name)).forEach(classNode -> {
-            classNode.methods.stream().filter(methodNode -> !methodExempted(classNode.name + '.' + methodNode.name + methodNode.desc)
+        this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
+        this.logStrings.add(LoggerUtils.stdOut("Started expiry transformer"));
+        this.classNodes().stream().filter(classNode -> !this.classExempted(classNode.name)).forEach(classNode -> {
+            classNode.methods.stream().filter(methodNode -> !this.methodExempted(classNode.name + '.' + methodNode.name + methodNode.desc)
                     && methodNode.name.equals("<init>") && methodSize(methodNode) < 60000).forEach(methodNode -> {
-                methodNode.instructions.insertBefore(methodNode.instructions.getFirst(), BytecodeUtils.returnExpiry(expiryTime, expiryMsg));
+                methodNode.instructions.insertBefore(methodNode.instructions.getFirst(), BytecodeUtils.returnExpiry(this.expiryTime, this.expiryMsg));
                 counter.incrementAndGet();
             });
         });
-        logStrings.add(LoggerUtils.stdOut("Added " + counter + " expiration code blocks."));
-        logStrings.add(LoggerUtils.stdOut("Finished. [" + tookThisLong(current) + "ms]"));
+        this.logStrings.add(LoggerUtils.stdOut("Added " + counter + " expiration code blocks."));
+        this.logStrings.add(LoggerUtils.stdOut("Finished. [" + tookThisLong(current) + "ms]"));
     }
 }

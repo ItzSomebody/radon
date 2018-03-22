@@ -15,15 +15,15 @@ public class InnerClassRemover extends AbstractTransformer {
      * Applies obfuscation.
      */
     public void obfuscate() {
-        logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
-        logStrings.add(LoggerUtils.stdOut("Starting inner class removal transformer"));
         AtomicInteger counter = new AtomicInteger();
         long current = System.currentTimeMillis();
-        classNodes().stream().filter(classNode -> !classExempted(classNode.name) && classNode.innerClasses != null).forEach(classNode -> {
+        this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
+        this.logStrings.add(LoggerUtils.stdOut("Started inner class removal transformer"));
+        this.classNodes().stream().filter(classNode -> !this.classExempted(classNode.name) && classNode.innerClasses != null).forEach(classNode -> {
             counter.addAndGet(classNode.innerClasses.size());
             classNode.innerClasses.clear();
         });
-        logStrings.add(LoggerUtils.stdOut("Removed " + counter + " inner class infos."));
-        logStrings.add(LoggerUtils.stdOut("Finished. [" + tookThisLong(current) + "ms]"));
+        this.logStrings.add(LoggerUtils.stdOut("Removed " + counter + " inner class infos."));
+        this.logStrings.add(LoggerUtils.stdOut("Finished. [" + tookThisLong(current) + "ms]"));
     }
 }

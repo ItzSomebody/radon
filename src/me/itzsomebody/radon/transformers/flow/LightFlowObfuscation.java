@@ -27,17 +27,17 @@ public class LightFlowObfuscation extends AbstractTransformer {
      * Applies obfuscation.
      */
     public void obfuscate() {
-        logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
-        logStrings.add(LoggerUtils.stdOut("Starting light flow obfuscation transformer."));
         AtomicInteger counter = new AtomicInteger();
         long current = System.currentTimeMillis();
-        classNodes().stream().filter(classNode -> !classExempted(classNode.name)).forEach(classNode -> {
+        this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
+        this.logStrings.add(LoggerUtils.stdOut("Started light flow obfuscation transformer."));
+        classNodes().stream().filter(classNode -> !this.classExempted(classNode.name)).forEach(classNode -> {
             String fieldName = StringUtils.crazyString();
             classNode.methods.stream().filter(methodNode -> !BytecodeUtils.isAbstractMethod(methodNode.access)
-                    && !methodExempted(classNode.name + '.' + methodNode.name + methodNode.desc)
+                    && !this.methodExempted(classNode.name + '.' + methodNode.name + methodNode.desc)
                     && BytecodeUtils.containsGoto(methodNode)).forEach(methodNode -> {
                 for (AbstractInsnNode ain : methodNode.instructions.toArray()) {
-                    if (methodSize(methodNode) > 60000) break;
+                    if (this.methodSize(methodNode) > 60000) break;
                     if (ain.getOpcode() == GOTO) {
                         methodNode.instructions.insertBefore(ain, new FieldInsnNode(GETSTATIC, classNode.name, fieldName, "Z"));
                         methodNode.instructions.insertBefore(ain, new InsnNode(ICONST_1));
@@ -50,7 +50,7 @@ public class LightFlowObfuscation extends AbstractTransformer {
             });
             classNode.fields.add(new FieldNode(ACC_PUBLIC + ACC_STATIC + ACC_FINAL, fieldName, "Z", null, true));
         });
-        logStrings.add(LoggerUtils.stdOut("Added " + counter + " instruction sets."));
-        logStrings.add(LoggerUtils.stdOut("Finished. [" + tookThisLong(current) + "ms]"));
+        this.logStrings.add(LoggerUtils.stdOut("Added " + counter + " instruction sets."));
+        this.logStrings.add(LoggerUtils.stdOut("Finished. [" + tookThisLong(current) + "ms]"));
     }
 }

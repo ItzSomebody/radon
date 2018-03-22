@@ -19,12 +19,12 @@ public class RemoveLineNumbers extends AbstractTransformer {
      * Applies obfuscation.
      */
     public void obfuscate() {
-        logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
-        logStrings.add(LoggerUtils.stdOut("Starting line removal transformer"));
         AtomicInteger counter = new AtomicInteger();
         long current = System.currentTimeMillis();
-        classNodes().stream().filter(classNode -> !classExempted(classNode.name)).forEach(classNode -> {
-            classNode.methods.stream().filter(methodNode -> !methodExempted(classNode.name + '.' + methodNode.name + methodNode.desc))
+        this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
+        this.logStrings.add(LoggerUtils.stdOut("Started line removal transformer"));
+        this.classNodes().stream().filter(classNode -> !this.classExempted(classNode.name)).forEach(classNode -> {
+            classNode.methods.stream().filter(methodNode -> !this.methodExempted(classNode.name + '.' + methodNode.name + methodNode.desc))
                     .filter(methodNode -> !BytecodeUtils.isAbstractMethod(methodNode.access)).forEach(methodNode -> {
                 for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
                     if (insn instanceof LineNumberNode) {
@@ -34,7 +34,7 @@ public class RemoveLineNumbers extends AbstractTransformer {
                 }
             });
         });
-        logStrings.add(LoggerUtils.stdOut("Removed " + counter + " line numbers."));
-        logStrings.add(LoggerUtils.stdOut("Finished. [" + tookThisLong(current) + "ms]"));
+        this.logStrings.add(LoggerUtils.stdOut("Removed " + counter + " line numbers."));
+        this.logStrings.add(LoggerUtils.stdOut("Finished. [" + tookThisLong(current) + "ms]"));
     }
 }

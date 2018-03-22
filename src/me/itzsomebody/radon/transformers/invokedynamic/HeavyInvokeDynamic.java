@@ -20,14 +20,28 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author ItzSomebody.
  */
 public class HeavyInvokeDynamic extends AbstractTransformer {
+    /*
+     * Magic numbers.
+     */
+    private int METHOD_INVOCATION = 1;
+    private int FIELD_INVOCATION = 0;
+
+    private int STATIC_INVOCATION = 1;
+    private int VIRTUAL_INVOCATION = 0;
+
+    private int VIRTUAL_GETTER = 0;
+    private int STATIC_GETTER = 1;
+    private int VIRTUAL_SETTER = 2;
+    private int STATIC_SETTER = 3;
+
     /**
      * Applies obfuscation.
      */
     public void obfuscate() {
-        logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
-        logStrings.add(LoggerUtils.stdOut("Starting heavy invokedynamic transformer"));
         AtomicInteger counter = new AtomicInteger();
         long current = System.currentTimeMillis();
+        this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
+        this.logStrings.add(LoggerUtils.stdOut("Started heavy invokedynamic transformer"));
         String[] bsmPath = new String[]{StringUtils.randomClass(classNames()), StringUtils.crazyString()};
         Handle bsmHandle = new Handle(Opcodes.H_INVOKESTATIC,
                 bsmPath[0],
@@ -36,16 +50,16 @@ public class HeavyInvokeDynamic extends AbstractTransformer {
                 false);
 
         List<String> finalFields = new ArrayList<>();
-        classNodes().stream().filter(classNode -> classNode.fields != null).forEach(classNode -> {
+        this.classNodes().stream().filter(classNode -> classNode.fields != null).forEach(classNode -> {
             classNode.fields.stream().filter(fieldNode -> (fieldNode.access & ACC_FINAL) != 0).forEach(fieldNode -> {
                 finalFields.add(classNode.name + '.' + fieldNode.name);
             });
         });
-        classNodes().stream().filter(classNode -> !classExempted(classNode.name) && classNode.version >= 51).forEach(classNode -> {
-            classNode.methods.stream().filter(methodNode -> !methodExempted(classNode.name + '.' + methodNode.name + methodNode.desc)
+        this.classNodes().stream().filter(classNode -> !this.classExempted(classNode.name) && classNode.version >= 51).forEach(classNode -> {
+            classNode.methods.stream().filter(methodNode -> !this.methodExempted(classNode.name + '.' + methodNode.name + methodNode.desc)
                     && !BytecodeUtils.isAbstractMethod(methodNode.access)).forEach(methodNode -> {
                 for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
-                    if (methodSize(methodNode) > 60000) break;
+                    if (this.methodSize(methodNode) > 60000) break;
                     if (insn instanceof MethodInsnNode) {
                         MethodInsnNode methodInsnNode = (MethodInsnNode) insn;
                         boolean isStatic = (methodInsnNode.getOpcode() == Opcodes.INVOKESTATIC);
@@ -62,8 +76,8 @@ public class HeavyInvokeDynamic extends AbstractTransformer {
                                         StringUtils.crazyString(),
                                         newSig,
                                         bsmHandle,
-                                        1,
-                                        1,
+                                        this.METHOD_INVOCATION,
+                                        this.STATIC_INVOCATION,
                                         methodInsnNode.owner.replaceAll("/", "."),
                                         methodInsnNode.name,
                                         methodInsnNode.desc));
@@ -75,8 +89,8 @@ public class HeavyInvokeDynamic extends AbstractTransformer {
                                         StringUtils.crazyString(),
                                         newSig,
                                         bsmHandle,
-                                        1,
-                                        0,
+                                        this.METHOD_INVOCATION,
+                                        this.VIRTUAL_INVOCATION,
                                         methodInsnNode.owner.replaceAll("/", "."),
                                         methodInsnNode.name,
                                         methodInsnNode.desc));
@@ -103,8 +117,8 @@ public class HeavyInvokeDynamic extends AbstractTransformer {
                                             StringUtils.crazyString(),
                                             newSig,
                                             bsmHandle,
-                                            0,
-                                            0,
+                                            this.FIELD_INVOCATION,
+                                            this.VIRTUAL_GETTER,
                                             fieldInsnNode.owner.replaceAll("/", "."),
                                             fieldInsnNode.name,
                                             wrappedDescription));
@@ -115,8 +129,8 @@ public class HeavyInvokeDynamic extends AbstractTransformer {
                                             StringUtils.crazyString(),
                                             newSig,
                                             bsmHandle,
-                                            0,
-                                            1,
+                                            this.FIELD_INVOCATION,
+                                            this.STATIC_GETTER,
                                             fieldInsnNode.owner.replaceAll("/", "."),
                                             fieldInsnNode.name,
                                             wrappedDescription));
@@ -127,8 +141,8 @@ public class HeavyInvokeDynamic extends AbstractTransformer {
                                             StringUtils.crazyString(),
                                             newSig,
                                             bsmHandle,
-                                            0,
-                                            2,
+                                            this.FIELD_INVOCATION,
+                                            this.VIRTUAL_SETTER,
                                             fieldInsnNode.owner.replaceAll("/", "."),
                                             fieldInsnNode.name,
                                             wrappedDescription));
@@ -139,8 +153,8 @@ public class HeavyInvokeDynamic extends AbstractTransformer {
                                             StringUtils.crazyString(),
                                             newSig,
                                             bsmHandle,
-                                            0,
-                                            3,
+                                            this.FIELD_INVOCATION,
+                                            this.STATIC_SETTER,
                                             fieldInsnNode.owner.replaceAll("/", "."),
                                             fieldInsnNode.name,
                                             wrappedDescription));
@@ -155,11 +169,11 @@ public class HeavyInvokeDynamic extends AbstractTransformer {
             });
         });
 
-        classNodes().stream().filter(classNode -> classNode.name.equals(bsmPath[0])).forEach(classNode -> {
+        this.classNodes().stream().filter(classNode -> classNode.name.equals(bsmPath[0])).forEach(classNode -> {
             classNode.methods.add(InvokeDynamicBSM.heavyBSM(bsmPath[1], classNode.name));
             classNode.access = BytecodeUtils.accessFixer(classNode.access);
         });
-        logStrings.add(LoggerUtils.stdOut("Hid " + counter + " field and/or method accesses with invokedynamics."));
-        logStrings.add(LoggerUtils.stdOut("Finished. [" + tookThisLong(current) + "ms]"));
+        this.logStrings.add(LoggerUtils.stdOut("Hid " + counter + " field and/or method accesses with invokedynamics."));
+        this.logStrings.add(LoggerUtils.stdOut("Finished. [" + tookThisLong(current) + "ms]"));
     }
 }

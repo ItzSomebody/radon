@@ -112,7 +112,7 @@ public class Bootstrap { // Eyyy bootstrap bill
     /**
      * Strings to write to log.
      */
-    private ArrayList<String> logStrings;
+    private List<String> logStrings;
 
     /**
      * {@link Long} used for entry times.
@@ -176,107 +176,117 @@ public class Bootstrap { // Eyyy bootstrap bill
      */
     public void startTheParty(boolean doInit) throws Throwable {
         try {
-            logStrings = new ArrayList<>();
+            this.logStrings = new ArrayList<>();
             if (doInit) {
-                init();
-                logStrings.add(LoggerUtils.stdOut("Successfully parsed config"));
+                this.init();
+                this.logStrings.add(LoggerUtils.stdOut("Successfully parsed config"));
             } else {
                 if (output.exists()) {
                     logStrings.add(LoggerUtils.stdOut("Output already exists, renamed to " + FileUtils.renameExistingFile(output)));
                 }
-                zos = new ZipOutputStream(new FileOutputStream(output));
+                this.zos = new ZipOutputStream(new FileOutputStream(output));
             }
-            currentTime = System.currentTimeMillis();
-            loadClassPath();
-            loadInput();
+            this.currentTime = System.currentTimeMillis();
+            this.loadClassPath();
+            this.loadInput();
 
-            for (AbstractTransformer transformer : transformers) {
+            for (AbstractTransformer transformer : this.transformers) {
                 if (transformer instanceof Renamer) {
-                    transformer.init(classes, classPath, classExempts, methodExempts, fieldExempts);
+                    transformer.init(this.classes, this.classPath, this.classExempts, this.methodExempts, this.fieldExempts);
                 } else {
-                    transformer.init(classes, classExempts, methodExempts, fieldExempts);
+                    transformer.init(this.classes, this.classExempts, this.methodExempts, this.fieldExempts);
                 }
                 transformer.obfuscate();
-                logStrings.addAll(transformer.getLogStrings());
+                this.logStrings.addAll(transformer.getLogStrings());
             }
 
-            if (trashClasses != -1) {
-                logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
-                for (int i = 0; i < trashClasses; i++) {
-                    TrashClasses trashClass = new TrashClasses(StringUtils.randomClassName(classes.keySet()));
+            if (this.trashClasses != -1) {
+                this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
+                for (int i = 0; i < this.trashClasses; i++) {
+                    TrashClasses trashClass = new TrashClasses(StringUtils.randomClassName(this.classes.keySet()));
                     ClassNode classNode = trashClass.returnTrashClass();
-                    extraClasses.put(classNode.name, classNode);
+                    this.extraClasses.put(classNode.name, classNode);
                 }
-                logStrings.add(LoggerUtils.stdOut("Generated " + String.valueOf(trashClasses) + " trash classes"));
+                this.logStrings.add(LoggerUtils.stdOut("Generated " + String.valueOf(this.trashClasses) + " trash classes"));
             }
 
-            if (extraClasses.values().size() != 0) {
-                logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
-                logStrings.add(LoggerUtils.stdOut("Writing generated classes to output"));
+            if (this.extraClasses.values().size() != 0) {
+                this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
+                this.logStrings.add(LoggerUtils.stdOut("Writing generated classes to output"));
 
                 // Write the contents of extraClasses to zos
-                for (ClassNode classNode : extraClasses.values()) {
+                for (ClassNode classNode : this.extraClasses.values()) {
                     ClassWriter cw = new ClassWriter(0);
                     classNode.accept(cw);
 
                     ZipEntry newEntry = new ZipEntry(classNode.name + ".class");
-                    newEntry.setTime(currentTime);
+                    newEntry.setTime(this.currentTime);
                     newEntry.setCompressedSize(-1);
-                    zos.putNextEntry(newEntry);
-                    FileUtils.writeToZip(zos, new ByteArrayInputStream(cw.toByteArray()));
+                    this.zos.putNextEntry(newEntry);
+                    FileUtils.writeToZip(this.zos, new ByteArrayInputStream(cw.toByteArray()));
                 }
             }
 
             // Write the contents of classes to zos and recompute maxlocals, maxstack and stackframes
-            logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
-            logStrings.add(LoggerUtils.stdOut("Writing classes to output"));
-            for (ClassNode classNode : classes.values()) {
+            this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
+            this.logStrings.add(LoggerUtils.stdOut("Writing classes to output"));
+            for (ClassNode classNode : this.classes.values()) {
                 ClassWriter cw = new CustomClassWriter(ClassWriter.COMPUTE_FRAMES);
 
-                if (watermarkMsg != null) {
-                    if (watermarkType == 0
+                if (this.watermarkMsg != null) {
+                    if (this.watermarkType == 0
                             && NumberUtils.getRandomInt(10) >= 5) {
-                        cw.newUTF8("WMID: " + StringUtils.aesEncrypt(watermarkMsg, watermarkKey));
-                        logStrings.add(LoggerUtils.stdOut("Watermarking " + watermarkMsg + " into " + classNode.name));
-                    } else if (watermarkType == 1
+                        cw.newUTF8("WMID: " + StringUtils.aesEncrypt(this.watermarkMsg, this.watermarkKey));
+                        this.logStrings.add(LoggerUtils.stdOut("Watermarking " + this.watermarkMsg + " into " + classNode.name));
+                    } else if (this.watermarkType == 1
                             && NumberUtils.getRandomInt(10) >= 5) {
-                        classNode.signature = StringUtils.aesEncrypt("WMID: " + watermarkMsg, watermarkKey);
-                        logStrings.add(LoggerUtils.stdOut("Watermarking " + watermarkMsg + " into " + classNode.name));
+                        classNode.signature = StringUtils.aesEncrypt("WMID: " + this.watermarkMsg, this.watermarkKey);
+                        this.logStrings.add(LoggerUtils.stdOut("Watermarking " + this.watermarkMsg + " into " + classNode.name));
                     }
                 }
 
                 cw.newUTF8("RADON" + Radon.VERSION); // :D
-                classNode.accept(cw);
+                try {
+                    classNode.accept(cw);
+                } catch (Throwable t) {
+                    if (t.getMessage() != null && t.getMessage().contains("JSR/RET")) {
+                        cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
+                        classNode.accept(cw);
+                    } else {
+                        this.logStrings.add(LoggerUtils.stdOut("Error while writing " + classNode.name + " -> " + t.getMessage()));
+                        throw t;
+                    }
+                }
 
                 ZipEntry newEntry = new ZipEntry(classNode.name + ".class");
                 newEntry.setTime(this.currentTime);
                 newEntry.setCompressedSize(-1);
-                zos.putNextEntry(newEntry);
-                FileUtils.writeToZip(zos, new ByteArrayInputStream(cw.toByteArray()));
+                this.zos.putNextEntry(newEntry);
+                FileUtils.writeToZip(this.zos, new ByteArrayInputStream(cw.toByteArray()));
             }
 
             logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
-            if (zos != null) {
-                zos.setComment("Obfuscation by Radon obfuscator developed by ItzSomebody"); // Cause why not xD
-                zos.close();
-                logStrings.add(LoggerUtils.stdOut("Finished processing file."));
+            if (this.zos != null) {
+                this.zos.setComment("Obfuscation by Radon obfuscator developed by ItzSomebody"); // Cause why not xD
+                this.zos.close();
+                this.logStrings.add(LoggerUtils.stdOut("Finished processing file."));
             }
         } catch (Throwable t) {
-            logStrings.add(LoggerUtils.stdOut("Error happened while processing: " + t.getMessage()));
+            this.logStrings.add(LoggerUtils.stdOut("Error happened while processing: " + t.getMessage()));
             if (zos != null) {
                 zos.close();
             }
             if (output.delete()) {
-                logStrings.add(LoggerUtils.stdOut("Deleted output."));
+                this.logStrings.add(LoggerUtils.stdOut("Deleted output."));
             } else {
-                logStrings.add(LoggerUtils.stdOut("Unable to delete faulty output."));
+                this.logStrings.add(LoggerUtils.stdOut("Unable to delete faulty output."));
             }
 
             t.printStackTrace();
             throw new RuntimeException(t.getMessage());
         } finally {
-            logStrings.add(LoggerUtils.stdOut("Writing log."));
-            LoggerUtils.logWriter(logStrings);
+            this.logStrings.add(LoggerUtils.stdOut("Writing log."));
+            LoggerUtils.logWriter(this.logStrings);
         }
     }
 
@@ -357,6 +367,7 @@ public class Bootstrap { // Eyyy bootstrap bill
             }
             this.zos = new ZipOutputStream(new FileOutputStream(this.output));
         } catch (Throwable t) {
+            t.printStackTrace();
             throw new RuntimeException("Error while loading config: " + t.getMessage());
         }
     }
@@ -432,7 +443,7 @@ public class Bootstrap { // Eyyy bootstrap bill
             throw new RuntimeException("Input " + this.input.getAbsolutePath() + " does not exist!");
         }
 
-        classPath.putAll(classes);
+        this.classPath.putAll(this.classes);
     }
 
     /**

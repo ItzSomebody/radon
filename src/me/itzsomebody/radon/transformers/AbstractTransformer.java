@@ -138,7 +138,7 @@ public abstract class AbstractTransformer implements Opcodes {
      * @return true/false based on if the input is listed in {@link AbstractTransformer#exemptClasses}.
      */
     protected boolean classExempted(String name) {
-        for (String string : exemptClasses) {
+        for (String string : this.exemptClasses) {
             if (CustomRegexUtils.isMatched(string, name)) {
                 return true;
             }
@@ -154,7 +154,7 @@ public abstract class AbstractTransformer implements Opcodes {
      * @return true/false based on if the input is listed in {@link AbstractTransformer#exemptMethods}.
      */
     protected boolean methodExempted(String name) {
-        for (String string : exemptMethods) {
+        for (String string : this.exemptMethods) {
             if (CustomRegexUtils.isMatched(string, name)) {
                 return true;
             }
@@ -170,7 +170,7 @@ public abstract class AbstractTransformer implements Opcodes {
      * @return true/false based on if the input is listed in {@link AbstractTransformer#exemptFields}.
      */
     protected boolean fieldExempted(String name) {
-        for (String string : exemptFields) {
+        for (String string : this.exemptFields) {
             if (CustomRegexUtils.isMatched(string, name)) {
                 return true;
             }

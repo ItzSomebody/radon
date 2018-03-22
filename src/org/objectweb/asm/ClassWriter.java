@@ -39,6 +39,10 @@ package org.objectweb.asm;
  * @author Eric Bruneton
  */
 public class ClassWriter extends ClassVisitor {
+    /**
+     * A flag I just randomly put.
+     */
+    public static final int COMPUTE_NOTHING = 0;
 
     /**
      * Flag to automatically compute the maximum stack size and the maximum

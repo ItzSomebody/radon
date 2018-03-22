@@ -103,6 +103,7 @@ This table describes the current obfuscation settings Radon has.
 * [Licel](https://licelus.com) - Makers of Stringer Java Obfuscator.
 * [Allatori Dev Team](http://www.allatori.com) - Makers of Allatori Java Obfuscator.
 * [Caleb Whiting](https://github.com/CalebWhiting/java-asm-obfuscator) - Author of Java ASM Obfuscator.
+* [Artel](https://gitlab.com/artel) - Beta tester.
 
 ## License
 

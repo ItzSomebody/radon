@@ -31,17 +31,17 @@ public class HideCode extends AbstractTransformer {
      * Applies obfuscation.
      */
     public void obfuscate() {
-        logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
-        logStrings.add(LoggerUtils.stdOut("Starting hide code transformer"));
         AtomicInteger counter = new AtomicInteger();
         long current = System.currentTimeMillis();
-        classNodes().stream().filter(classNode -> !classExempted(classNode.name)).forEach(classNode -> {
+        this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
+        this.logStrings.add(LoggerUtils.stdOut("Started hide code transformer"));
+        this.classNodes().stream().filter(classNode -> !this.classExempted(classNode.name)).forEach(classNode -> {
             if (!BytecodeUtils.isSyntheticMethod(classNode.access)) {
                 classNode.access |= ACC_SYNTHETIC;
                 counter.incrementAndGet();
             }
 
-            classNode.methods.stream().filter(methodNode -> !methodExempted(classNode.name + '.' + methodNode.name + methodNode.desc))
+            classNode.methods.stream().filter(methodNode -> !this.methodExempted(classNode.name + '.' + methodNode.name + methodNode.desc))
                     .forEach(methodNode -> {
                 boolean hidOnce = false;
                 if (!BytecodeUtils.isSyntheticMethod(methodNode.access)) {
@@ -66,7 +66,7 @@ public class HideCode extends AbstractTransformer {
                     }
                 });
         });
-        logStrings.add(LoggerUtils.stdOut("Hid " + counter + " members."));
-        logStrings.add(LoggerUtils.stdOut("Finished. [" + tookThisLong(current) + "ms]"));
+        this.logStrings.add(LoggerUtils.stdOut("Hid " + counter + " members."));
+        this.logStrings.add(LoggerUtils.stdOut("Finished. [" + tookThisLong(current) + "ms]"));
     }
 }

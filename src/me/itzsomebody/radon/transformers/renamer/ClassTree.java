@@ -30,9 +30,19 @@ public class ClassTree {
      */
     public Set<String> parentClasses = new HashSet<>();
 
+    /**
+     * Set of methods that this class contains.
+     */
     public Set<MethodNode> methods = new HashSet<>();
+
+    /**
+     * Set of fields that this class contains.
+     */
     public Set<FieldNode> fields = new HashSet<>();
 
+    /**
+     * Indication of this class being a library (external) class.
+     */
     public boolean libraryNode;
 
     /**

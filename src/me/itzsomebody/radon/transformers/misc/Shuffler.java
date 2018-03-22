@@ -16,11 +16,11 @@ public class Shuffler extends AbstractTransformer {
      * Applies obfuscation.
      */
     public void obfuscate() {
-        logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
-        logStrings.add(LoggerUtils.stdOut("Starting shuffle transformer"));
         AtomicInteger counter = new AtomicInteger();
         long current = System.currentTimeMillis();
-        classNodes().stream().filter(classNode -> !classExempted(classNode.name)).forEach(classNode -> {
+        this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
+        this.logStrings.add(LoggerUtils.stdOut("Started shuffle transformer"));
+        this.classNodes().stream().filter(classNode -> !this.classExempted(classNode.name)).forEach(classNode -> {
             Collections.shuffle(classNode.methods);
             counter.addAndGet(classNode.methods.size());
             if (classNode.fields != null) {
@@ -28,7 +28,7 @@ public class Shuffler extends AbstractTransformer {
                 counter.addAndGet(classNode.fields.size());
             }
         });
-        logStrings.add(LoggerUtils.stdOut("Shuffled " + counter + " members."));
-        logStrings.add(LoggerUtils.stdOut("Finished. [" + tookThisLong(current) + "ms]"));
+        this.logStrings.add(LoggerUtils.stdOut("Shuffled " + counter + " members."));
+        this.logStrings.add(LoggerUtils.stdOut("Finished. [" + tookThisLong(current) + "ms]"));
     }
 }

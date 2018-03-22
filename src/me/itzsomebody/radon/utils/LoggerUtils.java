@@ -7,6 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Utils to print fancy stuff in the console and to write log file.
@@ -24,7 +25,7 @@ public class LoggerUtils {
      *
      * @param strings {@link String}s to write to log file.
      */
-    public static void logWriter(ArrayList<String> strings) {
+    public static void logWriter(List<String> strings) {
         String date = FORMAT.format(new Date(System.currentTimeMillis()));
         BufferedWriter bw;
         try {

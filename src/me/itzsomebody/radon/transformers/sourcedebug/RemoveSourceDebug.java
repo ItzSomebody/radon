@@ -17,15 +17,15 @@ public class RemoveSourceDebug extends AbstractTransformer {
      * Applies obfuscation.
      */
     public void obfuscate() {
-        logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
-        logStrings.add(LoggerUtils.stdOut("Starting source debug removal transformer"));
         AtomicInteger counter = new AtomicInteger();
         long current = System.currentTimeMillis();
-        classNodes().stream().filter(classNode -> !classExempted(classNode.name) && classNode.sourceDebug != null).forEach(classNode -> {
+        this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
+        this.logStrings.add(LoggerUtils.stdOut("Started source debug removal transformer"));
+        this.classNodes().stream().filter(classNode -> !this.classExempted(classNode.name) && classNode.sourceDebug != null).forEach(classNode -> {
             classNode.sourceDebug = null;
             counter.incrementAndGet();
         });
-        logStrings.add(LoggerUtils.stdOut("Removed " + counter + " source debug attributes."));
-        logStrings.add(LoggerUtils.stdOut("Finished. [" + tookThisLong(current) + "ms]"));
+        this.logStrings.add(LoggerUtils.stdOut("Removed " + counter + " source debug attributes."));
+        this.logStrings.add(LoggerUtils.stdOut("Finished. [" + tookThisLong(current) + "ms]"));
     }
 }

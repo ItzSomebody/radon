@@ -23,14 +23,20 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Licel (transformer based on IndyProtector)
  */
 public class NormalInvokeDynamic extends AbstractTransformer {
+    /*
+     * Magic numbers
+     */
+    private int VIRTUAL_INVOCATION = 1;
+    private int STATIC_INVOCATION = 0;
+
     /**
      * Applies obfuscation.
      */
     public void obfuscate() {
-        logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
-        logStrings.add(LoggerUtils.stdOut("Starting normal invokedynamic transformer"));
         AtomicInteger counter = new AtomicInteger();
         long current = System.currentTimeMillis();
+        this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
+        this.logStrings.add(LoggerUtils.stdOut("Started normal invokedynamic transformer"));
         String[] bsmPath = new String[]{StringUtils.randomClass(classNames()), StringUtils.crazyString()};
         Handle bsmHandle = new Handle(Opcodes.H_INVOKESTATIC,
                 bsmPath[0],
@@ -38,11 +44,11 @@ public class NormalInvokeDynamic extends AbstractTransformer {
                 "(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
                 false);
 
-        classNodes().stream().filter(classNode -> !classExempted(classNode.name) && classNode.version >= 51).forEach(classNode -> {
-            classNode.methods.stream().filter(methodNode -> !methodExempted(classNode.name + '.' + methodNode.name + methodNode.desc)
+        this.classNodes().stream().filter(classNode -> !this.classExempted(classNode.name) && classNode.version >= 51).forEach(classNode -> {
+            classNode.methods.stream().filter(methodNode -> !this.methodExempted(classNode.name + '.' + methodNode.name + methodNode.desc)
                     && !BytecodeUtils.isAbstractMethod(methodNode.access)).forEach(methodNode -> {
                 for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
-                    if (methodSize(methodNode) > 60000) break;
+                    if (this.methodSize(methodNode) > 60000) break;
                     if (insn instanceof MethodInsnNode
                             && insn.getOpcode() != INVOKESPECIAL) {
                         MethodInsnNode methodInsnNode = (MethodInsnNode) insn;
@@ -56,7 +62,7 @@ public class NormalInvokeDynamic extends AbstractTransformer {
                         }
 
                         newSig = Type.getMethodDescriptor(origReturnType, args);
-                        int opcode = (isStatic) ? 0 : 1;
+                        int opcode = (isStatic) ? this.STATIC_INVOCATION : this.VIRTUAL_INVOCATION;
 
                         methodNode.instructions.set(insn, new InvokeDynamicInsnNode(StringUtils.crazyString(),
                                 newSig,
@@ -71,12 +77,12 @@ public class NormalInvokeDynamic extends AbstractTransformer {
             });
         });
 
-        classNodes().stream().filter(classNode -> classNode.name.equals(bsmPath[0])).forEach(classNode -> {
+        this.classNodes().stream().filter(classNode -> classNode.name.equals(bsmPath[0])).forEach(classNode -> {
             classNode.methods.add(InvokeDynamicBSM.normalBSM(bsmPath[1], classNode.name));
             classNode.access = BytecodeUtils.accessFixer(classNode.access);
         });
-        logStrings.add(LoggerUtils.stdOut("Replaced " + counter + " method invocations with invokedynamics."));
-        logStrings.add(LoggerUtils.stdOut("Finished. [" + tookThisLong(current) + "ms]"));
+        this.logStrings.add(LoggerUtils.stdOut("Replaced " + counter + " method invocations with invokedynamics."));
+        this.logStrings.add(LoggerUtils.stdOut("Finished. [" + tookThisLong(current) + "ms]"));
     }
 
     /**

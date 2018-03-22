@@ -33,13 +33,13 @@ public class HeavyStringEncryption extends AbstractTransformer {
      * Applies obfuscation.
      */
     public void obfuscate() {
-        logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
-        logStrings.add(LoggerUtils.stdOut("Starting heavy string encryption transformer"));
         AtomicInteger counter = new AtomicInteger();
         long current = System.currentTimeMillis();
+        this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
+        this.logStrings.add(LoggerUtils.stdOut("Started heavy string encryption transformer"));
         String[] decryptorPath = new String[]{StringUtils.randomClass(classNames()), StringUtils.crazyString()};
-        classNodes().stream().filter(classNode -> !classExempted(classNode.name)).forEach(classNode -> {
-            classNode.methods.stream().filter(methodNode -> !methodExempted(classNode.name + '.' + methodNode.name + methodNode.desc)
+        this.classNodes().stream().filter(classNode -> !this.classExempted(classNode.name)).forEach(classNode -> {
+            classNode.methods.stream().filter(methodNode -> !this.methodExempted(classNode.name + '.' + methodNode.name + methodNode.desc)
                     && !BytecodeUtils.isAbstractMethod(methodNode.access)).forEach(methodNode -> {
                 for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
                     if (methodSize(methodNode) > 60000) break;
@@ -47,15 +47,15 @@ public class HeavyStringEncryption extends AbstractTransformer {
                         Object cst = ((LdcInsnNode) insn).cst;
 
                         if (cst instanceof String) {
-                            if (spigotMode &&
+                            if (this.spigotMode &&
                                     ((String) cst).contains("%%__USER__%%")
                                     || ((String) cst).contains("%%__RESOURCE__%%")
                                     || ((String) cst).contains("%%__NONCE__%%")) continue;
 
-                            String junkLDC = StringUtils.crazyString();
-                            ((LdcInsnNode) insn).cst = StringUtils.heavyEncrypt(((String) ((LdcInsnNode) insn).cst), junkLDC, decryptorPath[0].replace("/", "."), decryptorPath[1]);
+                            String keyLdc = StringUtils.crazyString();
+                            ((LdcInsnNode) insn).cst = StringUtils.heavyEncrypt(((String) ((LdcInsnNode) insn).cst), keyLdc, decryptorPath[0].replace("/", "."), decryptorPath[1]);
                             methodNode.instructions.insert(insn, new MethodInsnNode(Opcodes.INVOKESTATIC, decryptorPath[0], decryptorPath[1], "(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/String;", false));
-                            methodNode.instructions.insert(insn, new LdcInsnNode(junkLDC));
+                            methodNode.instructions.insert(insn, new LdcInsnNode(keyLdc));
                             methodNode.instructions.insert(insn, new InsnNode(ACONST_NULL));
                             counter.incrementAndGet();
                         }
@@ -64,7 +64,7 @@ public class HeavyStringEncryption extends AbstractTransformer {
             });
         });
 
-        classNodes().stream().filter(classNode -> classNode.name.equals(decryptorPath[0])).forEach(classNode -> {
+        this.classNodes().stream().filter(classNode -> classNode.name.equals(decryptorPath[0])).forEach(classNode -> {
             classNode.methods.add(StringEncryption.heavyMethod(decryptorPath[1]));
             classNode.access = BytecodeUtils.accessFixer(classNode.access);
         });

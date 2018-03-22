@@ -98,15 +98,15 @@ public class GUI {
         } catch (Exception exception) {
             // exception.printStackTrace();
         }
-        frmRadonObfuscator = new JFrame();
-        frmRadonObfuscator.setTitle(Radon.PREFIX + " " + Radon.VERSION);
-        frmRadonObfuscator.setBounds(100, 100, 440, 570);
-        frmRadonObfuscator.setResizable(false);
-        frmRadonObfuscator.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        frmRadonObfuscator.getContentPane().setLayout(new BorderLayout(0, 0));
+        this.frmRadonObfuscator = new JFrame();
+        this.frmRadonObfuscator.setTitle(Radon.PREFIX + " " + Radon.VERSION);
+        this.frmRadonObfuscator.setBounds(100, 100, 440, 570);
+        this.frmRadonObfuscator.setResizable(false);
+        this.frmRadonObfuscator.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        this.frmRadonObfuscator.getContentPane().setLayout(new BorderLayout(0, 0));
 
         JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-        frmRadonObfuscator.getContentPane().add(tabbedPane);
+        this.frmRadonObfuscator.getContentPane().add(tabbedPane);
 
         JPanel panel_4 = new JPanel();
         tabbedPane.addTab("Input-Output", null, panel_4, null);
@@ -125,15 +125,15 @@ public class GUI {
         gbc_lblInput.gridy = 1;
         panel_4.add(lblInput, gbc_lblInput);
 
-        inputField = new JTextField();
+        this.inputField = new JTextField();
         GridBagConstraints gbc_textField_1 = new GridBagConstraints();
         gbc_textField_1.gridwidth = 9;
         gbc_textField_1.insets = new Insets(0, 0, 5, 5);
         gbc_textField_1.fill = GridBagConstraints.HORIZONTAL;
         gbc_textField_1.gridx = 2;
         gbc_textField_1.gridy = 1;
-        panel_4.add(inputField, gbc_textField_1);
-        inputField.setColumns(10);
+        panel_4.add(this.inputField, gbc_textField_1);
+        this.inputField.setColumns(10);
 
         JButton btnNewButton = new JButton("Select");
         GridBagConstraints gbc_btnNewButton = new GridBagConstraints();
@@ -171,15 +171,15 @@ public class GUI {
         gbc_lblOutput.gridy = 2;
         panel_4.add(lblOutput, gbc_lblOutput);
 
-        outputField = new JTextField();
+        this.outputField = new JTextField();
         GridBagConstraints gbc_textField_2 = new GridBagConstraints();
         gbc_textField_2.gridwidth = 9;
         gbc_textField_2.insets = new Insets(0, 0, 5, 5);
         gbc_textField_2.fill = GridBagConstraints.HORIZONTAL;
         gbc_textField_2.gridx = 2;
         gbc_textField_2.gridy = 2;
-        panel_4.add(outputField, gbc_textField_2);
-        outputField.setColumns(10);
+        panel_4.add(this.outputField, gbc_textField_2);
+        this.outputField.setColumns(10);
 
         JButton btnNewButton_1 = new JButton("Select");
         GridBagConstraints gbc_btnNewButton_1 = new GridBagConstraints();
@@ -444,17 +444,17 @@ public class GUI {
         });
         panel.add(chckbxLocalVariables, gbc_chckbxNewCheckBox_2);
 
-        trashChanceField = new JTextField();
-        trashChanceField.setToolTipText("Number of trash classes to generate");
-        trashChanceField.setEditable(false);
-        trashChanceField.setText("50");
+        this.trashChanceField = new JTextField();
+        this.trashChanceField.setToolTipText("Number of trash classes to generate");
+        this.trashChanceField.setEditable(false);
+        this.trashChanceField.setText("50");
         GridBagConstraints gbc_textField = new GridBagConstraints();
         gbc_textField.fill = GridBagConstraints.HORIZONTAL;
         gbc_textField.insets = new Insets(0, 0, 5, 5);
         gbc_textField.gridx = 9;
         gbc_textField.gridy = 4;
-        panel.add(trashChanceField, gbc_textField);
-        trashChanceField.setColumns(3);
+        panel.add(this.trashChanceField, gbc_textField);
+        this.trashChanceField.setColumns(3);
 
         JCheckBox chckbxTrashClasses = new JCheckBox("Trash Classes");
         GridBagConstraints gbc_chckbxNewCheckBox_3 = new GridBagConstraints();
@@ -656,16 +656,16 @@ public class GUI {
         gbc_lblNewLabel_1.gridy = 2;
         panel_2.add(lblNewLabel_1, gbc_lblNewLabel_1);
 
-        waterMarkMessageField = new JTextField();
-        waterMarkMessageField.setEnabled(false);
+        this.waterMarkMessageField = new JTextField();
+        this.waterMarkMessageField.setEnabled(false);
         GridBagConstraints gbc_textField_4 = new GridBagConstraints();
         gbc_textField_4.gridwidth = 11;
         gbc_textField_4.insets = new Insets(0, 0, 5, 5);
         gbc_textField_4.fill = GridBagConstraints.HORIZONTAL;
         gbc_textField_4.gridx = 1;
         gbc_textField_4.gridy = 2;
-        panel_2.add(waterMarkMessageField, gbc_textField_4);
-        waterMarkMessageField.setColumns(10);
+        panel_2.add(this.waterMarkMessageField, gbc_textField_4);
+        this.waterMarkMessageField.setColumns(10);
 
         JLabel lblNewLabel_2 = new JLabel("Key:");
         GridBagConstraints gbc_lblNewLabel_2 = new GridBagConstraints();
@@ -675,15 +675,15 @@ public class GUI {
         gbc_lblNewLabel_2.gridy = 3;
         panel_2.add(lblNewLabel_2, gbc_lblNewLabel_2);
 
-        watermarkPassword = new JPasswordField();
-        watermarkPassword.setEnabled(false);
+        this.watermarkPassword = new JPasswordField();
+        this.watermarkPassword.setEnabled(false);
         GridBagConstraints gbc_passwordField = new GridBagConstraints();
         gbc_passwordField.gridwidth = 11;
         gbc_passwordField.insets = new Insets(0, 0, 5, 5);
         gbc_passwordField.fill = GridBagConstraints.HORIZONTAL;
         gbc_passwordField.gridx = 1;
         gbc_passwordField.gridy = 3;
-        panel_2.add(watermarkPassword, gbc_passwordField);
+        panel_2.add(this.watermarkPassword, gbc_passwordField);
 
         JLabel lblNewLabel_3 = new JLabel("Embed Type:");
         GridBagConstraints gbc_lblNewLabel_3 = new GridBagConstraints();
@@ -755,15 +755,15 @@ public class GUI {
         gbc_lblNewLabel_4.gridy = 8;
         panel_2.add(lblNewLabel_4, gbc_lblNewLabel_4);
 
-        extractorInput = new JTextField();
+        this.extractorInput = new JTextField();
         GridBagConstraints gbc_textField_5 = new GridBagConstraints();
         gbc_textField_5.gridwidth = 10;
         gbc_textField_5.insets = new Insets(0, 0, 5, 5);
         gbc_textField_5.fill = GridBagConstraints.HORIZONTAL;
         gbc_textField_5.gridx = 1;
         gbc_textField_5.gridy = 8;
-        panel_2.add(extractorInput, gbc_textField_5);
-        extractorInput.setColumns(10);
+        panel_2.add(this.extractorInput, gbc_textField_5);
+        this.extractorInput.setColumns(10);
 
         JButton btnNewButton_4 = new JButton("Select");
         btnNewButton_4.addActionListener(new ActionListener() {
@@ -800,14 +800,14 @@ public class GUI {
         gbc_lblNewLabel_5.gridy = 9;
         panel_2.add(lblNewLabel_5, gbc_lblNewLabel_5);
 
-        extractorKey = new JPasswordField();
+        this.extractorKey = new JPasswordField();
         GridBagConstraints gbc_passwordField_1 = new GridBagConstraints();
         gbc_passwordField_1.gridwidth = 10;
         gbc_passwordField_1.insets = new Insets(0, 0, 5, 5);
         gbc_passwordField_1.fill = GridBagConstraints.HORIZONTAL;
         gbc_passwordField_1.gridx = 1;
         gbc_passwordField_1.gridy = 9;
-        panel_2.add(extractorKey, gbc_passwordField_1);
+        panel_2.add(this.extractorKey, gbc_passwordField_1);
 
         DefaultListModel<String> listModel = new DefaultListModel<String>();
 
@@ -882,16 +882,16 @@ public class GUI {
         gbc_expireMessageLabel.gridy = 2;
         expirePanel.add(expireMessageLabel, gbc_expireMessageLabel);
 
-        expirationMessageField = new JTextField();
-        expirationMessageField.setEnabled(false);
+        this.expirationMessageField = new JTextField();
+        this.expirationMessageField.setEnabled(false);
         GridBagConstraints gbc_messageField = new GridBagConstraints();
         gbc_messageField.gridwidth = 11;
         gbc_messageField.insets = new Insets(0, 0, 5, 5);
         gbc_messageField.fill = GridBagConstraints.HORIZONTAL;
         gbc_messageField.gridx = 1;
         gbc_messageField.gridy = 2;
-        expirePanel.add(expirationMessageField, gbc_messageField);
-        expirationMessageField.setColumns(10);
+        expirePanel.add(this.expirationMessageField, gbc_messageField);
+        this.expirationMessageField.setColumns(10);
 
         JLabel expiresLabel = new JLabel("Expires:");
         GridBagConstraints gbc_expiresLabel = new GridBagConstraints();
@@ -901,15 +901,15 @@ public class GUI {
         gbc_expiresLabel.gridy = 3;
         expirePanel.add(expiresLabel, gbc_expiresLabel);
 
-        expirationDateField = new JTextField();
-        expirationDateField.setEnabled(false);
+        this.expirationDateField = new JTextField();
+        this.expirationDateField.setEnabled(false);
         GridBagConstraints gbc_dateField = new GridBagConstraints();
         gbc_dateField.gridwidth = 11;
         gbc_dateField.insets = new Insets(0, 0, 5, 5);
         gbc_dateField.fill = GridBagConstraints.HORIZONTAL;
         gbc_dateField.gridx = 1;
         gbc_dateField.gridy = 3;
-        expirePanel.add(expirationDateField, gbc_dateField);
+        expirePanel.add(this.expirationDateField, gbc_dateField);
 
         JCheckBox chckbxAddExpiration = new JCheckBox("Expiration");
         GridBagConstraints gbc_AddExpiration = new GridBagConstraints();
@@ -979,15 +979,15 @@ public class GUI {
         scrollPane_1.setViewportView(list);
         panel_3.add(comboBox_04, gbc_comboBox_04);
 
-        exemptField = new JTextField();
+        this.exemptField = new JTextField();
         GridBagConstraints gbc_textField_3 = new GridBagConstraints();
         gbc_textField_3.gridwidth = 8;
         gbc_textField_3.insets = new Insets(0, 0, 5, 5);
         gbc_textField_3.fill = GridBagConstraints.HORIZONTAL;
         gbc_textField_3.gridx = 2;
         gbc_textField_3.gridy = 12;
-        panel_3.add(exemptField, gbc_textField_3);
-        exemptField.setColumns(10);
+        panel_3.add(this.exemptField, gbc_textField_3);
+        this.exemptField.setColumns(10);
 
         JButton btnNewButton_2 = new JButton("Add");
         btnNewButton_2.addActionListener(new ActionListener() {
@@ -1054,7 +1054,7 @@ public class GUI {
         panel_7.add(txtrPizzaObfuscatorAuthors, gbc_txtrPizzaObfuscatorAuthors);
 
         JPanel panel_1 = new JPanel();
-        frmRadonObfuscator.getContentPane().add(panel_1, BorderLayout.SOUTH);
+        this.frmRadonObfuscator.getContentPane().add(panel_1, BorderLayout.SOUTH);
         panel_1.setLayout(new BorderLayout(0, 0));
 
         JPanel panel_5 = new JPanel();
@@ -1552,6 +1552,6 @@ public class GUI {
         });
         btnLoadConfiguration.setToolTipText("Loads config for pre-defined settings.");
         panel_6.add(btnLoadConfiguration);
-        frmRadonObfuscator.setVisible(true);
+        this.frmRadonObfuscator.setVisible(true);
     }
 }

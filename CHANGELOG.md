@@ -1,3 +1,12 @@
+## 0.4.0
+
+* Completely changed the normal flow obfuscation transformer so that it doesn't have anymore skidded code (lol).
+* Added the StackAnaylzer which doesn't work very well at the moment.
+
+## 0.3.9
+
+* Some internal changes, nothing new.
+
 ## 0.3.8
 
 * Added super light string encryption setting to GUI.

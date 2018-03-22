@@ -17,15 +17,15 @@ public class RemoveSourceName extends AbstractTransformer {
      * Applies obfuscation to.
      */
     public void obfuscate() {
-        logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
-        logStrings.add(LoggerUtils.stdOut("Starting source name removal transformer"));
         AtomicInteger counter = new AtomicInteger();
         long current = System.currentTimeMillis();
-        classNodes().stream().filter(classNode -> !classExempted(classNode.name) && classNode.sourceFile != null).forEach(classNode -> {
+        this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
+        this.logStrings.add(LoggerUtils.stdOut("Started source name removal transformer"));
+        this.classNodes().stream().filter(classNode -> !this.classExempted(classNode.name) && classNode.sourceFile != null).forEach(classNode -> {
             classNode.sourceFile = null;
             counter.incrementAndGet();
         });
-        logStrings.add(LoggerUtils.stdOut("Removed " + counter + " source name attributes."));
-        logStrings.add(LoggerUtils.stdOut("Finished. [" + tookThisLong(current) + "ms]"));
+        this.logStrings.add(LoggerUtils.stdOut("Removed " + counter + " source name attributes."));
+        this.logStrings.add(LoggerUtils.stdOut("Finished. [" + tookThisLong(current) + "ms]"));
     }
 }

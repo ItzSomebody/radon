@@ -32,14 +32,14 @@ public class StringPool extends AbstractTransformer {
      * Applies obfuscation.
      */
     public void obfuscate() {
-        logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
-        logStrings.add(LoggerUtils.stdOut("Starting string pool transformer."));
-        long current = System.currentTimeMillis();
         AtomicInteger counter = new AtomicInteger();
-        randName = StringUtils.crazyString();
-        classNodes().stream().filter(classNode -> !classExempted(classNode.name)).forEach(classNode -> {
+        long current = System.currentTimeMillis();
+        this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
+        this.logStrings.add(LoggerUtils.stdOut("Started string pool transformer."));
+        this.randName = StringUtils.crazyString();
+        this.classNodes().stream().filter(classNode -> !this.classExempted(classNode.name)).forEach(classNode -> {
             List<String> stringslist = new ArrayList<>();
-            classNode.methods.stream().filter(methodNode -> !methodExempted(classNode.name + '.' + methodNode.name + methodNode.desc)
+            classNode.methods.stream().filter(methodNode -> !this.methodExempted(classNode.name + '.' + methodNode.name + methodNode.desc)
                     && !BytecodeUtils.isAbstractMethod(methodNode.access)).forEach(methodNode -> {
                 for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
                     if (insn instanceof LdcInsnNode) {
@@ -58,15 +58,15 @@ public class StringPool extends AbstractTransformer {
                 }
             });
             if (stringslist.size() != 0) {
-                strings = new String[stringslist.size()];
+                this.strings = new String[stringslist.size()];
                 for (int i = 0; i < stringslist.size(); i++) {
-                    strings[i] = stringslist.get(i);
+                    this.strings[i] = stringslist.get(i);
                 }
                 classNode.methods.add(stringPool());
             }
         });
-        logStrings.add(LoggerUtils.stdOut("Pooled  " + counter + " strings."));
-        logStrings.add(LoggerUtils.stdOut("Finished. [" + tookThisLong(current) + "ms]"));
+        this.logStrings.add(LoggerUtils.stdOut("Pooled  " + counter + " strings."));
+        this.logStrings.add(LoggerUtils.stdOut("Finished. [" + tookThisLong(current) + "ms]"));
     }
 
     /**
@@ -81,20 +81,20 @@ public class StringPool extends AbstractTransformer {
 
         Label l0 = new Label();
         method.visitLabel(l0);
-        int numberOfStrings = strings.length;
+        int numberOfStrings = this.strings.length;
         if (numberOfStrings <= 5) {
             method.visitInsn(numberOfStrings + 3);
         } else if (numberOfStrings <= 127) {
-            method.visitIntInsn(BIPUSH, strings.length);
+            method.visitIntInsn(BIPUSH, this.strings.length);
         } else if (numberOfStrings <= 32767) {
-            method.visitIntInsn(SIPUSH, strings.length);
+            method.visitIntInsn(SIPUSH, this.strings.length);
         } else {
-            method.visitLdcInsn(strings.length);
+            method.visitLdcInsn(this.strings.length);
         }
 
         method.visitTypeInsn(ANEWARRAY, "java/lang/String");
 
-        for (int i = 0; i < strings.length; i++) {
+        for (int i = 0; i < this.strings.length; i++) {
             method.visitInsn(DUP);
 
             if (i <= 5) {
@@ -107,7 +107,7 @@ public class StringPool extends AbstractTransformer {
                 method.visitLdcInsn(i);
             }
 
-            method.visitLdcInsn(strings[i]);
+            method.visitLdcInsn(this.strings[i]);
             method.visitInsn(AASTORE);
         }
         method.visitVarInsn(ASTORE, 1);

@@ -46,49 +46,50 @@ public class Renamer extends AbstractTransformer {
      * Applies obfuscation.
      */
     public void obfuscate() {
-        logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
-        logStrings.add(LoggerUtils.stdOut("Generating mappings."));
-        createTrees();
+        this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
+        this.logStrings.add(LoggerUtils.stdOut("Starting renamer transformer"));
+        this.logStrings.add(LoggerUtils.stdOut("Generating mappings."));
+        this.createTrees();
         long current = System.currentTimeMillis();
         AtomicInteger counter = new AtomicInteger();
-        classNodes().forEach(classNode -> {
+        this.classNodes().forEach(classNode -> {
             classNode.methods.stream().filter(methodNode -> !BytecodeUtils.isNativeMethod(methodNode.access)
                     && !methodNode.name.equals("main")
                     && !methodNode.name.equals("premain")
                     && !methodNode.name.startsWith("<")
                     && !methodNode.name.contains("lambda")).forEach(methodNode -> {
-                if (weCanRenameMethod(methodNode)) {
+                if (this.weCanRenameMethod(methodNode)) {
                     String newName = StringUtils.crazyString();
-                    renameMethodTree(new ArrayList<>(), methodNode, classNode.name, newName);
+                    this.renameMethodTree(new ArrayList<>(), methodNode, classNode.name, newName);
                 }
             });
 
             classNode.fields.forEach(fieldNode -> {
-                if (weCanRenameField(fieldNode)) {
+                if (this.weCanRenameField(fieldNode)) {
                     String newName = StringUtils.crazyString();
-                    renameFieldTree(new ArrayList<>(), fieldNode, classNode.name, newName);
+                    this.renameFieldTree(new ArrayList<>(), fieldNode, classNode.name, newName);
                 }
             });
 
-            if (!classExempted(classNode.name)
-                    && !BytecodeUtils.isMain(classNode, spigotMode)) {
+            if (!this.classExempted(classNode.name)
+                    && !BytecodeUtils.isMain(classNode, this.spigotMode)) {
                 int packages = NumberUtils.getRandomInt(2) + 1;
                 String newName = "";
                 for (int i = 0; i < packages; i++) {
                     newName += StringUtils.crazyString() + '/';
                 }
 
-                mappings.put(classNode.name, newName.substring(0, newName.length() - 1));
+                this.mappings.put(classNode.name, newName.substring(0, newName.length() - 1));
                 counter.incrementAndGet();
             }
         });
-        logStrings.add(LoggerUtils.stdOut("Finished generated mappings. [" + String.valueOf(System.currentTimeMillis() - current) + "ms]"));
-        logStrings.add(LoggerUtils.stdOut("Applying mappings."));
+        this.logStrings.add(LoggerUtils.stdOut("Finished generated mappings. [" + String.valueOf(System.currentTimeMillis() - current) + "ms]"));
+        this.logStrings.add(LoggerUtils.stdOut("Applying mappings."));
         current = System.currentTimeMillis();
 
         // Apply mapping
-        Remapper simpleRemapper = new SimpleRemapper(mappings);
-        for (ClassNode classNode : new ArrayList<>(classNodes())) {
+        Remapper simpleRemapper = new SimpleRemapper(this.mappings);
+        for (ClassNode classNode : new ArrayList<>(this.classNodes())) {
             ClassNode copy = new ClassNode();
             classNode.accept(new ClassRemapper(copy, simpleRemapper));
             copy.access = BytecodeUtils.accessFixer(copy.access);
@@ -102,22 +103,22 @@ public class Renamer extends AbstractTransformer {
                 }
             }
 
-            getClassMap().remove(classNode.name);
-            getClassPathMap().put(copy.name, copy);
-            getClassMap().put(copy.name, copy);
+            this.getClassMap().remove(classNode.name);
+            this.getClassPathMap().put(copy.name, copy);
+            this.getClassMap().put(copy.name, copy);
         }
 
-        logStrings.add(LoggerUtils.stdOut("Mapped " + counter + " members."));
-        logStrings.add(LoggerUtils.stdOut("Finished applying mappings. [" + String.valueOf(System.currentTimeMillis() - current) + "ms]"));
+        this.logStrings.add(LoggerUtils.stdOut("Mapped " + counter + " members."));
+        this.logStrings.add(LoggerUtils.stdOut("Finished applying mappings. [" + String.valueOf(System.currentTimeMillis() - current) + "ms]"));
     }
 
     /**
      * Creates {@link ClassTree}s needed for renaming.
      */
     private void createTrees() {
-        logStrings.add(LoggerUtils.stdOut("Creating class hierarchy."));
         long current = System.currentTimeMillis();
-        getClassPathMap().values().forEach(classNode -> {
+        this.logStrings.add(LoggerUtils.stdOut("Creating class hierarchy."));
+        this.getClassPathMap().values().forEach(classNode -> {
             classNode.methods.forEach(methodNode -> {
                 methodNode.owner = classNode.name;
             });
@@ -127,16 +128,16 @@ public class Renamer extends AbstractTransformer {
             ClassTree classTree = new ClassTree(classNode.name, classNode.libraryNode);
             classTree.parentClasses.add(classNode.superName);
             classTree.parentClasses.addAll(classNode.interfaces);
-            classNodes().stream().filter(node -> node.superName.equals(classNode.name)
+            this.classNodes().stream().filter(node -> node.superName.equals(classNode.name)
                     || node.interfaces.contains(classNode.name)).forEach(node -> {
                 classTree.subClasses.add(node.name);
             });
 
             classTree.methods.addAll(classNode.methods);
             classTree.fields.addAll(classNode.fields);
-            hierarchy.put(classNode.name, classTree);
+            this.hierarchy.put(classNode.name, classTree);
         });
-        logStrings.add(LoggerUtils.stdOut("Finished creating class hierarchy. [" + tookThisLong(current) + "ms]"));
+        this.logStrings.add(LoggerUtils.stdOut("Finished creating class hierarchy. [" + tookThisLong(current) + "ms]"));
     }
 
     /**
@@ -146,12 +147,12 @@ public class Renamer extends AbstractTransformer {
      * @return true if we can rename a method without running into errors.
      */
     private boolean weCanRenameMethod(MethodNode methodNode) {
-        if (methodExempted(methodNode.owner + '.' + methodNode.name + methodNode.desc)) {
+        if (this.methodExempted(methodNode.owner + '.' + methodNode.name + methodNode.desc)) {
             return false;
         }
-        for (ClassTree ct : hierarchy.values()) {
+        for (ClassTree ct : this.hierarchy.values()) {
             if (ct.subClasses.contains(methodNode.owner)
-                    && isLibInheritedMN(methodNode, methodNode.owner)) {
+                    && this.isLibInheritedMN(methodNode, methodNode.owner)) {
                 return false;
             }
         }
@@ -166,7 +167,7 @@ public class Renamer extends AbstractTransformer {
      * @return true if the method we input is inherited from a library class.
      */
     private boolean isLibInheritedMN(MethodNode methodNode, String className) {
-        ClassTree ct = hierarchy.get(className);
+        ClassTree ct = this.hierarchy.get(className);
         if (ct != null) {
             if (!methodNode.owner.equals(className)) {
                 for (MethodNode mn : ct.methods) {
@@ -178,7 +179,7 @@ public class Renamer extends AbstractTransformer {
                 }
             }
             for (String parentClass : ct.parentClasses) {
-                if (isLibInheritedMN(methodNode, parentClass)) {
+                if (this.isLibInheritedMN(methodNode, parentClass)) {
                     return true;
                 }
             }
@@ -196,15 +197,15 @@ public class Renamer extends AbstractTransformer {
      * @param newName    the new name of the method.
      */
     private void renameMethodTree(List<ClassTree> visited, MethodNode methodNode, String className, String newName) {
-        ClassTree ct = hierarchy.get(className);
+        ClassTree ct = this.hierarchy.get(className);
         if (!ct.libraryNode && !visited.contains(ct)) {
             mappings.put(className + '.' + methodNode.name + methodNode.desc, newName);
             visited.add(ct);
             for (String parentClass : ct.parentClasses) {
-                renameMethodTree(visited, methodNode, parentClass, newName);
+                this.renameMethodTree(visited, methodNode, parentClass, newName);
             }
             for (String subClass : ct.subClasses) {
-                renameMethodTree(visited, methodNode, subClass, newName);
+                this.renameMethodTree(visited, methodNode, subClass, newName);
             }
         }
     }
@@ -216,12 +217,12 @@ public class Renamer extends AbstractTransformer {
      * @return true if we can rename a field without running into errors.
      */
     private boolean weCanRenameField(FieldNode fieldNode) {
-        if (methodExempted(fieldNode.owner + '.' + fieldNode.name)) {
+        if (this.methodExempted(fieldNode.owner + '.' + fieldNode.name)) {
             return false;
         }
-        for (ClassTree ct : hierarchy.values()) {
+        for (ClassTree ct : this.hierarchy.values()) {
             if (ct.subClasses.contains(fieldNode.owner)
-                    && isLibInheritedFN(fieldNode, fieldNode.owner)) {
+                    && this.isLibInheritedFN(fieldNode, fieldNode.owner)) {
                 return false;
             }
         }
@@ -232,11 +233,11 @@ public class Renamer extends AbstractTransformer {
      * Attempts to determine if the method we input is inherited from a library class.
      *
      * @param fieldNode {@link FieldNode} we want to check if we can rename without causing the JVM to spit lots of errors.
-     * @param className  the name of the class we want to check
+     * @param className the name of the class we want to check
      * @return true if the method we input is inherited from a library class.
      */
     private boolean isLibInheritedFN(FieldNode fieldNode, String className) {
-        ClassTree ct = hierarchy.get(className);
+        ClassTree ct = this.hierarchy.get(className);
         if (ct != null) {
             if (!fieldNode.owner.equals(className)) {
                 for (MethodNode mn : ct.methods) {
@@ -248,7 +249,7 @@ public class Renamer extends AbstractTransformer {
                 }
             }
             for (String parentClass : ct.parentClasses) {
-                if (isLibInheritedFN(fieldNode, parentClass)) {
+                if (this.isLibInheritedFN(fieldNode, parentClass)) {
                     return true;
                 }
             }
@@ -260,21 +261,21 @@ public class Renamer extends AbstractTransformer {
     /**
      * Renames the methods in an inheritance tree to prevent inheritance errors.
      *
-     * @param visited    a list of {@link ClassTree}s which contain the {@link MethodNode}s we already renamed.
+     * @param visited   a list of {@link ClassTree}s which contain the {@link MethodNode}s we already renamed.
      * @param fieldNode the method information.
-     * @param className  the class we are currently browsing through.
-     * @param newName    the new name of the method.
+     * @param className the class we are currently browsing through.
+     * @param newName   the new name of the method.
      */
     private void renameFieldTree(List<ClassTree> visited, FieldNode fieldNode, String className, String newName) {
-        ClassTree ct = hierarchy.get(className);
+        ClassTree ct = this.hierarchy.get(className);
         if (!ct.libraryNode && !visited.contains(ct)) {
-            mappings.put(className + '.' + fieldNode.name, newName);
+            this.mappings.put(className + '.' + fieldNode.name, newName);
             visited.add(ct);
             for (String parentClass : ct.parentClasses) {
-                renameFieldTree(visited, fieldNode, parentClass, newName);
+                this.renameFieldTree(visited, fieldNode, parentClass, newName);
             }
             for (String subClass : ct.subClasses) {
-                renameFieldTree(visited, fieldNode, subClass, newName);
+                this.renameFieldTree(visited, fieldNode, subClass, newName);
             }
         }
     }

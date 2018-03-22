@@ -289,7 +289,9 @@ public class BytecodeUtils {
                 || rawDesc.equals("C")
                 || rawDesc.equals("S")
                 || rawDesc.equals("J")
-                || rawDesc.equals("Z"));
+                || rawDesc.equals("Z")
+                || rawDesc.equals("F")
+                || rawDesc.equals("D"));
     }
 
     /**
@@ -362,6 +364,6 @@ public class BytecodeUtils {
             } while (!(before instanceof LabelNode) && !(before instanceof LineNumberNode));
         }
 
-        return (before.getOpcode() == Opcodes.IINC);
+        return (before instanceof IincInsnNode);
     }
 }

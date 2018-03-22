@@ -112,7 +112,7 @@ public class Config {
      * Loads the configuration elements into {@link Config#map} using {@link Config#config}.
      */
     public void loadIntoMap() {
-        map = new Yaml().load(config);
+        this.map = new Yaml().load(this.config);
     }
 
     /**
@@ -121,8 +121,8 @@ public class Config {
      * @throws IllegalArgumentException if argument is unrecognized.
      */
     public void checkConfig() throws IllegalArgumentException {
-        for (String key : map.keySet()) {
-            if (!VALIDKEYS.contains(key)) {
+        for (String key : this.map.keySet()) {
+            if (!this.VALIDKEYS.contains(key)) {
                 throw new IllegalArgumentException("Invalid key: " + key);
             }
         }
@@ -135,7 +135,7 @@ public class Config {
      * @throws IllegalArgumentException if input is null or not a {@link String}.
      */
     public File getInput() throws IllegalArgumentException {
-        Object path = map.get("Input");
+        Object path = this.map.get("Input");
         if (path == null) throw new IllegalArgumentException("Input not specified in config!");
         if (!(path instanceof String)) throw new IllegalArgumentException("Input arg must be a string");
 
@@ -149,7 +149,7 @@ public class Config {
      * @throws IllegalArgumentException if output is not specified as a {@link String}.
      */
     public File getOutput() throws IllegalArgumentException {
-        Object path = map.get("Output");
+        Object path = this.map.get("Output");
         if (path == null) {
             return new File(getInput().getName().replace(".jar", "-OBF.jar"));
         } else {
@@ -166,7 +166,7 @@ public class Config {
      */
     public HashMap<String, File> getLibraries() throws IllegalArgumentException {
         HashMap<String, File> libs = new HashMap<>();
-        Object o = map.get("Libraries");
+        Object o = this.map.get("Libraries");
         if (o != null) {
             if (!(o instanceof List)) throw new IllegalArgumentException("Libraries must be represented as list");
             List list = (List) o;
@@ -186,8 +186,8 @@ public class Config {
      * @throws IllegalArgumentException if the exempt element is not a list or each list element is not a {@link String}.
      */
     private void setExempts() throws IllegalArgumentException {
-        exempts = new ArrayList<>();
-        Object o = map.get("Exempts");
+        this.exempts = new ArrayList<>();
+        Object o = this.map.get("Exempts");
         if (o != null) {
             if (!(o instanceof List)) throw new IllegalArgumentException("Exempts must be represented as list");
             List list = (List) o;
@@ -195,7 +195,7 @@ public class Config {
                 if (!(object instanceof String)) throw new IllegalArgumentException("Exemps must be string(s)");
                 String value = (String) object;
 
-                exempts.add(value);
+                this.exempts.add(value);
             }
         }
     }
@@ -205,19 +205,19 @@ public class Config {
      * and {@link Config#fieldExempts}
      */
     public void sortExempts() {
-        setExempts();
-        classExempts = new ArrayList<>();
-        methodExempts = new ArrayList<>();
-        fieldExempts = new ArrayList<>();
+        this.setExempts();
+        this.classExempts = new ArrayList<>();
+        this.methodExempts = new ArrayList<>();
+        this.fieldExempts = new ArrayList<>();
 
-        if (exempts != null) {
-            for (String exempt : exempts) {
+        if (this.exempts != null) {
+            for (String exempt : this.exempts) {
                 if (exempt.endsWith("(METHOD)")) {
-                    methodExempts.add(exempt.replace("(METHOD)", ""));
+                    this.methodExempts.add(exempt.replace("(METHOD)", ""));
                 } else if (exempt.endsWith("(FIELD)")) {
-                    fieldExempts.add(exempt.replace("(FIELD)", ""));
+                    this.fieldExempts.add(exempt.replace("(FIELD)", ""));
                 } else {
-                    classExempts.add(exempt);
+                    this.classExempts.add(exempt);
                 }
             }
         }
@@ -229,7 +229,7 @@ public class Config {
      * @return Returns the exempt element from {@link Config#map} as {@link List}.
      */
     public List<String> getExempts() {
-        return exempts;
+        return this.exempts;
     }
 
     /**
@@ -238,7 +238,7 @@ public class Config {
      * @return Returns the class exempts from {@link Config#exempts} as {@link ArrayList}
      */
     public List<String> getClassExempts() {
-        return classExempts;
+        return this.classExempts;
     }
 
     /**
@@ -247,7 +247,7 @@ public class Config {
      * @return Returns the method exempts from {@link Config#exempts} as {@link ArrayList}.
      */
     public List<String> getMethodExempts() {
-        return methodExempts;
+        return this.methodExempts;
     }
 
     /**
@@ -256,7 +256,7 @@ public class Config {
      * @return Returns the field exempts from {@link Config#exempts} as {@link ArrayList}.
      */
     public List<String> getFieldExempts() {
-        return fieldExempts;
+        return this.fieldExempts;
     }
 
     /**
@@ -266,8 +266,8 @@ public class Config {
      * @throws IllegalArgumentException if value from key is unexpected, null or not a {@link String}
      */
     public AbstractTransformer getStringEncryptionType() throws IllegalArgumentException {
-        if (map.containsKey("StringEncryption")) {
-            Object value = map.get("StringEncryption");
+        if (this.map.containsKey("StringEncryption")) {
+            Object value = this.map.get("StringEncryption");
             if (value != null) {
                 if (!(value instanceof String))
                     throw new IllegalArgumentException("String encryption arg must be a string");
@@ -298,8 +298,8 @@ public class Config {
      * @throws IllegalArgumentException if value from key is unexpected, null or not a {@link String}
      */
     public AbstractTransformer getInvokeDynamicType() throws IllegalArgumentException {
-        if (map.containsKey("InvokeDynamic")) {
-            Object value = map.get("InvokeDynamic");
+        if (this.map.containsKey("InvokeDynamic")) {
+            Object value = this.map.get("InvokeDynamic");
             if (value != null) {
                 if (!(value instanceof String))
                     throw new IllegalArgumentException("InvokeDynamic arg must be a string");
@@ -328,8 +328,8 @@ public class Config {
      * @throws IllegalArgumentException if value from key is unexpected, null or not a {@link String}
      */
     public AbstractTransformer getFlowObfuscationType() throws IllegalArgumentException {
-        if (map.containsKey("FlowObfuscation")) {
-            Object value = map.get("FlowObfuscation");
+        if (this.map.containsKey("FlowObfuscation")) {
+            Object value = this.map.get("FlowObfuscation");
             if (value != null) {
                 if (!(value instanceof String))
                     throw new IllegalArgumentException("Flow obfuscation arg must be a string");
@@ -358,8 +358,8 @@ public class Config {
      * @throws IllegalArgumentException if value from key is unexpected, null or not a {@link String}
      */
     public AbstractTransformer getLocalVariableObfuscationType() throws IllegalArgumentException {
-        if (map.containsKey("LocalVariableObfuscation")) {
-            Object value = map.get("LocalVariableObfuscation");
+        if (this.map.containsKey("LocalVariableObfuscation")) {
+            Object value = this.map.get("LocalVariableObfuscation");
             if (value != null) {
                 if (!(value instanceof String))
                     throw new IllegalArgumentException("Local variable obfuscation arg must be a string");
@@ -386,8 +386,8 @@ public class Config {
      * @throws IllegalArgumentException if value from key is unexpected, null or not a {@link String}
      */
     public AbstractTransformer getLineNumberObfuscationType() throws IllegalArgumentException {
-        if (map.containsKey("LineNumberObfuscation")) {
-            Object value = map.get("LineNumberObfuscation");
+        if (this.map.containsKey("LineNumberObfuscation")) {
+            Object value = this.map.get("LineNumberObfuscation");
             if (value != null) {
                 if (!(value instanceof String))
                     throw new IllegalArgumentException("Line number obfuscation arg must be a string");
@@ -414,8 +414,8 @@ public class Config {
      * @throws IllegalArgumentException if value from key is unexpected, null or not a {@link String}
      */
     public AbstractTransformer getSourceNameObfuscationType() throws IllegalArgumentException {
-        if (map.containsKey("SourceNameObfuscation")) {
-            Object value = map.get("SourceNameObfuscation");
+        if (this.map.containsKey("SourceNameObfuscation")) {
+            Object value = this.map.get("SourceNameObfuscation");
             if (value != null) {
                 if (!(value instanceof String))
                     throw new IllegalArgumentException("Source name obfuscation arg must be a string");
@@ -442,8 +442,8 @@ public class Config {
      * @throws IllegalArgumentException if value from key is unexpected, null or not a {@link String}
      */
     public AbstractTransformer getSourceDebugObfuscationType() throws IllegalArgumentException {
-        if (map.containsKey("SourceDebugObfuscation")) {
-            Object value = map.get("SourceDebugObfuscation");
+        if (this.map.containsKey("SourceDebugObfuscation")) {
+            Object value = this.map.get("SourceDebugObfuscation");
             if (value != null) {
                 if (!(value instanceof String))
                     throw new IllegalArgumentException("Source debug obfuscation arg must be a string");
@@ -470,8 +470,8 @@ public class Config {
      * @throws IllegalArgumentException if value from key is null or not a {@link Boolean}
      */
     public AbstractTransformer getShufflerType() throws IllegalArgumentException {
-        if (map.containsKey("Shuffler")) {
-            Object value = map.get("Shuffler");
+        if (this.map.containsKey("Shuffler")) {
+            Object value = this.map.get("Shuffler");
             if (value != null) {
                 if (!(value instanceof Boolean)) throw new IllegalArgumentException("Shuffler arg must be true/false");
                 boolean s = (Boolean) value;
@@ -493,8 +493,8 @@ public class Config {
      * @throws IllegalArgumentException if value from key is null or not a {@link Boolean}
      */
     public AbstractTransformer getInnerClassRemoverType() throws IllegalArgumentException {
-        if (map.containsKey("InnerClassRemover")) {
-            Object value = map.get("InnerClassRemover");
+        if (this.map.containsKey("InnerClassRemover")) {
+            Object value = this.map.get("InnerClassRemover");
             if (value != null) {
                 if (!(value instanceof Boolean))
                     throw new IllegalArgumentException("InnerClassRemover arg must be true/false");
@@ -517,8 +517,8 @@ public class Config {
      * @throws IllegalArgumentException if value from key is null or not a {@link Boolean}
      */
     public AbstractTransformer getCrasherType() throws IllegalArgumentException {
-        if (map.containsKey("Crasher")) {
-            Object value = map.get("Crasher");
+        if (this.map.containsKey("Crasher")) {
+            Object value = this.map.get("Crasher");
             if (value != null) {
                 if (!(value instanceof Boolean)) throw new IllegalArgumentException("Crasher arg must be true/false");
                 boolean s = (Boolean) value;
@@ -540,8 +540,8 @@ public class Config {
      * @throws IllegalArgumentException if value from key is null or not a {@link Boolean}
      */
     public AbstractTransformer getHideCodeType() throws IllegalArgumentException {
-        if (map.containsKey("HideCode")) {
-            Object value = map.get("HideCode");
+        if (this.map.containsKey("HideCode")) {
+            Object value = this.map.get("HideCode");
             if (value != null) {
                 if (!(value instanceof Boolean)) throw new IllegalArgumentException("HideCode arg must be true/false");
                 boolean s = (Boolean) value;
@@ -563,8 +563,8 @@ public class Config {
      * @throws IllegalArgumentException if value from key is null or not a {@link Integer}
      */
     public int getTrashClasses() throws IllegalArgumentException {
-        if (map.containsKey("TrashClasses")) {
-            Object value = map.get("TrashClasses");
+        if (this.map.containsKey("TrashClasses")) {
+            Object value = this.map.get("TrashClasses");
             if (value != null) {
                 if (!(value instanceof Integer))
                     throw new IllegalArgumentException("TrashClasses arg must be an Integer");
@@ -585,8 +585,8 @@ public class Config {
      * @throws IllegalArgumentException if value from key is null or not a {@link String}
      */
     public String getWatermarkMsg() throws IllegalArgumentException {
-        if (map.containsKey("WatermarkMessage")) {
-            Object value = map.get("WatermarkMessage");
+        if (this.map.containsKey("WatermarkMessage")) {
+            Object value = this.map.get("WatermarkMessage");
             if (value != null) {
                 return value.toString();
             } else {
@@ -604,8 +604,8 @@ public class Config {
      * @throws IllegalArgumentException if value from key is unexpected, null or not a {@link String}
      */
     public int getWatermarkType() throws IllegalArgumentException {
-        if (map.containsKey("WatermarkType")) {
-            Object value = map.get("WatermarkType");
+        if (this.map.containsKey("WatermarkType")) {
+            Object value = this.map.get("WatermarkType");
             if (value != null) {
                 if (!(value instanceof String))
                     throw new IllegalArgumentException("Watermark type arg must be a string");
@@ -632,8 +632,8 @@ public class Config {
      * @throws IllegalArgumentException if value from key is null or not a {@link String}
      */
     public String getWatermarkKey() throws IllegalArgumentException {
-        if (map.containsKey("WatermarkKey")) {
-            Object value = map.get("WatermarkKey");
+        if (this.map.containsKey("WatermarkKey")) {
+            Object value = this.map.get("WatermarkKey");
             if (value != null) {
                 return value.toString();
             } else {
@@ -651,8 +651,8 @@ public class Config {
      * @throws IllegalArgumentException if value from key is null or not a {@link Boolean}
      */
     public boolean getSpigotBool() throws IllegalArgumentException {
-        if (map.containsKey("SpigotPlugin")) {
-            Object value = map.get("SpigotPlugin");
+        if (this.map.containsKey("SpigotPlugin")) {
+            Object value = this.map.get("SpigotPlugin");
             if (value != null) {
                 if (!(value instanceof Boolean))
                     throw new IllegalArgumentException("Spigot plugin arg must be true/false");
@@ -672,8 +672,8 @@ public class Config {
      * @throws IllegalArgumentException if value from key is null or not a {@link Boolean}
      */
     public AbstractTransformer getRenamerType() throws IllegalArgumentException {
-        if (map.containsKey("Renamer")) {
-            Object value = map.get("Renamer");
+        if (this.map.containsKey("Renamer")) {
+            Object value = this.map.get("Renamer");
             if (value != null) {
                 if (!(value instanceof Boolean)) throw new IllegalArgumentException("Renamer arg must be true/false");
                 boolean s = (Boolean) value;
@@ -695,8 +695,8 @@ public class Config {
      * @throws IllegalArgumentException if value from key is null or not a {@link Boolean}
      */
     public AbstractTransformer getStringPoolType() throws IllegalArgumentException {
-        if (map.containsKey("StringPool")) {
-            Object value = map.get("StringPool");
+        if (this.map.containsKey("StringPool")) {
+            Object value = this.map.get("StringPool");
             if (value != null) {
                 if (!(value instanceof Boolean))
                     throw new IllegalArgumentException("String pool arg must be true/false");
@@ -719,8 +719,8 @@ public class Config {
      * @throws IllegalArgumentException if value from key is null or not a {@link Boolean}
      */
     public AbstractTransformer getNumberObfuscationType() throws IllegalArgumentException {
-        if (map.containsKey("NumberObfuscation")) {
-            Object value = map.get("NumberObfuscation");
+        if (this.map.containsKey("NumberObfuscation")) {
+            Object value = this.map.get("NumberObfuscation");
             if (value != null) {
                 if (!(value instanceof Boolean))
                     throw new IllegalArgumentException("Number obfuscation arg must be true/false");
@@ -743,8 +743,8 @@ public class Config {
      * @throws IllegalArgumentException if value from key is null or not a {@link String}, and/or is not a proper date format.
      */
     public long getExpiryTime() throws IllegalArgumentException {
-        if (map.containsKey("ExpiryTime")) {
-            Object value = map.get("ExpiryTime");
+        if (this.map.containsKey("ExpiryTime")) {
+            Object value = this.map.get("ExpiryTime");
             if (value != null) {
                 if (!(value instanceof String)) {
                     throw new IllegalArgumentException("Expiry time must be a string in simple date format");
@@ -771,8 +771,8 @@ public class Config {
      * @throws IllegalArgumentException if value from key is null or not a {@link String}
      */
     public String getExpiryMsg() throws IllegalArgumentException {
-        if (map.containsKey("ExpiryMessage")) {
-            Object value = map.get("ExpiryMessage");
+        if (this.map.containsKey("ExpiryMessage")) {
+            Object value = this.map.get("ExpiryMessage");
             if (value != null) {
                 return value.toString();
             } else {
