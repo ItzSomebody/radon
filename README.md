@@ -95,14 +95,11 @@ This table describes the current obfuscation settings Radon has.
 
 * [OW2 ASM](http://asm.ow2.org) - ObjectWeb ASM.
 * [SnakeYaml](http://www.snakeyaml.org) - SnameYAML.
-* [LordPancake](https://www.youtube.com/user/LordPankake) - Maker of SkidSuite
-* [samczsun](https://github.com/samczsun) - Author of Java-Deobfuscator and the 20 (or so) ways to crash the various decompilers which is no longer open-source.
-* [VincBreaker](https://github.com/Vinc0682) - Author of Smoke obfuscator which I stole some stuff from xD.
-* [Coolman](https://github.com/c001man) - I stole his Zip-writing algorithm xD.
+* [samczsun](https://github.com/samczsun) - Author of Java-Deobfuscator.
+* [VincBreaker](https://github.com/Vinc0682) - Author of Smoke obfuscator which I took some ideas from. (i.e. Renaming classes as spaces and splitting numbers into bitwise xor operations)
 * [WindowBuilder by Eclipse](https://www.eclipse.org/windowbuilder/) - Used to make GUI (yes I know it's Java Swing, I didn't feel like remaking it in JavaFX)
-* [Licel](https://licelus.com) - Makers of Stringer Java Obfuscator.
+* [Licel](https://licelus.com) - Makers of Stringer Java Obfuscator and IndyProtect.
 * [Allatori Dev Team](http://www.allatori.com) - Makers of Allatori Java Obfuscator.
-* [Caleb Whiting](https://github.com/CalebWhiting/java-asm-obfuscator) - Author of Java ASM Obfuscator.
 * [Artel](https://gitlab.com/artel) - Beta tester.
 
 ## License

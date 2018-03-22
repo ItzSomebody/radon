@@ -1,3 +1,8 @@
+## 0.4.1
+
+* Maven-ized the project.
+* Removed more ripped-off code.
+
 ## 0.4.0
 
 * Completely changed the normal flow obfuscation transformer so that it doesn't have anymore skidded code (lol).
