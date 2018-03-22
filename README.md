@@ -95,10 +95,9 @@ This table describes the current obfuscation settings Radon has.
 
 * [OW2 ASM](http://asm.ow2.org) - ObjectWeb ASM.
 * [SnakeYaml](http://www.snakeyaml.org) - SnameYAML.
-* [samczsun](https://github.com/samczsun) - Author of Java-Deobfuscator.
 * [VincBreaker](https://github.com/Vinc0682) - Author of Smoke obfuscator which I took some ideas from. (i.e. Renaming classes as spaces and splitting numbers into bitwise xor operations)
 * [WindowBuilder by Eclipse](https://www.eclipse.org/windowbuilder/) - Used to make GUI (yes I know it's Java Swing, I didn't feel like remaking it in JavaFX)
-* [Licel](https://licelus.com) - Makers of Stringer Java Obfuscator and IndyProtect.
+* [Licel](https://licelus.com) - Makers of IndyProtect.
 * [Allatori Dev Team](http://www.allatori.com) - Makers of Allatori Java Obfuscator.
 * [Artel](https://gitlab.com/artel) - Beta tester.
 

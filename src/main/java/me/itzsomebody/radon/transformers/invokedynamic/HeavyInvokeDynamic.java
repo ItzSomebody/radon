@@ -71,12 +71,6 @@ public class HeavyInvokeDynamic extends AbstractTransformer {
                         boolean isStatic = (methodInsnNode.getOpcode() == Opcodes.INVOKESTATIC);
                         String newSig =
                                 isStatic ? methodInsnNode.desc : methodInsnNode.desc.replace("(", "(Ljava/lang/Object;");
-                        Type origReturnType = Type.getReturnType(newSig);
-                        Type[] args = Type.getArgumentTypes(newSig);
-                        for (int j = 0; j < args.length; j++) {
-                            args[j] = BytecodeUtils.genericType(args[j]);
-                        }
-                        newSig = Type.getMethodDescriptor(origReturnType, args);
                         switch (methodInsnNode.getOpcode()) {
                             case Opcodes.INVOKESTATIC: // invokestatic opcode
                                 methodNode.instructions.set(insn, new InvokeDynamicInsnNode(

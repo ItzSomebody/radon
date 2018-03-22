@@ -11,82 +11,8 @@ import java.util.*;
  * Utils used for operating on bytecode.
  *
  * @author ItzSomebody
- * @author Stringer dev team (who made {@link BytecodeUtils#genericType(Type)})
  */
 public class BytecodeUtils {
-    /**
-     * Returns the generic {@link Type}.
-     *
-     * @param type input {@link Type}.
-     * @return the generic {@link Type}.
-     */
-    public static Type genericType(Type type) {
-        Type newType;
-        switch (type.getSort()) {
-            case Type.OBJECT:
-                newType = Type.getType(Object.class);
-                break;
-            default:
-                newType = type;
-                break;
-        }
-        return newType;
-    }
-
-    /**
-     * Returns ICONST_0 or ICONST_1 based on
-     * {@link NumberUtils#getRandomInt(int)}.
-     *
-     * @return ICONST_0 or ICONST_1 based on
-     * {@link NumberUtils#getRandomInt(int)}.
-     */
-    public static InsnNode randTrueFalse() {
-        return (NumberUtils.getRandomInt(2) == 1) ?
-                new InsnNode(Opcodes.ICONST_1) : new InsnNode(Opcodes.ICONST_0);
-    }
-
-    /**
-     * Returns true if input is a known ICONST else return false.
-     *
-     * @param ain the {@link AbstractInsnNode} to check.
-     * @return true if input is a known ICONST else return false.
-     */
-    public static boolean isIConst(AbstractInsnNode ain) {
-        int opcode = ain.getOpcode();
-        if (opcode >= Opcodes.ICONST_M1 && opcode <= Opcodes.ICONST_5) {
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Check if the input {@link MethodNode} has the same name as another
-     * method in the classpath.
-     *
-     * @param methodNode the {@link MethodNode} to check.
-     * @param clazz      the {@link ClassNode} in which the input
-     *                   {@link MethodNode} is contained.
-     * @param classes    the class collection to check.
-     * @return true if input {@link MethodNode} name and description match
-     * another one in the classpath.
-     */
-    @Deprecated
-    public static boolean hasSameMethod(MethodNode methodNode, ClassNode clazz,
-                                        Collection<ClassNode> classes) {
-        for (ClassNode classNode : classes) {
-            if (classNode.name.equals(clazz.name)) continue;
-            for (MethodNode method : classNode.methods) {
-                if (methodNode.name.equals(method.name)) {
-                    if (methodNode.desc.equals(method.desc)) {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
     /**
      * Checks if the input class is a main method.
      *
@@ -132,21 +58,6 @@ public class BytecodeUtils {
             a |= Opcodes.ACC_PUBLIC;
         }
         return a;
-    }
-
-    /**
-     * Returns true if input is a return opcode, else false.
-     *
-     * @param ain {@link AbstractInsnNode} to check if return opcode.
-     * @return true if input is a return opcode, else false.
-     */
-    public static boolean isReturn(AbstractInsnNode ain) {
-        int opcode = ain.getOpcode();
-        if (opcode >= Opcodes.IRETURN && opcode <= Opcodes.RETURN) {
-            return true;
-        }
-
-        return false;
     }
 
     /**
@@ -314,69 +225,5 @@ public class BytecodeUtils {
         }
 
         return false;
-    }
-
-    /**
-     * Checks if provided {@link ClassNode} contains a {@link MethodNode}
-     * based on info given.
-     *
-     * @param name      name to check.
-     * @param desc      description to check.
-     * @param classNode classNode to look in.
-     * @return true if provided {@link ClassNode} contains a
-     * {@link MethodNode} based on info given.
-     */
-    public static boolean containsMethod(String name, String desc,
-                                         ClassNode classNode) {
-        for (MethodNode methodNode : classNode.methods) {
-            if (methodNode.name.equals(name) && methodNode.desc.equals(desc)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Checks if provided {@link ClassNode} contains a {@link FieldNode}
-     * based on info given.
-     *
-     * @param name      name to check.
-     * @param desc      description to check.
-     * @param classNode classNode to look in.
-     * @return true if provided {@link ClassNode} contains a
-     * {@link FieldNode} based on info given.
-     */
-    public static boolean containsField(String name, String desc,
-                                        ClassNode classNode) {
-        if (classNode.fields != null) {
-            for (FieldNode fieldNode : classNode.fields) {
-                if (fieldNode.name.equals(name) && fieldNode.desc.equals(desc)) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Returns true if last not-label and not-line number instruction is an iinc.
-     *
-     * @param insn {@link AbstractInsnNode} to use as the current opcode.
-     * @return true if last not-label and not-line number instruction is an iinc.
-     */
-    public static boolean lastInsnIInc(AbstractInsnNode insn) {
-        AbstractInsnNode before = insn.getPrevious();
-        if (before instanceof LabelNode || before instanceof LineNumberNode) {
-            do {
-                if (before == null) return false;
-                before = before.getPrevious();
-            }
-            while (!(before instanceof LabelNode)
-                    && !(before instanceof LineNumberNode));
-        }
-
-        return (before instanceof IincInsnNode);
     }
 }

@@ -45,7 +45,8 @@ public class LightInvokeDynamic extends AbstractTransformer {
                         "Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
                 false);
 
-        this.classNodes().stream().filter(classNode -> !this.classExempted(classNode.name) && classNode.version >= 51).forEach(classNode -> {
+        this.classNodes().stream().filter(classNode -> !this.classExempted(classNode.name)
+                && classNode.version >= 51).forEach(classNode -> {
             classNode.methods.stream().filter(methodNode -> !this.methodExempted(classNode.name + '.' + methodNode.name + methodNode.desc)
                     && !BytecodeUtils.isAbstractMethod(methodNode.access)).forEach(methodNode -> {
                 for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
@@ -57,13 +58,6 @@ public class LightInvokeDynamic extends AbstractTransformer {
 
                         String newSig =
                                 isStatic ? methodInsnNode.desc : methodInsnNode.desc.replace("(", "(Ljava/lang/Object;");
-                        Type origReturnType = Type.getReturnType(newSig);
-                        Type[] args = Type.getArgumentTypes(newSig);
-                        for (int j = 0; j < args.length; j++) {
-                            args[j] = BytecodeUtils.genericType(args[j]);
-                        }
-
-                        newSig = Type.getMethodDescriptor(origReturnType, args);
                         int opcode = (isStatic) ? this.STATIC_INVOCATION : this.VIRTUAL_INVOCATION;
 
                         methodNode.instructions.set(insn, new InvokeDynamicInsnNode(StringUtils.crazyString(),
