@@ -582,7 +582,7 @@ public class InvokeDynamicBSM implements Opcodes {
         mv.visitMethodInsn(INVOKESTATIC, "java/lang/invoke/MethodType",
                 "fromMethodDescriptorString",
                 "(Ljava/lang/String;Ljava/lang/ClassLoader;)" +
-                        "Ljava/lang/invoke/Methodtype;", false);
+                        "Ljava/lang/invoke/MethodType;", false);
         mv.visitMethodInsn(INVOKEVIRTUAL,
                 "java/lang/invoke/MethodHandles$Lookup", "findVirtual",
                 "(Ljava/lang/Class;Ljava/lang/String;" +
