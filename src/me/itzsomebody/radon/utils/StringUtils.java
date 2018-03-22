@@ -5,6 +5,8 @@ import javax.crypto.spec.SecretKeySpec;
 import java.security.MessageDigest;
 import java.util.*;
 
+import me.itzsomebody.radon.transformers.stringencryption.*;
+
 /**
  * Utils for operating, and generating {@link String}s.
  *
@@ -74,20 +76,14 @@ public class StringUtils {
             }
         }
 
-        /*char[] alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".toCharArray();
-        for (int i = 0; i < numberOfChars; i++) {
-            buildString[i] = alpha[NumberUtils.getRandomInt(alpha.length)];
-        }*/
-
         return new String(buildString);
     }
 
     /**
-     * Generates a {@link String} to use as a key for string encryption.
-     * Causes encrypted strings to look like Asian letters.
-     * Used as an alternative to {@link StringUtils#crazyString()}.
+     * Alternative generator to the method above.
      *
-     * @return a {@link String} to use as a key for string encryption.
+     * @return a {@link String} consisting of characters the JVM doesn't
+     * recognize.
      */
     public static String crazyKey() {
         int numberOfChars = 10; // Just so I can do a quick switch.
@@ -126,11 +122,11 @@ public class StringUtils {
     }
 
     /**
-     * Returns an encrypted string used by {@link me.itzsomebody.radon.transformers.stringencryption.SuperLightStringEncryption}.
+     * Returns an encrypted string used by {@link SuperLightStringEncryption}.
      *
      * @param msg string to encrypt.
      * @param key random integer
-     * @return an encrypted string used by {@link me.itzsomebody.radon.transformers.stringencryption.SuperLightStringEncryption}.
+     * @return an encrypted string used by {@link SuperLightStringEncryption}.
      */
     public static String superLightEncrypt(String msg, int key) {
         char[] encryptedArray = msg.toCharArray();
@@ -144,15 +140,16 @@ public class StringUtils {
     }
 
     /**
-     * Returns an encrypted string used by {@link me.itzsomebody.radon.transformers.stringencryption.LightStringEncryption}.
+     * Returns an encrypted string used by {@link LightStringEncryption}.
      *
      * @param msg        string to encrypt.
      * @param className  name of the class the msg is in.
      * @param methodName name of the method the msg is in.
      * @param key3       random integer
-     * @return an encrypted string used by {@link me.itzsomebody.radon.transformers.stringencryption.LightStringEncryption}.
+     * @return an encrypted string used by {@link LightStringEncryption}.
      */
-    public static String lightEncrypt(String msg, String className, String methodName, int key3) {
+    public static String lightEncrypt(String msg, String className,
+                                      String methodName, int key3) {
         char[] chars = msg.toCharArray();
         char[] returnThis = new char[chars.length];
         for (int i = 0; i < returnThis.length; i++) {
@@ -165,7 +162,8 @@ public class StringUtils {
     }
 
     /**
-     * Returns {@link String} encrypted with AES symmetrical encryption algorithm to encrypt {@link String}s.
+     * Returns {@link String} encrypted with AES symmetrical encryption
+     * algorithm to encrypt {@link String}s.
      *
      * @param msg    {@link String} to encrypt.
      * @param secret {@link String} to use as a key.
@@ -181,11 +179,12 @@ public class StringUtils {
             secretKey = new SecretKeySpec(key, "AES");
             Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
             cipher.init(Cipher.ENCRYPT_MODE, secretKey);
-            return Base64.getEncoder().encodeToString(cipher.doFinal(msg.getBytes("UTF-8")));
+            return Base64.getEncoder().encodeToString(cipher.doFinal(msg.
+                    getBytes("UTF-8")));
         } catch (Throwable t) {
-            // t.printStackTrace();
+            throw new IllegalStateException("Was unable to encrypt string " +
+                    msg + " using " + secret);
         }
-        return null;
     }
 
     /**
@@ -205,11 +204,12 @@ public class StringUtils {
             secretKey = new SecretKeySpec(key, "AES");
             Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");
             cipher.init(Cipher.DECRYPT_MODE, secretKey);
-            return new String(cipher.doFinal(Base64.getDecoder().decode(strToDecrypt)));
+            return new String(cipher.doFinal(Base64.getDecoder()
+                    .decode(strToDecrypt)));
         } catch (Throwable t) {
-            // t.printStackTrace();
+            throw new IllegalStateException("Was unable to decrypt string " +
+                    strToDecrypt + " using " + secret);
         }
-        return null;
     }
 
     /**
@@ -234,7 +234,8 @@ public class StringUtils {
         List<String> classNames = new ArrayList<>();
         classNames.addAll(theClassNames);
 
-        String randomClass = classNames.get(NumberUtils.getRandomInt(classNames.size()));
+        String randomClass = classNames.get(NumberUtils.
+                getRandomInt(classNames.size()));
         String[] split = randomClass.split("/");
         StringBuilder sb = new StringBuilder();
 
@@ -257,39 +258,44 @@ public class StringUtils {
         List<String> classNames = new ArrayList<>();
         classNames.addAll(theClassNames);
 
-        String randomClass = classNames.get(NumberUtils.getRandomInt(classNames.size()));
+        String randomClass = classNames.get(NumberUtils
+                .getRandomInt(classNames.size()));
         return randomClass;
     }
 
     /**
-     * Returns encrypted {@link String} used by {@link me.itzsomebody.radon.transformers.stringencryption.NormalStringEncryption}.
+     * Returns encrypted {@link String} used by {@link NormalStringEncryption}.
      *
      * @param className  the className to get hashcode from.
      * @param methodName the methodName to get hashcode from.
-     * @param key3       the extra key to ensure a different encryption each time.
+     * @param key3       the extra key to ensure a different encryption each
+     *                   time.
      * @param msg        the string to encrypt
-     * @return encrypted {@link String} used by {@link me.itzsomebody.radon.transformers.stringencryption.NormalStringEncryption}.
+     * @return encrypted {@link String} used by {@link NormalStringEncryption}.
      */
-    public static String normalEncrypt(String className, String methodName, int key3, String msg) {
+    public static String normalEncrypt(String className, String methodName,
+                                       int key3, String msg) {
         char[] chars = msg.toCharArray();
         char[] returnThis = new char[chars.length];
         for (int i = 0; i < chars.length; i++) {
-            returnThis[i] = (char) (key3 ^ methodName.hashCode() ^ className.hashCode() ^ chars[i]);
+            returnThis[i] = (char) (key3 ^ methodName.hashCode() ^
+                    className.hashCode() ^ chars[i]);
         }
 
         return new String(returnThis);
     }
 
     /**
-     * Returns encrypted {@link String} used by {@link me.itzsomebody.radon.transformers.stringencryption.HeavyStringEncryption}.
+     * Returns encrypted {@link String} used by {@link HeavyStringEncryption}.
      *
      * @param msg        the string to encrypt.
      * @param secret     the key for AES to use.
      * @param className  the class name the string is contained in.
      * @param methodName the method name the string is contained in.
-     * @return encrypted {@link String} used by {@link me.itzsomebody.radon.transformers.stringencryption.HeavyStringEncryption}.
+     * @return encrypted {@link String} used by {@link HeavyStringEncryption}.
      */
-    public static String heavyEncrypt(String msg, String secret, String className, String methodName) {
+    public static String heavyEncrypt(String msg, String secret,
+                                      String className, String methodName) {
         char[] base64Chars;
         try {
             SecretKeySpec secretKey;
@@ -300,13 +306,16 @@ public class StringUtils {
             secretKey = new SecretKeySpec(key, "AES");
             Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
             cipher.init(Cipher.ENCRYPT_MODE, secretKey);
-            base64Chars = Base64.getEncoder().encodeToString(cipher.doFinal(msg.getBytes("UTF-8"))).toCharArray();
+            base64Chars = Base64.getEncoder().encodeToString(cipher.
+                    doFinal(msg.getBytes("UTF-8"))).toCharArray();
         } catch (Throwable t) {
-            throw null;
+            throw new IllegalStateException("Was unable to encrypt string " +
+                    msg + " using " + secret);
         }
         char[] returnThis = new char[base64Chars.length];
         for (int i = 0; i < returnThis.length; i++) {
-            returnThis[i] = (char) (base64Chars[i] ^ className.hashCode() ^ methodName.hashCode());
+            returnThis[i] = (char) (base64Chars[i] ^ className.hashCode() ^
+                    methodName.hashCode());
         }
 
         return new String(returnThis);

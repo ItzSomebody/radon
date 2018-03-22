@@ -23,7 +23,8 @@ public class FileUtils {
 
         while (true) {
             i++;
-            String newName = existing.getAbsolutePath() + ".BACKUP-" + String.valueOf(i);
+            String newName = existing.getAbsolutePath() + ".BACKUP-"
+                    + String.valueOf(i);
             File backUpName = new File(newName);
             if (!backUpName.exists()) {
                 existing.renameTo(backUpName);
@@ -37,11 +38,14 @@ public class FileUtils {
     /**
      * Writes an {@link InputStream} to a {@link ZipOutputStream}.
      *
-     * @param zos the {@link ZipOutputStream} to write the input {@link InputStream} to.
-     * @param in  the {@link InputStream} to write to the output {@link ZipOutputStream}.
+     * @param zos the {@link ZipOutputStream} to write the input
+     * {@link InputStream} to.
+     * @param in  the {@link InputStream} to write to the output
+     * {@link ZipOutputStream}.
      * @throws IOException if an error happens while writing to output stream.
      */
-    public static void writeToZip(ZipOutputStream zos, InputStream in) throws IOException {
+    public static void writeToZip(ZipOutputStream zos, InputStream in)
+            throws IOException {
         byte[] buffer = new byte[1024];
         try {
             while (in.available() > 0) {

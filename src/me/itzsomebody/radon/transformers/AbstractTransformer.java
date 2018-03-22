@@ -122,20 +122,24 @@ public abstract class AbstractTransformer implements Opcodes {
     }
 
     /**
-     * Returns a {@link Long} which indicates how long a transformer processed the classes.
+     * Returns a {@link Long} which indicates how long a transformer
+     * processed the classes.
      *
      * @param started time started.
-     * @return a {@link Long} which indicates how long a transformer processed the classes
+     * @return a {@link Long} which indicates how long a transformer
+     * processed the classes
      */
     protected long tookThisLong(long started) {
         return System.currentTimeMillis() - started;
     }
 
     /**
-     * Returns true/false based on if the input is listed in {@link AbstractTransformer#exemptClasses}.
+     * Returns true/false based on if the input is listed in
+     * {@link AbstractTransformer#exemptClasses}.
      *
      * @param name the name of the class to check.
-     * @return true/false based on if the input is listed in {@link AbstractTransformer#exemptClasses}.
+     * @return true/false based on if the input is listed in
+     * {@link AbstractTransformer#exemptClasses}.
      */
     protected boolean classExempted(String name) {
         for (String string : this.exemptClasses) {
@@ -148,10 +152,12 @@ public abstract class AbstractTransformer implements Opcodes {
     }
 
     /**
-     * Returns true/false based on if the input is listed in {@link AbstractTransformer#exemptMethods}.
+     * Returns true/false based on if the input is listed in
+     * {@link AbstractTransformer#exemptMethods}.
      *
      * @param name the path (and description) of the method to check.
-     * @return true/false based on if the input is listed in {@link AbstractTransformer#exemptMethods}.
+     * @return true/false based on if the input is listed in
+     * {@link AbstractTransformer#exemptMethods}.
      */
     protected boolean methodExempted(String name) {
         for (String string : this.exemptMethods) {
@@ -164,10 +170,12 @@ public abstract class AbstractTransformer implements Opcodes {
     }
 
     /**
-     * Returns true/false based on if the input is listed in {@link AbstractTransformer#exemptFields}.
+     * Returns true/false based on if the input is listed in
+     * {@link AbstractTransformer#exemptFields}.
      *
      * @param name the path of the field to check.
-     * @return true/false based on if the input is listed in {@link AbstractTransformer#exemptFields}.
+     * @return true/false based on if the input is listed in
+     * {@link AbstractTransformer#exemptFields}.
      */
     protected boolean fieldExempted(String name) {
         for (String string : this.exemptFields) {
@@ -202,12 +210,14 @@ public abstract class AbstractTransformer implements Opcodes {
     }
 
     /**
-     * Grabs {@link MethodNode} from input using arguments as parameters for searching.
+     * Grabs {@link MethodNode} from input using arguments as parameters for
+     * searching.
      *
      * @param name      the name of the {@link MethodNode}
      * @param desc      the desc of the {@link MethodNode}
      * @param classNode the {@link ClassNode} to search
-     * @return {@link MethodNode} from input using arguments as parameters for searching.
+     * @return {@link MethodNode} from input using arguments as parameters
+     * for searching.
      */
     protected MethodNode getMethodNode(String name, String desc, ClassNode classNode) {
         for (MethodNode methodNode : classNode.methods) {
@@ -216,13 +226,16 @@ public abstract class AbstractTransformer implements Opcodes {
             }
         }
 
-        throw new IllegalStateException("Could not find the method with info " + classNode.name + '.' + name + desc);
+        throw new IllegalStateException("Could not find the method with info " +
+                classNode.name + '.' + name + desc);
     }
 
     /**
-     * Returns a {@link List} of {@link String}s that were outputted into the console by transformer.
+     * Returns a {@link List} of {@link String}s that were outputted into the
+     * console by transformer.
      *
-     * @return a {@link List} of {@link String}s that were outputted into the console by transformer.
+     * @return a {@link List} of {@link String}s that were outputted into the
+     * console by transformer.
      */
     public List<String> getLogStrings() {
         return this.logStrings;

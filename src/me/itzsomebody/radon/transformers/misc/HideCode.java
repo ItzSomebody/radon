@@ -41,8 +41,8 @@ public class HideCode extends AbstractTransformer {
                 counter.incrementAndGet();
             }
 
-            classNode.methods.stream().filter(methodNode -> !this.methodExempted(classNode.name + '.' + methodNode.name + methodNode.desc))
-                    .forEach(methodNode -> {
+            classNode.methods.stream().filter(methodNode ->
+                    !this.methodExempted(classNode.name + '.' + methodNode.name + methodNode.desc)).forEach(methodNode -> {
                 boolean hidOnce = false;
                 if (!BytecodeUtils.isSyntheticMethod(methodNode.access)) {
                     methodNode.access |= ACC_SYNTHETIC;

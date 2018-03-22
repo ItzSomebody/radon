@@ -12,7 +12,8 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Transformer that takes all the strings in a class and pools them into a method. When the string is needed, the
+ * Transformer that takes all the strings in a class and pools them into a
+ * method. When the string is needed, the
  * string pool method is called with an index number.
  *
  * @author ItzSomebody
@@ -50,8 +51,10 @@ public class StringPool extends AbstractTransformer {
 
                             int indexNumber = stringslist.size() - 1;
 
-                            methodNode.instructions.insertBefore(insn, BytecodeUtils.getNumberInsn(indexNumber));
-                            methodNode.instructions.set(insn, new MethodInsnNode(INVOKESTATIC, classNode.name, randName, "(I)Ljava/lang/String;", false));
+                            methodNode.instructions.insertBefore(insn,
+                                    BytecodeUtils.getNumberInsn(indexNumber));
+                            methodNode.instructions.set(insn,
+                                    new MethodInsnNode(INVOKESTATIC, classNode.name, randName, "(I)Ljava/lang/String;", false));
                             counter.incrementAndGet();
                         }
                     }

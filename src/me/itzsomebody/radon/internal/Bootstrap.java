@@ -64,8 +64,8 @@ public class Bootstrap { // Eyyy bootstrap bill
     private ZipOutputStream zos;
 
     /**
-     * A HashMap that stores the locations to each of the libraries that will be loaded into
-     * the classpath.
+     * A HashMap that stores the locations to each of the libraries that will
+     * be loaded into the classpath.
      */
     private HashMap<String, File> libs;
 
@@ -171,7 +171,8 @@ public class Bootstrap { // Eyyy bootstrap bill
     /**
      * Actual obfuscation starts here.
      *
-     * @param doInit should obfuscator read and set variables according to values of {@link Bootstrap#config}?
+     * @param doInit should obfuscator read and set variables according to values
+     *               of {@link Bootstrap#config}?
      * @throws Throwable if any errors are thrown.
      */
     public void startTheParty(boolean doInit) throws Throwable {
@@ -182,7 +183,8 @@ public class Bootstrap { // Eyyy bootstrap bill
                 this.logStrings.add(LoggerUtils.stdOut("Successfully parsed config"));
             } else {
                 if (output.exists()) {
-                    logStrings.add(LoggerUtils.stdOut("Output already exists, renamed to " + FileUtils.renameExistingFile(output)));
+                    logStrings.add(LoggerUtils.stdOut("Output already exists, renamed to "
+                            + FileUtils.renameExistingFile(output)));
                 }
                 this.zos = new ZipOutputStream(new FileOutputStream(output));
             }
@@ -192,9 +194,11 @@ public class Bootstrap { // Eyyy bootstrap bill
 
             for (AbstractTransformer transformer : this.transformers) {
                 if (transformer instanceof Renamer) {
-                    transformer.init(this.classes, this.classPath, this.classExempts, this.methodExempts, this.fieldExempts);
+                    transformer.init(this.classes, this.classPath, this.classExempts,
+                            this.methodExempts, this.fieldExempts);
                 } else {
-                    transformer.init(this.classes, this.classExempts, this.methodExempts, this.fieldExempts);
+                    transformer.init(this.classes, this.classExempts, this.methodExempts,
+                            this.fieldExempts);
                 }
                 transformer.obfuscate();
                 this.logStrings.addAll(transformer.getLogStrings());
@@ -203,11 +207,13 @@ public class Bootstrap { // Eyyy bootstrap bill
             if (this.trashClasses != -1) {
                 this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
                 for (int i = 0; i < this.trashClasses; i++) {
-                    TrashClasses trashClass = new TrashClasses(StringUtils.randomClassName(this.classes.keySet()));
+                    TrashClasses trashClass =
+                            new TrashClasses(StringUtils.randomClassName(this.classes.keySet()));
                     ClassNode classNode = trashClass.returnTrashClass();
                     this.extraClasses.put(classNode.name, classNode);
                 }
-                this.logStrings.add(LoggerUtils.stdOut("Generated " + String.valueOf(this.trashClasses) + " trash classes"));
+                this.logStrings.add(LoggerUtils.stdOut("Generated "
+                        + String.valueOf(this.trashClasses) + " trash classes"));
             }
 
             if (this.extraClasses.values().size() != 0) {
@@ -223,7 +229,8 @@ public class Bootstrap { // Eyyy bootstrap bill
                     newEntry.setTime(this.currentTime);
                     newEntry.setCompressedSize(-1);
                     this.zos.putNextEntry(newEntry);
-                    FileUtils.writeToZip(this.zos, new ByteArrayInputStream(cw.toByteArray()));
+                    FileUtils.writeToZip(this.zos,
+                            new ByteArrayInputStream(cw.toByteArray()));
                 }
             }
 
@@ -236,12 +243,19 @@ public class Bootstrap { // Eyyy bootstrap bill
                 if (this.watermarkMsg != null) {
                     if (this.watermarkType == 0
                             && NumberUtils.getRandomInt(10) >= 5) {
-                        cw.newUTF8("WMID: " + StringUtils.aesEncrypt(this.watermarkMsg, this.watermarkKey));
-                        this.logStrings.add(LoggerUtils.stdOut("Watermarking " + this.watermarkMsg + " into " + classNode.name));
+                        cw.newUTF8("WMID: "
+                                + StringUtils.aesEncrypt(this.watermarkMsg, this.watermarkKey));
+
+                        this.logStrings.add(LoggerUtils.stdOut("Watermarking "
+                                + this.watermarkMsg + " into " + classNode.name));
                     } else if (this.watermarkType == 1
                             && NumberUtils.getRandomInt(10) >= 5) {
-                        classNode.signature = StringUtils.aesEncrypt("WMID: " + this.watermarkMsg, this.watermarkKey);
-                        this.logStrings.add(LoggerUtils.stdOut("Watermarking " + this.watermarkMsg + " into " + classNode.name));
+                        classNode.signature =
+                                StringUtils.aesEncrypt("WMID: " + this.watermarkMsg,
+                                        this.watermarkKey);
+
+                        this.logStrings.add(LoggerUtils.stdOut("Watermarking "
+                                + this.watermarkMsg + " into " + classNode.name));
                     }
                 }
 
@@ -253,7 +267,8 @@ public class Bootstrap { // Eyyy bootstrap bill
                         cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
                         classNode.accept(cw);
                     } else {
-                        this.logStrings.add(LoggerUtils.stdOut("Error while writing " + classNode.name + " -> " + t.getMessage()));
+                        this.logStrings.add(LoggerUtils.stdOut("Error while writing "
+                                + classNode.name + " -> " + t.getMessage()));
                         throw t;
                     }
                 }
@@ -265,18 +280,20 @@ public class Bootstrap { // Eyyy bootstrap bill
                 FileUtils.writeToZip(this.zos, new ByteArrayInputStream(cw.toByteArray()));
             }
 
-            logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
+            this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
             if (this.zos != null) {
                 this.zos.setComment("Obfuscation by Radon obfuscator developed by ItzSomebody"); // Cause why not xD
                 this.zos.close();
                 this.logStrings.add(LoggerUtils.stdOut("Finished processing file."));
             }
         } catch (Throwable t) {
-            this.logStrings.add(LoggerUtils.stdOut("Error happened while processing: " + t.getMessage()));
+            this.logStrings.add(LoggerUtils.stdOut("Error happened while processing: "
+                    + t.getMessage()));
+
             if (zos != null) {
                 zos.close();
             }
-            if (output.delete()) {
+            if (this.output.delete()) {
                 this.logStrings.add(LoggerUtils.stdOut("Deleted output."));
             } else {
                 this.logStrings.add(LoggerUtils.stdOut("Unable to delete faulty output."));
@@ -363,7 +380,8 @@ public class Bootstrap { // Eyyy bootstrap bill
             this.watermarkType = this.config.getWatermarkType();
             this.watermarkKey = this.config.getWatermarkKey();
             if (this.output.exists()) {
-                this.logStrings.add(LoggerUtils.stdOut("Output already exists, renamed to " + FileUtils.renameExistingFile(this.output)));
+                this.logStrings.add(LoggerUtils.stdOut("Output already exists, renamed to "
+                        + FileUtils.renameExistingFile(this.output)));
             }
             this.zos = new ZipOutputStream(new FileOutputStream(this.output));
         } catch (Throwable t) {
@@ -392,7 +410,11 @@ public class Bootstrap { // Eyyy bootstrap bill
                         ClassReader cr = new ClassReader(zipFile.getInputStream(zipEntry));
                         ClassNode classNode = new ClassNode();
                         classNode.libraryNode = true;
-                        cr.accept(classNode, ClassReader.SKIP_DEBUG | ClassReader.SKIP_FRAMES | ClassReader.SKIP_CODE); // We don't need code in methods for libs
+
+                        // We don't need code in methods for libs
+                        cr.accept(classNode, ClassReader.SKIP_DEBUG |
+                                ClassReader.SKIP_FRAMES | ClassReader.SKIP_CODE);
+
 
                         this.classPath.put(classNode.name, classNode);
                     }
@@ -407,7 +429,8 @@ public class Bootstrap { // Eyyy bootstrap bill
     }
 
     /**
-     * Loads input JAR classes and adds them to {@link Bootstrap#extraClasses} and {@link Bootstrap#classes}.
+     * Loads input JAR classes and adds them to {@link Bootstrap#extraClasses}
+     * and {@link Bootstrap#classes}.
      *
      * @throws RuntimeException if input cannot be be opened as Zip or some IOE happens.
      */
@@ -416,7 +439,8 @@ public class Bootstrap { // Eyyy bootstrap bill
         Enumeration<? extends ZipEntry> entries;
         ZipEntry zipEntry;
         try {
-            this.logStrings.add(LoggerUtils.stdOut("Loading classes of " + this.input.getAbsolutePath()));
+            this.logStrings.add(LoggerUtils.stdOut("Loading classes of "
+                    + this.input.getAbsolutePath()));
             zipFile = new ZipFile(this.input);
             entries = zipFile.entries();
             while (entries.hasMoreElements()) {
@@ -425,7 +449,9 @@ public class Bootstrap { // Eyyy bootstrap bill
                     ClassReader cr = new ClassReader(zipFile.getInputStream(zipEntry));
                     ClassNode classNode = new ClassNode();
                     classNode.libraryNode = false;
-                    cr.accept(classNode, ClassReader.SKIP_FRAMES); // We will manually compute stack frames later
+
+                    // We will manually compute stack frames later
+                    cr.accept(classNode, ClassReader.SKIP_FRAMES);
 
                     this.classes.put(classNode.name, classNode);
                 } else {
@@ -438,9 +464,11 @@ public class Bootstrap { // Eyyy bootstrap bill
             }
             zipFile.close();
         } catch (ZipException ze) {
-            throw new RuntimeException("There was an error opening " + this.input.getAbsolutePath() + " as a zip!");
+            throw new RuntimeException("There was an error opening "
+                    + this.input.getAbsolutePath() + " as a zip!");
         } catch (IOException ioe) {
-            throw new RuntimeException("Input " + this.input.getAbsolutePath() + " does not exist!");
+            throw new RuntimeException("Input "
+                    + this.input.getAbsolutePath() + " does not exist!");
         }
 
         this.classPath.putAll(this.classes);
@@ -458,7 +486,8 @@ public class Bootstrap { // Eyyy bootstrap bill
 
         @Override
         protected String getCommonSuperClass(final String type1, final String type2) {
-            if (type1.equals("java/lang/Object") || type2.equals("java/lang/Object")) {
+            if (type1.equals("java/lang/Object")
+                    || type2.equals("java/lang/Object")) {
                 return "java/lang/Object";
             }
 
@@ -504,7 +533,8 @@ public class Bootstrap { // Eyyy bootstrap bill
         private ClassNode returnClazz(String ref) {
             ClassNode clazz = classPath.get(ref);
             if (clazz == null) {
-                throw new RuntimeException(ref + " does not exist in classpath!");
+                throw new RuntimeException(ref
+                        + " does not exist in classpath!");
             }
             return clazz;
         }
@@ -517,7 +547,8 @@ public class Bootstrap { // Eyyy bootstrap bill
          * @return true/false based on if clazz1 is the superclass of clazz2.
          */
         private boolean isAssignableFrom(ClassNode clazz1, ClassNode clazz2) {
-            return (clazz1.name.equals("java/lang/Object") || clazz1.superName.equals(clazz2.name));
+            return (clazz1.name.equals("java/lang/Object")
+                    || clazz1.superName.equals(clazz2.name));
         }
     }
 }

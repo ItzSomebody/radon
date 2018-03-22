@@ -11,7 +11,8 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Transformer that applies a line number obfuscation by changing the correspondng numbers linked to labels
+ * Transformer that applies a line number obfuscation by changing the
+ * corresponding numbers linked to labels
  * to random numbers.
  *
  * @author ItzSomebody
@@ -31,7 +32,8 @@ public class ObfuscateLineNumbers extends AbstractTransformer {
                 for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
                     if (insn instanceof LineNumberNode) {
                         LineNumberNode lineNumberNode = (LineNumberNode) insn;
-                        methodNode.instructions.set(insn, new LineNumberNode(NumberUtils.getRandomInt(Integer.MAX_VALUE), lineNumberNode.start));
+                        methodNode.instructions.set(insn,
+                                new LineNumberNode(NumberUtils.getRandomInt(Integer.MAX_VALUE), lineNumberNode.start));
                         counter.incrementAndGet();
                     }
                 }

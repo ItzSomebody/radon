@@ -48,7 +48,8 @@ public class LightFlowObfuscation extends AbstractTransformer {
                     }
                 }
             });
-            classNode.fields.add(new FieldNode(ACC_PUBLIC + ACC_STATIC + ACC_FINAL, fieldName, "Z", null, true));
+            classNode.fields.add(new FieldNode(ACC_PUBLIC + ACC_STATIC +
+                    ACC_FINAL, fieldName, "Z", null, true));
         });
         this.logStrings.add(LoggerUtils.stdOut("Added " + counter + " instruction sets."));
         this.logStrings.add(LoggerUtils.stdOut("Finished. [" + tookThisLong(current) + "ms]"));

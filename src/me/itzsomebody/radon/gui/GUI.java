@@ -62,25 +62,7 @@ public class GUI {
     private JPasswordField watermarkPassword;
     private JTextField extractorInput;
     private JPasswordField extractorKey;
-    private String lastPath;
-
-    /*
-     * Launch the application.
-     */
-    /*
-    public static void main(String[] args) {
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    MainGUI window = new MainGUI();
-                    window.frmRadonObfuscator.setVisible(true);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-    }
-    */
+    private String lastPath; // TODO: Use this for last file selection path
 
     /**
      * Create the application.
@@ -102,8 +84,10 @@ public class GUI {
         this.frmRadonObfuscator.setTitle(Radon.PREFIX + " " + Radon.VERSION);
         this.frmRadonObfuscator.setBounds(100, 100, 440, 570);
         this.frmRadonObfuscator.setResizable(false);
-        this.frmRadonObfuscator.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        this.frmRadonObfuscator.getContentPane().setLayout(new BorderLayout(0, 0));
+        this.frmRadonObfuscator
+                .setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        this.frmRadonObfuscator.getContentPane()
+                .setLayout(new BorderLayout(0, 0));
 
         JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
         this.frmRadonObfuscator.getContentPane().add(tabbedPane);
@@ -111,10 +95,15 @@ public class GUI {
         JPanel panel_4 = new JPanel();
         tabbedPane.addTab("Input-Output", null, panel_4, null);
         GridBagLayout gbl_panel_4 = new GridBagLayout();
-        gbl_panel_4.columnWidths = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-        gbl_panel_4.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-        gbl_panel_4.columnWeights = new double[]{0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-        gbl_panel_4.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+        gbl_panel_4.columnWidths = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0};
+        gbl_panel_4.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0, 0};
+        gbl_panel_4.columnWeights = new double[]{0.0, 0.0, 1.0, 0.0, 0.0, 0.0,
+                0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+        gbl_panel_4.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0,
+                0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                0.0, Double.MIN_VALUE};
         panel_4.setLayout(gbl_panel_4);
 
         JLabel lblInput = new JLabel("Input:");
@@ -145,7 +134,8 @@ public class GUI {
             @Override
             public void actionPerformed(ActionEvent e) {
                 JFileChooser chooser = new JFileChooser();
-                if (inputField.getText() != null && !inputField.getText().isEmpty()) {
+                if (inputField.getText() != null
+                        && !inputField.getText().isEmpty()) {
                     chooser.setSelectedFile(new File(inputField.getText()));
                 }
                 chooser.setMultiSelectionEnabled(false);
@@ -155,7 +145,8 @@ public class GUI {
                     SwingUtilities.invokeLater(new Runnable() {
                         @Override
                         public void run() {
-                            inputField.setText(chooser.getSelectedFile().getAbsolutePath());
+                            inputField.setText(chooser.getSelectedFile()
+                                    .getAbsolutePath());
                         }
                     });
                 }
@@ -184,14 +175,16 @@ public class GUI {
         JButton btnNewButton_1 = new JButton("Select");
         GridBagConstraints gbc_btnNewButton_1 = new GridBagConstraints();
         gbc_btnNewButton_1.fill = GridBagConstraints.HORIZONTAL;
-        gbc_btnNewButton_1.insets = new Insets(0, 0, 5, 5);
+        gbc_btnNewButton_1.insets = new Insets(0, 0, 5,
+                5);
         gbc_btnNewButton_1.gridx = 11;
         gbc_btnNewButton_1.gridy = 2;
         btnNewButton_1.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 JFileChooser chooser = new JFileChooser();
-                if (outputField.getText() != null && !outputField.getText().isEmpty()) {
+                if (outputField.getText() != null
+                        && !outputField.getText().isEmpty()) {
                     chooser.setSelectedFile(new File(outputField.getText()));
                 }
                 chooser.setMultiSelectionEnabled(false);
@@ -201,7 +194,8 @@ public class GUI {
                     SwingUtilities.invokeLater(new Runnable() {
                         @Override
                         public void run() {
-                            outputField.setText(chooser.getSelectedFile().getAbsolutePath());
+                            outputField.setText(chooser.getSelectedFile()
+                                    .getAbsolutePath());
                         }
                     });
                 }
@@ -252,7 +246,8 @@ public class GUI {
             @Override
             public void actionPerformed(ActionEvent e) {
                 JFileChooser chooser = new JFileChooser();
-                if (inputField.getText() != null && !inputField.getText().isEmpty()) {
+                if (inputField.getText() != null
+                        && !inputField.getText().isEmpty()) {
                     chooser.setSelectedFile(new File(inputField.getText()));
                 }
                 chooser.setMultiSelectionEnabled(false);
@@ -262,10 +257,14 @@ public class GUI {
                     SwingUtilities.invokeLater(new Runnable() {
                         @Override
                         public void run() {
-                            if (chooser.getSelectedFile().getAbsolutePath().endsWith(".jar")) {
-                                libList.addElement(chooser.getSelectedFile().getAbsolutePath());
+                            if (chooser.getSelectedFile().getAbsolutePath()
+                                    .endsWith(".jar")) {
+                                libList.addElement(chooser.getSelectedFile()
+                                        .getAbsolutePath());
                             } else {
-                                JOptionPane.showMessageDialog(null, "Only Jars are allowed!", "Error", JOptionPane.ERROR_MESSAGE);
+                                JOptionPane.showMessageDialog(null,
+                                        "Only Jars are allowed!", "Error",
+                                        JOptionPane.ERROR_MESSAGE);
                             }
                         }
                     });
@@ -300,9 +299,13 @@ public class GUI {
         tabbedPane.addTab("Obfuscation", null, panel, null);
         GridBagLayout gbl_panel = new GridBagLayout();
         gbl_panel.columnWidths = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 75, 0, 0};
-        gbl_panel.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-        gbl_panel.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
-        gbl_panel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+        gbl_panel.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0};
+        gbl_panel.columnWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
+        gbl_panel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                Double.MIN_VALUE};
         panel.setLayout(gbl_panel);
 
         JComboBox<String> comboBox = new JComboBox<String>();
@@ -445,7 +448,8 @@ public class GUI {
         panel.add(chckbxLocalVariables, gbc_chckbxNewCheckBox_2);
 
         this.trashChanceField = new JTextField();
-        this.trashChanceField.setToolTipText("Number of trash classes to generate");
+        this.trashChanceField.setToolTipText("Number of trash classes to " +
+                "generate");
         this.trashChanceField.setEditable(false);
         this.trashChanceField.setText("50");
         GridBagConstraints gbc_textField = new GridBagConstraints();
@@ -518,7 +522,7 @@ public class GUI {
         gbc_comboBox1234.gridy = 6;
 
         String[] sourceDebugTypes = {"Obfuscate", "Remove"};
-        for (String s : sourceNameTypes) {
+        for (String s : sourceDebugTypes) {
             comboBox_1234.addItem(s);
         }
         panel.add(comboBox_1234, gbc_comboBox1234);
@@ -598,7 +602,8 @@ public class GUI {
         gbc_chckbxNewCheckBox_4.gridy = 10;
         panel.add(chckbxHidecode, gbc_chckbxNewCheckBox_4);
 
-        JCheckBox chckbxNumberObfuscation = new JCheckBox("Number Obfuscation");
+        JCheckBox chckbxNumberObfuscation
+                = new JCheckBox("Number Obfuscation");
         GridBagConstraints gbc_chckbxNewCheckBox_9 = new GridBagConstraints();
         gbc_chckbxNewCheckBox_9.anchor = GridBagConstraints.WEST;
         gbc_chckbxNewCheckBox_9.insets = new Insets(0, 0, 5, 5);
@@ -607,7 +612,9 @@ public class GUI {
         panel.add(chckbxNumberObfuscation, gbc_chckbxNewCheckBox_9);
 
         JCheckBox chckbxSpigotPlugin = new JCheckBox("Spigot Plugin");
-        chckbxSpigotPlugin.setToolTipText("Prevents string encryption from encrypting strings that contain %%__USER__%% or %%__RESOURCE__%% or %%__NONCE__%%.");
+        chckbxSpigotPlugin.setToolTipText("Prevents string encryption from " +
+                "encrypting strings that contain %%__USER__%% or " +
+                "%%__RESOURCE__%% or %%__NONCE__%%.");
         GridBagConstraints gbc_chckbxNewCheckBox_7 = new GridBagConstraints();
         gbc_chckbxNewCheckBox_7.anchor = GridBagConstraints.WEST;
         gbc_chckbxNewCheckBox_7.insets = new Insets(0, 0, 5, 5);
@@ -631,7 +638,8 @@ public class GUI {
         gbc_chckbxShuffler.gridy = 14;
         panel.add(chckbxShuffler, gbc_chckbxShuffler);
 
-        JCheckBox chckbxInnerClasses = new JCheckBox("InnerClasses Remover");
+        JCheckBox chckbxInnerClasses
+                = new JCheckBox("InnerClasses Remover");
         GridBagConstraints gbc_chckbxInnerClasses = new GridBagConstraints();
         gbc_chckbxInnerClasses.anchor = GridBagConstraints.WEST;
         gbc_chckbxInnerClasses.insets = new Insets(0, 0, 5, 5);
@@ -642,10 +650,13 @@ public class GUI {
         JPanel panel_2 = new JPanel();
         tabbedPane.addTab("Watermark", null, panel_2, null);
         GridBagLayout gbl_panel_2 = new GridBagLayout();
-        gbl_panel_2.columnWidths = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 59, 0, 0};
+        gbl_panel_2.columnWidths = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                59, 0, 0};
         gbl_panel_2.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-        gbl_panel_2.columnWeights = new double[]{0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-        gbl_panel_2.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
+        gbl_panel_2.columnWeights = new double[]{0.0, 1.0, 1.0, 1.0, 0.0, 0.0,
+                0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+        gbl_panel_2.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
         panel_2.setLayout(gbl_panel_2);
 
         JLabel lblNewLabel_1 = new JLabel("Message:");
@@ -769,7 +780,8 @@ public class GUI {
         btnNewButton_4.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 JFileChooser chooser = new JFileChooser();
-                if (extractorInput.getText() != null && !extractorInput.getText().isEmpty()) {
+                if (extractorInput.getText() != null
+                        && !extractorInput.getText().isEmpty()) {
                     chooser.setSelectedFile(new File(extractorInput.getText()));
                 }
                 chooser.setMultiSelectionEnabled(false);
@@ -779,7 +791,8 @@ public class GUI {
                     SwingUtilities.invokeLater(new Runnable() {
                         @Override
                         public void run() {
-                            extractorInput.setText(chooser.getSelectedFile().getAbsolutePath());
+                            extractorInput.setText(chooser.getSelectedFile()
+                                    .getAbsolutePath());
                         }
                     });
                 }
@@ -835,28 +848,38 @@ public class GUI {
             public void actionPerformed(ActionEvent arg0) {
                 listModel.clear();
 
-                if (extractorInput.getText() == null || extractorInput.getText().isEmpty()) {
-                    JOptionPane.showMessageDialog(null, "No file specified!", "Error", JOptionPane.ERROR_MESSAGE);
+                if (extractorInput.getText() == null
+                        || extractorInput.getText().isEmpty()) {
+                    JOptionPane.showMessageDialog(null, "No file specified!",
+                            "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
                 if (extractorKey.getText() == null || extractorKey.getText().isEmpty()) {
-                    JOptionPane.showMessageDialog(null, "No key entered!", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "No key entered!",
+                            "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
                 if (!extractorInput.getText().endsWith(".jar")) {
-                    JOptionPane.showMessageDialog(null, "Only Jars are allowed!", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null,
+                            "Only Jars are allowed!", "Error",
+                            JOptionPane.ERROR_MESSAGE);
                     return;
                 }
                 try {
                     File input = new File(extractorInput.getText());
-                    List<String> foundIds = WatermarkUtils.extractWatermark(input, new String(extractorKey.getPassword()));
+                    List<String> foundIds =
+                            WatermarkUtils.extractWatermark(input,
+                                    new String(extractorKey.getPassword()));
                     for (String s : foundIds) {
                         listModel.addElement(s);
                     }
 
-                    JOptionPane.showMessageDialog(null, "Finished! Found: " + String.valueOf(foundIds.size()) + " IDs", "Info", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(null,
+                            "Finished! Found: " +
+                                    String.valueOf(foundIds.size()) + " IDs",
+                            "Info", JOptionPane.INFORMATION_MESSAGE);
                 } catch (Throwable t) {
                     t.printStackTrace();
                 }
@@ -868,10 +891,14 @@ public class GUI {
         JPanel expirePanel = new JPanel();
         tabbedPane.addTab("Expiration", null, expirePanel, null);
         GridBagLayout gbl_expirePanel = new GridBagLayout();
-        gbl_expirePanel.columnWidths = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 59, 0, 0};
-        gbl_expirePanel.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-        gbl_expirePanel.columnWeights = new double[]{0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-        gbl_expirePanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
+        gbl_expirePanel.columnWidths = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 59, 0, 0};
+        gbl_expirePanel.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0};
+        gbl_expirePanel.columnWeights = new double[]{0.0, 1.0, 1.0, 1.0, 0.0,
+                0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+        gbl_expirePanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                0.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
         expirePanel.setLayout(gbl_expirePanel);
 
         JLabel expireMessageLabel = new JLabel("Message:");
@@ -944,10 +971,14 @@ public class GUI {
         JPanel panel_3 = new JPanel();
         tabbedPane.addTab("Exempt", null, panel_3, null);
         GridBagLayout gbl_panel_3 = new GridBagLayout();
-        gbl_panel_3.columnWidths = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-        gbl_panel_3.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-        gbl_panel_3.columnWeights = new double[]{0.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-        gbl_panel_3.rowWeights = new double[]{0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+        gbl_panel_3.columnWidths = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0};
+        gbl_panel_3.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                0, 0, 0};
+        gbl_panel_3.columnWeights = new double[]{0.0, 1.0, 1.0, 1.0, 0.0,
+                0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+        gbl_panel_3.rowWeights = new double[]{0.0, 1.0, 0.0, 0.0, 0.0, 0.0,
+                0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
         panel_3.setLayout(gbl_panel_3);
 
         JComboBox<String> comboBox_04 = new JComboBox<>();
@@ -1000,10 +1031,12 @@ public class GUI {
                         exemptList.addElement(exemptField.getText());
                         exemptField.setText("");
                     } else if (comboBox_04.getSelectedIndex() == 1) {
-                        exemptList.addElement(exemptField.getText() + "(METHOD)");
+                        exemptList.addElement(exemptField.getText() +
+                                "(METHOD)");
                         exemptField.setText("");
                     } else if (comboBox_04.getSelectedIndex() == 2) {
-                        exemptList.addElement(exemptField.getText() + "(FIELD)");
+                        exemptList.addElement(exemptField.getText() +
+                                "(FIELD)");
                         exemptField.setText("");
                     }
                 }
@@ -1043,10 +1076,12 @@ public class GUI {
 
         JTextArea txtrPizzaObfuscatorAuthors = new JTextArea();
         txtrPizzaObfuscatorAuthors.setFont(new Font("Arial", Font.PLAIN, 12));
-        txtrPizzaObfuscatorAuthors.setText(Radon.PREFIX + "\nVersion: " + Radon.VERSION + "\nAuthor: " + Radon.AUTHORS);
+        txtrPizzaObfuscatorAuthors.setText(Radon.PREFIX + "\nVersion: " +
+                Radon.VERSION + "\nAuthor: " + Radon.AUTHORS);
         txtrPizzaObfuscatorAuthors.setLineWrap(true);
         txtrPizzaObfuscatorAuthors.setEditable(false);
-        GridBagConstraints gbc_txtrPizzaObfuscatorAuthors = new GridBagConstraints();
+        GridBagConstraints gbc_txtrPizzaObfuscatorAuthors =
+                new GridBagConstraints();
         gbc_txtrPizzaObfuscatorAuthors.fill = GridBagConstraints.BOTH;
         gbc_txtrPizzaObfuscatorAuthors.insets = new Insets(0, 2, 0, 0);
         gbc_txtrPizzaObfuscatorAuthors.gridx = 0;
@@ -1067,60 +1102,82 @@ public class GUI {
                 if (inputField.getText().isEmpty()
                         || inputField.getText() == null
                         || !inputField.getText().endsWith(".jar")) {
-                    JOptionPane.showMessageDialog(null, "Invalid input JAR", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null,
+                            "Invalid input JAR", "Error",
+                            JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
                 if (outputField.getText().isEmpty()
                         || outputField.getText() == null
                         || !outputField.getText().endsWith(".jar")) {
-                    JOptionPane.showMessageDialog(null, "Invalid output JAR", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null,
+                            "Invalid output JAR", "Error",
+                            JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
                 if (outputField.getText().equals(inputField.getText())) {
-                    JOptionPane.showMessageDialog(null, "Output JAR can not have the same name as input JAR", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null,
+                            "Output JAR can not have the same name as input " +
+                                    "JAR", "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
-                if (!chckbxStringEncryption.isSelected() &&
-                        !chckbxInvokeDynamic.isSelected() &&
-                        !chckbxFlow.isSelected() &&
-                        !chckbxLocalVariables.isSelected() &&
-                        !chckbxTrashClasses.isSelected() &&
-                        !chckbxSpringPool.isSelected() &&
-                        !chckbxCrasher.isSelected() &&
-                        !chckbxHidecode.isSelected() &&
-                        !chckbxClassRenammer.isSelected() &&
-                        !chckbxNumberObfuscation.isSelected() &&
-                        !chckbxAddWatermark.isSelected() &&
-                        !chckbxLineObfuscation.isSelected() &&
-                        !chckbxSourceName.isSelected() &&
-                        !chckbxSourceDebug.isSelected() &&
-                        !chckbxShuffler.isSelected() &&
-                        !chckbxAddExpiration.isSelected() &&
-                        !chckbxInnerClasses.isSelected()) {
-                    JOptionPane.showMessageDialog(null, "Please select an obfuscation setting!\nSpigot-Plugin setting alone is not counted as an option.", "Error", JOptionPane.ERROR_MESSAGE);
+                if (!chckbxStringEncryption.isSelected()
+                        && !chckbxInvokeDynamic.isSelected()
+                        && !chckbxFlow.isSelected()
+                        && !chckbxLocalVariables.isSelected()
+                        && !chckbxTrashClasses.isSelected()
+                        && !chckbxSpringPool.isSelected()
+                        && !chckbxCrasher.isSelected()
+                        && !chckbxHidecode.isSelected()
+                        && !chckbxClassRenammer.isSelected()
+                        && !chckbxNumberObfuscation.isSelected()
+                        && !chckbxAddWatermark.isSelected()
+                        && !chckbxLineObfuscation.isSelected()
+                        && !chckbxSourceName.isSelected()
+                        && !chckbxSourceDebug.isSelected()
+                        && !chckbxShuffler.isSelected()
+                        && !chckbxAddExpiration.isSelected()
+                        && !chckbxInnerClasses.isSelected()) {
+                    JOptionPane.showMessageDialog(null,
+                            "Please select an obfuscation " +
+                                    "setting!\nThe Spigot-Plugin setting " +
+                                    "alone is not counted as an option.",
+                            "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
-                if (chckbxAddWatermark.isSelected() && waterMarkMessageField.getText().isEmpty()) {
-                    JOptionPane.showMessageDialog(null, "You must enter a message to be watermarked.", "Error", JOptionPane.ERROR_MESSAGE);
+                if (chckbxAddWatermark.isSelected()
+                        && waterMarkMessageField.getText().isEmpty()) {
+                    JOptionPane.showMessageDialog(null,
+                            "You must enter a message to be watermarked.",
+                            "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
-                if (chckbxAddWatermark.isSelected() && watermarkPassword.getText().isEmpty()) {
-                    JOptionPane.showMessageDialog(null, "You must enter a key to encrypt the watermark message.", "Error", JOptionPane.ERROR_MESSAGE);
+                if (chckbxAddWatermark.isSelected()
+                        && watermarkPassword.getText().isEmpty()) {
+                    JOptionPane.showMessageDialog(null,
+                            "You must enter a key to encrypt the watermark message.",
+                            "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
-                if (chckbxAddExpiration.isSelected() && expirationMessageField.getText().isEmpty()) {
-                    JOptionPane.showMessageDialog(null, "You must enter an expiration message.", "Error", JOptionPane.ERROR_MESSAGE);
+                if (chckbxAddExpiration.isSelected()
+                        && expirationMessageField.getText().isEmpty()) {
+                    JOptionPane.showMessageDialog(null,
+                            "You must enter an expiration message.", "Error",
+                            JOptionPane.ERROR_MESSAGE);
                     return;
                 }
 
-                if (chckbxAddExpiration.isSelected() && expirationDateField.getText().isEmpty()) {
-                    JOptionPane.showMessageDialog(null, "You must enter an expiration date.", "Error", JOptionPane.ERROR_MESSAGE);
+                if (chckbxAddExpiration.isSelected()
+                        && expirationDateField.getText().isEmpty()) {
+                    JOptionPane.showMessageDialog(null,
+                            "You must enter an expiration date.",
+                            "Error", JOptionPane.ERROR_MESSAGE);
                     return;
                 }
                 btnObfuscate.setText("Processing...");
@@ -1138,16 +1195,23 @@ public class GUI {
 
                             File input = new File(inputField.getText());
                             if (!input.exists()) {
-                                JOptionPane.showMessageDialog(null, "Input JAR does not exist.", "Error", JOptionPane.ERROR_MESSAGE);
+                                JOptionPane.showMessageDialog(null,
+                                        "Input JAR does not exist.",
+                                        "Error", JOptionPane.ERROR_MESSAGE);
                                 return;
                             }
                             output = new File(outputField.getText());
 
-                            int trashChance = 0;
+                            int trashChance;
                             try {
-                                trashChance = Integer.valueOf(trashChanceField.getText());
+                                trashChance =
+                                        Integer.valueOf(trashChanceField.getText());
                             } catch (Throwable t) {
-                                JOptionPane.showMessageDialog(null, "Please only enter numbers as a chance for trash classes.", "Error", JOptionPane.ERROR_MESSAGE);
+                                JOptionPane.showMessageDialog(null,
+                                        "Please enter numbers only for the " +
+                                                "number of desired trash " +
+                                                "classes.", "Error",
+                                        JOptionPane.ERROR_MESSAGE);
                                 return;
                             }
                             List<String> exemptClasses = new ArrayList<>();
@@ -1155,15 +1219,21 @@ public class GUI {
                             List<String> exemptFields = new ArrayList<>();
                             for (int i = 0; i < exemptList.size(); i++) {
                                 if (exemptList.get(i).endsWith("(FIELD)")) {
-                                    exemptFields.add(exemptList.get(i).substring(0, exemptList.get(i).length() - 7));
-                                } else if (exemptList.get(i).endsWith("(METHOD)")) {
-                                    exemptMethods.add(exemptList.get(i).substring(0, exemptList.get(i).length() - 8));
+                                    exemptFields.add(exemptList.get(i)
+                                            .substring(0, exemptList.get(i)
+                                                    .length() - 7));
+                                } else if (exemptList.get(i)
+                                        .endsWith("(METHOD)")) {
+                                    exemptMethods.add(exemptList.get(i)
+                                            .substring(0, exemptList.get(i)
+                                                    .length() - 8));
                                 } else {
                                     exemptClasses.add(exemptList.get(i));
                                 }
                             }
                             boolean spigotMode = chckbxSpigotPlugin.isSelected();
-                            List<AbstractTransformer> transformers = new ArrayList<>();
+                            List<AbstractTransformer> transformers
+                                    = new ArrayList<>();
 
                             if (chckbxClassRenammer.isSelected()) {
                                 transformers.add(new Renamer(spigotMode));
@@ -1189,9 +1259,14 @@ public class GUI {
                             }
                             if (chckbxAddExpiration.isSelected()) {
                                 if (!expirationDateField.getText().isEmpty()
-                                        && !expirationMessageField.getText().isEmpty()) {
-                                    long expireTime = new SimpleDateFormat("MM/dd/yyyy").parse(expirationDateField.getText()).getTime();
-                                    transformers.add(new Expiry(expireTime, expirationMessageField.getText()));
+                                        && !expirationMessageField.getText()
+                                        .isEmpty()) {
+                                    long expireTime =
+                                            new SimpleDateFormat("MM/dd/yyyy")
+                                                    .parse(expirationDateField
+                                                            .getText()).getTime();
+                                    transformers.add(new Expiry(expireTime,
+                                            expirationMessageField.getText()));
                                 }
                             }
                             if (chckbxStringEncryption.isSelected()) {
@@ -1295,9 +1370,12 @@ public class GUI {
                                     watermarkType,
                                     new String(watermarkPassword.getPassword()));
                             bootstrap.startTheParty(false);
-                            JOptionPane.showMessageDialog(null, "Successfully processed file!", "Done", JOptionPane.INFORMATION_MESSAGE);
+                            JOptionPane.showMessageDialog(null,
+                                    "Successfully processed file!",
+                                    "Done", JOptionPane.INFORMATION_MESSAGE);
                         } catch (Throwable t) {
-                            JOptionPane.showMessageDialog(null, t.toString(), "Error", 0);
+                            JOptionPane.showMessageDialog(null, t.toString(),
+                                    "Error", JOptionPane.ERROR_MESSAGE);
                             t.printStackTrace();
                             if (output != null) {
                                 output.delete();
@@ -1328,22 +1406,25 @@ public class GUI {
                         @Override
                         public void run() {
                             try {
-                                File config = new File(chooser.getSelectedFile().getAbsolutePath());
-                                if (!config.exists()) throw new IOException("Config file does not exist.");
+                                File config = new File(chooser.getSelectedFile()
+                                        .getAbsolutePath());
+                                if (!config.exists())
+                                    throw new IOException("Config file does " +
+                                            "not exist.");
 
-                                Config configParser = new Config(new FileInputStream(config));
+                                Config configParser
+                                        = new Config(new FileInputStream(config));
                                 configParser.loadIntoMap();
                                 configParser.sortExempts();
                                 configParser.checkConfig();
 
-                                inputField.setText(configParser.getInput().getAbsolutePath());
-                                outputField.setText(configParser.getOutput().getAbsolutePath());
-                                ArrayList<String> thisLibs = new ArrayList<>();
-                                for (String path : configParser.getLibraries().keySet()) {
-                                    thisLibs.add(path);
-                                }
+                                inputField.setText(configParser.getInput()
+                                        .getAbsolutePath());
+                                outputField.setText(configParser.getOutput()
+                                        .getAbsolutePath());
                                 libList.clear();
-                                for (String s : thisLibs) {
+                                for (String s : configParser.getLibraries()
+                                        .keySet()) {
                                     libList.addElement(s);
                                 }
 
@@ -1355,153 +1436,185 @@ public class GUI {
                                     }
                                 }
 
-                                AbstractTransformer stringEncryptionMode = configParser.getStringEncryptionType();
+                                AbstractTransformer stringEncryptionMode
+                                        = configParser.getStringEncryptionType();
                                 if (stringEncryptionMode == null) {
                                     chckbxStringEncryption.setSelected(false);
-                                } else if (stringEncryptionMode instanceof SuperLightStringEncryption) {
+                                } else if (stringEncryptionMode
+                                        instanceof SuperLightStringEncryption) {
                                     chckbxStringEncryption.setSelected(true);
                                     comboBox.setSelectedIndex(0);
                                     comboBox.setEnabled(true);
-                                } else if (stringEncryptionMode instanceof LightStringEncryption) {
+                                } else if (stringEncryptionMode
+                                        instanceof LightStringEncryption) {
                                     chckbxStringEncryption.setSelected(true);
                                     comboBox.setSelectedIndex(1);
                                     comboBox.setEnabled(true);
-                                } else if (stringEncryptionMode instanceof NormalStringEncryption) {
+                                } else if (stringEncryptionMode
+                                        instanceof NormalStringEncryption) {
                                     chckbxStringEncryption.setSelected(true);
                                     comboBox.setSelectedIndex(2);
                                     comboBox.setEnabled(true);
-                                } else if (stringEncryptionMode instanceof HeavyStringEncryption) {
+                                } else if (stringEncryptionMode
+                                        instanceof HeavyStringEncryption) {
                                     chckbxStringEncryption.setSelected(true);
                                     comboBox.setSelectedIndex(3);
                                     comboBox.setEnabled(true);
                                 }
 
-                                AbstractTransformer flowObfuscationMode = configParser.getFlowObfuscationType();
+                                AbstractTransformer flowObfuscationMode =
+                                        configParser.getFlowObfuscationType();
                                 if (flowObfuscationMode == null) {
                                     chckbxFlow.setSelected(false);
-                                } else if (flowObfuscationMode instanceof LightFlowObfuscation) {
+                                } else if (flowObfuscationMode
+                                        instanceof LightFlowObfuscation) {
                                     chckbxFlow.setSelected(true);
                                     comboBox_2.setSelectedIndex(0);
                                     comboBox_2.setEnabled(true);
-                                } else if (flowObfuscationMode instanceof NormalFlowObfuscation) {
+                                } else if (flowObfuscationMode
+                                        instanceof NormalFlowObfuscation) {
                                     chckbxFlow.setSelected(true);
                                     comboBox_2.setSelectedIndex(1);
                                     comboBox_2.setEnabled(true);
                                 }
 
-                                AbstractTransformer invokeDynamicMode = configParser.getInvokeDynamicType();
+                                AbstractTransformer invokeDynamicMode =
+                                        configParser.getInvokeDynamicType();
                                 if (invokeDynamicMode == null) {
                                     chckbxInvokeDynamic.setSelected(false);
-                                } else if (invokeDynamicMode instanceof LightInvokeDynamic) {
+                                } else if (invokeDynamicMode
+                                        instanceof LightInvokeDynamic) {
                                     chckbxInvokeDynamic.setSelected(true);
                                     comboBox_1.setSelectedIndex(0);
                                     comboBox_1.setEnabled(true);
-                                } else if (invokeDynamicMode instanceof NormalInvokeDynamic) {
+                                } else if (invokeDynamicMode
+                                        instanceof NormalInvokeDynamic) {
                                     chckbxInvokeDynamic.setSelected(true);
                                     comboBox_1.setSelectedIndex(1);
                                     comboBox_1.setEnabled(true);
-                                } else if (invokeDynamicMode instanceof HeavyInvokeDynamic) {
+                                } else if (invokeDynamicMode
+                                        instanceof HeavyInvokeDynamic) {
                                     chckbxInvokeDynamic.setSelected(true);
                                     comboBox_1.setSelectedIndex(2);
                                     comboBox_1.setEnabled(true);
                                 }
 
-                                AbstractTransformer localVariablesMode = configParser.getLocalVariableObfuscationType();
+                                AbstractTransformer localVariablesMode =
+                                        configParser.getLocalVariableObfuscationType();
                                 if (localVariablesMode == null) {
                                     chckbxLocalVariables.setSelected(false);
-                                } else if (localVariablesMode instanceof ObfuscateLocalVariables) {
+                                } else if (localVariablesMode
+                                        instanceof ObfuscateLocalVariables) {
                                     chckbxLocalVariables.setSelected(true);
                                     comboBox_3.setSelectedIndex(0);
                                     comboBox_3.setEnabled(true);
-                                } else if (localVariablesMode instanceof RemoveLocalVariables) {
+                                } else if (localVariablesMode
+                                        instanceof RemoveLocalVariables) {
                                     chckbxLocalVariables.setSelected(true);
                                     comboBox_3.setSelectedIndex(1);
                                     comboBox_3.setEnabled(true);
                                 }
 
-                                AbstractTransformer crasherMode = configParser.getCrasherType();
+                                AbstractTransformer crasherMode =
+                                        configParser.getCrasherType();
                                 if (crasherMode instanceof Crasher) {
                                     chckbxCrasher.setSelected(true);
                                 } else {
                                     chckbxCrasher.setSelected(false);
                                 }
 
-                                AbstractTransformer hideCodeMode = configParser.getHideCodeType();
+                                AbstractTransformer hideCodeMode =
+                                        configParser.getHideCodeType();
                                 if (hideCodeMode instanceof HideCode) {
                                     chckbxHidecode.setSelected(true);
                                 } else {
                                     chckbxHidecode.setSelected(false);
                                 }
 
-                                AbstractTransformer lineRemoverMode = configParser.getLineNumberObfuscationType();
+                                AbstractTransformer lineRemoverMode =
+                                        configParser.getLineNumberObfuscationType();
                                 if (lineRemoverMode == null) {
                                     chckbxLineObfuscation.setSelected(false);
-                                } else if (lineRemoverMode instanceof ObfuscateLineNumbers) {
+                                } else if (lineRemoverMode
+                                        instanceof ObfuscateLineNumbers) {
                                     chckbxLineObfuscation.setSelected(true);
                                     comboBox_5.setSelectedIndex(0);
                                     comboBox_5.setEnabled(true);
-                                } else if (lineRemoverMode instanceof RemoveLineNumbers) {
+                                } else if (lineRemoverMode
+                                        instanceof RemoveLineNumbers) {
                                     chckbxLineObfuscation.setSelected(true);
                                     comboBox_5.setSelectedIndex(1);
                                     comboBox_5.setEnabled(true);
                                 }
 
-                                AbstractTransformer numberObfuscationMode = configParser.getNumberObfuscationType();
-                                if (numberObfuscationMode instanceof NumberObfuscation) {
+                                AbstractTransformer numberObfuscationMode =
+                                        configParser.getNumberObfuscationType();
+                                if (numberObfuscationMode
+                                        instanceof NumberObfuscation) {
                                     chckbxNumberObfuscation.setSelected(true);
                                 } else {
                                     chckbxNumberObfuscation.setSelected(false);
                                 }
 
-                                AbstractTransformer sourceNameObfuscationMode = configParser.getSourceNameObfuscationType();
+                                AbstractTransformer sourceNameObfuscationMode =
+                                        configParser.getSourceNameObfuscationType();
                                 if (sourceNameObfuscationMode == null) {
                                     chckbxSourceName.setSelected(false);
-                                } else if (sourceNameObfuscationMode instanceof ObfuscateSourceName) {
+                                } else if (sourceNameObfuscationMode
+                                        instanceof ObfuscateSourceName) {
                                     chckbxSourceName.setSelected(true);
                                     comboBox_123.setSelectedIndex(0);
                                     comboBox_123.setEnabled(true);
-                                } else if (sourceNameObfuscationMode instanceof RemoveSourceName) {
+                                } else if (sourceNameObfuscationMode
+                                        instanceof RemoveSourceName) {
                                     chckbxSourceName.setSelected(true);
                                     comboBox_123.setSelectedIndex(1);
                                     comboBox_123.setEnabled(true);
                                 }
 
-                                AbstractTransformer sourceDebugObfuscationMode = configParser.getSourceDebugObfuscationType();
+                                AbstractTransformer sourceDebugObfuscationMode =
+                                        configParser.getSourceDebugObfuscationType();
                                 if (sourceDebugObfuscationMode == null) {
                                     chckbxSourceDebug.setSelected(false);
-                                } else if (sourceDebugObfuscationMode instanceof ObfuscateSourceDebug) {
+                                } else if (sourceDebugObfuscationMode
+                                        instanceof ObfuscateSourceDebug) {
                                     chckbxSourceDebug.setSelected(true);
                                     comboBox_1234.setSelectedIndex(0);
                                     comboBox_1234.setEnabled(true);
-                                } else if (sourceDebugObfuscationMode instanceof RemoveSourceDebug) {
+                                } else if (sourceDebugObfuscationMode
+                                        instanceof RemoveSourceDebug) {
                                     chckbxSourceDebug.setSelected(true);
                                     comboBox_1234.setSelectedIndex(1);
                                     comboBox_1234.setEnabled(true);
                                 }
 
 
-                                AbstractTransformer stringPoolMode = configParser.getStringPoolType();
+                                AbstractTransformer stringPoolMode =
+                                        configParser.getStringPoolType();
                                 if (stringPoolMode instanceof StringPool) {
                                     chckbxSpringPool.setSelected(true);
                                 } else {
                                     chckbxSpringPool.setSelected(false);
                                 }
 
-                                AbstractTransformer shufflerMode = configParser.getShufflerType();
+                                AbstractTransformer shufflerMode =
+                                        configParser.getShufflerType();
                                 if (shufflerMode instanceof Shuffler) {
                                     chckbxShuffler.setSelected(true);
                                 } else {
                                     chckbxShuffler.setSelected(false);
                                 }
 
-                                AbstractTransformer innerClassMode = configParser.getInnerClassRemoverType();
+                                AbstractTransformer innerClassMode =
+                                        configParser.getInnerClassRemoverType();
                                 if (innerClassMode instanceof InnerClassRemover) {
                                     chckbxInnerClasses.setSelected(true);
                                 } else {
                                     chckbxInnerClasses.setSelected(false);
                                 }
 
-                                AbstractTransformer renamer = configParser.getRenamerType();
+                                AbstractTransformer renamer =
+                                        configParser.getRenamerType();
                                 if (renamer instanceof Renamer) {
                                     chckbxClassRenammer.setSelected(true);
                                 } else {
@@ -1514,19 +1627,24 @@ public class GUI {
                                     chckbxSpigotPlugin.setSelected(false);
                                 }
 
-                                int trashClassesChance = configParser.getTrashClasses();
+                                int trashClassesChance =
+                                        configParser.getTrashClasses();
                                 if (trashClassesChance == -1) {
                                     chckbxTrashClasses.setSelected(false);
                                 } else {
                                     chckbxTrashClasses.setSelected(true);
-                                    trashChanceField.setText(String.valueOf(trashClassesChance));
+                                    trashChanceField.setText(String
+                                            .valueOf(trashClassesChance));
                                     trashChanceField.setEditable(true);
                                 }
 
-                                waterMarkMessageField.setText(configParser.getWatermarkMsg());
-                                watermarkPassword.setText(configParser.getWatermarkKey());
+                                waterMarkMessageField.setText(configParser
+                                        .getWatermarkMsg());
+                                watermarkPassword.setText(configParser
+                                        .getWatermarkKey());
 
-                                int watermarkType = configParser.getWatermarkType();
+                                int watermarkType =
+                                        configParser.getWatermarkType();
                                 if (configParser.getWatermarkType() != -1) {
                                     chckbxAddWatermark.setSelected(true);
                                     waterMarkMessageField.setEnabled(true);
@@ -1537,14 +1655,19 @@ public class GUI {
 
                                 if (configParser.getExpiryMsg() != null
                                         && configParser.getExpiryTime() != -1) {
-                                    expirationMessageField.setText(configParser.getExpiryMsg());
+                                    expirationMessageField.setText(configParser
+                                            .getExpiryMsg());
                                     expirationMessageField.setEnabled(true);
-                                    expirationDateField.setText(String.valueOf(new SimpleDateFormat("MM/dd/yyyy").format(configParser.getExpiryTime())));
+                                    expirationDateField.setText(String
+                                            .valueOf(new SimpleDateFormat("MM/dd/yyyy")
+                                                    .format(configParser.getExpiryTime())));
                                     expirationDateField.setEnabled(true);
                                     chckbxAddExpiration.setSelected(true);
                                 }
                             } catch (Throwable t) {
-                                JOptionPane.showMessageDialog(null, t.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                                JOptionPane.showMessageDialog(null,
+                                        t.getMessage(), "Error",
+                                        JOptionPane.ERROR_MESSAGE);
                                 t.printStackTrace();
                             }
                         }
@@ -1552,7 +1675,8 @@ public class GUI {
                 }
             }
         });
-        btnLoadConfiguration.setToolTipText("Loads config for pre-defined settings.");
+        btnLoadConfiguration.setToolTipText("Loads config for pre-defined " +
+                "settings.");
         panel_6.add(btnLoadConfiguration);
         this.frmRadonObfuscator.setVisible(true);
     }

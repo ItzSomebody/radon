@@ -20,14 +20,17 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class LightStringEncryption extends AbstractTransformer {
     /**
-     * Indication to not encrypt strings containing Spigot placeholders (%%__USER__%%, %%__RESOURCE__%% and %%__NONCE__%%).
+     * Indication to not encrypt strings containing Spigot placeholders
+     * (%%__USER__%%, %%__RESOURCE__%% and %%__NONCE__%%).
      */
     private boolean spigotMode;
 
     /**
      * Constructor used to create a {@link LightStringEncryption} object.
      *
-     * @param spigotMode indication to not encrypt strings containing Spigot placeholders (%%__USER__%%, %%__RESOURCE__%% and %%__NONCE__%%).
+     * @param spigotMode indication to not encrypt strings containing Spigot
+     *                   placeholders(%%__USER__%%, %%__RESOURCE__%%
+     *                   and %%__NONCE__%%).
      */
     public LightStringEncryption(boolean spigotMode) {
         this.spigotMode = spigotMode;
@@ -54,12 +57,22 @@ public class LightStringEncryption extends AbstractTransformer {
                             if (this.spigotMode &&
                                     ((String) cst).contains("%%__USER__%%")
                                     || ((String) cst).contains("%%__RESOURCE__%%")
-                                    || ((String) cst).contains("%%__NONCE__%%")) continue;
+                                    || ((String) cst).contains("%%__NONCE__%%"))
+                                continue;
 
                             int key3 = NumberUtils.getRandomInt();
-                            ((LdcInsnNode) insn).cst = StringUtils.lightEncrypt(((String) ((LdcInsnNode) insn).cst), decryptorPath[0].replace("/", "."), decryptorPath[1], key3);
-                            methodNode.instructions.insert(insn, new MethodInsnNode(Opcodes.INVOKESTATIC, decryptorPath[0], decryptorPath[1], "(Ljava/lang/Object;I)Ljava/lang/String;", false));
-                            methodNode.instructions.insert(insn, BytecodeUtils.getNumberInsn(key3));
+                            ((LdcInsnNode) insn).cst =
+                                    StringUtils.lightEncrypt(((String) ((LdcInsnNode) insn).cst),
+                                            decryptorPath[0].replace("/", "."),
+                                            decryptorPath[1], key3);
+                            methodNode.instructions.insert(insn,
+                                    new MethodInsnNode(Opcodes.INVOKESTATIC,
+                                            decryptorPath[0], decryptorPath[1],
+                                            "(Ljava/lang/Object;I)" +
+                                                    "Ljava/lang/String;",
+                                            false));
+                            methodNode.instructions.insert(insn,
+                                    BytecodeUtils.getNumberInsn(key3));
                             counter.incrementAndGet();
                         }
                     }

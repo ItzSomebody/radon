@@ -13,18 +13,25 @@ import me.itzsomebody.radon.transformers.stringencryption.*;
  */
 public class StringEncryption implements Opcodes {
     /**
-     * Returns a {@link MethodNode} that returns a {@link String} needed to decrypt strings encrypted by {@link SuperLightStringEncryption}.
+     * Returns a {@link MethodNode} that returns a {@link String} needed to
+     * decrypt strings encrypted by {@link SuperLightStringEncryption}.
      *
-     * @param decryptionMethodName used to determine the name of the generated {@link MethodNode}.
-     * @return a {@link MethodNode} that returns a {@link String} needed to decrypt strings encrypted by {@link SuperLightStringEncryption}.
+     * @param decryptionMethodName used to determine the name of the
+     *                             generated {@link MethodNode}.
+     * @return a {@link MethodNode} that returns a {@link String} needed to
+     * decrypt strings encrypted by {@link SuperLightStringEncryption}.
      */
     public static MethodNode superLightMethod(String decryptionMethodName) {
-        MethodNode mv = new MethodNode(ACC_PUBLIC + ACC_STATIC + ACC_SYNTHETIC + ACC_BRIDGE, decryptionMethodName, "(Ljava/lang/String;I)Ljava/lang/String;", null, null);
+        MethodNode mv = new MethodNode(ACC_PUBLIC + ACC_STATIC
+                + ACC_SYNTHETIC + ACC_BRIDGE, decryptionMethodName,
+                "(Ljava/lang/String;I)Ljava/lang/String;", null,
+                null);
         mv.visitCode();
         Label l0 = new Label();
         mv.visitLabel(l0);
         mv.visitVarInsn(ALOAD, 0);
-        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "toCharArray", "()[C", false);
+        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "toCharArray",
+                "()[C", false);
         mv.visitVarInsn(ASTORE, 2);
         Label l1 = new Label();
         mv.visitLabel(l1);
@@ -42,7 +49,8 @@ public class StringEncryption implements Opcodes {
         mv.visitJumpInsn(GOTO, l4);
         Label l5 = new Label();
         mv.visitLabel(l5);
-        mv.visitFrame(Opcodes.F_APPEND,3, new Object[] {"[C", "[C", Opcodes.INTEGER}, 0, null);
+        mv.visitFrame(Opcodes.F_APPEND, 3, new Object[]{"[C", "[C",
+                Opcodes.INTEGER}, 0, null);
         mv.visitVarInsn(ALOAD, 3);
         mv.visitVarInsn(ILOAD, 4);
         mv.visitVarInsn(ALOAD, 2);
@@ -66,7 +74,8 @@ public class StringEncryption implements Opcodes {
         mv.visitTypeInsn(NEW, "java/lang/String");
         mv.visitInsn(DUP);
         mv.visitVarInsn(ALOAD, 3);
-        mv.visitMethodInsn(INVOKESPECIAL, "java/lang/String", "<init>", "([C)V", false);
+        mv.visitMethodInsn(INVOKESPECIAL, "java/lang/String", "<init>",
+                "([C)V", false);
         mv.visitInsn(ARETURN);
         Label l8 = new Label();
         mv.visitLabel(l8);
@@ -77,33 +86,42 @@ public class StringEncryption implements Opcodes {
     }
 
     /**
-     * Returns a {@link MethodNode} that returns a {@link String} needed to decrypt strings encrypted by {@link LightStringEncryption}.
+     * Returns a {@link MethodNode} that returns a {@link String} needed to
+     * decrypt strings encrypted by {@link LightStringEncryption}.
      *
-     * @param decryptMethodName used to determine the name of the generated {@link MethodNode}.
-     * @return a {@link MethodNode} that returns a {@link String} needed to decrypt strings encrypted by {@link LightStringEncryption}.
+     * @param decryptMethodName used to determine the name of the generated
+     *                          {@link MethodNode}.
+     * @return a {@link MethodNode} that returns a {@link String} needed to
+     * decrypt strings encrypted by {@link LightStringEncryption}.
      */
     public static MethodNode lightMethod(String decryptMethodName) {
-        MethodNode mv = new MethodNode(ACC_PUBLIC + ACC_STATIC + ACC_SYNTHETIC + ACC_BRIDGE, decryptMethodName, "(Ljava/lang/Object;I)Ljava/lang/String;", null, null);
+        MethodNode mv = new MethodNode(ACC_PUBLIC + ACC_STATIC +
+                ACC_SYNTHETIC + ACC_BRIDGE, decryptMethodName,
+                "(Ljava/lang/Object;I)Ljava/lang/String;", null, null);
         mv.visitCode();
         Label l0 = new Label();
         mv.visitLabel(l0);
         mv.visitVarInsn(ALOAD, 0);
         mv.visitTypeInsn(CHECKCAST, "java/lang/String");
-        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "length", "()I", false);
+        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "length", "()I",
+                false);
         mv.visitIntInsn(NEWARRAY, T_CHAR);
         mv.visitVarInsn(ASTORE, 2);
         Label l1 = new Label();
         mv.visitLabel(l1);
         mv.visitVarInsn(ALOAD, 0);
         mv.visitTypeInsn(CHECKCAST, "java/lang/String");
-        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "toCharArray", "()[C", false);
+        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "toCharArray",
+                "()[C", false);
         mv.visitVarInsn(ASTORE, 3);
         Label l2 = new Label();
         mv.visitLabel(l2);
         mv.visitTypeInsn(NEW, "java/lang/Throwable");
         mv.visitInsn(DUP);
-        mv.visitMethodInsn(INVOKESPECIAL, "java/lang/Throwable", "<init>", "()V", false);
-        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Throwable", "getStackTrace", "()[Ljava/lang/StackTraceElement;", false);
+        mv.visitMethodInsn(INVOKESPECIAL, "java/lang/Throwable", "<init>",
+                "()V", false);
+        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Throwable",
+                "getStackTrace", "()[Ljava/lang/StackTraceElement;", false);
         mv.visitVarInsn(ASTORE, 4);
         Label l3 = new Label();
         mv.visitLabel(l3);
@@ -115,12 +133,16 @@ public class StringEncryption implements Opcodes {
         mv.visitJumpInsn(GOTO, l5);
         Label l6 = new Label();
         mv.visitLabel(l6);
-        mv.visitFrame(Opcodes.F_FULL, 6, new Object[]{"java/lang/Object", Opcodes.INTEGER, "[C", "[C", "[Ljava/lang/StackTraceElement;", Opcodes.INTEGER}, 0, new Object[]{});
+        mv.visitFrame(Opcodes.F_FULL, 6, new Object[]{"java/lang/Object",
+                Opcodes.INTEGER, "[C", "[C", "[Ljava/lang/StackTraceElement;",
+                Opcodes.INTEGER}, 0, new Object[]{});
         mv.visitVarInsn(ALOAD, 4);
         mv.visitInsn(ICONST_0);
         mv.visitInsn(AALOAD);
-        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StackTraceElement", "getClassName", "()Ljava/lang/String;", false);
-        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "hashCode", "()I", false);
+        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StackTraceElement",
+                "getClassName", "()Ljava/lang/String;", false);
+        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "hashCode",
+                "()I", false);
         mv.visitInsn(I2C);
         mv.visitVarInsn(ISTORE, 6);
         Label l7 = new Label();
@@ -128,8 +150,10 @@ public class StringEncryption implements Opcodes {
         mv.visitVarInsn(ALOAD, 4);
         mv.visitInsn(ICONST_0);
         mv.visitInsn(AALOAD);
-        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StackTraceElement", "getMethodName", "()Ljava/lang/String;", false);
-        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "hashCode", "()I", false);
+        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StackTraceElement",
+                "getMethodName", "()Ljava/lang/String;", false);
+        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "hashCode",
+                "()I", false);
         mv.visitInsn(I2C);
         mv.visitVarInsn(ISTORE, 7);
         Label l8 = new Label();
@@ -161,7 +185,8 @@ public class StringEncryption implements Opcodes {
         mv.visitTypeInsn(NEW, "java/lang/String");
         mv.visitInsn(DUP);
         mv.visitVarInsn(ALOAD, 2);
-        mv.visitMethodInsn(INVOKESPECIAL, "java/lang/String", "<init>", "([C)V", false);
+        mv.visitMethodInsn(INVOKESPECIAL, "java/lang/String", "<init>",
+                "([C)V", false);
         mv.visitInsn(ARETURN);
         Label l11 = new Label();
         mv.visitLabel(l11);
@@ -172,13 +197,19 @@ public class StringEncryption implements Opcodes {
     }
 
     /**
-     * Returns a {@link MethodNode} that returns a {@link String} needed to decrypt strings encrypted by {@link NormalStringEncryption}.
+     * Returns a {@link MethodNode} that returns a {@link String} needed to
+     * decrypt strings encrypted by {@link NormalStringEncryption}.
      *
-     * @param decryptionMethodName used to determine the name of the generated {@link MethodNode}.
-     * @return a {@link MethodNode} that returns a {@link String} needed to decrypt strings encrypted by {@link NormalStringEncryption}.
+     * @param decryptionMethodName used to determine the name of the
+     *                             generated {@link MethodNode}.
+     * @return a {@link MethodNode} that returns a {@link String} needed to
+     * decrypt strings encrypted by {@link NormalStringEncryption}.
      */
     public static MethodNode normalMethod(String decryptionMethodName) {
-        MethodNode mv = new MethodNode(ACC_PUBLIC + ACC_STATIC + ACC_BRIDGE + ACC_SYNTHETIC, decryptionMethodName, "(Ljava/lang/Object;Ljava/lang/Object;I)Ljava/lang/String;", null, null);
+        MethodNode mv = new MethodNode(ACC_PUBLIC + ACC_STATIC +
+                ACC_BRIDGE + ACC_SYNTHETIC, decryptionMethodName,
+                "(Ljava/lang/Object;Ljava/lang/Object;I)Ljava/lang/String;",
+                null, null);
         mv.visitCode();
         Label l0 = new Label();
         Label l1 = new Label();
@@ -240,14 +271,16 @@ public class StringEncryption implements Opcodes {
         Label l26 = new Label();
         mv.visitJumpInsn(GOTO, l26);
         mv.visitLabel(l25);
-        mv.visitFrame(Opcodes.F_APPEND, 1, new Object[]{Opcodes.INTEGER}, 0, null);
+        mv.visitFrame(Opcodes.F_APPEND, 1, new Object[]{Opcodes.INTEGER},
+                0, null);
         mv.visitInsn(ICONST_0);
         mv.visitLabel(l26);
         mv.visitFrame(Opcodes.F_SAME1, 0, null, 1, new Object[]{Opcodes.INTEGER});
         mv.visitVarInsn(ISTORE, 4);
         Label l27 = new Label();
         mv.visitLabel(l27);
-        mv.visitFrame(Opcodes.F_APPEND, 1, new Object[]{Opcodes.INTEGER}, 0, null);
+        mv.visitFrame(Opcodes.F_APPEND, 1, new Object[]{Opcodes.INTEGER},
+                0, null);
         mv.visitVarInsn(ILOAD, 3);
         mv.visitVarInsn(ILOAD, 4);
         Label l28 = new Label();
@@ -303,11 +336,13 @@ public class StringEncryption implements Opcodes {
         Label l43 = new Label();
         mv.visitJumpInsn(GOTO, l43);
         mv.visitLabel(l40);
-        mv.visitFrame(Opcodes.F_APPEND, 1, new Object[]{Opcodes.INTEGER}, 0, null);
+        mv.visitFrame(Opcodes.F_APPEND, 1, new Object[]{Opcodes.INTEGER},
+                0, null);
         mv.visitIntInsn(BIPUSH, 8);
         mv.visitVarInsn(ISTORE, 6);
         mv.visitLabel(l43);
-        mv.visitFrame(Opcodes.F_APPEND, 1, new Object[]{Opcodes.INTEGER}, 0, null);
+        mv.visitFrame(Opcodes.F_APPEND, 1, new Object[]{Opcodes.INTEGER},
+                0, null);
         mv.visitInsn(ICONST_1);
         mv.visitVarInsn(ISTORE, 7);
         Label l44 = new Label();
@@ -328,7 +363,8 @@ public class StringEncryption implements Opcodes {
         Label l48 = new Label();
         mv.visitJumpInsn(GOTO, l48);
         mv.visitLabel(l45);
-        mv.visitFrame(Opcodes.F_APPEND, 1, new Object[]{Opcodes.INTEGER}, 0, null);
+        mv.visitFrame(Opcodes.F_APPEND, 1, new Object[]{Opcodes.INTEGER},
+                0, null);
         mv.visitIntInsn(SIPUSH, 255);
         mv.visitVarInsn(ILOAD, 6);
         mv.visitInsn(IAND);
@@ -336,7 +372,8 @@ public class StringEncryption implements Opcodes {
         mv.visitInsn(ISHR);
         mv.visitVarInsn(ISTORE, 8);
         mv.visitLabel(l48);
-        mv.visitFrame(Opcodes.F_APPEND, 1, new Object[]{Opcodes.INTEGER}, 0, null);
+        mv.visitFrame(Opcodes.F_APPEND, 1, new Object[]{Opcodes.INTEGER},
+                0, null);
         mv.visitInsn(ICONST_2);
         mv.visitVarInsn(ILOAD, 6);
         mv.visitInsn(ISHL);
@@ -349,7 +386,8 @@ public class StringEncryption implements Opcodes {
         Label l52 = new Label();
         mv.visitTableSwitchInsn(0, 1, l52, new Label[]{l50, l51});
         mv.visitLabel(l50);
-        mv.visitFrame(Opcodes.F_APPEND, 1, new Object[]{Opcodes.INTEGER}, 0, null);
+        mv.visitFrame(Opcodes.F_APPEND, 1, new Object[]{Opcodes.INTEGER},
+                0, null);
         mv.visitVarInsn(ALOAD, 1);
         mv.visitTypeInsn(CHECKCAST, "java/lang/String");
         mv.visitVarInsn(ASTORE, 10);
@@ -359,7 +397,8 @@ public class StringEncryption implements Opcodes {
         mv.visitLabel(l51);
         mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
         mv.visitVarInsn(ILOAD, 9);
-        mv.visitMethodInsn(INVOKESTATIC, "java/lang/String", "valueOf", "(I)Ljava/lang/String;", false);
+        mv.visitMethodInsn(INVOKESTATIC, "java/lang/String", "valueOf",
+                "(I)Ljava/lang/String;", false);
         mv.visitVarInsn(ASTORE, 10);
         Label l54 = new Label();
         mv.visitLabel(l54);
@@ -370,7 +409,8 @@ public class StringEncryption implements Opcodes {
         mv.visitTypeInsn(CHECKCAST, "java/lang/String");
         mv.visitVarInsn(ASTORE, 10);
         mv.visitLabel(l0);
-        mv.visitFrame(Opcodes.F_APPEND, 1, new Object[]{"java/lang/String"}, 0, null);
+        mv.visitFrame(Opcodes.F_APPEND, 1, new Object[]{"java/lang/String"},
+                0, null);
         mv.visitInsn(ICONST_3);
         mv.visitIntInsn(NEWARRAY, T_CHAR);
         mv.visitVarInsn(ASTORE, 12);
@@ -380,7 +420,8 @@ public class StringEncryption implements Opcodes {
         mv.visitInsn(ICONST_0);
         mv.visitVarInsn(ALOAD, 0);
         mv.visitTypeInsn(CHECKCAST, "java/lang/String");
-        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "toCharArray", "()[C", false);
+        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "toCharArray",
+                "()[C", false);
         mv.visitInsn(ICONST_0);
         mv.visitInsn(CALOAD);
         mv.visitInsn(CASTORE);
@@ -390,7 +431,8 @@ public class StringEncryption implements Opcodes {
         mv.visitInsn(ICONST_1);
         mv.visitVarInsn(ALOAD, 0);
         mv.visitTypeInsn(CHECKCAST, "java/lang/String");
-        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "toCharArray", "()[C", false);
+        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "toCharArray",
+                "()[C", false);
         mv.visitInsn(ICONST_1);
         mv.visitInsn(CALOAD);
         mv.visitInsn(CASTORE);
@@ -400,7 +442,8 @@ public class StringEncryption implements Opcodes {
         mv.visitInsn(ICONST_2);
         mv.visitVarInsn(ALOAD, 0);
         mv.visitTypeInsn(CHECKCAST, "java/lang/String");
-        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "toCharArray", "()[C", false);
+        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "toCharArray",
+                "()[C", false);
         mv.visitInsn(ICONST_2);
         mv.visitInsn(CALOAD);
         mv.visitInsn(CASTORE);
@@ -410,7 +453,8 @@ public class StringEncryption implements Opcodes {
         mv.visitInsn(ICONST_3);
         mv.visitVarInsn(ALOAD, 0);
         mv.visitTypeInsn(CHECKCAST, "java/lang/String");
-        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "toCharArray", "()[C", false);
+        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "toCharArray",
+                "()[C", false);
         mv.visitInsn(ICONST_3);
         mv.visitInsn(CALOAD);
         mv.visitInsn(CASTORE);
@@ -418,8 +462,10 @@ public class StringEncryption implements Opcodes {
         mv.visitLabel(l59);
         mv.visitTypeInsn(NEW, "java/lang/Throwable");
         mv.visitInsn(DUP);
-        mv.visitMethodInsn(INVOKESPECIAL, "java/lang/Throwable", "<init>", "()V", false);
-        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Throwable", "getStackTrace", "()[Ljava/lang/StackTraceElement;", false);
+        mv.visitMethodInsn(INVOKESPECIAL, "java/lang/Throwable", "<init>",
+                "()V", false);
+        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Throwable",
+                "getStackTrace", "()[Ljava/lang/StackTraceElement;", false);
         mv.visitVarInsn(ILOAD, 8);
         mv.visitIntInsn(SIPUSH, 255);
         mv.visitInsn(IOR);
@@ -430,14 +476,17 @@ public class StringEncryption implements Opcodes {
         mv.visitInsn(ACONST_NULL);
         mv.visitInsn(ATHROW);
         mv.visitLabel(l1);
-        mv.visitFrame(Opcodes.F_SAME1, 0, null, 1, new Object[]{"java/lang/Throwable"});
+        mv.visitFrame(Opcodes.F_SAME1, 0, null, 1,
+                new Object[]{"java/lang/Throwable"});
         mv.visitVarInsn(ASTORE, 12);
         Label l61 = new Label();
         mv.visitLabel(l61);
         mv.visitTypeInsn(NEW, "java/lang/Throwable");
         mv.visitInsn(DUP);
-        mv.visitMethodInsn(INVOKESPECIAL, "java/lang/Throwable", "<init>", "()V", false);
-        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Throwable", "getStackTrace", "()[Ljava/lang/StackTraceElement;", false);
+        mv.visitMethodInsn(INVOKESPECIAL, "java/lang/Throwable", "<init>",
+                "()V", false);
+        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Throwable", "getStackTrace",
+                "()[Ljava/lang/StackTraceElement;", false);
         mv.visitVarInsn(ILOAD, 8);
         mv.visitInsn(ICONST_1);
         mv.visitInsn(ISUB);
@@ -446,14 +495,18 @@ public class StringEncryption implements Opcodes {
         Label l62 = new Label();
         mv.visitLabel(l62);
         mv.visitVarInsn(ALOAD, 11);
-        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StackTraceElement", "getClassName", "()Ljava/lang/String;", false);
-        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "hashCode", "()I", false);
+        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StackTraceElement",
+                "getClassName", "()Ljava/lang/String;", false);
+        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "hashCode",
+                "()I", false);
         mv.visitVarInsn(ISTORE, 12);
         Label l63 = new Label();
         mv.visitLabel(l63);
         mv.visitVarInsn(ALOAD, 11);
-        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StackTraceElement", "getMethodName", "()Ljava/lang/String;", false);
-        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "hashCode", "()I", false);
+        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StackTraceElement",
+                "getMethodName", "()Ljava/lang/String;", false);
+        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "hashCode",
+                "()I", false);
         mv.visitVarInsn(ISTORE, 13);
         Label l64 = new Label();
         mv.visitLabel(l64);
@@ -467,7 +520,13 @@ public class StringEncryption implements Opcodes {
         mv.visitLabel(l65);
         mv.visitJumpInsn(GOTO, l13);
         mv.visitLabel(l7);
-        mv.visitFrame(Opcodes.F_FULL, 15, new Object[]{"java/lang/Object", "java/lang/Object", Opcodes.INTEGER, Opcodes.INTEGER, Opcodes.INTEGER, Opcodes.INTEGER, Opcodes.INTEGER, Opcodes.INTEGER, Opcodes.INTEGER, Opcodes.INTEGER, "java/lang/String", "java/lang/StackTraceElement", Opcodes.INTEGER, Opcodes.INTEGER, Opcodes.INTEGER}, 0, new Object[]{});
+        mv.visitFrame(Opcodes.F_FULL, 15, new Object[]{"java/lang/Object",
+                        "java/lang/Object", Opcodes.INTEGER, Opcodes.INTEGER,
+                        Opcodes.INTEGER, Opcodes.INTEGER, Opcodes.INTEGER,
+                        Opcodes.INTEGER, Opcodes.INTEGER, Opcodes.INTEGER,
+                        "java/lang/String", "java/lang/StackTraceElement",
+                        Opcodes.INTEGER, Opcodes.INTEGER, Opcodes.INTEGER},
+                0, new Object[]{});
         mv.visitInsn(ICONST_4);
         mv.visitVarInsn(ILOAD, 14);
         mv.visitInsn(ISHL);
@@ -487,7 +546,8 @@ public class StringEncryption implements Opcodes {
         Label l67 = new Label();
         mv.visitLabel(l67);
         mv.visitVarInsn(ALOAD, 10);
-        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "toCharArray", "()[C", false);
+        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "toCharArray",
+                "()[C", false);
         mv.visitVarInsn(ASTORE, 16);
         Label l68 = new Label();
         mv.visitLabel(l68);
@@ -505,10 +565,12 @@ public class StringEncryption implements Opcodes {
         mv.visitJumpInsn(GOTO, l71);
         Label l72 = new Label();
         mv.visitLabel(l72);
-        mv.visitFrame(Opcodes.F_APPEND, 3, new Object[]{Opcodes.INTEGER, "[C", "[C"}, 0, null);
+        mv.visitFrame(Opcodes.F_APPEND, 3, new Object[]{Opcodes.INTEGER,
+                "[C", "[C"}, 0, null);
         mv.visitVarInsn(ILOAD, 15);
         mv.visitVarInsn(ALOAD, 10);
-        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "toCharArray", "()[C", false);
+        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "toCharArray",
+                "()[C", false);
         mv.visitInsn(ARRAYLENGTH);
         Label l73 = new Label();
         mv.visitJumpInsn(IF_ICMPGE, l73);
@@ -553,17 +615,25 @@ public class StringEncryption implements Opcodes {
         mv.visitTypeInsn(NEW, "java/lang/String");
         mv.visitInsn(DUP);
         mv.visitVarInsn(ALOAD, 17);
-        mv.visitMethodInsn(INVOKESPECIAL, "java/lang/String", "<init>", "([C)V", false);
+        mv.visitMethodInsn(INVOKESPECIAL, "java/lang/String", "<init>",
+                "([C)V", false);
         mv.visitLabel(l6);
         mv.visitInsn(ARETURN);
         mv.visitLabel(l4);
-        mv.visitFrame(Opcodes.F_SAME1, 0, null, 1, new Object[]{"java/lang/Throwable"});
+        mv.visitFrame(Opcodes.F_SAME1, 0, null, 1,
+                new Object[]{"java/lang/Throwable"});
         mv.visitVarInsn(ASTORE, 18);
         mv.visitLabel(l9);
         mv.visitInsn(ACONST_NULL);
         mv.visitInsn(ARETURN);
         mv.visitLabel(l8);
-        mv.visitFrame(Opcodes.F_FULL, 15, new Object[]{"java/lang/Object", "java/lang/Object", Opcodes.INTEGER, Opcodes.INTEGER, Opcodes.INTEGER, Opcodes.INTEGER, Opcodes.INTEGER, Opcodes.INTEGER, Opcodes.INTEGER, Opcodes.INTEGER, "java/lang/String", "java/lang/StackTraceElement", Opcodes.INTEGER, Opcodes.INTEGER, Opcodes.INTEGER}, 1, new Object[]{"java/lang/Throwable"});
+        mv.visitFrame(Opcodes.F_FULL, 15, new Object[]{"java/lang/Object",
+                        "java/lang/Object", Opcodes.INTEGER, Opcodes.INTEGER,
+                        Opcodes.INTEGER, Opcodes.INTEGER, Opcodes.INTEGER,
+                        Opcodes.INTEGER, Opcodes.INTEGER, Opcodes.INTEGER,
+                        "java/lang/String", "java/lang/StackTraceElement",
+                        Opcodes.INTEGER, Opcodes.INTEGER, Opcodes.INTEGER},
+                1, new Object[]{"java/lang/Throwable"});
         mv.visitVarInsn(ASTORE, 15);
         mv.visitLabel(l12);
         mv.visitInsn(ACONST_NULL);
@@ -579,7 +649,10 @@ public class StringEncryption implements Opcodes {
         mv.visitInsn(ACONST_NULL);
         mv.visitInsn(ARETURN);
         mv.visitLabel(l15);
-        mv.visitFrame(Opcodes.F_FULL, 5, new Object[]{"java/lang/Object", "java/lang/Object", Opcodes.INTEGER, Opcodes.INTEGER, Opcodes.INTEGER}, 0, new Object[]{});
+        mv.visitFrame(Opcodes.F_FULL, 5, new Object[]{"java/lang/Object",
+                        "java/lang/Object", Opcodes.INTEGER,
+                        Opcodes.INTEGER, Opcodes.INTEGER},
+                0, new Object[]{});
         mv.visitInsn(ACONST_NULL);
         mv.visitInsn(ATHROW);
         mv.visitLabel(l35);
@@ -590,7 +663,8 @@ public class StringEncryption implements Opcodes {
         Label l77 = new Label();
         mv.visitJumpInsn(GOTO, l77);
         mv.visitLabel(l11);
-        mv.visitFrame(Opcodes.F_SAME1, 0, null, 1, new Object[]{"java/lang/Throwable"});
+        mv.visitFrame(Opcodes.F_SAME1, 0, null, 1,
+                new Object[]{"java/lang/Throwable"});
         mv.visitVarInsn(ASTORE, 5);
         Label l78 = new Label();
         mv.visitLabel(l78);
@@ -607,7 +681,8 @@ public class StringEncryption implements Opcodes {
         mv.visitLabel(l19);
         mv.visitJumpInsn(GOTO, l33);
         mv.visitLabel(l18);
-        mv.visitFrame(Opcodes.F_SAME1, 0, null, 1, new Object[]{"java/lang/Throwable"});
+        mv.visitFrame(Opcodes.F_SAME1, 0, null, 1,
+                new Object[]{"java/lang/Throwable"});
         mv.visitVarInsn(ASTORE, 5);
         Label l79 = new Label();
         mv.visitLabel(l79);
@@ -632,7 +707,8 @@ public class StringEncryption implements Opcodes {
         Label l81 = new Label();
         mv.visitJumpInsn(GOTO, l81);
         mv.visitLabel(l21);
-        mv.visitFrame(Opcodes.F_SAME1, 0, null, 1, new Object[]{"java/lang/Throwable"});
+        mv.visitFrame(Opcodes.F_SAME1, 0, null, 1,
+                new Object[]{"java/lang/Throwable"});
         mv.visitVarInsn(ASTORE, 5);
         Label l82 = new Label();
         mv.visitLabel(l82);
@@ -655,13 +731,19 @@ public class StringEncryption implements Opcodes {
     }
 
     /**
-     * Returns a {@link MethodNode} that returns a {@link String} needed to decrypt strings encrypted by {@link HeavyStringEncryption}.
+     * Returns a {@link MethodNode} that returns a {@link String} needed to
+     * decrypt strings encrypted by {@link HeavyStringEncryption}.
      *
-     * @param decryptionMethodName used to determine the name of the generated {@link MethodNode}.
-     * @return a {@link MethodNode} that returns a {@link String} needed to decrypt strings encrypted by {@link HeavyStringEncryption}.
+     * @param decryptionMethodName used to determine the name of the
+     *                             generated {@link MethodNode}.
+     * @return a {@link MethodNode} that returns a {@link String} needed to
+     * decrypt strings encrypted by {@link HeavyStringEncryption}.
      */
     public static MethodNode heavyMethod(String decryptionMethodName) {
-        MethodNode mv = new MethodNode(ACC_PUBLIC + ACC_STATIC + ACC_SYNTHETIC + ACC_BRIDGE, decryptionMethodName, "(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/String;", null, null);
+        MethodNode mv = new MethodNode(ACC_PUBLIC + ACC_STATIC +
+                ACC_SYNTHETIC + ACC_BRIDGE, decryptionMethodName,
+                "(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)" +
+                        "Ljava/lang/String;", null, null);
         mv.visitCode();
         Label l0 = new Label();
         Label l1 = new Label();
@@ -713,14 +795,17 @@ public class StringEncryption implements Opcodes {
         Label l24 = new Label();
         mv.visitJumpInsn(GOTO, l24);
         mv.visitLabel(l23);
-        mv.visitFrame(Opcodes.F_APPEND, 1, new Object[]{Opcodes.INTEGER}, 0, null);
+        mv.visitFrame(Opcodes.F_APPEND, 1, new Object[]{Opcodes.INTEGER},
+                0, null);
         mv.visitInsn(ICONST_0);
         mv.visitLabel(l24);
-        mv.visitFrame(Opcodes.F_SAME1, 0, null, 1, new Object[]{Opcodes.INTEGER});
+        mv.visitFrame(Opcodes.F_SAME1, 0, null, 1,
+                new Object[]{Opcodes.INTEGER});
         mv.visitVarInsn(ISTORE, 4);
         Label l25 = new Label();
         mv.visitLabel(l25);
-        mv.visitFrame(Opcodes.F_APPEND, 1, new Object[]{Opcodes.INTEGER}, 0, null);
+        mv.visitFrame(Opcodes.F_APPEND, 1, new Object[]{Opcodes.INTEGER},
+                0, null);
         mv.visitVarInsn(ILOAD, 3);
         mv.visitVarInsn(ILOAD, 4);
         Label l26 = new Label();
@@ -760,11 +845,13 @@ public class StringEncryption implements Opcodes {
         Label l37 = new Label();
         mv.visitJumpInsn(GOTO, l37);
         mv.visitLabel(l34);
-        mv.visitFrame(Opcodes.F_APPEND, 1, new Object[]{Opcodes.INTEGER}, 0, null);
+        mv.visitFrame(Opcodes.F_APPEND, 1, new Object[]{Opcodes.INTEGER},
+                0, null);
         mv.visitIntInsn(BIPUSH, 8);
         mv.visitVarInsn(ISTORE, 6);
         mv.visitLabel(l37);
-        mv.visitFrame(Opcodes.F_APPEND, 1, new Object[]{Opcodes.INTEGER}, 0, null);
+        mv.visitFrame(Opcodes.F_APPEND, 1, new Object[]{Opcodes.INTEGER},
+                0, null);
         mv.visitInsn(ICONST_1);
         mv.visitVarInsn(ISTORE, 7);
         Label l38 = new Label();
@@ -785,7 +872,8 @@ public class StringEncryption implements Opcodes {
         Label l42 = new Label();
         mv.visitJumpInsn(GOTO, l42);
         mv.visitLabel(l39);
-        mv.visitFrame(Opcodes.F_APPEND, 1, new Object[]{Opcodes.INTEGER}, 0, null);
+        mv.visitFrame(Opcodes.F_APPEND, 1, new Object[]{Opcodes.INTEGER},
+                0, null);
         mv.visitIntInsn(SIPUSH, 255);
         mv.visitVarInsn(ILOAD, 6);
         mv.visitInsn(IAND);
@@ -793,7 +881,8 @@ public class StringEncryption implements Opcodes {
         mv.visitInsn(ISHR);
         mv.visitVarInsn(ISTORE, 8);
         mv.visitLabel(l42);
-        mv.visitFrame(Opcodes.F_APPEND, 1, new Object[]{Opcodes.INTEGER}, 0, null);
+        mv.visitFrame(Opcodes.F_APPEND, 1, new Object[]{Opcodes.INTEGER},
+                0, null);
         mv.visitInsn(ICONST_2);
         mv.visitVarInsn(ILOAD, 6);
         mv.visitInsn(ISHL);
@@ -806,7 +895,8 @@ public class StringEncryption implements Opcodes {
         Label l46 = new Label();
         mv.visitTableSwitchInsn(0, 1, l46, new Label[]{l44, l45});
         mv.visitLabel(l44);
-        mv.visitFrame(Opcodes.F_APPEND, 1, new Object[]{Opcodes.INTEGER}, 0, null);
+        mv.visitFrame(Opcodes.F_APPEND, 1, new Object[]{Opcodes.INTEGER},
+                0, null);
         mv.visitVarInsn(ALOAD, 1);
         mv.visitTypeInsn(CHECKCAST, "java/lang/String");
         mv.visitVarInsn(ASTORE, 10);
@@ -816,7 +906,8 @@ public class StringEncryption implements Opcodes {
         mv.visitLabel(l45);
         mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
         mv.visitVarInsn(ILOAD, 9);
-        mv.visitMethodInsn(INVOKESTATIC, "java/lang/String", "valueOf", "(I)Ljava/lang/String;", false);
+        mv.visitMethodInsn(INVOKESTATIC, "java/lang/String", "valueOf",
+                "(I)Ljava/lang/String;", false);
         mv.visitVarInsn(ASTORE, 10);
         Label l48 = new Label();
         mv.visitLabel(l48);
@@ -827,7 +918,8 @@ public class StringEncryption implements Opcodes {
         mv.visitTypeInsn(CHECKCAST, "java/lang/String");
         mv.visitVarInsn(ASTORE, 10);
         mv.visitLabel(l0);
-        mv.visitFrame(Opcodes.F_APPEND, 1, new Object[]{"java/lang/String"}, 0, null);
+        mv.visitFrame(Opcodes.F_APPEND, 1, new Object[]{"java/lang/String"},
+                0, null);
         mv.visitInsn(ICONST_3);
         mv.visitIntInsn(NEWARRAY, T_CHAR);
         mv.visitVarInsn(ASTORE, 12);
@@ -837,7 +929,8 @@ public class StringEncryption implements Opcodes {
         mv.visitInsn(ICONST_0);
         mv.visitVarInsn(ALOAD, 0);
         mv.visitTypeInsn(CHECKCAST, "java/lang/String");
-        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "toCharArray", "()[C", false);
+        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "toCharArray",
+                "()[C", false);
         mv.visitInsn(ICONST_0);
         mv.visitInsn(CALOAD);
         mv.visitInsn(CASTORE);
@@ -847,7 +940,8 @@ public class StringEncryption implements Opcodes {
         mv.visitInsn(ICONST_1);
         mv.visitVarInsn(ALOAD, 0);
         mv.visitTypeInsn(CHECKCAST, "java/lang/String");
-        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "toCharArray", "()[C", false);
+        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "toCharArray",
+                "()[C", false);
         mv.visitInsn(ICONST_1);
         mv.visitInsn(CALOAD);
         mv.visitInsn(CASTORE);
@@ -857,7 +951,8 @@ public class StringEncryption implements Opcodes {
         mv.visitInsn(ICONST_2);
         mv.visitVarInsn(ALOAD, 0);
         mv.visitTypeInsn(CHECKCAST, "java/lang/String");
-        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "toCharArray", "()[C", false);
+        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "toCharArray",
+                "()[C", false);
         mv.visitInsn(ICONST_2);
         mv.visitInsn(CALOAD);
         mv.visitInsn(CASTORE);
@@ -867,14 +962,17 @@ public class StringEncryption implements Opcodes {
         mv.visitInsn(ICONST_3);
         mv.visitVarInsn(ALOAD, 0);
         mv.visitTypeInsn(CHECKCAST, "java/lang/String");
-        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "toCharArray", "()[C", false);
+        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "toCharArray",
+                "()[C", false);
         mv.visitInsn(ICONST_3);
         mv.visitInsn(CALOAD);
         mv.visitInsn(CASTORE);
         Label l53 = new Label();
         mv.visitLabel(l53);
-        mv.visitMethodInsn(INVOKESTATIC, "java/lang/Thread", "currentThread", "()Ljava/lang/Thread;", false);
-        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Thread", "getStackTrace", "()[Ljava/lang/StackTraceElement;", false);
+        mv.visitMethodInsn(INVOKESTATIC, "java/lang/Thread", "currentThread",
+                "()Ljava/lang/Thread;", false);
+        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Thread", "getStackTrace",
+                "()[Ljava/lang/StackTraceElement;", false);
         mv.visitVarInsn(ILOAD, 8);
         mv.visitIntInsn(SIPUSH, 255);
         mv.visitInsn(IOR);
@@ -885,26 +983,33 @@ public class StringEncryption implements Opcodes {
         mv.visitInsn(ACONST_NULL);
         mv.visitInsn(ATHROW);
         mv.visitLabel(l1);
-        mv.visitFrame(Opcodes.F_SAME1, 0, null, 1, new Object[]{"java/lang/Throwable"});
+        mv.visitFrame(Opcodes.F_SAME1, 0, null, 1,
+                new Object[]{"java/lang/Throwable"});
         mv.visitVarInsn(ASTORE, 12);
         Label l55 = new Label();
         mv.visitLabel(l55);
-        mv.visitMethodInsn(INVOKESTATIC, "java/lang/Thread", "currentThread", "()Ljava/lang/Thread;", false);
-        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Thread", "getStackTrace", "()[Ljava/lang/StackTraceElement;", false);
+        mv.visitMethodInsn(INVOKESTATIC, "java/lang/Thread", "currentThread",
+                "()Ljava/lang/Thread;", false);
+        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Thread", "getStackTrace",
+                "()[Ljava/lang/StackTraceElement;", false);
         mv.visitVarInsn(ILOAD, 8);
         mv.visitInsn(AALOAD);
         mv.visitVarInsn(ASTORE, 11);
         Label l56 = new Label();
         mv.visitLabel(l56);
         mv.visitVarInsn(ALOAD, 11);
-        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StackTraceElement", "getClassName", "()Ljava/lang/String;", false);
-        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "hashCode", "()I", false);
+        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StackTraceElement",
+                "getClassName", "()Ljava/lang/String;", false);
+        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "hashCode",
+                "()I", false);
         mv.visitVarInsn(ISTORE, 12);
         Label l57 = new Label();
         mv.visitLabel(l57);
         mv.visitVarInsn(ALOAD, 11);
-        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StackTraceElement", "getMethodName", "()Ljava/lang/String;", false);
-        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "hashCode", "()I", false);
+        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StackTraceElement",
+                "getMethodName", "()Ljava/lang/String;", false);
+        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "hashCode",
+                "()I", false);
         mv.visitVarInsn(ISTORE, 13);
         Label l58 = new Label();
         mv.visitLabel(l58);
@@ -918,7 +1023,14 @@ public class StringEncryption implements Opcodes {
         mv.visitLabel(l59);
         mv.visitJumpInsn(GOTO, l19);
         mv.visitLabel(l13);
-        mv.visitFrame(Opcodes.F_FULL, 15, new Object[]{"java/lang/Object", "java/lang/Object", "java/lang/Object", Opcodes.INTEGER, Opcodes.INTEGER, Opcodes.INTEGER, Opcodes.INTEGER, Opcodes.INTEGER, Opcodes.INTEGER, Opcodes.INTEGER, "java/lang/String", "java/lang/StackTraceElement", Opcodes.INTEGER, Opcodes.INTEGER, Opcodes.INTEGER}, 0, new Object[]{});
+        mv.visitFrame(Opcodes.F_FULL, 15, new Object[]{"java/lang/Object",
+                "java/lang/Object", "java/lang/Object",
+                Opcodes.INTEGER, Opcodes.INTEGER,
+                Opcodes.INTEGER, Opcodes.INTEGER,
+                Opcodes.INTEGER, Opcodes.INTEGER,
+                Opcodes.INTEGER, "java/lang/String",
+                "java/lang/StackTraceElement", Opcodes.INTEGER,
+                Opcodes.INTEGER, Opcodes.INTEGER}, 0, new Object[]{});
         mv.visitInsn(ICONST_4);
         mv.visitVarInsn(ILOAD, 14);
         mv.visitInsn(ISHL);
@@ -938,7 +1050,8 @@ public class StringEncryption implements Opcodes {
         Label l61 = new Label();
         mv.visitLabel(l61);
         mv.visitVarInsn(ALOAD, 10);
-        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "toCharArray", "()[C", false);
+        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "toCharArray",
+                "()[C", false);
         mv.visitVarInsn(ASTORE, 16);
         Label l62 = new Label();
         mv.visitLabel(l62);
@@ -957,7 +1070,8 @@ public class StringEncryption implements Opcodes {
         mv.visitLabel(l2);
         mv.visitVarInsn(ALOAD, 0);
         mv.visitTypeInsn(CHECKCAST, "java/lang/String");
-        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "toCharArray", "()[C", false);
+        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "toCharArray",
+                "()[C", false);
         mv.visitVarInsn(ASTORE, 19);
         Label l65 = new Label();
         mv.visitLabel(l65);
@@ -975,15 +1089,28 @@ public class StringEncryption implements Opcodes {
         mv.visitJumpInsn(GOTO, l68);
         Label l69 = new Label();
         mv.visitLabel(l69);
-        mv.visitFrame(Opcodes.F_FULL, 22, new Object[]{"java/lang/Object", "java/lang/Object", "java/lang/Object", Opcodes.INTEGER, Opcodes.INTEGER, Opcodes.INTEGER, Opcodes.INTEGER, Opcodes.INTEGER, Opcodes.INTEGER, Opcodes.INTEGER, "java/lang/String", "java/lang/StackTraceElement", Opcodes.INTEGER, Opcodes.INTEGER, Opcodes.INTEGER, Opcodes.INTEGER, "[C", "[C", "java/lang/String", "[C", "[C", Opcodes.INTEGER}, 0, new Object[]{});
+        mv.visitFrame(Opcodes.F_FULL, 22, new Object[]{"java/lang/Object",
+                "java/lang/Object", "java/lang/Object",
+                Opcodes.INTEGER, Opcodes.INTEGER,
+                Opcodes.INTEGER, Opcodes.INTEGER,
+                Opcodes.INTEGER, Opcodes.INTEGER,
+                Opcodes.INTEGER, "java/lang/String",
+                "java/lang/StackTraceElement", Opcodes.INTEGER,
+                Opcodes.INTEGER, Opcodes.INTEGER, Opcodes.INTEGER,
+                "[C", "[C", "java/lang/String", "[C", "[C",
+                Opcodes.INTEGER}, 0, new Object[]{});
         mv.visitVarInsn(ALOAD, 20);
         mv.visitVarInsn(ILOAD, 21);
         mv.visitVarInsn(ALOAD, 11);
-        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StackTraceElement", "getMethodName", "()Ljava/lang/String;", false);
-        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "hashCode", "()I", false);
+        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StackTraceElement",
+                "getMethodName", "()Ljava/lang/String;", false);
+        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "hashCode",
+                "()I", false);
         mv.visitVarInsn(ALOAD, 11);
-        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StackTraceElement", "getClassName", "()Ljava/lang/String;", false);
-        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "hashCode", "()I", false);
+        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StackTraceElement",
+                "getClassName", "()Ljava/lang/String;", false);
+        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "hashCode",
+                "()I", false);
         mv.visitInsn(IXOR);
         mv.visitVarInsn(ALOAD, 19);
         mv.visitVarInsn(ILOAD, 21);
@@ -1005,7 +1132,8 @@ public class StringEncryption implements Opcodes {
         mv.visitTypeInsn(NEW, "java/lang/String");
         mv.visitInsn(DUP);
         mv.visitVarInsn(ALOAD, 20);
-        mv.visitMethodInsn(INVOKESPECIAL, "java/lang/String", "<init>", "([C)V", false);
+        mv.visitMethodInsn(INVOKESPECIAL, "java/lang/String", "<init>",
+                "([C)V", false);
         mv.visitVarInsn(ASTORE, 18);
         Label l72 = new Label();
         mv.visitLabel(l72);
@@ -1015,7 +1143,16 @@ public class StringEncryption implements Opcodes {
         mv.visitLabel(l3);
         mv.visitJumpInsn(GOTO, l63);
         mv.visitLabel(l4);
-        mv.visitFrame(Opcodes.F_FULL, 19, new Object[]{"java/lang/Object", "java/lang/Object", "java/lang/Object", Opcodes.INTEGER, Opcodes.INTEGER, Opcodes.INTEGER, Opcodes.INTEGER, Opcodes.INTEGER, Opcodes.INTEGER, Opcodes.INTEGER, "java/lang/String", "java/lang/StackTraceElement", Opcodes.INTEGER, Opcodes.INTEGER, Opcodes.INTEGER, Opcodes.INTEGER, "[C", "[C", "java/lang/String"}, 1, new Object[]{"java/lang/Throwable"});
+        mv.visitFrame(Opcodes.F_FULL, 19, new Object[]{"java/lang/Object",
+                        "java/lang/Object", "java/lang/Object",
+                        Opcodes.INTEGER, Opcodes.INTEGER,
+                        Opcodes.INTEGER, Opcodes.INTEGER,
+                        Opcodes.INTEGER, Opcodes.INTEGER,
+                        Opcodes.INTEGER, "java/lang/String",
+                        "java/lang/StackTraceElement", Opcodes.INTEGER,
+                        Opcodes.INTEGER, Opcodes.INTEGER, Opcodes.INTEGER,
+                        "[C", "[C", "java/lang/String"},
+                1, new Object[]{"java/lang/Throwable"});
         mv.visitVarInsn(ASTORE, 19);
         Label l73 = new Label();
         mv.visitLabel(l73);
@@ -1049,8 +1186,10 @@ public class StringEncryption implements Opcodes {
         mv.visitInsn(ICONST_4);
         mv.visitIntInsn(BIPUSH, 56);
         mv.visitInsn(BASTORE);
-        mv.visitMethodInsn(INVOKESPECIAL, "java/lang/String", "<init>", "([B)V", false);
-        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "getBytes", "(Ljava/lang/String;)[B", false);
+        mv.visitMethodInsn(INVOKESPECIAL, "java/lang/String", "<init>",
+                "([B)V", false);
+        mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "getBytes",
+                "(Ljava/lang/String;)[B", false);
         mv.visitVarInsn(ASTORE, 20);
         Label l74 = new Label();
         mv.visitLabel(l74);
@@ -1078,20 +1217,25 @@ public class StringEncryption implements Opcodes {
         mv.visitInsn(ICONST_4);
         mv.visitIntInsn(BIPUSH, 49);
         mv.visitInsn(BASTORE);
-        mv.visitMethodInsn(INVOKESPECIAL, "java/lang/String", "<init>", "([B)V", false);
-        mv.visitMethodInsn(INVOKESTATIC, "java/security/MessageDigest", "getInstance", "(Ljava/lang/String;)Ljava/security/MessageDigest;", false);
+        mv.visitMethodInsn(INVOKESPECIAL, "java/lang/String", "<init>",
+                "([B)V", false);
+        mv.visitMethodInsn(INVOKESTATIC, "java/security/MessageDigest",
+                "getInstance", "(Ljava/lang/String;)" +
+                        "Ljava/security/MessageDigest;", false);
         mv.visitVarInsn(ASTORE, 21);
         Label l75 = new Label();
         mv.visitLabel(l75);
         mv.visitVarInsn(ALOAD, 21);
         mv.visitVarInsn(ALOAD, 20);
-        mv.visitMethodInsn(INVOKEVIRTUAL, "java/security/MessageDigest", "digest", "([B)[B", false);
+        mv.visitMethodInsn(INVOKEVIRTUAL, "java/security/MessageDigest",
+                "digest", "([B)[B", false);
         mv.visitVarInsn(ASTORE, 20);
         Label l76 = new Label();
         mv.visitLabel(l76);
         mv.visitVarInsn(ALOAD, 20);
         mv.visitIntInsn(BIPUSH, 16);
-        mv.visitMethodInsn(INVOKESTATIC, "java/util/Arrays", "copyOf", "([BI)[B", false);
+        mv.visitMethodInsn(INVOKESTATIC, "java/util/Arrays", "copyOf",
+                "([BI)[B", false);
         mv.visitVarInsn(ASTORE, 20);
         Label l77 = new Label();
         mv.visitLabel(l77);
@@ -1114,8 +1258,10 @@ public class StringEncryption implements Opcodes {
         mv.visitInsn(ICONST_2);
         mv.visitIntInsn(BIPUSH, 83);
         mv.visitInsn(BASTORE);
-        mv.visitMethodInsn(INVOKESPECIAL, "java/lang/String", "<init>", "([B)V", false);
-        mv.visitMethodInsn(INVOKESPECIAL, "javax/crypto/spec/SecretKeySpec", "<init>", "([BLjava/lang/String;)V", false);
+        mv.visitMethodInsn(INVOKESPECIAL, "java/lang/String", "<init>",
+                "([B)V", false);
+        mv.visitMethodInsn(INVOKESPECIAL, "javax/crypto/spec/SecretKeySpec",
+                "<init>", "([BLjava/lang/String;)V", false);
         mv.visitVarInsn(ASTORE, 19);
         Label l78 = new Label();
         mv.visitLabel(l78);
@@ -1203,29 +1349,37 @@ public class StringEncryption implements Opcodes {
         mv.visitIntInsn(BIPUSH, 19);
         mv.visitIntInsn(BIPUSH, 71);
         mv.visitInsn(BASTORE);
-        mv.visitMethodInsn(INVOKESPECIAL, "java/lang/String", "<init>", "([B)V", false);
-        mv.visitMethodInsn(INVOKESTATIC, "javax/crypto/Cipher", "getInstance", "(Ljava/lang/String;)Ljavax/crypto/Cipher;", false);
+        mv.visitMethodInsn(INVOKESPECIAL, "java/lang/String", "<init>",
+                "([B)V", false);
+        mv.visitMethodInsn(INVOKESTATIC, "javax/crypto/Cipher", "getInstance",
+                "(Ljava/lang/String;)Ljavax/crypto/Cipher;", false);
         mv.visitVarInsn(ASTORE, 22);
         Label l79 = new Label();
         mv.visitLabel(l79);
         mv.visitVarInsn(ALOAD, 22);
         mv.visitInsn(ICONST_2);
         mv.visitVarInsn(ALOAD, 19);
-        mv.visitMethodInsn(INVOKEVIRTUAL, "javax/crypto/Cipher", "init", "(ILjava/security/Key;)V", false);
+        mv.visitMethodInsn(INVOKEVIRTUAL, "javax/crypto/Cipher", "init",
+                "(ILjava/security/Key;)V", false);
         Label l80 = new Label();
         mv.visitLabel(l80);
         mv.visitTypeInsn(NEW, "java/lang/String");
         mv.visitInsn(DUP);
         mv.visitVarInsn(ALOAD, 22);
-        mv.visitMethodInsn(INVOKESTATIC, "java/util/Base64", "getDecoder", "()Ljava/util/Base64$Decoder;", false);
+        mv.visitMethodInsn(INVOKESTATIC, "java/util/Base64", "getDecoder",
+                "()Ljava/util/Base64$Decoder;", false);
         mv.visitVarInsn(ALOAD, 18);
-        mv.visitMethodInsn(INVOKEVIRTUAL, "java/util/Base64$Decoder", "decode", "(Ljava/lang/String;)[B", false);
-        mv.visitMethodInsn(INVOKEVIRTUAL, "javax/crypto/Cipher", "doFinal", "([B)[B", false);
-        mv.visitMethodInsn(INVOKESPECIAL, "java/lang/String", "<init>", "([B)V", false);
+        mv.visitMethodInsn(INVOKEVIRTUAL, "java/util/Base64$Decoder", "decode",
+                "(Ljava/lang/String;)[B", false);
+        mv.visitMethodInsn(INVOKEVIRTUAL, "javax/crypto/Cipher", "doFinal",
+                "([B)[B", false);
+        mv.visitMethodInsn(INVOKESPECIAL, "java/lang/String", "<init>",
+                "([B)V", false);
         mv.visitLabel(l6);
         mv.visitInsn(ARETURN);
         mv.visitLabel(l7);
-        mv.visitFrame(Opcodes.F_SAME1, 0, null, 1, new Object[]{"java/lang/Throwable"});
+        mv.visitFrame(Opcodes.F_SAME1, 0, null, 1,
+                new Object[]{"java/lang/Throwable"});
         mv.visitVarInsn(ASTORE, 19);
         Label l81 = new Label();
         mv.visitLabel(l81);
@@ -1246,17 +1400,27 @@ public class StringEncryption implements Opcodes {
         mv.visitTypeInsn(NEW, "java/lang/String");
         mv.visitInsn(DUP);
         mv.visitVarInsn(ALOAD, 17);
-        mv.visitMethodInsn(INVOKESPECIAL, "java/lang/String", "<init>", "([C)V", false);
+        mv.visitMethodInsn(INVOKESPECIAL, "java/lang/String", "<init>",
+                "([C)V", false);
         mv.visitLabel(l12);
         mv.visitInsn(ARETURN);
         mv.visitLabel(l9);
-        mv.visitFrame(Opcodes.F_SAME1, 0, null, 1, new Object[]{"java/lang/Throwable"});
+        mv.visitFrame(Opcodes.F_SAME1, 0, null, 1,
+                new Object[]{"java/lang/Throwable"});
         mv.visitVarInsn(ASTORE, 18);
         mv.visitLabel(l15);
         mv.visitInsn(ACONST_NULL);
         mv.visitInsn(ARETURN);
         mv.visitLabel(l14);
-        mv.visitFrame(Opcodes.F_FULL, 15, new Object[]{"java/lang/Object", "java/lang/Object", "java/lang/Object", Opcodes.INTEGER, Opcodes.INTEGER, Opcodes.INTEGER, Opcodes.INTEGER, Opcodes.INTEGER, Opcodes.INTEGER, Opcodes.INTEGER, "java/lang/String", "java/lang/StackTraceElement", Opcodes.INTEGER, Opcodes.INTEGER, Opcodes.INTEGER}, 1, new Object[]{"java/lang/Throwable"});
+        mv.visitFrame(Opcodes.F_FULL, 15, new Object[]{"java/lang/Object",
+                        "java/lang/Object", "java/lang/Object",
+                        Opcodes.INTEGER, Opcodes.INTEGER,
+                        Opcodes.INTEGER, Opcodes.INTEGER,
+                        Opcodes.INTEGER, Opcodes.INTEGER,
+                        Opcodes.INTEGER, "java/lang/String",
+                        "java/lang/StackTraceElement", Opcodes.INTEGER,
+                        Opcodes.INTEGER, Opcodes.INTEGER},
+                1, new Object[]{"java/lang/Throwable"});
         mv.visitVarInsn(ASTORE, 15);
         mv.visitLabel(l18);
         mv.visitInsn(ACONST_NULL);
@@ -1269,7 +1433,9 @@ public class StringEncryption implements Opcodes {
         mv.visitInsn(ISHL);
         mv.visitJumpInsn(IF_ICMPLT, l13);
         mv.visitLabel(l31);
-        mv.visitFrame(Opcodes.F_FULL, 5, new Object[]{"java/lang/Object", "java/lang/Object", "java/lang/Object", Opcodes.INTEGER, Opcodes.INTEGER}, 0, new Object[]{});
+        mv.visitFrame(Opcodes.F_FULL, 5, new Object[]{"java/lang/Object",
+                "java/lang/Object", "java/lang/Object",
+                Opcodes.INTEGER, Opcodes.INTEGER}, 0, new Object[]{});
         mv.visitVarInsn(ALOAD, 2);
         mv.visitJumpInsn(IFNONNULL, l32);
         Label l83 = new Label();
@@ -1287,7 +1453,8 @@ public class StringEncryption implements Opcodes {
         Label l84 = new Label();
         mv.visitJumpInsn(GOTO, l84);
         mv.visitLabel(l17);
-        mv.visitFrame(Opcodes.F_SAME1, 0, null, 1, new Object[]{"java/lang/Throwable"});
+        mv.visitFrame(Opcodes.F_SAME1, 0, null, 1,
+                new Object[]{"java/lang/Throwable"});
         mv.visitVarInsn(ASTORE, 5);
         Label l85 = new Label();
         mv.visitLabel(l85);

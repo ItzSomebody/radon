@@ -8,7 +8,8 @@ import org.objectweb.asm.tree.*;
 import java.util.Stack;
 
 /**
- * Checks if the stack is empty at the specified {@link AbstractInsnNode} used as a break point.
+ * Attempts to make a virtual machine-like object which attempts to mimic the
+ * JVM stack.
  * TODO: MAKE IT ACTUALLY WORK LOL
  *
  * @author ItzSomebody
@@ -41,19 +42,22 @@ public class StackAnalyzer implements Opcodes {
     }
 
     /**
-     * Returns a simulated stack of the Java bytecode instructions up to the specified breakpoint.
+     * Returns a simulated stack of the Java bytecode instructions up to the
+     * specified breakpoint.
      *
-     * @return a simulated stack of the Java bytecode instructions up to the specified breakpoint.
+     * @return a simulated stack of the Java bytecode instructions up to the
+     * specified breakpoint.
      */
     public Stack<Object> returnStackAtBreak() {
-        if (DEBUG) System.out.println("Entering " + methodNode.owner + '.' + methodNode.name + methodNode.desc);
-        Stack<Object> stack = new Stack<>();
-        // Simulated stack
+        if (DEBUG)
+            System.out.println("Entering " + this.methodNode.owner + '.'
+                    + this.methodNode.name + this.methodNode.desc);
+        Stack<Object> stack = new Stack<>(); // Simulated stack
 
-        for (int i = 0; i < methodNode.instructions.size(); i++) {
-            AbstractInsnNode insn = methodNode.instructions.get(i);
+        for (int i = 0; i < this.methodNode.instructions.size(); i++) {
+            AbstractInsnNode insn = this.methodNode.instructions.get(i);
 
-            if (breakPoint == insn)
+            if (this.breakPoint == insn)
                 break;
             try {
                 switch (insn.getOpcode()) {
@@ -95,7 +99,8 @@ public class StackAnalyzer implements Opcodes {
                     case GETSTATIC:
                     case GETFIELD:
                         if (DEBUG)
-                            System.out.println("Pushing - Opcode = " + OpcodeUtils.getOpcodeName(insn.getOpcode()));
+                            System.out.println("Pushing - Opcode = " +
+                                    OpcodeUtils.getOpcodeName(insn.getOpcode()));
                         stack.push(null);
                         break;
                     case ISTORE:
@@ -177,12 +182,14 @@ public class StackAnalyzer implements Opcodes {
                     case IFNULL:
                     case IFNONNULL:
                         if (DEBUG)
-                            System.out.println("Popping - Opcode = " + OpcodeUtils.getOpcodeName(insn.getOpcode()));
+                            System.out.println("Popping - Opcode = " +
+                                    OpcodeUtils.getOpcodeName(insn.getOpcode()));
                         stack.pop();
                         break;
                     case POP2:
                         if (DEBUG)
-                            System.out.println("Double popping - Opcode = " + OpcodeUtils.getOpcodeName(insn.getOpcode()));
+                            System.out.println("Double popping - Opcode = " +
+                                    OpcodeUtils.getOpcodeName(insn.getOpcode()));
                         stack.pop();
                         stack.pop();
                         break;
@@ -190,7 +197,8 @@ public class StackAnalyzer implements Opcodes {
                     case DUP2_X1:
                     case DUP2_X2:
                         if (DEBUG)
-                            System.out.println("Double pushing - Opcode = " + OpcodeUtils.getOpcodeName(insn.getOpcode()));
+                            System.out.println("Double pushing - Opcode = " +
+                                    OpcodeUtils.getOpcodeName(insn.getOpcode()));
                         stack.push(null);
                         stack.push(null);
                         break;
@@ -223,19 +231,24 @@ public class StackAnalyzer implements Opcodes {
                     case INSTANCEOF:
                     case GOTO:
                         if (DEBUG)
-                            System.out.println("Doing nothing - Opcode = " + OpcodeUtils.getOpcodeName(insn.getOpcode()));
+                            System.out.println("Doing nothing - Opcode = " +
+                                    OpcodeUtils.getOpcodeName(insn.getOpcode()));
                         break;
                     case JSR:
                     case RET:
-                        throw new IllegalArgumentException("Unsupported opcode (JSR/RET)");
+                        throw new IllegalArgumentException("Unsupported " +
+                                "opcode (JSR/RET)");
                     case INVOKEVIRTUAL:
                     case INVOKESPECIAL:
                     case INVOKEINTERFACE:
                         if (DEBUG)
-                            System.out.println("Processing static method invocation - Opcode = " + OpcodeUtils.getOpcodeName(insn.getOpcode()));
+                            System.out.println("Processing static method " +
+                                    "invocation - Opcode = " + OpcodeUtils
+                                    .getOpcodeName(insn.getOpcode()));
                         MethodInsnNode virtualInvoke = (MethodInsnNode) insn;
                         stack.pop(); // Objectref
-                        for (int j = 0; j < Type.getArgumentTypes(virtualInvoke.desc).length; j++) {
+                        for (int j = 0; j < Type.getArgumentTypes
+                                (virtualInvoke.desc).length; j++) {
                             stack.pop();
                         }
 
@@ -246,10 +259,13 @@ public class StackAnalyzer implements Opcodes {
                         break;
                     case INVOKESTATIC:
                         if (DEBUG)
-                            System.out.println("Processing virtual method invocation - Opcode = " + OpcodeUtils.getOpcodeName(insn.getOpcode()));
+                            System.out.println("Processing virtual method " +
+                                    "invocation - Opcode = " + OpcodeUtils
+                                    .getOpcodeName(insn.getOpcode()));
                         MethodInsnNode staticInvoke = (MethodInsnNode) insn;
 
-                        for (int j = 0; j < Type.getArgumentTypes(staticInvoke.desc).length; j++) {
+                        for (int j = 0; j < Type.getArgumentTypes
+                                (staticInvoke.desc).length; j++) {
                             stack.pop();
                         }
 
@@ -260,10 +276,14 @@ public class StackAnalyzer implements Opcodes {
                         break;
                     case INVOKEDYNAMIC:
                         if (DEBUG)
-                            System.out.println("Processing dynamic invocation - Opcode = " + OpcodeUtils.getOpcodeName(insn.getOpcode()));
-                        InvokeDynamicInsnNode indy = (InvokeDynamicInsnNode) insn;
+                            System.out.println("Processing dynamic invocation" +
+                                    " -  Opcode = " + OpcodeUtils
+                                    .getOpcodeName(insn.getOpcode()));
+                        InvokeDynamicInsnNode indy =
+                                (InvokeDynamicInsnNode) insn;
 
-                        for (int j = 0; j < Type.getArgumentTypes(indy.desc).length; j++) {
+                        for (int j = 0; j < Type.getArgumentTypes(indy.desc)
+                                .length; j++) {
                             stack.pop();
                         }
 
@@ -274,8 +294,11 @@ public class StackAnalyzer implements Opcodes {
                         break;
                     case MULTIANEWARRAY:
                         if (DEBUG)
-                            System.out.println("Processing multi-dimension array - Opcode = " + OpcodeUtils.getOpcodeName(insn.getOpcode()));
-                        MultiANewArrayInsnNode arrays = (MultiANewArrayInsnNode) insn;
+                            System.out.println("Processing multi-dimension " +
+                                    "array - Opcode = " + OpcodeUtils.
+                                    getOpcodeName(insn.getOpcode()));
+                        MultiANewArrayInsnNode arrays
+                                = (MultiANewArrayInsnNode) insn;
                         for (int j = 0; j < arrays.dims; j++) {
                             stack.pop();
                         }

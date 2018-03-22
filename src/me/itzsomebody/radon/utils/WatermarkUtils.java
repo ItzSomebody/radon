@@ -18,14 +18,17 @@ import java.util.zip.ZipFile;
  */
 public class WatermarkUtils { // TODO: Add more secure watermark injection
     /**
-     * Extracts injected watermarks by console and stores them in a {@link List} as a {@link String}.
+     * Extracts injected watermarks by console and stores them in a
+     * {@link List} as a {@link String}.
      *
      * @param jarFile file to extract watermarks from.
-     * @param key     {@link String} to use to decrypt encrypted watemark messages.
+     * @param key     {@link String} to use to decrypt encrypted watemark
+     *                              messages.
      * @return a {@link List} of all extracted watermarks.
      * @throws Throwable should some virtual-disaster should happen.
      */
-    public static List<String> extractWatermark(File jarFile, String key) throws Throwable {
+    public static List<String> extractWatermark(File jarFile, String key)
+            throws Throwable {
         List<String> foundIds = new ArrayList<>();
         ZipFile zipFile = new ZipFile(jarFile);
         Enumeration<? extends ZipEntry> entries = zipFile.entries();
@@ -36,7 +39,8 @@ public class WatermarkUtils { // TODO: Add more secure watermark injection
                     try (InputStream in = zipFile.getInputStream(entry)) {
                         ClassReader cr = new ClassReader(in);
                         ClassNode classNode = new ClassNode();
-                        cr.accept(classNode, ClassReader.SKIP_FRAMES | ClassReader.SKIP_DEBUG);
+                        cr.accept(classNode, ClassReader.SKIP_FRAMES
+                                | ClassReader.SKIP_DEBUG);
                         char[] buf = new char[cr.getMaxStringLength()];
 
                         try {

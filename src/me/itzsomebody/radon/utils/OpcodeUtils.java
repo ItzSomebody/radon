@@ -8,6 +8,12 @@ import org.objectweb.asm.Opcodes;
  * @author ItzSomebody
  */
 public class OpcodeUtils implements Opcodes {
+    /**
+     * Returns a {@link String} representation of inputted opcode.
+     *
+     * @param opcode the opcode to get a name from.
+     * @return a {@link String} representation of inputted opcode.
+     */
     public static String getOpcodeName(int opcode) {
         switch (opcode) {
             case NOP:

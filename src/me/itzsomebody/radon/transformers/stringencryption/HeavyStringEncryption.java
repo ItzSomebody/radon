@@ -16,14 +16,17 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class HeavyStringEncryption extends AbstractTransformer {
     /**
-     * Indication to not encrypt strings containing Spigot placeholders (%%__USER__%%, %%__RESOURCE__%% and %%__NONCE__%%).
+     * Indication to not encrypt strings containing Spigot placeholders
+     * (%%__USER__%%, %%__RESOURCE__%% and %%__NONCE__%%).
      */
     private boolean spigotMode;
 
     /**
      * Constructor used to create a {@link HeavyStringEncryption} object.
      *
-     * @param spigotMode indication to not encrypt strings containing Spigot placeholders (%%__USER__%%, %%__RESOURCE__%% and %%__NONCE__%%).
+     * @param spigotMode indication to not encrypt strings containing Spigot
+     *                   placeholders (%%__USER__%%, %%__RESOURCE__%% and
+     *                   %%__NONCE__%%).
      */
     public HeavyStringEncryption(boolean spigotMode) {
         this.spigotMode = spigotMode;
@@ -50,13 +53,26 @@ public class HeavyStringEncryption extends AbstractTransformer {
                             if (this.spigotMode &&
                                     ((String) cst).contains("%%__USER__%%")
                                     || ((String) cst).contains("%%__RESOURCE__%%")
-                                    || ((String) cst).contains("%%__NONCE__%%")) continue;
+                                    || ((String) cst).contains("%%__NONCE__%%"))
+                                continue;
 
                             String keyLdc = StringUtils.crazyString();
-                            ((LdcInsnNode) insn).cst = StringUtils.heavyEncrypt(((String) ((LdcInsnNode) insn).cst), keyLdc, decryptorPath[0].replace("/", "."), decryptorPath[1]);
-                            methodNode.instructions.insert(insn, new MethodInsnNode(Opcodes.INVOKESTATIC, decryptorPath[0], decryptorPath[1], "(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/String;", false));
-                            methodNode.instructions.insert(insn, new LdcInsnNode(keyLdc));
-                            methodNode.instructions.insert(insn, new InsnNode(ACONST_NULL));
+                            ((LdcInsnNode) insn).cst =
+                                    StringUtils.heavyEncrypt(((String) ((LdcInsnNode) insn).cst),
+                                            keyLdc, decryptorPath[0].replace("/", "."),
+                                            decryptorPath[1]);
+                            methodNode.instructions.insert(insn,
+                                    new MethodInsnNode(Opcodes.INVOKESTATIC,
+                                            decryptorPath[0], decryptorPath[1],
+                                            "(Ljava/lang/Object;" +
+                                                    "Ljava/lang/Object;" +
+                                                    "Ljava/lang/Object;)" +
+                                                    "Ljava/lang/String;",
+                                            false));
+                            methodNode.instructions.insert(insn,
+                                    new LdcInsnNode(keyLdc));
+                            methodNode.instructions.insert(insn,
+                                    new InsnNode(ACONST_NULL));
                             counter.incrementAndGet();
                         }
                     }

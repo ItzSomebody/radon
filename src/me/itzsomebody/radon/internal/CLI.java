@@ -89,7 +89,8 @@ public class CLI {
                     }
 
                     try {
-                        List<String> ids = WatermarkUtils.extractWatermark(leaked, this.args[2]);
+                        List<String> ids = WatermarkUtils
+                                .extractWatermark(leaked, this.args[2]);
                         for (String id : ids) {
                             LoggerUtils.stdOut(id);
                         }

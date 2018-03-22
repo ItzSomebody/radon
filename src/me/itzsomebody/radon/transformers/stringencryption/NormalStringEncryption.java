@@ -14,20 +14,24 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Transformer that encrypts strings the same way {@link LightStringEncryption} does, but with flow obfuscation in the decryption method.
+ * Transformer that encrypts strings the same way {@link LightStringEncryption}
+ * does, but with flow obfuscation in the decryption method.
  *
  * @author ItzSomebody
  */
 public class NormalStringEncryption extends AbstractTransformer {
     /**
-     * Indication to not encrypt strings containing Spigot placeholders (%%__USER__%%, %%__RESOURCE__%% and %%__NONCE__%%).
+     * Indication to not encrypt strings containing Spigot placeholders
+     * (%%__USER__%%, %%__RESOURCE__%% and %%__NONCE__%%).
      */
     private boolean spigotMode;
 
     /**
      * Constructor used to create a {@link NormalStringEncryption} object.
      *
-     * @param spigotMode indication to not encrypt strings containing Spigot placeholders (%%__USER__%%, %%__RESOURCE__%% and %%__NONCE__%%).
+     * @param spigotMode indication to not encrypt strings containing Spigot
+     *                   placeholders (%%__USER__%%, %%__RESOURCE__%% and
+     *                   %%__NONCE__%%).
      */
     public NormalStringEncryption(boolean spigotMode) {
         this.spigotMode = spigotMode;
@@ -54,13 +58,25 @@ public class NormalStringEncryption extends AbstractTransformer {
                             if (this.spigotMode &&
                                     ((String) cst).contains("%%__USER__%%")
                                     || ((String) cst).contains("%%__RESOURCE__%%")
-                                    || ((String) cst).contains("%%__NONCE__%%")) continue;
+                                    || ((String) cst).contains("%%__NONCE__%%"))
+                                continue;
 
                             int key3 = NumberUtils.getRandomInt(25000) + 25000;
-                            ((LdcInsnNode) insn).cst = StringUtils.normalEncrypt(decryptorPath[0].replace("/", "."), decryptorPath[1], key3, ((String) ((LdcInsnNode) insn).cst));
-                            methodNode.instructions.insert(insn, new MethodInsnNode(Opcodes.INVOKESTATIC, decryptorPath[0], decryptorPath[1], "(Ljava/lang/Object;Ljava/lang/Object;I)Ljava/lang/String;", false));
-                            methodNode.instructions.insert(insn, BytecodeUtils.getNumberInsn(key3));
-                            methodNode.instructions.insert(insn, new InsnNode(ACONST_NULL));
+                            ((LdcInsnNode) insn).cst =
+                                    StringUtils.normalEncrypt(decryptorPath[0].replace("/", "."),
+                                            decryptorPath[1], key3,
+                                            ((String) ((LdcInsnNode) insn).cst));
+                            methodNode.instructions.insert(insn,
+                                    new MethodInsnNode(Opcodes.INVOKESTATIC,
+                                            decryptorPath[0], decryptorPath[1],
+                                            "(Ljava/lang/Object;" +
+                                                    "Ljava/lang/Object;I)" +
+                                                    "Ljava/lang/String;",
+                                            false));
+                            methodNode.instructions.insert(insn,
+                                    BytecodeUtils.getNumberInsn(key3));
+                            methodNode.instructions.insert(insn,
+                                    new InsnNode(ACONST_NULL));
                             counter.incrementAndGet();
                         }
                     }

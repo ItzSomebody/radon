@@ -40,7 +40,9 @@ public class LightInvokeDynamic extends AbstractTransformer {
         Handle bsmHandle = new Handle(Opcodes.H_INVOKESTATIC,
                 bsmPath[0],
                 bsmPath[1],
-                "(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
+                "(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;" +
+                        "Ljava/lang/Object;Ljava/lang/Object;" +
+                        "Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
                 false);
 
         this.classNodes().stream().filter(classNode -> !this.classExempted(classNode.name) && classNode.version >= 51).forEach(classNode -> {
@@ -53,7 +55,8 @@ public class LightInvokeDynamic extends AbstractTransformer {
                         MethodInsnNode methodInsnNode = (MethodInsnNode) insn;
                         boolean isStatic = (methodInsnNode.getOpcode() == Opcodes.INVOKESTATIC);
 
-                        String newSig = isStatic ? methodInsnNode.desc : methodInsnNode.desc.replace("(", "(Ljava/lang/Object;");
+                        String newSig =
+                                isStatic ? methodInsnNode.desc : methodInsnNode.desc.replace("(", "(Ljava/lang/Object;");
                         Type origReturnType = Type.getReturnType(newSig);
                         Type[] args = Type.getArgumentTypes(newSig);
                         for (int j = 0; j < args.length; j++) {

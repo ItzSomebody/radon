@@ -8,7 +8,8 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Transformer that obfuscates the source name attribute by removing the attribute entirely.
+ * Transformer that obfuscates the source name attribute by removing the
+ * attribute entirely.
  *
  * @author ItzSomebody
  */
@@ -21,7 +22,8 @@ public class RemoveSourceName extends AbstractTransformer {
         long current = System.currentTimeMillis();
         this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
         this.logStrings.add(LoggerUtils.stdOut("Started source name removal transformer"));
-        this.classNodes().stream().filter(classNode -> !this.classExempted(classNode.name) && classNode.sourceFile != null).forEach(classNode -> {
+        this.classNodes().stream().filter(classNode -> !this.classExempted(classNode.name)
+                && classNode.sourceFile != null).forEach(classNode -> {
             classNode.sourceFile = null;
             counter.incrementAndGet();
         });

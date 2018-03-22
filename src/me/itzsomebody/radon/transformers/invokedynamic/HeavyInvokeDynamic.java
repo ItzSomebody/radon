@@ -15,7 +15,8 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Transformer that applies an InvokeDynamic obfuscation to field and (virtual and static) method access.
+ * Transformer that applies an InvokeDynamic obfuscation to field and
+ * (virtual and static) method access.
  *
  * @author ItzSomebody.
  */
@@ -46,16 +47,21 @@ public class HeavyInvokeDynamic extends AbstractTransformer {
         Handle bsmHandle = new Handle(Opcodes.H_INVOKESTATIC,
                 bsmPath[0],
                 bsmPath[1],
-                "(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
+                "(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;" +
+                        "Ljava/lang/Object;Ljava/lang/Object;" +
+                        "Ljava/lang/Object;Ljava/lang/Object;" +
+                        "Ljava/lang/Object;)Ljava/lang/Object;",
                 false);
 
         List<String> finalFields = new ArrayList<>();
         this.classNodes().stream().filter(classNode -> classNode.fields != null).forEach(classNode -> {
-            classNode.fields.stream().filter(fieldNode -> (fieldNode.access & ACC_FINAL) != 0).forEach(fieldNode -> {
+            classNode.fields.stream().filter(fieldNode ->
+                    (fieldNode.access & ACC_FINAL) != 0).forEach(fieldNode -> {
                 finalFields.add(classNode.name + '.' + fieldNode.name);
             });
         });
-        this.classNodes().stream().filter(classNode -> !this.classExempted(classNode.name) && classNode.version >= 51).forEach(classNode -> {
+        this.classNodes().stream().filter(classNode -> !this.classExempted(classNode.name)
+                && classNode.version >= 51).forEach(classNode -> {
             classNode.methods.stream().filter(methodNode -> !this.methodExempted(classNode.name + '.' + methodNode.name + methodNode.desc)
                     && !BytecodeUtils.isAbstractMethod(methodNode.access)).forEach(methodNode -> {
                 for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
@@ -63,7 +69,8 @@ public class HeavyInvokeDynamic extends AbstractTransformer {
                     if (insn instanceof MethodInsnNode) {
                         MethodInsnNode methodInsnNode = (MethodInsnNode) insn;
                         boolean isStatic = (methodInsnNode.getOpcode() == Opcodes.INVOKESTATIC);
-                        String newSig = isStatic ? methodInsnNode.desc : methodInsnNode.desc.replace("(", "(Ljava/lang/Object;");
+                        String newSig =
+                                isStatic ? methodInsnNode.desc : methodInsnNode.desc.replace("(", "(Ljava/lang/Object;");
                         Type origReturnType = Type.getReturnType(newSig);
                         Type[] args = Type.getArgumentTypes(newSig);
                         for (int j = 0; j < args.length; j++) {
@@ -105,10 +112,14 @@ public class HeavyInvokeDynamic extends AbstractTransformer {
                             && !methodNode.name.equals("<init>")) {
                         FieldInsnNode fieldInsnNode = (FieldInsnNode) insn;
                         if (!finalFields.contains(fieldInsnNode.owner + '.' + fieldInsnNode.name)) {
-                            boolean isStatic = (fieldInsnNode.getOpcode() == Opcodes.GETSTATIC || fieldInsnNode.getOpcode() == Opcodes.PUTSTATIC);
-                            boolean isSetter = (fieldInsnNode.getOpcode() == Opcodes.PUTFIELD || fieldInsnNode.getOpcode() == Opcodes.PUTSTATIC);
-                            String newSig = (isSetter) ? "(" + fieldInsnNode.desc + ")V" : "()" + fieldInsnNode.desc;
-                            if (!isStatic) newSig = newSig.replace("(", "(Ljava/lang/Object;");
+                            boolean isStatic = (fieldInsnNode.getOpcode() == Opcodes.GETSTATIC
+                                    || fieldInsnNode.getOpcode() == Opcodes.PUTSTATIC);
+                            boolean isSetter = (fieldInsnNode.getOpcode() == Opcodes.PUTFIELD
+                                    || fieldInsnNode.getOpcode() == Opcodes.PUTSTATIC);
+                            String newSig
+                                    = (isSetter) ? "(" + fieldInsnNode.desc + ")V" : "()" + fieldInsnNode.desc;
+                            if (!isStatic)
+                                newSig = newSig.replace("(", "(Ljava/lang/Object;");
                             Type type = Type.getType(fieldInsnNode.desc);
                             String wrappedDescription = type.getClassName();
                             switch (fieldInsnNode.getOpcode()) {

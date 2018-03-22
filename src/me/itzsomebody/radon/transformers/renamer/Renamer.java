@@ -83,7 +83,8 @@ public class Renamer extends AbstractTransformer {
                 counter.incrementAndGet();
             }
         });
-        this.logStrings.add(LoggerUtils.stdOut("Finished generated mappings. [" + String.valueOf(System.currentTimeMillis() - current) + "ms]"));
+        this.logStrings.add(LoggerUtils.stdOut("Finished generated mappings. [" +
+                String.valueOf(System.currentTimeMillis() - current) + "ms]"));
         this.logStrings.add(LoggerUtils.stdOut("Applying mappings."));
         current = System.currentTimeMillis();
 
@@ -109,7 +110,8 @@ public class Renamer extends AbstractTransformer {
         }
 
         this.logStrings.add(LoggerUtils.stdOut("Mapped " + counter + " members."));
-        this.logStrings.add(LoggerUtils.stdOut("Finished applying mappings. [" + String.valueOf(System.currentTimeMillis() - current) + "ms]"));
+        this.logStrings.add(LoggerUtils.stdOut("Finished applying mappings. [" +
+                String.valueOf(System.currentTimeMillis() - current) + "ms]"));
     }
 
     /**
@@ -261,12 +263,14 @@ public class Renamer extends AbstractTransformer {
     /**
      * Renames the methods in an inheritance tree to prevent inheritance errors.
      *
-     * @param visited   a list of {@link ClassTree}s which contain the {@link MethodNode}s we already renamed.
+     * @param visited   a list of {@link ClassTree}s which contain the
+     *                  {@link MethodNode}s we already renamed.
      * @param fieldNode the method information.
      * @param className the class we are currently browsing through.
      * @param newName   the new name of the method.
      */
-    private void renameFieldTree(List<ClassTree> visited, FieldNode fieldNode, String className, String newName) {
+    private void renameFieldTree(List<ClassTree> visited, FieldNode fieldNode,
+                                 String className, String newName) {
         ClassTree ct = this.hierarchy.get(className);
         if (!ct.libraryNode && !visited.contains(ct)) {
             this.mappings.put(className + '.' + fieldNode.name, newName);

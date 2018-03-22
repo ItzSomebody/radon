@@ -9,7 +9,8 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Transformer that obfuscates the source name attribute by changing the corresponding value.
+ * Transformer that obfuscates the source name attribute by changing the
+ * corresponding value.
  *
  * @author ItzSomebody
  */

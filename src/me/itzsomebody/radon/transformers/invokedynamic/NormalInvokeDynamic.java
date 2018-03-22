@@ -16,7 +16,8 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Transformer that applies an InvokeDynamic which attempts to prevent deobfuscation to happen if {@link Runtime#getRuntime()} is disabled.
+ * Transformer that applies an InvokeDynamic which attempts to prevent
+ * deobfuscation to happen if {@link Runtime#getRuntime()} is disabled.
  * Specifically java-deobfuscator's MethodExecutor.
  *
  * @author ItzSomebody
@@ -41,7 +42,9 @@ public class NormalInvokeDynamic extends AbstractTransformer {
         Handle bsmHandle = new Handle(Opcodes.H_INVOKESTATIC,
                 bsmPath[0],
                 bsmPath[1],
-                "(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
+                "(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;" +
+                        "Ljava/lang/Object;Ljava/lang/Object;" +
+                        "Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
                 false);
 
         this.classNodes().stream().filter(classNode -> !this.classExempted(classNode.name) && classNode.version >= 51).forEach(classNode -> {
@@ -54,7 +57,8 @@ public class NormalInvokeDynamic extends AbstractTransformer {
                         MethodInsnNode methodInsnNode = (MethodInsnNode) insn;
                         boolean isStatic = (methodInsnNode.getOpcode() == Opcodes.INVOKESTATIC);
 
-                        String newSig = isStatic ? methodInsnNode.desc : methodInsnNode.desc.replace("(", "(Ljava/lang/Object;");
+                        String newSig =
+                                isStatic ? methodInsnNode.desc : methodInsnNode.desc.replace("(", "(Ljava/lang/Object;");
                         Type origReturnType = Type.getReturnType(newSig);
                         Type[] args = Type.getArgumentTypes(newSig);
                         for (int j = 0; j < args.length; j++) {
@@ -64,7 +68,8 @@ public class NormalInvokeDynamic extends AbstractTransformer {
                         newSig = Type.getMethodDescriptor(origReturnType, args);
                         int opcode = (isStatic) ? this.STATIC_INVOCATION : this.VIRTUAL_INVOCATION;
 
-                        methodNode.instructions.set(insn, new InvokeDynamicInsnNode(StringUtils.crazyString(),
+                        methodNode.instructions.set(insn, new InvokeDynamicInsnNode(
+                                StringUtils.crazyString(),
                                 newSig,
                                 bsmHandle,
                                 opcode,

@@ -9,7 +9,8 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * Transformer that obfuscates the source debug attribute by changing the corresponding value.
+ * Transformer that obfuscates the source debug attribute by changing the
+ * corresponding value.
  *
  * @author ItzSomebody
  */
@@ -22,7 +23,8 @@ public class ObfuscateSourceDebug extends AbstractTransformer {
         long current = System.currentTimeMillis();
         this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
         this.logStrings.add(LoggerUtils.stdOut("Started source debug obfuscation transformer"));
-        this.classNodes().stream().filter(classNode -> !this.classExempted(classNode.name) && classNode.sourceDebug != null).forEach(classNode -> {
+        this.classNodes().stream().filter(classNode -> !this.classExempted(classNode.name)
+                && classNode.sourceDebug != null).forEach(classNode -> {
             classNode.sourceDebug = StringUtils.crazyKey();
             counter.incrementAndGet();
         });

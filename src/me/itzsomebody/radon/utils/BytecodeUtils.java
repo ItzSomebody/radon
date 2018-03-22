@@ -35,12 +35,15 @@ public class BytecodeUtils {
     }
 
     /**
-     * Returns ICONST_0 or ICONST_1 based on {@link NumberUtils#getRandomInt(int)}.
+     * Returns ICONST_0 or ICONST_1 based on
+     * {@link NumberUtils#getRandomInt(int)}.
      *
-     * @return ICONST_0 or ICONST_1 based on {@link NumberUtils#getRandomInt(int)}.
+     * @return ICONST_0 or ICONST_1 based on
+     * {@link NumberUtils#getRandomInt(int)}.
      */
     public static InsnNode randTrueFalse() {
-        return (NumberUtils.getRandomInt(2) == 1) ? new InsnNode(Opcodes.ICONST_1) : new InsnNode(Opcodes.ICONST_0);
+        return (NumberUtils.getRandomInt(2) == 1) ?
+                new InsnNode(Opcodes.ICONST_1) : new InsnNode(Opcodes.ICONST_0);
     }
 
     /**
@@ -59,15 +62,19 @@ public class BytecodeUtils {
     }
 
     /**
-     * Check if the input {@link MethodNode} has the same name as another method in the classpath.
+     * Check if the input {@link MethodNode} has the same name as another
+     * method in the classpath.
      *
      * @param methodNode the {@link MethodNode} to check.
-     * @param clazz      the {@link ClassNode} in which the input {@link MethodNode} is contained.
+     * @param clazz      the {@link ClassNode} in which the input
+     *                   {@link MethodNode} is contained.
      * @param classes    the class collection to check.
-     * @return true if input {@link MethodNode} name and description match another one in the classpath.
+     * @return true if input {@link MethodNode} name and description match
+     * another one in the classpath.
      */
     @Deprecated
-    public static boolean hasSameMethod(MethodNode methodNode, ClassNode clazz, Collection<ClassNode> classes) {
+    public static boolean hasSameMethod(MethodNode methodNode, ClassNode clazz,
+                                        Collection<ClassNode> classes) {
         for (ClassNode classNode : classes) {
             if (classNode.name.equals(clazz.name)) continue;
             for (MethodNode method : classNode.methods) {
@@ -85,8 +92,10 @@ public class BytecodeUtils {
      * Checks if the input class is a main method.
      *
      * @param clazz      {@link ClassNode} to check for main methods.
-     * @param spigotMode if obfuscator should consider the input {@link ClassNode} as a Spigot/Bukkit/Bungee plugin.
-     * @return true if the input {@link ClassNode} contains a main method, false if not.
+     * @param spigotMode if obfuscator should consider the input
+     *                   {@link ClassNode} as a Spigot/Bukkit/Bungee plugin.
+     * @return true if the input {@link ClassNode} contains a main method,
+     * false if not.
      */
     public static boolean isMain(ClassNode clazz, boolean spigotMode) {
         if (spigotMode) {
@@ -106,7 +115,8 @@ public class BytecodeUtils {
     }
 
     /**
-     * Returns access modifier without private or protected so that class renaming works properly.
+     * Returns access modifier without private or protected so that class
+     * renaming works properly.
      *
      * @param access input access as {@link Integer}.
      * @return new {@link Integer} without restrictive flags.
@@ -125,10 +135,12 @@ public class BytecodeUtils {
         if ((access & Opcodes.ACC_MODULE) != 0) a |= Opcodes.ACC_MODULE;
         if ((access & Opcodes.ACC_OPEN) != 0) a |= Opcodes.ACC_OPEN;
         if ((access & Opcodes.ACC_STATIC) != 0) a |= Opcodes.ACC_STATIC;
-        if ((access & Opcodes.ACC_STATIC_PHASE) != 0) a |= Opcodes.ACC_STATIC_PHASE;
+        if ((access & Opcodes.ACC_STATIC_PHASE) != 0)
+            a |= Opcodes.ACC_STATIC_PHASE;
         if ((access & Opcodes.ACC_STRICT) != 0) a |= Opcodes.ACC_STRICT;
         if ((access & Opcodes.ACC_SUPER) != 0) a |= Opcodes.ACC_SUPER;
-        if ((access & Opcodes.ACC_SYNCHRONIZED) != 0) a |= Opcodes.ACC_SYNCHRONIZED;
+        if ((access & Opcodes.ACC_SYNCHRONIZED) != 0)
+            a |= Opcodes.ACC_SYNCHRONIZED;
         if ((access & Opcodes.ACC_SYNTHETIC) != 0) a |= Opcodes.ACC_SYNTHETIC;
         if ((access & Opcodes.ACC_TRANSIENT) != 0) a |= Opcodes.ACC_TRANSIENT;
         if ((access & Opcodes.ACC_VARARGS) != 0) a |= Opcodes.ACC_VARARGS;
@@ -164,17 +176,22 @@ public class BytecodeUtils {
         expiryCode.add(new TypeInsnNode(Opcodes.NEW, "java/util/Date"));
         expiryCode.add(new InsnNode(Opcodes.DUP));
         expiryCode.add(new LdcInsnNode(expiryTime));
-        expiryCode.add(new MethodInsnNode(Opcodes.INVOKESPECIAL, "java/util/Date", "<init>", "(J)V", false));
+        expiryCode.add(new MethodInsnNode(Opcodes.INVOKESPECIAL,
+                "java/util/Date", "<init>", "(J)V", false));
         expiryCode.add(new TypeInsnNode(Opcodes.NEW, "java/util/Date"));
         expiryCode.add(new InsnNode(Opcodes.DUP));
-        expiryCode.add(new MethodInsnNode(Opcodes.INVOKESPECIAL, "java/util/Date", "<init>", "()V", false));
+        expiryCode.add(new MethodInsnNode(Opcodes.INVOKESPECIAL,
+                "java/util/Date", "<init>", "()V", false));
         expiryCode.add(new InsnNode(Opcodes.SWAP));
-        expiryCode.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/util/Date", "after", "(Ljava/util/Date;)Z", false));
+        expiryCode.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL,
+                "java/util/Date", "after", "(Ljava/util/Date;)Z", false));
         expiryCode.add(new JumpInsnNode(Opcodes.IFEQ, injectedLabel));
         expiryCode.add(new TypeInsnNode(Opcodes.NEW, "java/lang/Throwable"));
         expiryCode.add(new InsnNode(Opcodes.DUP));
         expiryCode.add(new LdcInsnNode(expiredMsg));
-        expiryCode.add(new MethodInsnNode(Opcodes.INVOKESPECIAL, "java/lang/Throwable", "<init>", "(Ljava/lang/String;)V", false));
+        expiryCode.add(new MethodInsnNode(Opcodes.INVOKESPECIAL,
+                "java/lang/Throwable", "<init>",
+                "(Ljava/lang/String;)V", false));
         expiryCode.add(new InsnNode(Opcodes.ATHROW));
         expiryCode.add(injectedLabel);
 
@@ -255,10 +272,12 @@ public class BytecodeUtils {
     }
 
     /**
-     * Returns {@link Integer} represented by bytecode instruction and/or operand.
+     * Returns {@link Integer} represented by bytecode instruction and/or
+     * operand.
      *
      * @param insn {@link AbstractInsnNode} to check.
-     * @return {@link Integer} represented by bytecode instruction and/or operand.
+     * @return {@link Integer} represented by bytecode instruction and/or
+     * operand.
      */
     public static int getNumber(AbstractInsnNode insn) {
         int opcode = insn.getOpcode();
@@ -312,14 +331,17 @@ public class BytecodeUtils {
     }
 
     /**
-     * Checks if provided {@link ClassNode} contains a {@link MethodNode} based on info given.
+     * Checks if provided {@link ClassNode} contains a {@link MethodNode}
+     * based on info given.
      *
      * @param name      name to check.
      * @param desc      description to check.
      * @param classNode classNode to look in.
-     * @return true if provided {@link ClassNode} contains a {@link MethodNode} based on info given.
+     * @return true if provided {@link ClassNode} contains a
+     * {@link MethodNode} based on info given.
      */
-    public static boolean containsMethod(String name, String desc, ClassNode classNode) {
+    public static boolean containsMethod(String name, String desc,
+                                         ClassNode classNode) {
         for (MethodNode methodNode : classNode.methods) {
             if (methodNode.name.equals(name) && methodNode.desc.equals(desc)) {
                 return true;
@@ -330,14 +352,17 @@ public class BytecodeUtils {
     }
 
     /**
-     * Checks if provided {@link ClassNode} contains a {@link FieldNode} based on info given.
+     * Checks if provided {@link ClassNode} contains a {@link FieldNode}
+     * based on info given.
      *
      * @param name      name to check.
      * @param desc      description to check.
      * @param classNode classNode to look in.
-     * @return true if provided {@link ClassNode} contains a {@link FieldNode} based on info given.
+     * @return true if provided {@link ClassNode} contains a
+     * {@link FieldNode} based on info given.
      */
-    public static boolean containsField(String name, String desc, ClassNode classNode) {
+    public static boolean containsField(String name, String desc,
+                                        ClassNode classNode) {
         if (classNode.fields != null) {
             for (FieldNode fieldNode : classNode.fields) {
                 if (fieldNode.name.equals(name) && fieldNode.desc.equals(desc)) {
@@ -361,7 +386,9 @@ public class BytecodeUtils {
             do {
                 if (before == null) return false;
                 before = before.getPrevious();
-            } while (!(before instanceof LabelNode) && !(before instanceof LineNumberNode));
+            }
+            while (!(before instanceof LabelNode)
+                    && !(before instanceof LineNumberNode));
         }
 
         return (before instanceof IincInsnNode);

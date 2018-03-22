@@ -18,7 +18,8 @@ public class LoggerUtils {
     /**
      * The {@link SimpleDateFormat} that will be used for logging.
      */
-    private static SimpleDateFormat FORMAT = new SimpleDateFormat("MM/dd/yyyy-HH:mm:ss");
+    private static SimpleDateFormat FORMAT
+            = new SimpleDateFormat("MM/dd/yyyy-HH:mm:ss");
 
     /**
      * Writes an inputted {@link ArrayList} of {@link String}s to a log file.
@@ -26,14 +27,12 @@ public class LoggerUtils {
      * @param strings {@link String}s to write to log file.
      */
     public static void logWriter(List<String> strings) {
-        String date = FORMAT.format(new Date(System.currentTimeMillis()));
         BufferedWriter bw;
         try {
             File log = new File("Radon.log");
             if (!log.exists()) {
                 log.createNewFile();
             }
-            //bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(log), StandardCharsets.UTF_8));
             bw = new BufferedWriter(new FileWriter(log));
             bw.append("##############################################\n");
             bw.append("# +----------------------------------------+ #\n");
@@ -61,7 +60,8 @@ public class LoggerUtils {
     }
 
     /**
-     * Prints a formatted message into the console and returns the result as a {@link String}.
+     * Prints a formatted message into the console and returns the result as
+     * a {@link String}.
      *
      * @param string to write to the console.
      * @return formatted {@link String}.
@@ -69,11 +69,6 @@ public class LoggerUtils {
     public static String stdOut(String string) {
         String date = FORMAT.format(new Date(System.currentTimeMillis()));
         String formatted = "[" + date + "] " + Radon.PREFIX + " - " + string;
-        /*try {
-            new PrintStream(System.out, true, "UTF-8").println(formatted);
-        } catch (Throwable t) {
-            ;
-        }*/
         System.out.println(formatted);
         return formatted;
     }

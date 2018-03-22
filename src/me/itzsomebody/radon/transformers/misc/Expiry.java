@@ -45,7 +45,8 @@ public class Expiry extends AbstractTransformer {
         this.classNodes().stream().filter(classNode -> !this.classExempted(classNode.name)).forEach(classNode -> {
             classNode.methods.stream().filter(methodNode -> !this.methodExempted(classNode.name + '.' + methodNode.name + methodNode.desc)
                     && methodNode.name.equals("<init>") && methodSize(methodNode) < 60000).forEach(methodNode -> {
-                methodNode.instructions.insertBefore(methodNode.instructions.getFirst(), BytecodeUtils.returnExpiry(this.expiryTime, this.expiryMsg));
+                methodNode.instructions.insertBefore(methodNode.instructions.getFirst(),
+                        BytecodeUtils.returnExpiry(this.expiryTime, this.expiryMsg));
                 counter.incrementAndGet();
             });
         });

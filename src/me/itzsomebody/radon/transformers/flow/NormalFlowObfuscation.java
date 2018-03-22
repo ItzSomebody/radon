@@ -33,10 +33,12 @@ public class NormalFlowObfuscation extends AbstractTransformer {
         this.logStrings.add(LoggerUtils.stdOut("Started normal flow obfuscation transformer"));
         String s = StringUtils.bigLDC();
         classNodes().stream().filter(classNode -> !this.classExempted(classNode.name)).forEach(classNode -> {
-            FieldNode field = new FieldNode(ACC_PUBLIC + ACC_STATIC + ACC_FINAL, StringUtils.crazyString(), "Z", null, true);
+            FieldNode field = new FieldNode(ACC_PUBLIC + ACC_STATIC +
+                    ACC_FINAL, StringUtils.crazyString(), "Z", null, true);
             classNode.fields.add(field);
-            classNode.methods.stream().filter(methodNode -> !this.methodExempted(classNode.name + '.' + methodNode.name + methodNode.desc)
-                    && !BytecodeUtils.isAbstractMethod(methodNode.access)).forEach(methodNode -> {
+            classNode.methods.stream().filter(methodNode ->
+                    !this.methodExempted(classNode.name + '.' + methodNode.name + methodNode.desc)
+                            && !BytecodeUtils.isAbstractMethod(methodNode.access)).forEach(methodNode -> {
                 int varIndex = methodNode.maxLocals;
                 methodNode.maxLocals++;
                 methodNode.owner = classNode.name;
@@ -47,7 +49,8 @@ public class NormalFlowObfuscation extends AbstractTransformer {
                     if (this.methodSize(methodNode) > 60000) break;
                     if (methodNode.name.equals("<init>")) {
                         if (insn instanceof MethodInsnNode) {
-                            if (insn.getOpcode() == INVOKESPECIAL && insn.getPrevious() instanceof VarInsnNode
+                            if (insn.getOpcode() == INVOKESPECIAL
+                                    && insn.getPrevious() instanceof VarInsnNode
                                     && ((VarInsnNode) insn.getPrevious()).var == 0) {
                                 calledSuper = true;
                             }
@@ -58,7 +61,8 @@ public class NormalFlowObfuscation extends AbstractTransformer {
                             && insn.getPrevious() != null
                             && insn.getPrevious().getOpcode() != ASTORE
                             && insn.getOpcode() != ASTORE) {
-                        if (methodNode.name.equals("<init>") && !calledSuper) continue;
+                        if (methodNode.name.equals("<init>") && !calledSuper)
+                            continue;
                         StackAnalyzer sa = new StackAnalyzer(methodNode, insn);
                         Stack<Object> stack = sa.returnStackAtBreak();
                         if (stack.isEmpty()) { // We need to make sure stack is empty before making jumps
@@ -91,7 +95,8 @@ public class NormalFlowObfuscation extends AbstractTransformer {
                     }
                 }
                 methodNode.instructions.insertBefore(methodNode.instructions.getFirst(), new VarInsnNode(ISTORE, varIndex));
-                methodNode.instructions.insertBefore(methodNode.instructions.getFirst(), new FieldInsnNode(GETSTATIC, classNode.name, field.name, "Z"));
+                methodNode.instructions.insertBefore(methodNode.instructions.getFirst(),
+                        new FieldInsnNode(GETSTATIC, classNode.name, field.name, "Z"));
             });
         });
         this.logStrings.add(LoggerUtils.stdOut("Added " + counter + " instruction sets."));
