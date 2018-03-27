@@ -330,6 +330,8 @@ public class OpcodeUtils implements Opcodes {
                 return "ifnull";
             case IFNONNULL:
                 return "ifnonnull";
+            case -1:
+                return "debugging";
         }
 
         throw new IllegalArgumentException("Unknown opcode");

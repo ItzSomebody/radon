@@ -69,23 +69,17 @@ public class BytecodeUtils {
 
         expiryCode.add(new TypeInsnNode(Opcodes.NEW, "java/util/Date"));
         expiryCode.add(new InsnNode(Opcodes.DUP));
-        expiryCode.add(new LdcInsnNode(expiryTime));
-        expiryCode.add(new MethodInsnNode(Opcodes.INVOKESPECIAL,
-                "java/util/Date", "<init>", "(J)V", false));
+        expiryCode.add(new MethodInsnNode(Opcodes.INVOKESPECIAL, "java/util/Date", "<init>", "()V", false));
         expiryCode.add(new TypeInsnNode(Opcodes.NEW, "java/util/Date"));
         expiryCode.add(new InsnNode(Opcodes.DUP));
-        expiryCode.add(new MethodInsnNode(Opcodes.INVOKESPECIAL,
-                "java/util/Date", "<init>", "()V", false));
-        expiryCode.add(new InsnNode(Opcodes.SWAP));
-        expiryCode.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL,
-                "java/util/Date", "after", "(Ljava/util/Date;)Z", false));
+        expiryCode.add(new LdcInsnNode(expiryTime));
+        expiryCode.add(new MethodInsnNode(Opcodes.INVOKESPECIAL, "java/util/Date", "<init>", "(J)V", false));
+        expiryCode.add(new MethodInsnNode(Opcodes.INVOKEVIRTUAL, "java/util/Date", "after", "(Ljava/util/Date;)Z", false));
         expiryCode.add(new JumpInsnNode(Opcodes.IFEQ, injectedLabel));
         expiryCode.add(new TypeInsnNode(Opcodes.NEW, "java/lang/Throwable"));
         expiryCode.add(new InsnNode(Opcodes.DUP));
         expiryCode.add(new LdcInsnNode(expiredMsg));
-        expiryCode.add(new MethodInsnNode(Opcodes.INVOKESPECIAL,
-                "java/lang/Throwable", "<init>",
-                "(Ljava/lang/String;)V", false));
+        expiryCode.add(new MethodInsnNode(Opcodes.INVOKESPECIAL, "java/lang/Throwable", "<init>", "(Ljava/lang/String;)V", false));
         expiryCode.add(new InsnNode(Opcodes.ATHROW));
         expiryCode.add(injectedLabel);
 
@@ -187,24 +181,6 @@ public class BytecodeUtils {
         }
 
         throw new IllegalStateException("Unexpected instruction");
-    }
-
-    /**
-     * Determines if description is a primitive int.
-     *
-     * @param desc the description to check.
-     * @return true if description is a primitive int.
-     */
-    public static boolean isPrimitiveType(String desc) {
-        String rawDesc = desc.replace("[", "");
-        return (rawDesc.equals("I")
-                || rawDesc.equals("B")
-                || rawDesc.equals("C")
-                || rawDesc.equals("S")
-                || rawDesc.equals("J")
-                || rawDesc.equals("Z")
-                || rawDesc.equals("F")
-                || rawDesc.equals("D"));
     }
 
     /**

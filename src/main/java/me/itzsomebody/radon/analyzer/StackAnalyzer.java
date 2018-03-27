@@ -20,12 +20,10 @@ public class StackAnalyzer implements Opcodes {
      * {@link MethodNode} we are checking.
      */
     private MethodNode methodNode;
-
     /**
      * {@link AbstractInsnNode} opcode which is the breakpoint.
      */
     private AbstractInsnNode breakPoint;
-
     /**
      * Debug boolean;
      */
@@ -54,10 +52,8 @@ public class StackAnalyzer implements Opcodes {
             System.out.println("Entering " + this.methodNode.owner + '.'
                     + this.methodNode.name + this.methodNode.desc);
         Stack<Object> stack = new Stack<>(); // Simulated stack
-
         for (int i = 0; i < this.methodNode.instructions.size(); i++) {
             AbstractInsnNode insn = this.methodNode.instructions.get(i);
-
             if (this.breakPoint == insn)
                 break;
             try {
@@ -252,11 +248,9 @@ public class StackAnalyzer implements Opcodes {
                                 (virtualInvoke.desc).length; j++) {
                             stack.pop();
                         }
-
                         if (!virtualInvoke.desc.endsWith(")V")) {
                             stack.push(null);
                         }
-
                         break;
                     case INVOKESTATIC:
                         if (DEBUG)
@@ -264,34 +258,28 @@ public class StackAnalyzer implements Opcodes {
                                     "invocation - Opcode = " + OpcodeUtils
                                     .getOpcodeName(insn.getOpcode()));
                         MethodInsnNode staticInvoke = (MethodInsnNode) insn;
-
                         for (int j = 0; j < Type.getArgumentTypes
                                 (staticInvoke.desc).length; j++) {
                             stack.pop();
                         }
-
                         if (!staticInvoke.desc.endsWith(")V")) {
                             stack.push(null);
                         }
-
                         break;
                     case INVOKEDYNAMIC:
                         if (DEBUG)
                             System.out.println("Processing dynamic invocation" +
-                                    " -  Opcode = " + OpcodeUtils
+                                    " - Opcode = " + OpcodeUtils
                                     .getOpcodeName(insn.getOpcode()));
                         InvokeDynamicInsnNode indy =
                                 (InvokeDynamicInsnNode) insn;
-
                         for (int j = 0; j < Type.getArgumentTypes(indy.desc)
                                 .length; j++) {
                             stack.pop();
                         }
-
                         if (!indy.desc.endsWith(")V")) {
                             stack.push(null);
                         }
-
                         break;
                     case MULTIANEWARRAY:
                         if (DEBUG)
@@ -303,7 +291,6 @@ public class StackAnalyzer implements Opcodes {
                         for (int j = 0; j < arrays.dims; j++) {
                             stack.pop();
                         }
-
                         stack.push(null); // Arrayref
                         break;
                 }
@@ -311,7 +298,6 @@ public class StackAnalyzer implements Opcodes {
                 if (DEBUG) empty.printStackTrace();
             }
         }
-
         return stack;
     }
 }

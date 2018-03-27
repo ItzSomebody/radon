@@ -154,7 +154,7 @@ public class Renamer extends AbstractTransformer {
         }
         for (ClassTree ct : this.hierarchy.values()) {
             if (ct.subClasses.contains(methodNode.owner)
-                    && this.isLibInheritedMN(methodNode, methodNode.owner)) {
+                    && this.isLibInheritedMN(new ArrayList<>(), methodNode, methodNode.owner)) {
                 return false;
             }
         }
@@ -162,15 +162,17 @@ public class Renamer extends AbstractTransformer {
     }
 
     /**
-     * Attempts to determine if the method we input is inherited from a library class.
+     * Attempts to determine if the method we input is inherited from a library class or is exempted.
      *
+     * @param visited    a list of {@link ClassTree}s which contain the {@link MethodNode}s we already checked.
      * @param methodNode {@link MethodNode} we want to check if we can rename without causing the JVM to spit lots of errors.
      * @param className  the name of the class we want to check
      * @return true if the method we input is inherited from a library class.
      */
-    private boolean isLibInheritedMN(MethodNode methodNode, String className) {
+    private boolean isLibInheritedMN(List<ClassTree> visited, MethodNode methodNode, String className) {
         ClassTree ct = this.hierarchy.get(className);
-        if (ct != null) {
+        if (ct != null && !visited.contains(ct)) {
+            visited.add(ct);
             if (!methodNode.owner.equals(className)) {
                 for (MethodNode mn : ct.methods) {
                     if (mn.name.equals(methodNode.name) && mn.desc.equals(methodNode.desc)) {
@@ -180,8 +182,17 @@ public class Renamer extends AbstractTransformer {
                     }
                 }
             }
+            if (methodExempted(className + '.' + methodNode.name + methodNode.desc)) {
+                return true;
+            }
             for (String parentClass : ct.parentClasses) {
-                if (this.isLibInheritedMN(methodNode, parentClass)) {
+                if (this.isLibInheritedMN(visited, methodNode, parentClass)) {
+                    return true;
+                }
+            }
+
+            for (String subClass : ct.subClasses) {
+                if (this.isLibInheritedMN(visited, methodNode, subClass)) {
                     return true;
                 }
             }
@@ -224,7 +235,7 @@ public class Renamer extends AbstractTransformer {
         }
         for (ClassTree ct : this.hierarchy.values()) {
             if (ct.subClasses.contains(fieldNode.owner)
-                    && this.isLibInheritedFN(fieldNode, fieldNode.owner)) {
+                    && this.isLibInheritedFN(new ArrayList<>(), fieldNode, fieldNode.owner)) {
                 return false;
             }
         }
@@ -232,15 +243,16 @@ public class Renamer extends AbstractTransformer {
     }
 
     /**
-     * Attempts to determine if the method we input is inherited from a library class.
+     * Attempts to determine if the method we input is inherited from a library class or is exempted.
      *
      * @param fieldNode {@link FieldNode} we want to check if we can rename without causing the JVM to spit lots of errors.
      * @param className the name of the class we want to check
      * @return true if the method we input is inherited from a library class.
      */
-    private boolean isLibInheritedFN(FieldNode fieldNode, String className) {
+    private boolean isLibInheritedFN(List<ClassTree> visited, FieldNode fieldNode, String className) {
         ClassTree ct = this.hierarchy.get(className);
-        if (ct != null) {
+        if (ct != null && !visited.contains(ct)) {
+            visited.add(ct);
             if (!fieldNode.owner.equals(className)) {
                 for (MethodNode mn : ct.methods) {
                     if (mn.name.equals(fieldNode.name) && mn.desc.equals(fieldNode.desc)) {
@@ -250,8 +262,17 @@ public class Renamer extends AbstractTransformer {
                     }
                 }
             }
+            if (fieldExempted(className + '.' + fieldNode.name)) {
+                return true;
+            }
             for (String parentClass : ct.parentClasses) {
-                if (this.isLibInheritedFN(fieldNode, parentClass)) {
+                if (this.isLibInheritedFN(visited, fieldNode, parentClass)) {
+                    return true;
+                }
+            }
+
+            for (String subClass : ct.subClasses) {
+                if (this.isLibInheritedFN(visited, fieldNode, subClass)) {
                     return true;
                 }
             }

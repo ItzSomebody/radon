@@ -1,3 +1,11 @@
+## 0.4.4
+
+* Exempting should work with renamer transformer again.
+
+## 0.4.3
+
+* Changed the heavy invokedynamic transformer so it now replaces field calls with primitive types.
+
 ## 0.4.2
 
 * Added UTF-8 source-encoding to Maven.
