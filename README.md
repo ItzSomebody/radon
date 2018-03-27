@@ -1,4 +1,4 @@
-# Radon Java Obfuscator
+# Radon Java Obfuscator [![Build Status](https://travis-ci.org/ItzSomebody/Radon.svg?branch=master)]
 Yet another Java obfuscator. If I forgot to credit you, just make a pull-request or open an issue.
 
 Licenses get to go with the manifest in src/META-INF (yay!)
