@@ -23,7 +23,7 @@ public class WatermarkUtils { // TODO: Add more secure watermark injection
      *
      * @param jarFile file to extract watermarks from.
      * @param key     {@link String} to use to decrypt encrypted watemark
-     *                              messages.
+     *                messages.
      * @return a {@link List} of all extracted watermarks.
      * @throws Throwable should some virtual-disaster should happen.
      */
@@ -55,16 +55,18 @@ public class WatermarkUtils { // TODO: Add more secure watermark injection
                                 }
                             }
                         } catch (Throwable t) {
-                            //t.printStackTrace();
+                            // ignored;
                         }
 
 
                         if (classNode.signature != null) {
-                            String decrypted = StringUtils.aesDecrypt(classNode.signature, key);
-                            if (decrypted != null) {
+                            try {
+                                String decrypted = StringUtils.aesDecrypt(classNode.signature, key);
                                 if (decrypted.startsWith("WMID: ")) {
                                     foundIds.add("Watermarked ID in class signature of " + entry.getName() + " -> " + decrypted);
                                 }
+                            } catch (Throwable t) {
+                                // ignored
                             }
                         }
                     }
