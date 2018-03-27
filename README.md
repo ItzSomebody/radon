@@ -9,33 +9,36 @@ Alternatively, you can also use ```java -jar Radon.jar --help``` for help.
 
 Example config:
 ```yaml
-Input: ClearChat.jar
-Output: ClearChat-OBF.jar
-StringEncryption: Light
-InvokeDynamic: Normal
+Input: "C:/Users/Buddy/Desktop/RadonOBF/Counter.jar"
+Output: "C:/Users/Buddy/Desktop/Counter-OBF.jar"
+StringEncryption: Normal
+InvokeDynamic: Heavy
 FlowObfuscation: Normal
 LocalVariableObfuscation: Remove
 LineNumberObfuscation: Remove
-SourceNameObfuscation: Obfuscate
-SourceDebugObfuscation: Obfuscate
+SourceNameObfuscation: Remove
+SourceDebugObfuscation: Remove
 HideCode: True
 Crasher: True
-StringPool: True
-NumberObfuscation: True
 Shuffler: True
 InnerClassRemover: True
+StringPool: True
+NumberObfuscation: True
 TrashClasses: 50
 Renamer: True
 WatermarkType: ConstantPool
 WatermarkMessage: ItzSomebody
 WatermarkKey: PASSWORD
-ExpiryTime: 1/18/2018
+ExpiryTime: 5/25/2018
 ExpiryMessage: "YOUR SOFTWARE TRIAL HAS ENDED!!! YOU MUST NOW PAY $100000000 FOR THE FULL VERSION LULZ"
 Libraries:
-    - "C:/Program Files/Java/jdk1.8.0_131/jre/lib/rt.jar"
-Exempt:
-    - "me/itzsomebody/clearchat/ClearChat"
-    - "me/itzsomebody/clearchat/config/Config"
+    - "C:/Program Files/Java/jre1.8.0_xxx/lib/rt.jar"
+Exempts:
+    - "Class: org/objectweb/asm/*"
+    - "StringPool: me/itzsomebody/counter/Counter$1"
+    - "InvokeDynamic: me/itzsomebody/counter/Counter"
+    - "Renamer: me/itzsomebody/counter/Counter$1"
+    - "Renamer: me/itzsomebody/counter/Counter.process(*"
 ```
 
 Valid config options you can use:
@@ -67,6 +70,32 @@ Valid config options you can use:
 | InnerClassRemover | Boolean | Determines if obfuscator should remove inner-class information |
 | ExpiryTime | String | Message to insert for expiry obfuscation (useful for trialware) |
 | ExpiryMessage | String | Message to show when set your trialware goes past expiration date (rip) |
+
+## Exempting
+
+The character '\*' can be used as a wildcard for "anything which starts with before this". So "me/itzsomebody/\*" will match "me/itzsomebody/ExampleClass1", "me/itzsomebody/example/ExampleClass2". This also works on method matching, "me/itzsomebody/example/Example.exampleMethod(*" will match any method which has the name "exampleMethod" in "me/itzsomebody/example/Example".
+
+Valid exempt types you can use:
+
+| Option | Expected Value(s) | Desc |
+| --- | --- | --- |
+| Class | Fully qualified name of internal class name (i.e. me/itzsomebody/counter/Counter) | Exempts entire classes from obfuscation. |
+| Method | Fully qualified name of internal owner name + '.' + internal method name + internal method descriptor (i.e. me/itzsomebody/counter/Counter.exampleMethod()V) | Exempts entire method from obfuscation. |
+| Field | Fully qualified name of internal owner name + '.' + internal field name | Exempts field from obfuscation. |
+| StringEncryption | Fully qualified internal name (member name must be seperated from owner by a '.') (i.e. me/itzsomebody/counter/Counter.exampleMethod()V or me/itzsomebody/counter/Counter) | Exempts class or method from string encryption. |
+| InvokeDynamic | Fully qualified internal name (member name must be seperated from owner by a '.') (i.e. me/itzsomebody/counter/Counter.exampleMethod()V or me/itzsomebody/counter/Counter) | Exempts class or method from invokedynamic obfuscation. |
+| Flow | Fully qualified internal name (member name must be seperated from owner by a '.') (i.e. me/itzsomebody/counter/Counter.exampleMethod()V or me/itzsomebody/counter/Counter) | Exempts class or method from flow control obfuscation. |
+| LocalVars | Fully qualified internal name (member name must be seperated from owner by a '.') (i.e. me/itzsomebody/counter/Counter.exampleMethod()V or me/itzsomebody/counter/Counter) | Exempts class or method from local variable obfuscation. |
+| SourceName | Fully qualified internal name (i.e. me/itzsomebody/counter/Counter) | Exempts class source from name obfuscation. |
+| SourceDebug | Fully qualified internal name (i.e. me/itzsomebody/counter/Counter) | Exempts class source from debug obfuscation. |
+| LineNumbers | Fully qualified internal name (member name must be seperated from owner by a '.') (i.e. me/itzsomebody/counter/Counter.exampleMethod()V or me/itzsomebody/counter/Counter) | Exempts class or method from line number obfuscation. |
+| StringPool | Fully qualified internal name (member name must be seperated from owner by a '.') (i.e. me/itzsomebody/counter/Counter.exampleMethod()V or me/itzsomebody/counter/Counter) | Exempts class or method from string pooling. |
+| Crasher | Fully qualified internal name (i.e. me/itzsomebody/counter/Counter) | Exempts class from being added an invalid class signature. |
+| HideCode | Fully qualified internal name (member name must be seperated from owner by a '.') (i.e. me/itzsomebody/counter/Counter.exampleMethod()V or me/itzsomebody/counter/Counter.exampleField or ) | Exempts class, method or field from hide code obfuscation. |
+| Numbers | Fully qualified internal name (member name must be seperated from owner by a '.') (i.e. me/itzsomebody/counter/Counter.exampleMethod()V or me/itzsomebody/counter/Counter) | Exempts class or method number obfuscation. |
+| Shuffler | Fully qualified internal name (i.e. me/itzsomebody/counter/Counter) | Exempts class from member shuffling. |
+| InnerClasses | Fully qualified internal name (i.e. me/itzsomebody/counter/Counter) | Exempts class from inner-class information removal. |
+| Renamer | Fully qualified internal name (member name must be seperated from owner by a '.') (i.e. me/itzsomebody/counter/Counter.exampleMethod()V or me/itzsomebody/counter/Counter.exampleField or ) | Exempts class, method or field from renaming. |
 
 ## Obfuscation description
 This table describes the current obfuscation settings Radon has.

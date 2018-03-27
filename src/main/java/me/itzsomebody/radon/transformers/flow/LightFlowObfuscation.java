@@ -31,10 +31,10 @@ public class LightFlowObfuscation extends AbstractTransformer {
         long current = System.currentTimeMillis();
         this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
         this.logStrings.add(LoggerUtils.stdOut("Started light flow obfuscation transformer."));
-        classNodes().stream().filter(classNode -> !this.classExempted(classNode.name)).forEach(classNode -> {
+        classNodes().stream().filter(classNode -> !this.exempted(classNode.name, "Flow")).forEach(classNode -> {
             String fieldName = StringUtils.crazyString();
             classNode.methods.stream().filter(methodNode -> !BytecodeUtils.isAbstractMethod(methodNode.access)
-                    && !this.methodExempted(classNode.name + '.' + methodNode.name + methodNode.desc)
+                    && !this.exempted(classNode.name + '.' + methodNode.name + methodNode.desc, "Flow")
                     && BytecodeUtils.containsGoto(methodNode)).forEach(methodNode -> {
                 for (AbstractInsnNode ain : methodNode.instructions.toArray()) {
                     if (this.methodSize(methodNode) > 60000) break;

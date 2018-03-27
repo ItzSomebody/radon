@@ -45,9 +45,10 @@ public class SuperLightStringEncryption extends AbstractTransformer {
         this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
         this.logStrings.add(LoggerUtils.stdOut("Started super light string encryption transformer"));
         String[] decryptorPath = new String[]{StringUtils.randomClass(classNames()), StringUtils.crazyString()};
-        this.classNodes().stream().filter(classNode -> !this.classExempted(classNode.name)).forEach(classNode -> {
-            classNode.methods.stream().filter(methodNode -> !this.methodExempted(classNode.name + '.' + methodNode.name + methodNode.desc)
-                    && !BytecodeUtils.isAbstractMethod(methodNode.access)).forEach(methodNode -> {
+        this.classNodes().stream().filter(classNode -> !this.exempted(classNode.name, "StringEncryption")).forEach(classNode -> {
+            classNode.methods.stream().filter(methodNode ->
+                    !this.exempted(classNode.name + '.' + methodNode.name + methodNode.desc, "StringEncryption")
+                            && !BytecodeUtils.isAbstractMethod(methodNode.access)).forEach(methodNode -> {
                 for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
                     if (methodSize(methodNode) > 60000) break;
                     if (insn instanceof LdcInsnNode) {

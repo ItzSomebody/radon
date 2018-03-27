@@ -16,7 +16,7 @@ public class CustomRegexUtils {
      */
     public static boolean isMatched(String customregex, String string) {
         return (customregex.equals(string)
-                || customregex.contains("*")
-                && string.contains(customregex.split("\\*")[0]));
+                || (customregex.contains("*")
+                && string.contains(customregex.split("\\*")[0])));
     }
 }

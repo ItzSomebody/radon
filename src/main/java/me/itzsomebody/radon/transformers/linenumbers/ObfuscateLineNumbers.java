@@ -26,8 +26,9 @@ public class ObfuscateLineNumbers extends AbstractTransformer {
         long current = System.currentTimeMillis();
         this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
         this.logStrings.add(LoggerUtils.stdOut("Started line obfuscation transformer"));
-        this.classNodes().stream().filter(classNode -> !this.classExempted(classNode.name)).forEach(classNode -> {
-            classNode.methods.stream().filter(methodNode -> !this.methodExempted(classNode.name + '.' + methodNode.name + methodNode.desc))
+        this.classNodes().stream().filter(classNode -> !this.exempted(classNode.name, "LineNumbers")).forEach(classNode -> {
+            classNode.methods.stream().filter(methodNode ->
+                    !this.exempted(classNode.name + '.' + methodNode.name + methodNode.desc, "LineNumbers"))
                     .filter(methodNode -> !BytecodeUtils.isAbstractMethod(methodNode.access)).forEach(methodNode -> {
                 for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
                     if (insn instanceof LineNumberNode) {

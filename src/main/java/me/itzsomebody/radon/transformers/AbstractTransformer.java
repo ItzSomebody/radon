@@ -25,19 +25,9 @@ public abstract class AbstractTransformer implements Opcodes {
     private Map<String, ClassNode> classPath;
 
     /**
-     * Classes exempted from obfuscation.
+     * Exempt information.
      */
-    private List<String> exemptClasses;
-
-    /**
-     * Methods exempted from obfuscation.
-     */
-    private List<String> exemptMethods;
-
-    /**
-     * Fields exempted from obfuscation.
-     */
-    private List<String> exemptFields;
+    private List<String> exempts;
 
     /**
      * Logged strings from transformer console output.
@@ -47,41 +37,29 @@ public abstract class AbstractTransformer implements Opcodes {
     /**
      * Init method.
      *
-     * @param classes       the classes.
-     * @param exemptClasses the exempted classes.
-     * @param exemptMethods the exempted methods.
-     * @param exemptFields  the exempted fields.
+     * @param classes the classes.
+     * @param exempts exempt information.
      */
     public void init(Map<String, ClassNode> classes,
-                     List<String> exemptClasses,
-                     List<String> exemptMethods,
-                     List<String> exemptFields) {
+                     List<String> exempts) {
         this.classes = classes;
-        this.exemptClasses = exemptClasses;
-        this.exemptMethods = exemptMethods;
-        this.exemptFields = exemptFields;
+        this.exempts = exempts;
         this.logStrings = new ArrayList<>();
     }
 
     /**
      * The other init method.
      *
-     * @param classes       the classes.
-     * @param classPath     the almighty classpath. (Bow down to it)
-     * @param exemptClasses the exempted classes.
-     * @param exemptMethods the exempted methods.
-     * @param exemptFields  the exempted fields.
+     * @param classes   the classes.
+     * @param classPath the almighty classpath. (Bow down to it)
+     * @param exempts   the exempted classes.
      */
     public void init(Map<String, ClassNode> classes,
                      Map<String, ClassNode> classPath,
-                     List<String> exemptClasses,
-                     List<String> exemptMethods,
-                     List<String> exemptFields) {
+                     List<String> exempts) {
         this.classes = classes;
         this.classPath = classPath;
-        this.exemptClasses = exemptClasses;
-        this.exemptMethods = exemptMethods;
-        this.exemptFields = exemptFields;
+        this.exempts = exempts;
         this.logStrings = new ArrayList<>();
     }
 
@@ -134,53 +112,22 @@ public abstract class AbstractTransformer implements Opcodes {
     }
 
     /**
-     * Returns true/false based on if the input is listed in
-     * {@link AbstractTransformer#exemptClasses}.
+     * Returns true if member is exempted from obfuscation.
      *
-     * @param name the name of the class to check.
-     * @return true/false based on if the input is listed in
-     * {@link AbstractTransformer#exemptClasses}.
+     * @param checkThis string to check for exempt.
+     * @param exemptId  per-transformer exempt identifier.
+     * @return true if member is exempted from obfuscation.
      */
-    protected boolean classExempted(String name) {
-        for (String string : this.exemptClasses) {
-            if (CustomRegexUtils.isMatched(string, name)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Returns true/false based on if the input is listed in
-     * {@link AbstractTransformer#exemptMethods}.
-     *
-     * @param name the path (and description) of the method to check.
-     * @return true/false based on if the input is listed in
-     * {@link AbstractTransformer#exemptMethods}.
-     */
-    protected boolean methodExempted(String name) {
-        for (String string : this.exemptMethods) {
-            if (CustomRegexUtils.isMatched(string, name)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Returns true/false based on if the input is listed in
-     * {@link AbstractTransformer#exemptFields}.
-     *
-     * @param name the path of the field to check.
-     * @return true/false based on if the input is listed in
-     * {@link AbstractTransformer#exemptFields}.
-     */
-    protected boolean fieldExempted(String name) {
-        for (String string : this.exemptFields) {
-            if (CustomRegexUtils.isMatched(string, name)) {
-                return true;
+    protected boolean exempted(String checkThis, String exemptId) {
+        String exemptKey = exemptId + ": ";
+        for (String exempt : this.exempts) {
+            if (exempt.startsWith(exemptKey)
+                    || exempt.startsWith("Class: ")
+                    || exempt.startsWith("Method: ")
+                    || exempt.startsWith("Field: ")) {
+                if (CustomRegexUtils.isMatched(exempt.replace(exemptKey, ""), checkThis)) {
+                    return true;
+                }
             }
         }
 
@@ -197,37 +144,6 @@ public abstract class AbstractTransformer implements Opcodes {
         CodeSizeEvaluator cse = new CodeSizeEvaluator(null);
         methodNode.accept(cse);
         return cse.getMaxSize();
-    }
-
-    /**
-     * Grabs {@link ClassNode} via {@link AbstractTransformer#classPath}.
-     *
-     * @param className the key to use to get corresponding classnode.
-     * @return {@link ClassNode} via {@link AbstractTransformer#classPath}.
-     */
-    protected ClassNode getClassNode(String className) {
-        return this.classPath.get(className);
-    }
-
-    /**
-     * Grabs {@link MethodNode} from input using arguments as parameters for
-     * searching.
-     *
-     * @param name      the name of the {@link MethodNode}
-     * @param desc      the desc of the {@link MethodNode}
-     * @param classNode the {@link ClassNode} to search
-     * @return {@link MethodNode} from input using arguments as parameters
-     * for searching.
-     */
-    protected MethodNode getMethodNode(String name, String desc, ClassNode classNode) {
-        for (MethodNode methodNode : classNode.methods) {
-            if (methodNode.name.equals(name) && methodNode.desc.equals(desc)) {
-                return methodNode;
-            }
-        }
-
-        throw new IllegalStateException("Could not find the method with info " +
-                classNode.name + '.' + name + desc);
     }
 
     /**

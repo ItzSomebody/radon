@@ -24,7 +24,7 @@ public class ObfuscateSourceName extends AbstractTransformer {
         this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
         this.logStrings.add(LoggerUtils.stdOut("Started source name obfuscation transformer"));
         String newName = StringUtils.crazyString() + ".java";
-        this.classNodes().stream().filter(classNode -> !this.classExempted(classNode.name)).forEach(classNode -> {
+        this.classNodes().stream().filter(classNode -> !this.exempted(classNode.name, "SourceName")).forEach(classNode -> {
             classNode.sourceFile = newName;
             counter.incrementAndGet();
         });

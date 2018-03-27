@@ -22,7 +22,7 @@ public class RemoveSourceName extends AbstractTransformer {
         long current = System.currentTimeMillis();
         this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
         this.logStrings.add(LoggerUtils.stdOut("Started source name removal transformer"));
-        this.classNodes().stream().filter(classNode -> !this.classExempted(classNode.name)
+        this.classNodes().stream().filter(classNode -> !this.exempted(classNode.name, "SourceName")
                 && classNode.sourceFile != null).forEach(classNode -> {
             classNode.sourceFile = null;
             counter.incrementAndGet();

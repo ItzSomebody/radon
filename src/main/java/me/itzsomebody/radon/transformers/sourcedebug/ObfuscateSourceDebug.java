@@ -24,7 +24,7 @@ public class ObfuscateSourceDebug extends AbstractTransformer {
         this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
         this.logStrings.add(LoggerUtils.stdOut("Started source debug obfuscation transformer"));
         String newDebug = StringUtils.crazyString();
-        this.classNodes().stream().filter(classNode -> !this.classExempted(classNode.name)
+        this.classNodes().stream().filter(classNode -> !this.exempted(classNode.name, "SourceDebug")
                 && classNode.sourceDebug != null).forEach(classNode -> {
             classNode.sourceDebug = newDebug;
             counter.incrementAndGet();

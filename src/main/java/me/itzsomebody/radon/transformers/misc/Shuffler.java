@@ -20,7 +20,7 @@ public class Shuffler extends AbstractTransformer {
         long current = System.currentTimeMillis();
         this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
         this.logStrings.add(LoggerUtils.stdOut("Started shuffle transformer"));
-        this.classNodes().stream().filter(classNode -> !this.classExempted(classNode.name)).forEach(classNode -> {
+        this.classNodes().stream().filter(classNode -> !this.exempted(classNode.name, "Shuffler")).forEach(classNode -> {
             Collections.shuffle(classNode.methods);
             counter.addAndGet(classNode.methods.size());
             if (classNode.fields != null) {

@@ -1,3 +1,7 @@
+## 0.5.0
+
+* Exempt update. Exempt-per-transformer is now implemented.
+
 ## 0.4.4
 
 * Exempting should work with renamer transformer again.

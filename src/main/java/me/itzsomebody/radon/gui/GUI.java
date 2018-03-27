@@ -987,7 +987,9 @@ public class GUI {
         gbc_comboBox_04.fill = GridBagConstraints.HORIZONTAL;
         gbc_comboBox_04.gridx = 1;
         gbc_comboBox_04.gridy = 12;
-        String[] options = {"Class", "Method", "Field"};
+        String[] options = {"Class", "Method", "Field", "StringEncryption", "InvokeDynamic",
+                "Flow", "LocalVars", "SourceName", "SourceDebug", "LineNumbers", "StringPool",
+                "Crasher", "HideCode", "Numbers", "Shuffler", "InnerClasses", "Renamer"};
 
         for (String s : options) {
             comboBox_04.addItem(s);
@@ -1024,19 +1026,59 @@ public class GUI {
         btnNewButton_2.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (exemptField.getText() != ""
+                if (!exemptField.getText().equals("")
                         && exemptField.getText() != null
                         && !exemptField.getText().isEmpty()) {
                     if (comboBox_04.getSelectedIndex() == 0) {
-                        exemptList.addElement(exemptField.getText());
+                        exemptList.addElement("Class: " + exemptField.getText());
                         exemptField.setText("");
                     } else if (comboBox_04.getSelectedIndex() == 1) {
-                        exemptList.addElement(exemptField.getText() +
-                                "(METHOD)");
+                        exemptList.addElement("Method: " + exemptField.getText());
                         exemptField.setText("");
                     } else if (comboBox_04.getSelectedIndex() == 2) {
-                        exemptList.addElement(exemptField.getText() +
-                                "(FIELD)");
+                        exemptList.addElement("Field: " + exemptField.getText());
+                        exemptField.setText("");
+                    } else if (comboBox_04.getSelectedIndex() == 3) {
+                        exemptList.addElement("StringEncryption: " + exemptField.getText());
+                        exemptField.setText("");
+                    } else if (comboBox_04.getSelectedIndex() == 4) {
+                        exemptList.addElement("InvokeDynamic: " + exemptField.getText());
+                        exemptField.setText("");
+                    } else if (comboBox_04.getSelectedIndex() == 5) {
+                        exemptList.addElement("Flow: " + exemptField.getText());
+                        exemptField.setText("");
+                    } else if (comboBox_04.getSelectedIndex() == 6) {
+                        exemptList.addElement("LocalVars: " + exemptField.getText());
+                        exemptField.setText("");
+                    } else if (comboBox_04.getSelectedIndex() == 7) {
+                        exemptList.addElement("SourceName: " + exemptField.getText());
+                        exemptField.setText("");
+                    } else if (comboBox_04.getSelectedIndex() == 8) {
+                        exemptList.addElement("SourceDebug: " + exemptField.getText());
+                        exemptField.setText("");
+                    } else if (comboBox_04.getSelectedIndex() == 9) {
+                        exemptList.addElement("LineNumbers: " + exemptField.getText());
+                        exemptField.setText("");
+                    } else if (comboBox_04.getSelectedIndex() == 10) {
+                        exemptList.addElement("StringPool: " + exemptField.getText());
+                        exemptField.setText("");
+                    } else if (comboBox_04.getSelectedIndex() == 11) {
+                        exemptList.addElement("Crasher: " + exemptField.getText());
+                        exemptField.setText("");
+                    } else if (comboBox_04.getSelectedIndex() == 12) {
+                        exemptList.addElement("HideCode: " + exemptField.getText());
+                        exemptField.setText("");
+                    } else if (comboBox_04.getSelectedIndex() == 13) {
+                        exemptList.addElement("Numbers: " + exemptField.getText());
+                        exemptField.setText("");
+                    } else if (comboBox_04.getSelectedIndex() == 14) {
+                        exemptList.addElement("Shuffler: " + exemptField.getText());
+                        exemptField.setText("");
+                    } else if (comboBox_04.getSelectedIndex() == 15) {
+                        exemptList.addElement("InnerClasses: " + exemptField.getText());
+                        exemptField.setText("");
+                    } else if (comboBox_04.getSelectedIndex() == 16) {
+                        exemptList.addElement("Renamer: " + exemptField.getText());
                         exemptField.setText("");
                     }
                 }
@@ -1214,22 +1256,9 @@ public class GUI {
                                         JOptionPane.ERROR_MESSAGE);
                                 return;
                             }
-                            List<String> exemptClasses = new ArrayList<>();
-                            List<String> exemptMethods = new ArrayList<>();
-                            List<String> exemptFields = new ArrayList<>();
+                            List<String> exempts = new ArrayList<>();
                             for (int i = 0; i < exemptList.size(); i++) {
-                                if (exemptList.get(i).endsWith("(FIELD)")) {
-                                    exemptFields.add(exemptList.get(i)
-                                            .substring(0, exemptList.get(i)
-                                                    .length() - 7));
-                                } else if (exemptList.get(i)
-                                        .endsWith("(METHOD)")) {
-                                    exemptMethods.add(exemptList.get(i)
-                                            .substring(0, exemptList.get(i)
-                                                    .length() - 8));
-                                } else {
-                                    exemptClasses.add(exemptList.get(i));
-                                }
+                                exempts.add(exemptList.get(i));
                             }
                             boolean spigotMode = chckbxSpigotPlugin.isSelected();
                             List<AbstractTransformer> transformers
@@ -1361,9 +1390,7 @@ public class GUI {
                                     input,
                                     output,
                                     libs,
-                                    exemptClasses,
-                                    exemptMethods,
-                                    exemptFields,
+                                    exempts,
                                     transformers,
                                     trashClasses,
                                     waterMarkMessageField.getText(),

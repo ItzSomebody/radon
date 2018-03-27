@@ -28,12 +28,12 @@ public class NormalFlowObfuscation extends AbstractTransformer {
         this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
         this.logStrings.add(LoggerUtils.stdOut("Started normal flow obfuscation transformer"));
         String s = StringUtils.bigLDC();
-        classNodes().stream().filter(classNode -> !this.classExempted(classNode.name)).forEach(classNode -> {
+        classNodes().stream().filter(classNode -> !this.exempted(classNode.name, "Flow")).forEach(classNode -> {
             FieldNode field = new FieldNode(ACC_PUBLIC + ACC_STATIC +
                     ACC_FINAL, StringUtils.crazyString(), "Z", null, null);
             classNode.fields.add(field);
             classNode.methods.stream().filter(methodNode ->
-                    !this.methodExempted(classNode.name + '.' + methodNode.name + methodNode.desc)
+                    !this.exempted(classNode.name + '.' + methodNode.name + methodNode.desc, "Flow")
                             && !BytecodeUtils.isAbstractMethod(methodNode.access)).forEach(methodNode -> {
                 int varIndex = methodNode.maxLocals;
                 methodNode.maxLocals++;

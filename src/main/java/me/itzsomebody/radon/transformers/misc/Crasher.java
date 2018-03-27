@@ -27,7 +27,7 @@ public class Crasher extends AbstractTransformer {
         long current = System.currentTimeMillis();
         this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
         this.logStrings.add(LoggerUtils.stdOut("Started crasher transformer."));
-        this.classNodes().stream().filter(classNode -> !this.classExempted(classNode.name)).forEach(classNode -> {
+        this.classNodes().stream().filter(classNode -> !this.exempted(classNode.name, "Crasher")).forEach(classNode -> {
             if (classNode.signature == null) {
                 classNode.signature = StringUtils.crazyString();
                 counter.incrementAndGet();

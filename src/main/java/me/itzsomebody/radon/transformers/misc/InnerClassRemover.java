@@ -19,7 +19,7 @@ public class InnerClassRemover extends AbstractTransformer {
         long current = System.currentTimeMillis();
         this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
         this.logStrings.add(LoggerUtils.stdOut("Started inner class removal transformer"));
-        this.classNodes().stream().filter(classNode -> !this.classExempted(classNode.name)
+        this.classNodes().stream().filter(classNode -> !this.exempted(classNode.name, "InnerClasses")
                 && classNode.innerClasses != null).forEach(classNode -> {
             counter.addAndGet(classNode.innerClasses.size());
             classNode.innerClasses.clear();

@@ -38,10 +38,11 @@ public class StringPool extends AbstractTransformer {
         this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
         this.logStrings.add(LoggerUtils.stdOut("Started string pool transformer."));
         this.randName = StringUtils.crazyString();
-        this.classNodes().stream().filter(classNode -> !this.classExempted(classNode.name)).forEach(classNode -> {
+        this.classNodes().stream().filter(classNode -> !this.exempted(classNode.name, "StringPool")).forEach(classNode -> {
             List<String> stringslist = new ArrayList<>();
-            classNode.methods.stream().filter(methodNode -> !this.methodExempted(classNode.name + '.' + methodNode.name + methodNode.desc)
-                    && !BytecodeUtils.isAbstractMethod(methodNode.access)).forEach(methodNode -> {
+            classNode.methods.stream().filter(methodNode ->
+                    !this.exempted(classNode.name + '.' + methodNode.name + methodNode.desc, "StringPool")
+                            && !BytecodeUtils.isAbstractMethod(methodNode.access)).forEach(methodNode -> {
                 for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
                     if (insn instanceof LdcInsnNode) {
                         Object cst = ((LdcInsnNode) insn).cst;

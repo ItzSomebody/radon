@@ -71,19 +71,9 @@ public class Bootstrap { // Eyyy bootstrap bill
     private HashMap<String, File> libs;
 
     /**
-     * Classes that will be protected from obfuscation.
+     * Exempt information.
      */
-    private List<String> classExempts;
-
-    /**
-     * Methods that will be protected from obfuscation.
-     */
-    private List<String> methodExempts;
-
-    /**
-     * Fields that will be protected from obfuscation
-     */
-    private List<String> fieldExempts;
+    private List<String> exempts;
 
     /**
      * Transformers that will be used.
@@ -135,9 +125,7 @@ public class Bootstrap { // Eyyy bootstrap bill
      * @param input         the input {@link File}.
      * @param output        the output {@link File}.
      * @param libs          the {@link HashMap} of libraries.
-     * @param classExempts  classes protected from obfuscation as {@link List}.
-     * @param methodExempts methods protected from obfuscation as {@link List}.
-     * @param fieldExempts  fields protected from obfuscation as {@link List}.
+     * @param exempts       exempt information.
      * @param transformers  transformers that will be run.
      * @param trashClasses  number of trash classes to generate as
      *                      {@link Integer}.
@@ -149,9 +137,7 @@ public class Bootstrap { // Eyyy bootstrap bill
             File input,
             File output,
             HashMap<String, File> libs,
-            List<String> classExempts,
-            List<String> methodExempts,
-            List<String> fieldExempts,
+            List<String> exempts,
             List<AbstractTransformer> transformers,
             int trashClasses,
             String watermarkMsg,
@@ -160,9 +146,7 @@ public class Bootstrap { // Eyyy bootstrap bill
         this.input = input;
         this.output = output;
         this.libs = libs;
-        this.classExempts = classExempts;
-        this.methodExempts = methodExempts;
-        this.fieldExempts = fieldExempts;
+        this.exempts = exempts;
         this.transformers = transformers;
         this.trashClasses = trashClasses;
         this.watermarkMsg = watermarkMsg;
@@ -197,12 +181,9 @@ public class Bootstrap { // Eyyy bootstrap bill
 
             for (AbstractTransformer transformer : this.transformers) {
                 if (transformer instanceof Renamer) {
-                    transformer.init(this.classes, this.classPath,
-                            this.classExempts, this.methodExempts,
-                            this.fieldExempts);
+                    transformer.init(this.classes, this.classPath, this.exempts);
                 } else {
-                    transformer.init(this.classes, this.classExempts,
-                            this.methodExempts, this.fieldExempts);
+                    transformer.init(this.classes, this.exempts);
                 }
                 transformer.obfuscate();
                 this.logStrings.addAll(transformer.getLogStrings());
@@ -324,12 +305,10 @@ public class Bootstrap { // Eyyy bootstrap bill
             this.config.loadIntoMap();
             this.config.sortExempts();
             this.config.checkConfig();
+            this.exempts = this.config.getExempts();
             this.input = this.config.getInput();
             this.output = this.config.getOutput();
             this.libs = this.config.getLibraries();
-            this.classExempts = this.config.getClassExempts();
-            this.methodExempts = this.config.getMethodExempts();
-            this.fieldExempts = this.config.getFieldExempts();
             this.transformers = new ArrayList<>();
             AbstractTransformer transformer;
             // Specific order of adding transformers, feel free to change if

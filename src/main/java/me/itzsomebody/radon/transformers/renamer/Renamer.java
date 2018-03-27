@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Transformer that renames classes and their members.
- * TODO: FIX THIS
+ * TODO: Figure out why this doesn't work with TestingProject
  *
  * @author ItzSomebody
  */
@@ -71,12 +71,12 @@ public class Renamer extends AbstractTransformer {
                 }
             });
 
-            if (!this.classExempted(classNode.name)
+            if (!this.exempted(classNode.name, "Renamer")
                     && !BytecodeUtils.isMain(classNode, this.spigotMode)) {
                 int packages = NumberUtils.getRandomInt(2) + 1;
-                String newName = "";
+                StringBuilder newName = new StringBuilder();
                 for (int i = 0; i < packages; i++) {
-                    newName += StringUtils.crazyString() + '/';
+                    newName.append(StringUtils.crazyString()).append('/');
                 }
 
                 this.mappings.put(classNode.name, newName.substring(0, newName.length() - 1));
@@ -149,9 +149,6 @@ public class Renamer extends AbstractTransformer {
      * @return true if we can rename a method without running into errors.
      */
     private boolean weCanRenameMethod(MethodNode methodNode) {
-        if (this.methodExempted(methodNode.owner + '.' + methodNode.name + methodNode.desc)) {
-            return false;
-        }
         for (ClassTree ct : this.hierarchy.values()) {
             if (ct.subClasses.contains(methodNode.owner)
                     && this.isLibInheritedMN(new ArrayList<>(), methodNode, methodNode.owner)) {
@@ -182,7 +179,7 @@ public class Renamer extends AbstractTransformer {
                     }
                 }
             }
-            if (methodExempted(className + '.' + methodNode.name + methodNode.desc)) {
+            if (exempted(className + '.' + methodNode.name + methodNode.desc, "Renamer")) {
                 return true;
             }
             for (String parentClass : ct.parentClasses) {
@@ -230,9 +227,6 @@ public class Renamer extends AbstractTransformer {
      * @return true if we can rename a field without running into errors.
      */
     private boolean weCanRenameField(FieldNode fieldNode) {
-        if (this.methodExempted(fieldNode.owner + '.' + fieldNode.name)) {
-            return false;
-        }
         for (ClassTree ct : this.hierarchy.values()) {
             if (ct.subClasses.contains(fieldNode.owner)
                     && this.isLibInheritedFN(new ArrayList<>(), fieldNode, fieldNode.owner)) {
@@ -262,7 +256,7 @@ public class Renamer extends AbstractTransformer {
                     }
                 }
             }
-            if (fieldExempted(className + '.' + fieldNode.name)) {
+            if (exempted(className + '.' + fieldNode.name, "Renamer")) {
                 return true;
             }
             for (String parentClass : ct.parentClasses) {

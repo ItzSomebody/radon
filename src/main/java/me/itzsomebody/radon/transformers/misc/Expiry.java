@@ -42,9 +42,10 @@ public class Expiry extends AbstractTransformer {
         long current = System.currentTimeMillis();
         this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
         this.logStrings.add(LoggerUtils.stdOut("Started expiry transformer"));
-        this.classNodes().stream().filter(classNode -> !this.classExempted(classNode.name)).forEach(classNode -> {
-            classNode.methods.stream().filter(methodNode -> !this.methodExempted(classNode.name + '.' + methodNode.name + methodNode.desc)
-                    && methodNode.name.equals("<init>") && methodSize(methodNode) < 60000).forEach(methodNode -> {
+        this.classNodes().stream().filter(classNode -> !this.exempted(classNode.name, "Expiry")).forEach(classNode -> {
+            classNode.methods.stream().filter(methodNode ->
+                    !this.exempted(classNode.name + '.' + methodNode.name + methodNode.desc, "Expiry")
+                            && methodNode.name.equals("<init>") && methodSize(methodNode) < 60000).forEach(methodNode -> {
                 methodNode.instructions.insertBefore(methodNode.instructions.getFirst(),
                         BytecodeUtils.returnExpiry(this.expiryTime, this.expiryMsg));
                 counter.incrementAndGet();

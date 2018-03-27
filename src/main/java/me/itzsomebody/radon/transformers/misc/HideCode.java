@@ -35,31 +35,33 @@ public class HideCode extends AbstractTransformer {
         long current = System.currentTimeMillis();
         this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
         this.logStrings.add(LoggerUtils.stdOut("Started hide code transformer"));
-        this.classNodes().stream().filter(classNode -> !this.classExempted(classNode.name)).forEach(classNode -> {
+        this.classNodes().stream().filter(classNode -> !this.exempted(classNode.name, "HideCode")).forEach(classNode -> {
             if (!BytecodeUtils.isSyntheticMethod(classNode.access)) {
                 classNode.access |= ACC_SYNTHETIC;
                 counter.incrementAndGet();
             }
 
             classNode.methods.stream().filter(methodNode ->
-                    !this.methodExempted(classNode.name + '.' + methodNode.name + methodNode.desc)).forEach(methodNode -> {
-                boolean hidOnce = false;
-                if (!BytecodeUtils.isSyntheticMethod(methodNode.access)) {
-                    methodNode.access |= ACC_SYNTHETIC;
-                    hidOnce = true;
-                }
+                    !this.exempted(classNode.name + '.' + methodNode.name + methodNode.desc, "HideCode"))
+                    .forEach(methodNode -> {
+                        boolean hidOnce = false;
+                        if (!BytecodeUtils.isSyntheticMethod(methodNode.access)) {
+                            methodNode.access |= ACC_SYNTHETIC;
+                            hidOnce = true;
+                        }
 
-                if (!BytecodeUtils.isBridgeMethod(methodNode.access)
-                        && !methodNode.name.startsWith("<")) {
-                    methodNode.access |= ACC_BRIDGE;
-                    hidOnce = true;
-                }
+                        if (!BytecodeUtils.isBridgeMethod(methodNode.access)
+                                && !methodNode.name.startsWith("<")) {
+                            methodNode.access |= ACC_BRIDGE;
+                            hidOnce = true;
+                        }
 
-                if (hidOnce) counter.incrementAndGet();
-            });
+                        if (hidOnce) counter.incrementAndGet();
+                    });
 
             if (classNode.fields != null)
-                classNode.fields.stream().filter(fieldNode -> !fieldExempted(classNode.name + '.' + fieldNode.name)).forEach(fieldNode -> {
+                classNode.fields.stream().filter(fieldNode ->
+                        !exempted(classNode.name + '.' + fieldNode.name, "HideCode")).forEach(fieldNode -> {
                     if (!BytecodeUtils.isSyntheticMethod(fieldNode.access)) {
                         fieldNode.access |= ACC_SYNTHETIC;
                         counter.incrementAndGet();

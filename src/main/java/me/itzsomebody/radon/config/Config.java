@@ -85,19 +85,89 @@ public class Config {
     private List<String> exempts;
 
     /**
-     * Exempted classes from {@link Config#exempts} as {@link List}.
+     * Exempted classes from any obfuscation.
      */
-    private List<String> classExempts;
+    public List<String> classExempts;
 
     /**
-     * Exempted methods from {@link Config#exempts} as {@link List}.
+     * Exempted methods from any obfuscation.
      */
-    private List<String> methodExempts;
+    public List<String> methodExempts;
 
     /**
-     * Exempted fields from {@link Config#exempts} as {@link List}.
+     * Exempted fields from any obfuscation.
      */
-    private List<String> fieldExempts;
+    public List<String> fieldExempts;
+
+    /**
+     * Exempted classes/methods from string encryption,
+     */
+    public List<String> stringEncExempts;
+
+    /**
+     * Exempted classes/methods from invokedynamics.
+     */
+    public List<String> indyExempts;
+
+    /**
+     * Exempted classes/methods from flow control obfuscation.
+     */
+    public List<String> flowExempts;
+
+    /**
+     * Exempted classes/methods from local variable obfuscation.
+     */
+    public List<String> localVarExempts;
+
+    /**
+     * Exempted classes from source name obfuscation.
+     */
+    public List<String> sourceNameExempts;
+
+    /**
+     * Exempted classes from source debug obfuscation.
+     */
+    public List<String> sourceDebugExempts;
+
+    /**
+     * Exempted classes/methods from line number obfuscation.
+     */
+    public List<String> lineNumbersExempts;
+
+    /**
+     * Exempted classes/methods from string pooling.
+     */
+    public List<String> stringPoolExempts;
+
+    /**
+     * Exempted classes from crashers.
+     */
+    public List<String> crasherExempts;
+
+    /**
+     * Exempted classes/methods/fields from hide code obfuscation.
+     */
+    public List<String> hideCodeExempts;
+
+    /**
+     * Exempted classes/methods from number obfuscation.
+     */
+    public List<String> numberExempts;
+
+    /**
+     * Exempted classes from member shuffling.
+     */
+    public List<String> shufflerExempts;
+
+    /**
+     * Exempted classes from inner-class information removal.
+     */
+    public List<String> innerClassExempts;
+
+    /**
+     * Exempted classes/methods/fields from renaming.
+     */
+    public List<String> renamerExempts;
 
     /**
      * Constructs a new {@link Config}
@@ -223,23 +293,67 @@ public class Config {
      * Sorts the elements in {@link Config#exempts} into
      * {@link Config#classExempts}, {@link Config#methodExempts} and
      * {@link Config#fieldExempts}.
+     *
+     * @throws IllegalArgumentException if exempt type is unknown.
      */
-    public void sortExempts() {
+    public void sortExempts() throws IllegalArgumentException {
         this.setExempts();
         this.classExempts = new ArrayList<>();
         this.methodExempts = new ArrayList<>();
         this.fieldExempts = new ArrayList<>();
+        this.stringEncExempts = new ArrayList<>();
+        this.indyExempts = new ArrayList<>();
+        this.flowExempts = new ArrayList<>();
+        this.localVarExempts = new ArrayList<>();
+        this.sourceNameExempts = new ArrayList<>();
+        this.sourceDebugExempts = new ArrayList<>();
+        this.lineNumbersExempts = new ArrayList<>();
+        this.stringPoolExempts = new ArrayList<>();
+        this.crasherExempts = new ArrayList<>();
+        this.hideCodeExempts = new ArrayList<>();
+        this.numberExempts = new ArrayList<>();
+        this.shufflerExempts = new ArrayList<>();
+        this.innerClassExempts = new ArrayList<>();
+        this.renamerExempts = new ArrayList<>();
 
         if (this.exempts != null) {
             for (String exempt : this.exempts) {
-                if (exempt.endsWith("(METHOD)")) {
-                    this.methodExempts.add(exempt.replace("(METHOD)",
-                            ""));
-                } else if (exempt.endsWith("(FIELD)")) {
-                    this.fieldExempts.add(exempt.replace("(FIELD)",
-                            ""));
+                if (exempt.startsWith("Class: ")) {
+                    this.classExempts.add(exempt.replace("Class: ", ""));
+                } else if (exempt.startsWith("Method: ")) {
+                    this.methodExempts.add(exempt.replace("Method: ", ""));
+                } else if (exempt.startsWith("Field: ")) {
+                    this.fieldExempts.add(exempt.replace("Field: ", ""));
+                } else if (exempt.startsWith("StringEncryption: ")) {
+                    this.stringEncExempts.add(exempt.replace("StringEncryption: ", ""));
+                } else if (exempt.startsWith("InvokeDynamic: ")) {
+                    this.indyExempts.add(exempt.replace("InvokeDynamic: ", ""));
+                } else if (exempt.startsWith("Flow: ")) {
+                    this.flowExempts.add(exempt.replace("Flow: ", ""));
+                } else if (exempt.startsWith("LocalVars: ")) {
+                    this.localVarExempts.add(exempt.replace("LocalVars: ", ""));
+                } else if (exempt.startsWith("SourceName: ")) {
+                    this.sourceNameExempts.add(exempt.replace("SourceName: ", ""));
+                } else if (exempt.startsWith("SourceDebug: ")) {
+                    this.sourceDebugExempts.add(exempt.replace("SourceDebug: ", ""));
+                } else if (exempt.startsWith("LineNumbers: ")) {
+                    this.lineNumbersExempts.add(exempt.replace("LineNumbers: ", ""));
+                } else if (exempt.startsWith("StringPool: ")) {
+                    this.stringPoolExempts.add(exempt.replace("StringPool: ", ""));
+                } else if (exempt.startsWith("Crasher: ")) {
+                    this.crasherExempts.add(exempt.replace("Crasher: ", ""));
+                } else if (exempt.startsWith("HideCode: ")) {
+                    this.hideCodeExempts.add(exempt.replace("HideCode: ", ""));
+                } else if (exempt.startsWith("Numbers: ")) {
+                    this.numberExempts.add(exempt.replace("Numbers: ", ""));
+                } else if (exempt.startsWith("Shuffler: ")) {
+                    this.shufflerExempts.add(exempt.replace("Shuffler: ", ""));
+                } else if (exempt.startsWith("InnerClasses: ")) {
+                    this.innerClassExempts.add(exempt.replace("InnerClasses: ", ""));
+                } else if (exempt.startsWith("Renamer: ")) {
+                    this.renamerExempts.add(exempt.replace("Renamer: ", ""));
                 } else {
-                    this.classExempts.add(exempt);
+                    throw new IllegalArgumentException("Unrecognized exempt type: " + exempt);
                 }
             }
         }
@@ -253,36 +367,6 @@ public class Config {
      */
     public List<String> getExempts() {
         return this.exempts;
-    }
-
-    /**
-     * Returns the class exempts from {@link Config#exempts} as {@link List}.
-     *
-     * @return Returns the class exempts from {@link Config#exempts} as
-     * {@link List}
-     */
-    public List<String> getClassExempts() {
-        return this.classExempts;
-    }
-
-    /**
-     * Returns the method exempts from {@link Config#exempts} as {@link List}.
-     *
-     * @return Returns the method exempts from {@link Config#exempts} as
-     * {@link List}.
-     */
-    public List<String> getMethodExempts() {
-        return this.methodExempts;
-    }
-
-    /**
-     * Returns the field exempts from {@link Config#exempts} as {@link List}.
-     *
-     * @return Returns the field exempts from {@link Config#exempts} as
-     * {@link List}.
-     */
-    public List<String> getFieldExempts() {
-        return this.fieldExempts;
     }
 
     /**

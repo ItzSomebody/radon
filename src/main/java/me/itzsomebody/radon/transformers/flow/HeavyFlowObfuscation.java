@@ -25,7 +25,7 @@ public class HeavyFlowObfuscation extends AbstractTransformer {
         long current = System.currentTimeMillis();
         this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
         this.logStrings.add(LoggerUtils.stdOut("Started heavy flow obfuscation transformer"));
-        this.classNodes().stream().filter(classNode -> !this.classExempted(classNode.name)).forEach(classNode -> {
+        this.classNodes().stream().filter(classNode -> !this.exempted(classNode.name, "Flow")).forEach(classNode -> {
             // TODO: DO THIS
         });
         this.logStrings.add(LoggerUtils.stdOut("Added " + counter + " instruction sets."));

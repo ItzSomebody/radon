@@ -22,7 +22,7 @@ public class RemoveSourceDebug extends AbstractTransformer {
         long current = System.currentTimeMillis();
         this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
         this.logStrings.add(LoggerUtils.stdOut("Started source debug removal transformer"));
-        this.classNodes().stream().filter(classNode -> !this.classExempted(classNode.name)
+        this.classNodes().stream().filter(classNode -> !this.exempted(classNode.name, "SourceDebug")
                 && classNode.sourceDebug != null).forEach(classNode -> {
             classNode.sourceDebug = null;
             counter.incrementAndGet();
