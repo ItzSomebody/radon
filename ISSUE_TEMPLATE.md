@@ -10,3 +10,5 @@
 **Is Radon the issue or the jar Radon obfuscated the issue?**
 
 **What is the error produced? (Copy-and-paste error into [PasteBin](http://pastebin.com) or [HasteBin](http://hastebin.com) and link it here)**
+
+**Any other information? (i.e. You combined Radon with other obfuscators)**
