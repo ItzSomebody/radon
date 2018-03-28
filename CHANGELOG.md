@@ -1,3 +1,7 @@
+## 0.5.1
+
+* Fixes as issue with exempting where global-exempts didn't work.
+
 ## 0.5.0
 
 * Exempt update. Exempt-per-transformer is now implemented.

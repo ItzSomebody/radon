@@ -121,11 +121,20 @@ public abstract class AbstractTransformer implements Opcodes {
     protected boolean exempted(String checkThis, String exemptId) {
         String exemptKey = exemptId + ": ";
         for (String exempt : this.exempts) {
-            if (exempt.startsWith(exemptKey)
-                    || exempt.startsWith("Class: ")
-                    || exempt.startsWith("Method: ")
-                    || exempt.startsWith("Field: ")) {
+            if (exempt.startsWith(exemptKey)) {
                 if (CustomRegexUtils.isMatched(exempt.replace(exemptKey, ""), checkThis)) {
+                    return true;
+                }
+            } else if (exempt.startsWith("Class: ")) {
+                if (CustomRegexUtils.isMatched(exempt.replace("Class: ", ""), checkThis)) {
+                    return true;
+                }
+            } else if (exempt.startsWith("Method: ")) {
+                if (CustomRegexUtils.isMatched(exempt.replace("Method: ", ""), checkThis)) {
+                    return true;
+                }
+            } else if (exempt.startsWith("Field: ")) {
+                if (CustomRegexUtils.isMatched(exempt.replace("Field: ", ""), checkThis)) {
                     return true;
                 }
             }
