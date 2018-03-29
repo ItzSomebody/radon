@@ -87,10 +87,10 @@ public class BytecodeUtils {
     }
 
     /**
-     * Returns a bytecode instruction representing a number.
+     * Returns a bytecode instruction representing an int.
      *
      * @param number the {@link Integer} for the obfuscator to contemplate.
-     * @return a bytecode instruction representing a number.
+     * @return a bytecode instruction representing an int.
      */
     public static AbstractInsnNode getNumberInsn(int number) {
         if (number >= -1 && number <= 5) {
@@ -99,6 +99,20 @@ public class BytecodeUtils {
             return new IntInsnNode(Opcodes.BIPUSH, number);
         } else if (number >= -32768 && number <= 32767) {
             return new IntInsnNode(Opcodes.SIPUSH, number);
+        } else {
+            return new LdcInsnNode(number);
+        }
+    }
+
+    /**
+     * Returns a bytecode instruction representing a long.
+     *
+     * @param number the {@link Long} for the obfuscator to contemplate.
+     * @return a bytecode instruction representing a long.
+     */
+    public static AbstractInsnNode getNumberInsn(long number) {
+        if (number >= 0 && number <= 1) {
+            return new InsnNode((int) (number + 9));
         } else {
             return new LdcInsnNode(number);
         }
@@ -145,18 +159,32 @@ public class BytecodeUtils {
     }
 
     /**
-     * Returns true if input is an integer instruction.
+     * Returns true if input pushes an integer.
      *
      * @param insn {@link AbstractInsnNode} to check.
-     * @return true if input is an integer instruction.
+     * @return true if input pushes an integer.
      */
-    public static boolean isNumberNode(AbstractInsnNode insn) {
+    public static boolean isIntInsn(AbstractInsnNode insn) {
         int opcode = insn.getOpcode();
-        return (opcode >= Opcodes.ICONST_M1 && opcode <= Opcodes.ICONST_5
-                || insn.getOpcode() == Opcodes.BIPUSH
-                || insn.getOpcode() == Opcodes.SIPUSH
-                || insn instanceof LdcInsnNode
-                && ((LdcInsnNode) insn).cst instanceof Integer);
+        return ((opcode >= Opcodes.ICONST_M1 && opcode <= Opcodes.ICONST_5)
+                || opcode == Opcodes.BIPUSH
+                || opcode == Opcodes.SIPUSH
+                || (insn instanceof LdcInsnNode
+                && ((LdcInsnNode) insn).cst instanceof Integer));
+    }
+
+    /**
+     * Returns true if input pushes a long.
+     *
+     * @param insn {@link AbstractInsnNode} to check.
+     * @return true if input pushes a long.
+     */
+    public static boolean isLongInsn(AbstractInsnNode insn) {
+        int opcode = insn.getOpcode();
+        return (opcode == Opcodes.LCONST_0
+                || opcode == Opcodes.LCONST_1
+                || (insn instanceof LdcInsnNode
+                && ((LdcInsnNode) insn).cst instanceof Long));
     }
 
     /**
@@ -167,7 +195,7 @@ public class BytecodeUtils {
      * @return {@link Integer} represented by bytecode instruction and/or
      * operand.
      */
-    public static int getNumber(AbstractInsnNode insn) {
+    public static int getIntNumber(AbstractInsnNode insn) {
         int opcode = insn.getOpcode();
 
         if (opcode >= Opcodes.ICONST_M1 && opcode <= Opcodes.ICONST_5) {
@@ -178,6 +206,27 @@ public class BytecodeUtils {
         } else if (insn instanceof LdcInsnNode
                 && ((LdcInsnNode) insn).cst instanceof Integer) {
             return (Integer) ((LdcInsnNode) insn).cst;
+        }
+
+        throw new IllegalStateException("Unexpected instruction");
+    }
+
+    /**
+     * Returns {@link Long} represented by bytecode instruction and/or
+     * operand.
+     *
+     * @param insn {@link AbstractInsnNode} to check.
+     * @return {@link Long} represented by bytecode instruction and/or
+     * operand.
+     */
+    public static long getLongNumber(AbstractInsnNode insn) {
+        int opcode = insn.getOpcode();
+
+        if (opcode >= Opcodes.LCONST_0 && opcode <= Opcodes.LCONST_1) {
+            return opcode - 9;
+        } else if (insn instanceof LdcInsnNode
+                && ((LdcInsnNode) insn).cst instanceof Long) {
+            return (Long) ((LdcInsnNode) insn).cst;
         }
 
         throw new IllegalStateException("Unexpected instruction");

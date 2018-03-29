@@ -170,6 +170,11 @@ public class Config {
     public List<String> renamerExempts;
 
     /**
+     * Exempted classes/methods/fields from expiration.
+     */
+    public List<String> expiryExempts;
+
+    /**
      * Constructs a new {@link Config}
      *
      * @param config the {@link InputStream} to read from.
@@ -315,6 +320,7 @@ public class Config {
         this.shufflerExempts = new ArrayList<>();
         this.innerClassExempts = new ArrayList<>();
         this.renamerExempts = new ArrayList<>();
+        this.expiryExempts = new ArrayList<>();
 
         if (this.exempts != null) {
             for (String exempt : this.exempts) {
@@ -352,6 +358,8 @@ public class Config {
                     this.innerClassExempts.add(exempt.replace("InnerClasses: ", ""));
                 } else if (exempt.startsWith("Renamer: ")) {
                     this.renamerExempts.add(exempt.replace("Renamer: ", ""));
+                } else if (exempt.startsWith("Expiry")) {
+                    this.expiryExempts.add(exempt.replace("Expiry: ", ""));
                 } else {
                     throw new IllegalArgumentException("Unrecognized exempt type: " + exempt);
                 }

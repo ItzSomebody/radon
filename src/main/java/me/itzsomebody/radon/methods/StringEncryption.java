@@ -6,7 +6,8 @@ import org.objectweb.asm.tree.MethodNode;
 import me.itzsomebody.radon.transformers.stringencryption.*;
 
 /**
- * That returns methods needed to produce a {@link String} for the appropriate StringEncryption transformer.
+ * Class containing {@link MethodNode}s needed to decrypt a {@link String} for the
+ * appropriate StringEncryption transformer.
  *
  * @author ItzSomebody
  * @author ASMifier by OW2

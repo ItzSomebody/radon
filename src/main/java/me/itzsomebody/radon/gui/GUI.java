@@ -83,7 +83,7 @@ public class GUI {
         this.frmRadonObfuscator = new JFrame();
         this.frmRadonObfuscator.setTitle(Radon.PREFIX + " " + Radon.VERSION);
         this.frmRadonObfuscator.setBounds(100, 100, 440, 570);
-        this.frmRadonObfuscator.setResizable(false);
+        this.frmRadonObfuscator.setResizable(true);
         this.frmRadonObfuscator
                 .setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         this.frmRadonObfuscator.getContentPane()
@@ -451,12 +451,12 @@ public class GUI {
         this.trashChanceField.setToolTipText("Number of trash classes to " +
                 "generate");
         this.trashChanceField.setEditable(false);
-        this.trashChanceField.setText("50");
+        this.trashChanceField.setText("10");
         GridBagConstraints gbc_textField = new GridBagConstraints();
         gbc_textField.fill = GridBagConstraints.HORIZONTAL;
         gbc_textField.insets = new Insets(0, 0, 5, 5);
         gbc_textField.gridx = 9;
-        gbc_textField.gridy = 4;
+        gbc_textField.gridy = 7;
         panel.add(this.trashChanceField, gbc_textField);
         this.trashChanceField.setColumns(3);
 
@@ -465,7 +465,7 @@ public class GUI {
         gbc_chckbxNewCheckBox_3.insets = new Insets(0, 0, 5, 5);
         gbc_chckbxNewCheckBox_3.anchor = GridBagConstraints.WEST;
         gbc_chckbxNewCheckBox_3.gridx = 0;
-        gbc_chckbxNewCheckBox_3.gridy = 4;
+        gbc_chckbxNewCheckBox_3.gridy = 7;
         chckbxTrashClasses.addActionListener(new ActionListener() {
 
             @Override
@@ -551,7 +551,7 @@ public class GUI {
         gbc_comboBox_5.fill = GridBagConstraints.HORIZONTAL;
         gbc_comboBox_5.insets = new Insets(0, 0, 5, 5);
         gbc_comboBox_5.gridx = 9;
-        gbc_comboBox_5.gridy = 7;
+        gbc_comboBox_5.gridy = 4;
 
         String[] lineTypes = {"Obfuscate", "Remove"};
         for (String s : lineTypes) {
@@ -565,7 +565,7 @@ public class GUI {
         gbc_chckbxNewCheckBox_10.anchor = GridBagConstraints.WEST;
         gbc_chckbxNewCheckBox_10.insets = new Insets(0, 0, 5, 5);
         gbc_chckbxNewCheckBox_10.gridx = 0;
-        gbc_chckbxNewCheckBox_10.gridy = 7;
+        gbc_chckbxNewCheckBox_10.gridy = 4;
         chckbxLineObfuscation.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -989,7 +989,8 @@ public class GUI {
         gbc_comboBox_04.gridy = 12;
         String[] options = {"Class", "Method", "Field", "StringEncryption", "InvokeDynamic",
                 "Flow", "LocalVars", "SourceName", "SourceDebug", "LineNumbers", "StringPool",
-                "Crasher", "HideCode", "Numbers", "Shuffler", "InnerClasses", "Renamer"};
+                "Crasher", "HideCode", "Numbers", "Shuffler", "InnerClasses", "Renamer",
+        "Expiry"};
 
         for (String s : options) {
             comboBox_04.addItem(s);
@@ -1079,6 +1080,9 @@ public class GUI {
                         exemptField.setText("");
                     } else if (comboBox_04.getSelectedIndex() == 16) {
                         exemptList.addElement("Renamer: " + exemptField.getText());
+                        exemptField.setText("");
+                    } else if (comboBox_04.getSelectedIndex() == 17) {
+                        exemptList.addElement("Expiry: " + exemptField.getText());
                         exemptField.setText("");
                     }
                 }
@@ -1401,7 +1405,7 @@ public class GUI {
                                     "Successfully processed file!",
                                     "Done", JOptionPane.INFORMATION_MESSAGE);
                         } catch (Throwable t) {
-                            JOptionPane.showMessageDialog(null, t.toString(),
+                            JOptionPane.showMessageDialog(null, t.getMessage(),
                                     "Error", JOptionPane.ERROR_MESSAGE);
                             t.printStackTrace();
                             if (output != null) {

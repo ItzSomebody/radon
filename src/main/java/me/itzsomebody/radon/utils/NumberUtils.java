@@ -29,4 +29,26 @@ public class NumberUtils {
     public static int getRandomInt(int bounds) {
         return ThreadLocalRandom.current().nextInt(bounds);
     }
+
+    /**
+     * Gets a random {@link Long} from {@link ThreadLocalRandom#nextLong()}.
+     *
+     * @return a random {@link Integer} from
+     * {@link ThreadLocalRandom#nextLong()}.
+     */
+    public static long getRandomLong() {
+        return ThreadLocalRandom.current().nextLong();
+    }
+
+    /**
+     * Gets a random {@link Long} from
+     * {@link ThreadLocalRandom#nextLong(long)}.
+     *
+     * @param bounds {@link Long} used to define the bounds of the random.
+     * @return a random {@link Integer} from
+     * {@link ThreadLocalRandom#nextLong(long)}.
+     */
+    public static long getRandomLong(int bounds) {
+        return ThreadLocalRandom.current().nextLong(bounds);
+    }
 }

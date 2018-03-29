@@ -1,3 +1,10 @@
+## 0.5.2
+
+* You can now resize the GUI.
+* Expiry exempts are added.
+* StackAnalyzer takes try-catch blocks into account now resulting in possibly better obfuscation by normal flow obfuscation transformer.
+* Number obfuscation transformer now operates on longs as well as integers.
+
 ## 0.5.1
 
 * Fixes as issue with exempting where global-exempts didn't work.

@@ -53,10 +53,10 @@ public class NormalFlowObfuscation extends AbstractTransformer {
                         }
                     }
                     if (insn != methodNode.instructions.getFirst()
-                            && !(insn instanceof LineNumberNode)
-                            && insn.getPrevious() != null
-                            && insn.getPrevious().getOpcode() != ASTORE
-                            && insn.getOpcode() != ASTORE) {
+                            //&& !(insn instanceof LineNumberNode)
+                            //&& insn.getPrevious() != null
+                            //&& insn.getPrevious().getOpcode() != ASTORE
+                            /*&& insn.getOpcode() != ASTORE*/) {
                         if (methodNode.name.equals("<init>") && !calledSuper)
                             continue;
                         StackAnalyzer sa = new StackAnalyzer(methodNode, insn);

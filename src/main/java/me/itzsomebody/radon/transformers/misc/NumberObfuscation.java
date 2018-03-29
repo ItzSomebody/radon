@@ -31,9 +31,9 @@ public class NumberObfuscation extends AbstractTransformer {
                     .filter(methodNode -> !BytecodeUtils.isAbstractMethod(methodNode.access)).forEach(methodNode -> {
                 for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
                     if (methodSize(methodNode) > 60000) break;
-                    if (BytecodeUtils.isNumberNode(insn)) {
-                        int originalNum = BytecodeUtils.getNumber(insn);
-                        int value1 = NumberUtils.getRandomInt(255) + 20;
+                    if (BytecodeUtils.isIntInsn(insn)) {
+                        int originalNum = BytecodeUtils.getIntNumber(insn);
+                        int value1 = NumberUtils.getRandomInt();
                         int value2 = originalNum ^ value1;
 
                         InsnList insnList = new InsnList();
@@ -44,11 +44,24 @@ public class NumberObfuscation extends AbstractTransformer {
                         methodNode.instructions.insertBefore(insn, insnList);
                         methodNode.instructions.remove(insn);
                         counter.incrementAndGet();
+                    } else if (BytecodeUtils.isLongInsn(insn)) {
+                        long originalNum = BytecodeUtils.getLongNumber(insn);
+                        long value1 = NumberUtils.getRandomLong();
+                        long value2 = originalNum ^ value1;
+
+                        InsnList insnList = new InsnList();
+                        insnList.add(BytecodeUtils.getNumberInsn(value1));
+                        insnList.add(BytecodeUtils.getNumberInsn(value2));
+                        insnList.add(new InsnNode(LXOR));
+
+                        methodNode.instructions.insertBefore(insn, insnList);
+                        methodNode.instructions.remove(insn);
+                        counter.incrementAndGet();
                     }
                 }
             });
         });
-        this.logStrings.add(LoggerUtils.stdOut("Split " + counter + " integers into bitwise xor instructions."));
+        this.logStrings.add(LoggerUtils.stdOut("Split " + counter + " numbers into bitwise xor instructions."));
         this.logStrings.add(LoggerUtils.stdOut("Finished. [" + tookThisLong(current) + "ms]"));
     }
 }

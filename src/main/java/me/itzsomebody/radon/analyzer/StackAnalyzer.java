@@ -6,6 +6,8 @@ import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
 
 import java.util.EmptyStackException;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.Stack;
 
 /**
@@ -52,8 +54,17 @@ public class StackAnalyzer implements Opcodes {
             System.out.println("Entering " + this.methodNode.owner + '.'
                     + this.methodNode.name + this.methodNode.desc);
         Stack<Object> stack = new Stack<>(); // Simulated stack
+        Set<LabelNode> excHandlers = new HashSet<>();
+        methodNode.tryCatchBlocks.forEach(tryCatchBlockNode -> {
+            excHandlers.add(tryCatchBlockNode.handler);
+        });
         for (int i = 0; i < this.methodNode.instructions.size(); i++) {
             AbstractInsnNode insn = this.methodNode.instructions.get(i);
+            if (insn instanceof LabelNode
+                    && excHandlers.contains(insn)) {
+                stack.clear(); // Stack gets cleared an exception is pushed.
+                stack.push(null);
+            }
             if (this.breakPoint == insn)
                 break;
             try {
