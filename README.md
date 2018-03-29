@@ -96,6 +96,7 @@ Valid exempt types you can use:
 | Shuffler | Fully qualified internal name (i.e. me/itzsomebody/counter/Counter) | Exempts class from member shuffling. |
 | InnerClasses | Fully qualified internal name (i.e. me/itzsomebody/counter/Counter) | Exempts class from inner-class information removal. |
 | Renamer | Fully qualified internal name (member name must be seperated from owner by a '.') (i.e. me/itzsomebody/counter/Counter.exampleMethod()V or me/itzsomebody/counter/Counter.exampleField or ) | Exempts class, method or field from renaming. |
+| Expiry | Fully qualified internal name (member name must be seperated from owner by a '.') (i.e. me/itzsomebody/counter/Counter.exampleMethod()V or me/itzsomebody/counter/Counter.exampleField or ) | Exempts class, method or field from expiration. |
 
 ## Obfuscation description
 This table describes the current obfuscation settings Radon has.

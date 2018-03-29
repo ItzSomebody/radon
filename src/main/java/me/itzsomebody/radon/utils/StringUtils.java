@@ -6,7 +6,6 @@ import java.security.MessageDigest;
 import java.util.*;
 
 import me.itzsomebody.radon.transformers.stringencryption.*;
-import me.itzsomebody.radon.transformers.misc.*;
 
 /**
  * Utils for operating, and generating {@link String}s.
@@ -320,51 +319,5 @@ public class StringUtils {
         }
 
         return new String(returnThis);
-    }
-
-    /**
-     * String encryption used by {@link PrimitivesObfuscation}.
-     *
-     * @param msg  {@link String} representation of the primitive type.
-     * @param key1 hashCode of class name the decryption method is in.
-     * @param key2 hashCode of method name of the decryption method.
-     * @param key3 randomized integer.
-     * @return encrypted string which contains primitive type information used
-     * by {@link PrimitivesObfuscation}.
-     */
-    public static String primitiveEncrypt(String msg, int key1, int key2, int key3) {
-        char[] chars = msg.toCharArray();
-        StringBuilder sb = new StringBuilder();
-
-        for (int i = 0; i < chars.length; i++) {
-            switch (i % 8) {
-                case 0:
-                    sb.append((char) ((chars[i] ^ (key3 ^ key1))));
-                    break;
-                case 1:
-                    sb.append((char) (chars[i] ^ (key2 ^ key1)));
-                    break;
-                case 2:
-                    sb.append((char) ((chars[i] ^ (key2 & key1))));
-                    break;
-                case 3:
-                    sb.append((char) ((chars[i] ^ (key3 & key1))));
-                    break;
-                case 4:
-                    sb.append((char) ((chars[i] ^ (key3 & key2))));
-                    break;
-                case 5:
-                    sb.append((char) (chars[i] ^ key1));
-                    break;
-                case 6:
-                    sb.append((char) (chars[i] ^ key2));
-                    break;
-                case 7:
-                    sb.append((char) (chars[i] ^ (key3 ^ key2)));
-                    break;
-            }
-        }
-
-        return sb.toString();
     }
 }

@@ -10,7 +10,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Transformer that adds an expiration block of code to <init> methods.
  *
  * @author ItzSomebody
- * @author Allatori Dev Team
+ * @author Allatori Dev Team (transformer based on Allatori's
+ * expiration obfuscation)
  */
 public class Expiry extends AbstractTransformer {
     /**
