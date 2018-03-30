@@ -1,3 +1,13 @@
 language: java
 sudo: false
 script: mvn clean verify
+
+before_deploy:
+  - git config --local user.name "ItzSomebody"
+  - git config --local user.email "23221108+ItzSomebody@users.noreply.github.com"
+  - git tag "$(date +'%Y%m%d%H%M%S')-$(git log --format=%h -1)"
+deploy:
+  provider: releases
+  api_key: "99d9461c1a19f36b5285fcce5a55e62612dab822"
+  file: "Radon-0.5.3.jar"
+  skip_cleanup: true
