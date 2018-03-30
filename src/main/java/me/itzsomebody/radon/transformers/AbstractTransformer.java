@@ -30,6 +30,11 @@ public abstract class AbstractTransformer implements Opcodes {
     private List<String> exempts;
 
     /**
+     * Dictionary for naming.
+     */
+    protected int dictionary;
+
+    /**
      * Logged strings from transformer console output.
      */
     protected List<String> logStrings;
@@ -41,9 +46,10 @@ public abstract class AbstractTransformer implements Opcodes {
      * @param exempts exempt information.
      */
     public void init(Map<String, ClassNode> classes,
-                     List<String> exempts) {
+                     List<String> exempts, int dictionary) {
         this.classes = classes;
         this.exempts = exempts;
+        this.dictionary = dictionary;
         this.logStrings = new ArrayList<>();
     }
 
@@ -56,10 +62,11 @@ public abstract class AbstractTransformer implements Opcodes {
      */
     public void init(Map<String, ClassNode> classes,
                      Map<String, ClassNode> classPath,
-                     List<String> exempts) {
+                     List<String> exempts, int dictionary) {
         this.classes = classes;
         this.classPath = classPath;
         this.exempts = exempts;
+        this.dictionary = dictionary;
         this.logStrings = new ArrayList<>();
     }
 

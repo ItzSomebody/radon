@@ -1,32 +1,30 @@
-/***
- * ASM: a very small and fast Java bytecode manipulation framework
- * Copyright (c) 2000-2011 INRIA, France Telecom
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of the copyright holders nor the names of its
- *    contributors may be used to endorse or promote products derived from
- *    this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
- * THE POSSIBILITY OF SUCH DAMAGE.
- */
+// ASM: a very small and fast Java bytecode manipulation framework
+// Copyright (c) 2000-2011 INRIA, France Telecom
+// All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions
+// are met:
+// 1. Redistributions of source code must retain the above copyright
+//    notice, this list of conditions and the following disclaimer.
+// 2. Redistributions in binary form must reproduce the above copyright
+//    notice, this list of conditions and the following disclaimer in the
+//    documentation and/or other materials provided with the distribution.
+// 3. Neither the name of the copyright holders nor the names of its
+//    contributors may be used to endorse or promote products derived from
+//    this software without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+// THE POSSIBILITY OF SUCH DAMAGE.
 
 package org.objectweb.asm.commons;
 
@@ -37,19 +35,17 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 
 /**
- * A {@link MethodVisitor} providing a more detailed API to generate and
- * transform instructions.
+ * A {@link MethodVisitor} providing a more detailed API to generate and transform instructions.
  *
  * @author Eric Bruneton
  */
 public class InstructionAdapter extends MethodVisitor {
 
-    public final static Type OBJECT_TYPE = Type.getType("Ljava/lang/Object;");
+    public static final Type OBJECT_TYPE = Type.getType("Ljava/lang/Object;");
 
     /**
-     * Creates a new {@link InstructionAdapter}. <i>Subclasses must not use this
-     * constructor</i>. Instead, they must use the
-     * {@link #InstructionAdapter(int, MethodVisitor)} version.
+     * Constructs a new {@link InstructionAdapter}. <i>Subclasses must not use this constructor</i>.
+     * Instead, they must use the {@link #InstructionAdapter(int, MethodVisitor)} version.
      *
      * @param mv the method visitor to which this adapter delegates calls.
      * @throws IllegalStateException If a subclass calls this constructor.
@@ -62,10 +58,10 @@ public class InstructionAdapter extends MethodVisitor {
     }
 
     /**
-     * Creates a new {@link InstructionAdapter}.
+     * Constructs a new {@link InstructionAdapter}.
      *
-     * @param api the ASM API version implemented by this visitor. Must be one
-     *            of {@link Opcodes#ASM4}, {@link Opcodes#ASM5} or {@link Opcodes#ASM6}.
+     * @param api the ASM API version implemented by this visitor. Must be one of {@link
+     *            Opcodes#ASM4}, {@link Opcodes#ASM5} or {@link Opcodes#ASM6}.
      * @param mv  the method visitor to which this adapter delegates calls.
      */
     protected InstructionAdapter(final int api, final MethodVisitor mv) {
@@ -488,8 +484,8 @@ public class InstructionAdapter extends MethodVisitor {
     }
 
     @Override
-    public void visitFieldInsn(final int opcode, final String owner,
-                               final String name, final String desc) {
+    public void visitFieldInsn(
+            final int opcode, final String owner, final String name, final String desc) {
         switch (opcode) {
             case Opcodes.GETSTATIC:
                 getstatic(owner, name, desc);
@@ -510,19 +506,22 @@ public class InstructionAdapter extends MethodVisitor {
 
     @Deprecated
     @Override
-    public void visitMethodInsn(final int opcode, final String owner,
-                                final String name, final String desc) {
+    public void visitMethodInsn(
+            final int opcode, final String owner, final String name, final String desc) {
         if (api >= Opcodes.ASM5) {
             super.visitMethodInsn(opcode, owner, name, desc);
             return;
         }
-        doVisitMethodInsn(opcode, owner, name, desc,
-                opcode == Opcodes.INVOKEINTERFACE);
+        doVisitMethodInsn(opcode, owner, name, desc, opcode == Opcodes.INVOKEINTERFACE);
     }
 
     @Override
-    public void visitMethodInsn(final int opcode, final String owner,
-                                final String name, final String desc, final boolean itf) {
+    public void visitMethodInsn(
+            final int opcode,
+            final String owner,
+            final String name,
+            final String desc,
+            final boolean itf) {
         if (api < Opcodes.ASM5) {
             super.visitMethodInsn(opcode, owner, name, desc, itf);
             return;
@@ -530,8 +529,8 @@ public class InstructionAdapter extends MethodVisitor {
         doVisitMethodInsn(opcode, owner, name, desc, itf);
     }
 
-    private void doVisitMethodInsn(int opcode, final String owner,
-                                   final String name, final String desc, final boolean itf) {
+    private void doVisitMethodInsn(
+            int opcode, final String owner, final String name, final String desc, final boolean itf) {
         switch (opcode) {
             case Opcodes.INVOKESPECIAL:
                 invokespecial(owner, name, desc, itf);
@@ -551,8 +550,7 @@ public class InstructionAdapter extends MethodVisitor {
     }
 
     @Override
-    public void visitInvokeDynamicInsn(String name, String desc, Handle bsm,
-                                       Object... bsmArgs) {
+    public void visitInvokeDynamicInsn(String name, String desc, Handle bsm, Object... bsmArgs) {
         invokedynamic(name, desc, bsm, bsmArgs);
     }
 
@@ -624,37 +622,42 @@ public class InstructionAdapter extends MethodVisitor {
     }
 
     @Override
-    public void visitLdcInsn(final Object cst) {
-        if (cst instanceof Integer) {
-            int val = ((Integer) cst).intValue();
+    public void visitLdcInsn(final Object value) {
+        if (api < Opcodes.ASM5
+                && (value instanceof Handle
+                || (value instanceof Type && ((Type) value).getSort() == Type.METHOD))) {
+            throw new UnsupportedOperationException();
+        }
+        if (value instanceof Integer) {
+            int val = ((Integer) value).intValue();
             iconst(val);
-        } else if (cst instanceof Byte) {
-            int val = ((Byte) cst).intValue();
+        } else if (value instanceof Byte) {
+            int val = ((Byte) value).intValue();
             iconst(val);
-        } else if (cst instanceof Character) {
-            int val = ((Character) cst).charValue();
+        } else if (value instanceof Character) {
+            int val = ((Character) value).charValue();
             iconst(val);
-        } else if (cst instanceof Short) {
-            int val = ((Short) cst).intValue();
+        } else if (value instanceof Short) {
+            int val = ((Short) value).intValue();
             iconst(val);
-        } else if (cst instanceof Boolean) {
-            int val = ((Boolean) cst).booleanValue() ? 1 : 0;
+        } else if (value instanceof Boolean) {
+            int val = ((Boolean) value).booleanValue() ? 1 : 0;
             iconst(val);
-        } else if (cst instanceof Float) {
-            float val = ((Float) cst).floatValue();
+        } else if (value instanceof Float) {
+            float val = ((Float) value).floatValue();
             fconst(val);
-        } else if (cst instanceof Long) {
-            long val = ((Long) cst).longValue();
+        } else if (value instanceof Long) {
+            long val = ((Long) value).longValue();
             lconst(val);
-        } else if (cst instanceof Double) {
-            double val = ((Double) cst).doubleValue();
+        } else if (value instanceof Double) {
+            double val = ((Double) value).doubleValue();
             dconst(val);
-        } else if (cst instanceof String) {
-            aconst(cst);
-        } else if (cst instanceof Type) {
-            tconst((Type) cst);
-        } else if (cst instanceof Handle) {
-            hconst((Handle) cst);
+        } else if (value instanceof String) {
+            aconst(value);
+        } else if (value instanceof Type) {
+            tconst((Type) value);
+        } else if (value instanceof Handle) {
+            hconst((Handle) value);
         } else {
             throw new IllegalArgumentException();
         }
@@ -666,14 +669,13 @@ public class InstructionAdapter extends MethodVisitor {
     }
 
     @Override
-    public void visitTableSwitchInsn(final int min, final int max,
-                                     final Label dflt, final Label... labels) {
+    public void visitTableSwitchInsn(
+            final int min, final int max, final Label dflt, final Label... labels) {
         tableswitch(min, max, dflt, labels);
     }
 
     @Override
-    public void visitLookupSwitchInsn(final Label dflt, final int[] keys,
-                                      final Label[] labels) {
+    public void visitLookupSwitchInsn(final Label dflt, final int[] keys, final Label[] labels) {
         lookupswitch(dflt, keys, labels);
     }
 
@@ -973,13 +975,11 @@ public class InstructionAdapter extends MethodVisitor {
         mv.visitVarInsn(Opcodes.RET, var);
     }
 
-    public void tableswitch(final int min, final int max, final Label dflt,
-                            final Label... labels) {
+    public void tableswitch(final int min, final int max, final Label dflt, final Label... labels) {
         mv.visitTableSwitchInsn(min, max, dflt, labels);
     }
 
-    public void lookupswitch(final Label dflt, final int[] keys,
-                             final Label[] labels) {
+    public void lookupswitch(final Label dflt, final int[] keys, final Label[] labels) {
         mv.visitLookupSwitchInsn(dflt, keys, labels);
     }
 
@@ -987,29 +987,24 @@ public class InstructionAdapter extends MethodVisitor {
         mv.visitInsn(t.getOpcode(Opcodes.IRETURN));
     }
 
-    public void getstatic(final String owner, final String name,
-                          final String desc) {
+    public void getstatic(final String owner, final String name, final String desc) {
         mv.visitFieldInsn(Opcodes.GETSTATIC, owner, name, desc);
     }
 
-    public void putstatic(final String owner, final String name,
-                          final String desc) {
+    public void putstatic(final String owner, final String name, final String desc) {
         mv.visitFieldInsn(Opcodes.PUTSTATIC, owner, name, desc);
     }
 
-    public void getfield(final String owner, final String name,
-                         final String desc) {
+    public void getfield(final String owner, final String name, final String desc) {
         mv.visitFieldInsn(Opcodes.GETFIELD, owner, name, desc);
     }
 
-    public void putfield(final String owner, final String name,
-                         final String desc) {
+    public void putfield(final String owner, final String name, final String desc) {
         mv.visitFieldInsn(Opcodes.PUTFIELD, owner, name, desc);
     }
 
     @Deprecated
-    public void invokevirtual(final String owner, final String name,
-                              final String desc) {
+    public void invokevirtual(final String owner, final String name, final String desc) {
         if (api >= Opcodes.ASM5) {
             invokevirtual(owner, name, desc, false);
             return;
@@ -1017,12 +1012,11 @@ public class InstructionAdapter extends MethodVisitor {
         mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, owner, name, desc);
     }
 
-    public void invokevirtual(final String owner, final String name,
-                              final String desc, final boolean itf) {
+    public void invokevirtual(
+            final String owner, final String name, final String desc, final boolean itf) {
         if (api < Opcodes.ASM5) {
             if (itf) {
-                throw new IllegalArgumentException(
-                        "INVOKEVIRTUAL on interfaces require ASM 5");
+                throw new IllegalArgumentException("INVOKEVIRTUAL on interfaces require ASM 5");
             }
             invokevirtual(owner, name, desc);
             return;
@@ -1031,8 +1025,7 @@ public class InstructionAdapter extends MethodVisitor {
     }
 
     @Deprecated
-    public void invokespecial(final String owner, final String name,
-                              final String desc) {
+    public void invokespecial(final String owner, final String name, final String desc) {
         if (api >= Opcodes.ASM5) {
             invokespecial(owner, name, desc, false);
             return;
@@ -1040,12 +1033,11 @@ public class InstructionAdapter extends MethodVisitor {
         mv.visitMethodInsn(Opcodes.INVOKESPECIAL, owner, name, desc, false);
     }
 
-    public void invokespecial(final String owner, final String name,
-                              final String desc, final boolean itf) {
+    public void invokespecial(
+            final String owner, final String name, final String desc, final boolean itf) {
         if (api < Opcodes.ASM5) {
             if (itf) {
-                throw new IllegalArgumentException(
-                        "INVOKESPECIAL on interfaces require ASM 5");
+                throw new IllegalArgumentException("INVOKESPECIAL on interfaces require ASM 5");
             }
             invokespecial(owner, name, desc);
             return;
@@ -1054,8 +1046,7 @@ public class InstructionAdapter extends MethodVisitor {
     }
 
     @Deprecated
-    public void invokestatic(final String owner, final String name,
-                             final String desc) {
+    public void invokestatic(final String owner, final String name, final String desc) {
         if (api >= Opcodes.ASM5) {
             invokestatic(owner, name, desc, false);
             return;
@@ -1063,12 +1054,11 @@ public class InstructionAdapter extends MethodVisitor {
         mv.visitMethodInsn(Opcodes.INVOKESTATIC, owner, name, desc, false);
     }
 
-    public void invokestatic(final String owner, final String name,
-                             final String desc, final boolean itf) {
+    public void invokestatic(
+            final String owner, final String name, final String desc, final boolean itf) {
         if (api < Opcodes.ASM5) {
             if (itf) {
-                throw new IllegalArgumentException(
-                        "INVOKESTATIC on interfaces require ASM 5");
+                throw new IllegalArgumentException("INVOKESTATIC on interfaces require ASM 5");
             }
             invokestatic(owner, name, desc);
             return;
@@ -1076,13 +1066,11 @@ public class InstructionAdapter extends MethodVisitor {
         mv.visitMethodInsn(Opcodes.INVOKESTATIC, owner, name, desc, itf);
     }
 
-    public void invokeinterface(final String owner, final String name,
-                                final String desc) {
+    public void invokeinterface(final String owner, final String name, final String desc) {
         mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, owner, name, desc, true);
     }
 
-    public void invokedynamic(String name, String desc, Handle bsm,
-                              Object[] bsmArgs) {
+    public void invokedynamic(String name, String desc, Handle bsm, Object[] bsmArgs) {
         mv.visitInvokeDynamicInsn(name, desc, bsm, bsmArgs);
     }
 

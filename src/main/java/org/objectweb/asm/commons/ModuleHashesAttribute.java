@@ -1,32 +1,30 @@
-/***
- * ASM: a very small and fast Java bytecode manipulation framework
- * Copyright (c) 2000-2011 INRIA, France Telecom
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of the copyright holders nor the names of its
- *    contributors may be used to endorse or promote products derived from
- *    this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
- * THE POSSIBILITY OF SUCH DAMAGE.
- */
+// ASM: a very small and fast Java bytecode manipulation framework
+// Copyright (c) 2000-2011 INRIA, France Telecom
+// All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions
+// are met:
+// 1. Redistributions of source code must retain the above copyright
+//    notice, this list of conditions and the following disclaimer.
+// 2. Redistributions in binary form must reproduce the above copyright
+//    notice, this list of conditions and the following disclaimer in the
+//    documentation and/or other materials provided with the distribution.
+// 3. Neither the name of the copyright holders nor the names of its
+//    contributors may be used to endorse or promote products derived from
+//    this software without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+// THE POSSIBILITY OF SUCH DAMAGE.
 
 package org.objectweb.asm.commons;
 
@@ -40,8 +38,7 @@ import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Label;
 
 /**
- * ModuleHashes attribute.
- * This attribute is specific to the OpenJDK and may change in the future.
+ * ModuleHashes attribute. This attribute is specific to the OpenJDK and may change in the future.
  *
  * @author Remi Forax
  */
@@ -51,15 +48,15 @@ public final class ModuleHashesAttribute extends Attribute {
     public List<byte[]> hashes;
 
     /**
-     * Creates an attribute with a hashing algorithm, a list of module names,
-     * and a list of the same length of hashes.
+     * Constructs an attribute with a hashing algorithm, a list of module names, and a list of the same
+     * length of hashes.
      *
      * @param algorithm the hashing algorithm name.
      * @param modules   a list of module name
      * @param hashes    a list of hash, one for each module name.
      */
-    public ModuleHashesAttribute(final String algorithm,
-                                 final List<String> modules, final List<byte[]> hashes) {
+    public ModuleHashesAttribute(
+            final String algorithm, final List<String> modules, final List<byte[]> hashes) {
         super("ModuleHashes");
         this.algorithm = algorithm;
         this.modules = modules;
@@ -67,8 +64,7 @@ public final class ModuleHashesAttribute extends Attribute {
     }
 
     /**
-     * Creates an empty attribute that can be used as prototype
-     * to be passed as argument of the method
+     * Constructs an empty attribute that can be used as prototype to be passed as argument of the method
      * {@link ClassReader#accept(org.objectweb.asm.ClassVisitor, Attribute[], int)}.
      */
     public ModuleHashesAttribute() {
@@ -76,8 +72,8 @@ public final class ModuleHashesAttribute extends Attribute {
     }
 
     @Override
-    protected Attribute read(ClassReader cr, int off, int len, char[] buf,
-                             int codeOff, Label[] labels) {
+    protected Attribute read(
+            ClassReader cr, int off, int len, char[] buf, int codeOff, Label[] labels) {
         String hashAlgorithm = cr.readUTF8(off, buf);
 
         int count = cr.readUnsignedShort(off + 2);
@@ -103,8 +99,7 @@ public final class ModuleHashesAttribute extends Attribute {
     }
 
     @Override
-    protected ByteVector write(ClassWriter cw, byte[] code, int len,
-                               int maxStack, int maxLocals) {
+    protected ByteVector write(ClassWriter cw, byte[] code, int len, int maxStack, int maxLocals) {
         ByteVector v = new ByteVector();
         int index = cw.newUTF8(algorithm);
         v.putShort(index);

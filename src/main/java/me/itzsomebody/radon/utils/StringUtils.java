@@ -14,6 +14,43 @@ import me.itzsomebody.radon.transformers.stringencryption.*;
  */
 public class StringUtils {
     /**
+     * Returns the proper string generation type given a dictionary type to use.
+     *
+     * @param dictionary an integer indicating which pre-defined string
+     *                   generation type to use.
+     * @return the proper string generation type given a dictionary type to use.
+     */
+    public static String randomString(int dictionary) {
+        switch (dictionary) {
+            case 0:
+                return crazyString();
+            case 1:
+                return crazyKey();
+            case 2:
+                return alphaNumString();
+            default:
+                throw new IllegalArgumentException("Illegal dictionary type " + dictionary);
+        }
+    }
+
+    /**
+     * Generates and returns a pseudo-random alpha-numeric string.
+     *
+     * @return a pseudo-random alpha-numeric string.
+     */
+    public static String alphaNumString() {
+        int numberOfChars = 4;
+        char[] alphaNum = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789".toCharArray();
+        StringBuilder sb = new StringBuilder();
+
+        for (int i = 0; i < numberOfChars; i++) {
+            sb.append(alphaNum[NumberUtils.getRandomInt(alphaNum.length)]);
+        }
+
+        return sb.toString();
+    }
+
+    /**
      * Generates a {@link String} with a length of 10 consisting of spaces.
      * Stole this idea from NeonObf and Smoke.
      *
@@ -213,24 +250,11 @@ public class StringUtils {
     }
 
     /**
-     * Generates and returns a gigantic string.
-     *
-     * @return a gigantic string.
-     */
-    public static String bigLDC() {
-        StringBuilder sb = new StringBuilder();
-        while (sb.length() < 65536 - 1) {
-            sb.append("[");
-        }
-        return new String(sb);
-    }
-
-    /**
      * Returns a generated classname based on current class packages.
      *
      * @return a generated classname based on current class packages.
      */
-    public static String randomClassName(Collection<String> theClassNames) {
+    public static String randomClassName(Collection<String> theClassNames, int dictionary) {
         List<String> classNames = new ArrayList<>();
         classNames.addAll(theClassNames);
 
@@ -244,7 +268,7 @@ public class StringUtils {
             sb.append("/");
         }
 
-        sb.append(crazyString());
+        sb.append(StringUtils.randomString(dictionary));
 
         return new String(sb);
     }

@@ -33,7 +33,7 @@ public class LightInvokeDynamic extends AbstractTransformer {
         long current = System.currentTimeMillis();
         this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
         this.logStrings.add(LoggerUtils.stdOut("Started light invokedynamic transformer"));
-        String[] bsmPath = new String[]{StringUtils.randomClass(classNames()), StringUtils.crazyString()};
+        String[] bsmPath = new String[]{StringUtils.randomClass(classNames()), StringUtils.randomString(this.dictionary)};
         Handle bsmHandle = new Handle(Opcodes.H_INVOKESTATIC,
                 bsmPath[0],
                 bsmPath[1],
@@ -58,7 +58,7 @@ public class LightInvokeDynamic extends AbstractTransformer {
                                 isStatic ? methodInsnNode.desc : methodInsnNode.desc.replace("(", "(Ljava/lang/Object;");
                         int opcode = (isStatic) ? this.STATIC_INVOCATION : this.VIRTUAL_INVOCATION;
 
-                        methodNode.instructions.set(insn, new InvokeDynamicInsnNode(StringUtils.crazyString(),
+                        methodNode.instructions.set(insn, new InvokeDynamicInsnNode(StringUtils.randomString(this.dictionary),
                                 newSig,
                                 bsmHandle,
                                 opcode,

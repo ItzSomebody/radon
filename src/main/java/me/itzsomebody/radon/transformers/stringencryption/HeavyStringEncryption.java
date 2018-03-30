@@ -40,7 +40,7 @@ public class HeavyStringEncryption extends AbstractTransformer {
         long current = System.currentTimeMillis();
         this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
         this.logStrings.add(LoggerUtils.stdOut("Started heavy string encryption transformer"));
-        String[] decryptorPath = new String[]{StringUtils.randomClass(classNames()), StringUtils.crazyString()};
+        String[] decryptorPath = new String[]{StringUtils.randomClass(classNames()), StringUtils.randomString(this.dictionary)};
         this.classNodes().stream().filter(classNode -> !this.exempted(classNode.name, "StringEncryption")).forEach(classNode -> {
             classNode.methods.stream().filter(methodNode ->
                     !this.exempted(classNode.name + '.' + methodNode.name + methodNode.desc, "StringEncryption")
@@ -57,7 +57,7 @@ public class HeavyStringEncryption extends AbstractTransformer {
                                     || ((String) cst).contains("%%__NONCE__%%"))
                                 continue;
 
-                            String keyLdc = StringUtils.crazyString();
+                            String keyLdc = StringUtils.randomString(this.dictionary);
                             ((LdcInsnNode) insn).cst =
                                     StringUtils.heavyEncrypt(((String) ((LdcInsnNode) insn).cst),
                                             keyLdc, decryptorPath[0].replace("/", "."),

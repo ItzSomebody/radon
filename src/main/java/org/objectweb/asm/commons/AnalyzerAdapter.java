@@ -1,32 +1,30 @@
-/***
- * ASM: a very small and fast Java bytecode manipulation framework
- * Copyright (c) 2000-2011 INRIA, France Telecom
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of the copyright holders nor the names of its
- *    contributors may be used to endorse or promote products derived from
- *    this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
- * THE POSSIBILITY OF SUCH DAMAGE.
- */
+// ASM: a very small and fast Java bytecode manipulation framework
+// Copyright (c) 2000-2011 INRIA, France Telecom
+// All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions
+// are met:
+// 1. Redistributions of source code must retain the above copyright
+//    notice, this list of conditions and the following disclaimer.
+// 2. Redistributions in binary form must reproduce the above copyright
+//    notice, this list of conditions and the following disclaimer in the
+//    documentation and/or other materials provided with the distribution.
+// 3. Neither the name of the copyright holders nor the names of its
+//    contributors may be used to endorse or promote products derived from
+//    this software without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+// THE POSSIBILITY OF SUCH DAMAGE.
 package org.objectweb.asm.commons;
 
 import java.util.ArrayList;
@@ -41,66 +39,54 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 
 /**
- * A {@link MethodVisitor} that keeps track of stack map frame changes between
- * {@link #visitFrame(int, int, Object[], int, Object[]) visitFrame} calls. This
- * adapter must be used with the
- * {@link org.objectweb.asm.ClassReader#EXPAND_FRAMES} option. Each
- * visit<i>X</i> instruction delegates to the next visitor in the chain, if any,
- * and then simulates the effect of this instruction on the stack map frame,
- * represented by {@link #locals} and {@link #stack}. The next visitor in the
- * chain can get the state of the stack map frame <i>before</i> each instruction
- * by reading the value of these fields in its visit<i>X</i> methods (this
- * requires a reference to the AnalyzerAdapter that is before it in the chain).
- * If this adapter is used with a class that does not contain stack map table
- * attributes (i.e., pre Java 6 classes) then this adapter may not be able to
- * compute the stack map frame for each instruction. In this case no exception
- * is thrown but the {@link #locals} and {@link #stack} fields will be null for
- * these instructions.
+ * A {@link MethodVisitor} that keeps track of stack map frame changes between {@link
+ * #visitFrame(int, int, Object[], int, Object[]) visitFrame} calls. This adapter must be used with
+ * the {@link org.objectweb.asm.ClassReader#EXPAND_FRAMES} option. Each visit<i>X</i> instruction
+ * delegates to the next visitor in the chain, if any, and then simulates the effect of this
+ * instruction on the stack map frame, represented by {@link #locals} and {@link #stack}. The next
+ * visitor in the chain can get the state of the stack map frame <i>before</i> each instruction by
+ * reading the value of these fields in its visit<i>X</i> methods (this requires a reference to the
+ * AnalyzerAdapter that is before it in the chain). If this adapter is used with a class that does
+ * not contain stack map table attributes (i.e., pre Java 6 classes) then this adapter may not be
+ * able to compute the stack map frame for each instruction. In this case no exception is thrown but
+ * the {@link #locals} and {@link #stack} fields will be null for these instructions.
  *
  * @author Eric Bruneton
  */
 public class AnalyzerAdapter extends MethodVisitor {
 
     /**
-     * <code>List</code> of the local variable slots for current execution
-     * frame. Primitive types are represented by {@link Opcodes#TOP},
-     * {@link Opcodes#INTEGER}, {@link Opcodes#FLOAT}, {@link Opcodes#LONG},
-     * {@link Opcodes#DOUBLE},{@link Opcodes#NULL} or
-     * {@link Opcodes#UNINITIALIZED_THIS} (long and double are represented by
-     * two elements, the second one being TOP). Reference types are represented
-     * by String objects (representing internal names), and uninitialized types
-     * by Label objects (this label designates the NEW instruction that created
-     * this uninitialized value). This field is <tt>null</tt> for unreachable
-     * instructions.
+     * <code>List</code> of the local variable slots for current execution frame. Primitive types are
+     * represented by {@link Opcodes#TOP}, {@link Opcodes#INTEGER}, {@link Opcodes#FLOAT}, {@link
+     * Opcodes#LONG}, {@link Opcodes#DOUBLE},{@link Opcodes#NULL} or {@link
+     * Opcodes#UNINITIALIZED_THIS} (long and double are represented by two elements, the second one
+     * being TOP). Reference types are represented by String objects (representing internal names),
+     * and uninitialized types by Label objects (this label designates the NEW instruction that
+     * created this uninitialized value). This field is <tt>null</tt> for unreachable instructions.
      */
     public List<Object> locals;
 
     /**
-     * <code>List</code> of the operand stack slots for current execution frame.
-     * Primitive types are represented by {@link Opcodes#TOP},
-     * {@link Opcodes#INTEGER}, {@link Opcodes#FLOAT}, {@link Opcodes#LONG},
-     * {@link Opcodes#DOUBLE},{@link Opcodes#NULL} or
-     * {@link Opcodes#UNINITIALIZED_THIS} (long and double are represented by
-     * two elements, the second one being TOP). Reference types are represented
-     * by String objects (representing internal names), and uninitialized types
-     * by Label objects (this label designates the NEW instruction that created
-     * this uninitialized value). This field is <tt>null</tt> for unreachable
-     * instructions.
+     * <code>List</code> of the operand stack slots for current execution frame. Primitive types are
+     * represented by {@link Opcodes#TOP}, {@link Opcodes#INTEGER}, {@link Opcodes#FLOAT}, {@link
+     * Opcodes#LONG}, {@link Opcodes#DOUBLE},{@link Opcodes#NULL} or {@link
+     * Opcodes#UNINITIALIZED_THIS} (long and double are represented by two elements, the second one
+     * being TOP). Reference types are represented by String objects (representing internal names),
+     * and uninitialized types by Label objects (this label designates the NEW instruction that
+     * created this uninitialized value). This field is <tt>null</tt> for unreachable instructions.
      */
     public List<Object> stack;
 
     /**
-     * The labels that designate the next instruction to be visited. May be
-     * <tt>null</tt>.
+     * The labels that designate the next instruction to be visited. May be <tt>null</tt>.
      */
     private List<Label> labels;
 
     /**
-     * Information about uninitialized types in the current execution frame.
-     * This map associates internal names to Label objects. Each label
-     * designates a NEW instruction that created the currently uninitialized
-     * types, and the associated internal name represents the NEW operand, i.e.
-     * the final, initialized type value.
+     * Information about uninitialized types in the current execution frame. This map associates
+     * internal names to Label objects. Each label designates a NEW instruction that created the
+     * currently uninitialized types, and the associated internal name represents the NEW operand,
+     * i.e. the final, initialized type value.
      */
     public Map<Object, Object> uninitializedTypes;
 
@@ -120,21 +106,23 @@ public class AnalyzerAdapter extends MethodVisitor {
     private String owner;
 
     /**
-     * Creates a new {@link AnalyzerAdapter}. <i>Subclasses must not use this
-     * constructor</i>. Instead, they must use the
-     * {@link #AnalyzerAdapter(int, String, int, String, String, MethodVisitor)}
-     * version.
+     * Constructs a new {@link AnalyzerAdapter}. <i>Subclasses must not use this constructor</i>.
+     * Instead, they must use the {@link #AnalyzerAdapter(int, String, int, String, String,
+     * MethodVisitor)} version.
      *
      * @param owner  the owner's class name.
      * @param access the method's access flags (see {@link Opcodes}).
      * @param name   the method's name.
      * @param desc   the method's descriptor (see {@link Type Type}).
-     * @param mv     the method visitor to which this adapter delegates calls. May
-     *               be <tt>null</tt>.
+     * @param mv     the method visitor to which this adapter delegates calls. May be <tt>null</tt>.
      * @throws IllegalStateException If a subclass calls this constructor.
      */
-    public AnalyzerAdapter(final String owner, final int access,
-                           final String name, final String desc, final MethodVisitor mv) {
+    public AnalyzerAdapter(
+            final String owner,
+            final int access,
+            final String name,
+            final String desc,
+            final MethodVisitor mv) {
         this(Opcodes.ASM6, owner, access, name, desc, mv);
         if (getClass() != AnalyzerAdapter.class) {
             throw new IllegalStateException();
@@ -142,20 +130,23 @@ public class AnalyzerAdapter extends MethodVisitor {
     }
 
     /**
-     * Creates a new {@link AnalyzerAdapter}.
+     * Constructs a new {@link AnalyzerAdapter}.
      *
-     * @param api    the ASM API version implemented by this visitor. Must be one
-     *               of {@link Opcodes#ASM4}, {@link Opcodes#ASM5} or {@link Opcodes#ASM6}.
+     * @param api    the ASM API version implemented by this visitor. Must be one of {@link
+     *               Opcodes#ASM4}, {@link Opcodes#ASM5} or {@link Opcodes#ASM6}.
      * @param owner  the owner's class name.
      * @param access the method's access flags (see {@link Opcodes}).
      * @param name   the method's name.
      * @param desc   the method's descriptor (see {@link Type Type}).
-     * @param mv     the method visitor to which this adapter delegates calls. May
-     *               be <tt>null</tt>.
+     * @param mv     the method visitor to which this adapter delegates calls. May be <tt>null</tt>.
      */
-    protected AnalyzerAdapter(final int api, final String owner,
-                              final int access, final String name, final String desc,
-                              final MethodVisitor mv) {
+    protected AnalyzerAdapter(
+            final int api,
+            final String owner,
+            final int access,
+            final String name,
+            final String desc,
+            final MethodVisitor mv) {
         super(api, mv);
         this.owner = owner;
         locals = new ArrayList<Object>();
@@ -203,16 +194,18 @@ public class AnalyzerAdapter extends MethodVisitor {
     }
 
     @Override
-    public void visitFrame(final int type, final int nLocal,
-                           final Object[] local, final int nStack, final Object[] stack) {
+    public void visitFrame(
+            final int type,
+            final int nLocal,
+            final Object[] local,
+            final int nStack,
+            final Object[] stack) {
         if (type != Opcodes.F_NEW) { // uncompressed frame
-            throw new IllegalStateException(
-                    "ClassReader.accept() should be called with EXPAND_FRAMES flag");
+            throw new IllegalArgumentException(
+                    "AnalyzerAdapter only accepts expanded frames (see ClassReader.EXPAND_FRAMES)");
         }
 
-        if (mv != null) {
-            mv.visitFrame(type, nLocal, local, nStack, stack);
-        }
+        super.visitFrame(type, nLocal, local, nStack, stack);
 
         if (this.locals != null) {
             this.locals.clear();
@@ -223,11 +216,12 @@ public class AnalyzerAdapter extends MethodVisitor {
         }
         visitFrameTypes(nLocal, local, this.locals);
         visitFrameTypes(nStack, stack, this.stack);
+        maxLocals = Math.max(maxLocals, this.locals.size());
         maxStack = Math.max(maxStack, this.stack.size());
     }
 
-    private static void visitFrameTypes(final int n, final Object[] types,
-                                        final List<Object> result) {
+    private static void visitFrameTypes(
+            final int n, final Object[] types, final List<Object> result) {
         for (int i = 0; i < n; ++i) {
             Object type = types[i];
             result.add(type);
@@ -239,12 +233,9 @@ public class AnalyzerAdapter extends MethodVisitor {
 
     @Override
     public void visitInsn(final int opcode) {
-        if (mv != null) {
-            mv.visitInsn(opcode);
-        }
+        super.visitInsn(opcode);
         execute(opcode, 0, null);
-        if ((opcode >= Opcodes.IRETURN && opcode <= Opcodes.RETURN)
-                || opcode == Opcodes.ATHROW) {
+        if ((opcode >= Opcodes.IRETURN && opcode <= Opcodes.RETURN) || opcode == Opcodes.ATHROW) {
             this.locals = null;
             this.stack = null;
         }
@@ -252,17 +243,19 @@ public class AnalyzerAdapter extends MethodVisitor {
 
     @Override
     public void visitIntInsn(final int opcode, final int operand) {
-        if (mv != null) {
-            mv.visitIntInsn(opcode, operand);
-        }
+        super.visitIntInsn(opcode, operand);
         execute(opcode, operand, null);
     }
 
     @Override
     public void visitVarInsn(final int opcode, final int var) {
-        if (mv != null) {
-            mv.visitVarInsn(opcode, var);
-        }
+        super.visitVarInsn(opcode, var);
+        boolean isLongOrDouble =
+                opcode == Opcodes.LLOAD
+                        || opcode == Opcodes.DLOAD
+                        || opcode == Opcodes.LSTORE
+                        || opcode == Opcodes.DSTORE;
+        maxLocals = Math.max(maxLocals, var + (isLongOrDouble ? 2 : 1));
         execute(opcode, var, null);
     }
 
@@ -281,36 +274,35 @@ public class AnalyzerAdapter extends MethodVisitor {
                 uninitializedTypes.put(labels.get(i), type);
             }
         }
-        if (mv != null) {
-            mv.visitTypeInsn(opcode, type);
-        }
+        super.visitTypeInsn(opcode, type);
         execute(opcode, 0, type);
     }
 
     @Override
-    public void visitFieldInsn(final int opcode, final String owner,
-                               final String name, final String desc) {
-        if (mv != null) {
-            mv.visitFieldInsn(opcode, owner, name, desc);
-        }
+    public void visitFieldInsn(
+            final int opcode, final String owner, final String name, final String desc) {
+        super.visitFieldInsn(opcode, owner, name, desc);
         execute(opcode, 0, desc);
     }
 
     @Deprecated
     @Override
-    public void visitMethodInsn(final int opcode, final String owner,
-                                final String name, final String desc) {
+    public void visitMethodInsn(
+            final int opcode, final String owner, final String name, final String desc) {
         if (api >= Opcodes.ASM5) {
             super.visitMethodInsn(opcode, owner, name, desc);
             return;
         }
-        doVisitMethodInsn(opcode, owner, name, desc,
-                opcode == Opcodes.INVOKEINTERFACE);
+        doVisitMethodInsn(opcode, owner, name, desc, opcode == Opcodes.INVOKEINTERFACE);
     }
 
     @Override
-    public void visitMethodInsn(final int opcode, final String owner,
-                                final String name, final String desc, final boolean itf) {
+    public void visitMethodInsn(
+            final int opcode,
+            final String owner,
+            final String name,
+            final String desc,
+            final boolean itf) {
         if (api < Opcodes.ASM5) {
             super.visitMethodInsn(opcode, owner, name, desc, itf);
             return;
@@ -318,8 +310,8 @@ public class AnalyzerAdapter extends MethodVisitor {
         doVisitMethodInsn(opcode, owner, name, desc, itf);
     }
 
-    private void doVisitMethodInsn(int opcode, final String owner,
-                                   final String name, final String desc, final boolean itf) {
+    private void doVisitMethodInsn(
+            int opcode, final String owner, final String name, final String desc, final boolean itf) {
         if (mv != null) {
             mv.visitMethodInsn(opcode, owner, name, desc, itf);
         }
@@ -354,11 +346,8 @@ public class AnalyzerAdapter extends MethodVisitor {
     }
 
     @Override
-    public void visitInvokeDynamicInsn(String name, String desc, Handle bsm,
-                                       Object... bsmArgs) {
-        if (mv != null) {
-            mv.visitInvokeDynamicInsn(name, desc, bsm, bsmArgs);
-        }
+    public void visitInvokeDynamicInsn(String name, String desc, Handle bsm, Object... bsmArgs) {
+        super.visitInvokeDynamicInsn(name, desc, bsm, bsmArgs);
         if (this.locals == null) {
             labels = null;
             return;
@@ -370,9 +359,7 @@ public class AnalyzerAdapter extends MethodVisitor {
 
     @Override
     public void visitJumpInsn(final int opcode, final Label label) {
-        if (mv != null) {
-            mv.visitJumpInsn(opcode, label);
-        }
+        super.visitJumpInsn(opcode, label);
         execute(opcode, 0, null);
         if (opcode == Opcodes.GOTO) {
             this.locals = null;
@@ -382,9 +369,7 @@ public class AnalyzerAdapter extends MethodVisitor {
 
     @Override
     public void visitLabel(final Label label) {
-        if (mv != null) {
-            mv.visitLabel(label);
-        }
+        super.visitLabel(label);
         if (labels == null) {
             labels = new ArrayList<Label>(3);
         }
@@ -393,9 +378,7 @@ public class AnalyzerAdapter extends MethodVisitor {
 
     @Override
     public void visitLdcInsn(final Object cst) {
-        if (mv != null) {
-            mv.visitLdcInsn(cst);
-        }
+        super.visitLdcInsn(cst);
         if (this.locals == null) {
             labels = null;
             return;
@@ -431,29 +414,23 @@ public class AnalyzerAdapter extends MethodVisitor {
 
     @Override
     public void visitIincInsn(final int var, final int increment) {
-        if (mv != null) {
-            mv.visitIincInsn(var, increment);
-        }
+        super.visitIincInsn(var, increment);
+        maxLocals = Math.max(maxLocals, var + 1);
         execute(Opcodes.IINC, var, null);
     }
 
     @Override
-    public void visitTableSwitchInsn(final int min, final int max,
-                                     final Label dflt, final Label... labels) {
-        if (mv != null) {
-            mv.visitTableSwitchInsn(min, max, dflt, labels);
-        }
+    public void visitTableSwitchInsn(
+            final int min, final int max, final Label dflt, final Label... labels) {
+        super.visitTableSwitchInsn(min, max, dflt, labels);
         execute(Opcodes.TABLESWITCH, 0, null);
         this.locals = null;
         this.stack = null;
     }
 
     @Override
-    public void visitLookupSwitchInsn(final Label dflt, final int[] keys,
-                                      final Label[] labels) {
-        if (mv != null) {
-            mv.visitLookupSwitchInsn(dflt, keys, labels);
-        }
+    public void visitLookupSwitchInsn(final Label dflt, final int[] keys, final Label[] labels) {
+        super.visitLookupSwitchInsn(dflt, keys, labels);
         execute(Opcodes.LOOKUPSWITCH, 0, null);
         this.locals = null;
         this.stack = null;
@@ -461,10 +438,16 @@ public class AnalyzerAdapter extends MethodVisitor {
 
     @Override
     public void visitMultiANewArrayInsn(final String desc, final int dims) {
-        if (mv != null) {
-            mv.visitMultiANewArrayInsn(desc, dims);
-        }
+        super.visitMultiANewArrayInsn(desc, dims);
         execute(Opcodes.MULTIANEWARRAY, dims, desc);
+    }
+
+    @Override
+    public void visitLocalVariable(
+            String name, String descriptor, String signature, Label start, Label end, int index) {
+        char firstDescChar = descriptor.charAt(0);
+        maxLocals = Math.max(maxLocals, index + (firstDescChar == 'J' || firstDescChar == 'D' ? 2 : 1));
+        super.visitLocalVariable(name, descriptor, signature, start, end, index);
     }
 
     @Override

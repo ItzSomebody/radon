@@ -1,3 +1,7 @@
+## 0.5.3
+
+* Added the ability to change between Radon's built-in dictionaries.
+
 ## 0.5.2
 
 * You can now resize the GUI.

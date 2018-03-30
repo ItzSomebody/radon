@@ -93,7 +93,7 @@ public class GUI {
         this.frmRadonObfuscator.getContentPane().add(tabbedPane);
 
         JPanel panel_4 = new JPanel();
-        tabbedPane.addTab("Input-Output", null, panel_4, null);
+        tabbedPane.addTab("Files", null, panel_4, null);
         GridBagLayout gbl_panel_4 = new GridBagLayout();
         gbl_panel_4.columnWidths = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                 0, 0};
@@ -888,18 +888,18 @@ public class GUI {
         });
         panel_2.add(btnNewButton_5, gbc_btnNewButton_5);
 
-        JPanel expirePanel = new JPanel();
-        tabbedPane.addTab("Expiration", null, expirePanel, null);
-        GridBagLayout gbl_expirePanel = new GridBagLayout();
-        gbl_expirePanel.columnWidths = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        JPanel otherPanel = new JPanel();
+        tabbedPane.addTab("Other", null, otherPanel, null);
+        GridBagLayout gbl_otherPanel = new GridBagLayout();
+        gbl_otherPanel.columnWidths = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                 0, 59, 0, 0};
-        gbl_expirePanel.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        gbl_otherPanel.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                 0};
-        gbl_expirePanel.columnWeights = new double[]{0.0, 1.0, 1.0, 1.0, 0.0,
+        gbl_otherPanel.columnWeights = new double[]{0.0, 1.0, 1.0, 1.0, 0.0,
                 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
-        gbl_expirePanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+        gbl_otherPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
                 0.0, 0.0, 0.0, 0.0, 1.0, Double.MIN_VALUE};
-        expirePanel.setLayout(gbl_expirePanel);
+        otherPanel.setLayout(gbl_otherPanel);
 
         JLabel expireMessageLabel = new JLabel("Message:");
         GridBagConstraints gbc_expireMessageLabel = new GridBagConstraints();
@@ -907,7 +907,7 @@ public class GUI {
         gbc_expireMessageLabel.anchor = GridBagConstraints.EAST;
         gbc_expireMessageLabel.gridx = 0;
         gbc_expireMessageLabel.gridy = 2;
-        expirePanel.add(expireMessageLabel, gbc_expireMessageLabel);
+        otherPanel.add(expireMessageLabel, gbc_expireMessageLabel);
 
         this.expirationMessageField = new JTextField();
         this.expirationMessageField.setEnabled(false);
@@ -917,7 +917,7 @@ public class GUI {
         gbc_messageField.fill = GridBagConstraints.HORIZONTAL;
         gbc_messageField.gridx = 1;
         gbc_messageField.gridy = 2;
-        expirePanel.add(this.expirationMessageField, gbc_messageField);
+        otherPanel.add(this.expirationMessageField, gbc_messageField);
         this.expirationMessageField.setColumns(10);
 
         JLabel expiresLabel = new JLabel("Expires:");
@@ -926,7 +926,7 @@ public class GUI {
         gbc_expiresLabel.anchor = GridBagConstraints.EAST;
         gbc_expiresLabel.gridx = 0;
         gbc_expiresLabel.gridy = 3;
-        expirePanel.add(expiresLabel, gbc_expiresLabel);
+        otherPanel.add(expiresLabel, gbc_expiresLabel);
 
         this.expirationDateField = new JTextField();
         this.expirationDateField.setEnabled(false);
@@ -936,7 +936,7 @@ public class GUI {
         gbc_dateField.fill = GridBagConstraints.HORIZONTAL;
         gbc_dateField.gridx = 1;
         gbc_dateField.gridy = 3;
-        expirePanel.add(this.expirationDateField, gbc_dateField);
+        otherPanel.add(this.expirationDateField, gbc_dateField);
 
         JCheckBox chckbxAddExpiration = new JCheckBox("Expiration");
         GridBagConstraints gbc_AddExpiration = new GridBagConstraints();
@@ -957,7 +957,7 @@ public class GUI {
             }
 
         });
-        expirePanel.add(chckbxAddExpiration, gbc_AddExpiration);
+        otherPanel.add(chckbxAddExpiration, gbc_AddExpiration);
 
         JSeparator expireSeparator = new JSeparator();
         GridBagConstraints gbc_expireSeparator = new GridBagConstraints();
@@ -966,7 +966,30 @@ public class GUI {
         gbc_expireSeparator.gridwidth = 13;
         gbc_expireSeparator.gridx = 0;
         gbc_expireSeparator.gridy = 4;
-        expirePanel.add(expireSeparator, gbc_expireSeparator);
+        otherPanel.add(expireSeparator, gbc_expireSeparator);
+
+        JComboBox<String> dictionaryComboBox = new JComboBox<>();
+        dictionaryComboBox.setEnabled(true);
+        GridBagConstraints gbc_dictionaryComboBox = new GridBagConstraints();
+        gbc_dictionaryComboBox.fill = GridBagConstraints.HORIZONTAL;
+        gbc_dictionaryComboBox.insets = new Insets(0, 0, 5, 5);
+        gbc_dictionaryComboBox.gridx = 11;
+        gbc_dictionaryComboBox.gridy = 5;
+
+        String[] dictionaries = {"0", "1", "2"};
+        for (String s : dictionaries) {
+            dictionaryComboBox.addItem(s);
+        }
+
+        otherPanel.add(dictionaryComboBox, gbc_dictionaryComboBox);
+
+        JLabel chckbxDictionary = new JLabel("Dictionary:");
+        GridBagConstraints gbc_chckbxDictionary = new GridBagConstraints();
+        gbc_chckbxDictionary.anchor = GridBagConstraints.WEST;
+        gbc_chckbxDictionary.insets = new Insets(0, 5, 5, 5);
+        gbc_chckbxDictionary.gridx = 0;
+        gbc_chckbxDictionary.gridy = 5;
+        otherPanel.add(chckbxDictionary, gbc_chckbxDictionary);
 
         JPanel panel_3 = new JPanel();
         tabbedPane.addTab("Exempt", null, panel_3, null);
@@ -983,7 +1006,7 @@ public class GUI {
 
         JComboBox<String> comboBox_04 = new JComboBox<>();
         GridBagConstraints gbc_comboBox_04 = new GridBagConstraints();
-        gbc_comboBox_04.insets = new Insets(0, 4, 5, 5);
+        gbc_comboBox_04.insets = new Insets(0, 5, 5, 5);
         gbc_comboBox_04.fill = GridBagConstraints.HORIZONTAL;
         gbc_comboBox_04.gridx = 1;
         gbc_comboBox_04.gridy = 12;
@@ -1390,6 +1413,8 @@ public class GUI {
                             if (chckbxAddWatermark.isSelected()) {
                                 watermarkType = comboBox_05.getSelectedIndex();
                             }
+
+                            int dictionary = dictionaryComboBox.getSelectedIndex();
                             Bootstrap bootstrap = new Bootstrap(
                                     input,
                                     output,
@@ -1399,7 +1424,8 @@ public class GUI {
                                     trashClasses,
                                     waterMarkMessageField.getText(),
                                     watermarkType,
-                                    new String(watermarkPassword.getPassword()));
+                                    new String(watermarkPassword.getPassword()),
+                                    dictionary);
                             bootstrap.startTheParty(false);
                             JOptionPane.showMessageDialog(null,
                                     "Successfully processed file!",
@@ -1695,6 +1721,9 @@ public class GUI {
                                     expirationDateField.setEnabled(true);
                                     chckbxAddExpiration.setSelected(true);
                                 }
+
+                                int dictionary = configParser.getDictionaryType();
+                                dictionaryComboBox.setSelectedIndex(dictionary);
                             } catch (Throwable t) {
                                 JOptionPane.showMessageDialog(null,
                                         t.getMessage(), "Error",

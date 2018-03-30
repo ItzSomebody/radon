@@ -66,6 +66,7 @@ public class Config {
             add("ExpiryMessage");
             add("Shuffler");
             add("InnerClassRemover");
+            add("Dictionary");
         }
     };
 
@@ -1018,5 +1019,31 @@ public class Config {
         }
 
         return null;
+    }
+
+    /**
+     * Returns the dictionary type from {@link Config#map} as an
+     * {@link Integer}. Defaults to 0 if null;
+     *
+     * @return Returns the dictionary type from {@link Config#map} as an
+     * {@link Integer}. Defaults to 0 if null.
+     * @throws IllegalArgumentException if value from key is null or not
+     *                                  an {@link Integer}
+     */
+    public int getDictionaryType()
+            throws IllegalArgumentException {
+        if (this.map.containsKey("Dictionary")) {
+            Object value = this.map.get("Dictionary");
+            if (value != null) {
+                if (!(value instanceof Integer))
+                    throw new IllegalArgumentException("Dictionary arg must " +
+                            "be an integer");
+                return (Integer) value;
+            } else {
+                throw new IllegalArgumentException("Dictionary arg is null");
+            }
+        } else {
+            return 0;
+        }
     }
 }

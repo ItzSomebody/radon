@@ -1,32 +1,30 @@
-/***
- * ASM: a very small and fast Java bytecode manipulation framework
- * Copyright (c) 2000-2011 INRIA, France Telecom
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of the copyright holders nor the names of its
- *    contributors may be used to endorse or promote products derived from
- *    this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
- * THE POSSIBILITY OF SUCH DAMAGE.
- */
+// ASM: a very small and fast Java bytecode manipulation framework
+// Copyright (c) 2000-2011 INRIA, France Telecom
+// All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions
+// are met:
+// 1. Redistributions of source code must retain the above copyright
+//    notice, this list of conditions and the following disclaimer.
+// 2. Redistributions in binary form must reproduce the above copyright
+//    notice, this list of conditions and the following disclaimer in the
+//    documentation and/or other materials provided with the distribution.
+// 3. Neither the name of the copyright holders nor the names of its
+//    contributors may be used to endorse or promote products derived from
+//    this software without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+// THE POSSIBILITY OF SUCH DAMAGE.
 package org.objectweb.asm.commons;
 
 import java.io.ByteArrayOutputStream;
@@ -44,9 +42,9 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
 /**
- * A {@link ClassVisitor} that adds a serial version unique identifier to a
- * class if missing. Here is typical usage of this class:
- * <p>
+ * A {@link ClassVisitor} that adds a serial version unique identifier to a class if missing. Here
+ * is typical usage of this class:
+ *
  * <pre>
  *   ClassWriter cw = new ClassWriter(...);
  *   ClassVisitor sv = new SerialVersionUIDAdder(cw);
@@ -57,7 +55,7 @@ import org.objectweb.asm.Opcodes;
  * The SVUID algorithm can be found <a href=
  * "http://java.sun.com/j2se/1.4.2/docs/guide/serialization/spec/class.html"
  * >http://java.sun.com/j2se/1.4.2/docs/guide/serialization/spec/class.html</a>:
- * <p>
+ *
  * <pre>
  * The serialVersionUID is computed using the signature of a stream of bytes
  * that reflect the class definition. The National Institute of Standards and
@@ -138,8 +136,7 @@ public class SerialVersionUIDAdder extends ClassVisitor {
     private String[] interfaces;
 
     /**
-     * Collection of fields. (except private static and private transient
-     * fields)
+     * Collection of fields. (except private static and private transient fields)
      */
     private Collection<Item> svuidFields;
 
@@ -159,12 +156,10 @@ public class SerialVersionUIDAdder extends ClassVisitor {
     private Collection<Item> svuidMethods;
 
     /**
-     * Creates a new {@link SerialVersionUIDAdder}. <i>Subclasses must not use
-     * this constructor</i>. Instead, they must use the
-     * {@link #SerialVersionUIDAdder(int, ClassVisitor)} version.
+     * Constructs a new {@link SerialVersionUIDAdder}. <i>Subclasses must not use this constructor</i>.
+     * Instead, they must use the {@link #SerialVersionUIDAdder(int, ClassVisitor)} version.
      *
-     * @param cv a {@link ClassVisitor} to which this visitor will delegate
-     *           calls.
+     * @param cv a {@link ClassVisitor} to which this visitor will delegate calls.
      * @throws IllegalStateException If a subclass calls this constructor.
      */
     public SerialVersionUIDAdder(final ClassVisitor cv) {
@@ -175,12 +170,11 @@ public class SerialVersionUIDAdder extends ClassVisitor {
     }
 
     /**
-     * Creates a new {@link SerialVersionUIDAdder}.
+     * Constructs a new {@link SerialVersionUIDAdder}.
      *
-     * @param api the ASM API version implemented by this visitor. Must be one
-     *            of {@link Opcodes#ASM4}, {@link Opcodes#ASM5} or {@link Opcodes#ASM6}.
-     * @param cv  a {@link ClassVisitor} to which this visitor will delegate
-     *            calls.
+     * @param api the ASM API version implemented by this visitor. Must be one of {@link
+     *            Opcodes#ASM4}, {@link Opcodes#ASM5} or {@link Opcodes#ASM6}.
+     * @param cv  a {@link ClassVisitor} to which this visitor will delegate calls.
      */
     protected SerialVersionUIDAdder(final int api, final ClassVisitor cv) {
         super(api, cv);
@@ -198,17 +192,20 @@ public class SerialVersionUIDAdder extends ClassVisitor {
      * information (step 1,2, and 3) for SVUID computation.
      */
     @Override
-    public void visit(final int version, final int access, final String name,
-                      final String signature, final String superName,
-                      final String[] interfaces) {
+    public void visit(
+            final int version,
+            final int access,
+            final String name,
+            final String signature,
+            final String superName,
+            final String[] interfaces) {
         computeSVUID = (access & Opcodes.ACC_ENUM) == 0;
 
         if (computeSVUID) {
             this.name = name;
             this.access = access;
             this.interfaces = new String[interfaces.length];
-            System.arraycopy(interfaces, 0, this.interfaces, 0,
-                    interfaces.length);
+            System.arraycopy(interfaces, 0, this.interfaces, 0, interfaces.length);
         }
 
         super.visit(version, access, name, signature, superName, interfaces);
@@ -219,8 +216,12 @@ public class SerialVersionUIDAdder extends ClassVisitor {
      * 7). Also determine if there is a class initializer (step 6).
      */
     @Override
-    public MethodVisitor visitMethod(final int access, final String name,
-                                     final String desc, final String signature, final String[] exceptions) {
+    public MethodVisitor visitMethod(
+            final int access,
+            final String name,
+            final String desc,
+            final String signature,
+            final String[] exceptions) {
         if (computeSVUID) {
             if ("<clinit>".equals(name)) {
                 hasStaticInitializer = true;
@@ -232,11 +233,17 @@ public class SerialVersionUIDAdder extends ClassVisitor {
              * ACC_SYNCHRONIZED, ACC_NATIVE, ACC_ABSTRACT and ACC_STRICT flags
              * are used.
              */
-            int mods = access
-                    & (Opcodes.ACC_PUBLIC | Opcodes.ACC_PRIVATE
-                    | Opcodes.ACC_PROTECTED | Opcodes.ACC_STATIC
-                    | Opcodes.ACC_FINAL | Opcodes.ACC_SYNCHRONIZED
-                    | Opcodes.ACC_NATIVE | Opcodes.ACC_ABSTRACT | Opcodes.ACC_STRICT);
+            int mods =
+                    access
+                            & (Opcodes.ACC_PUBLIC
+                            | Opcodes.ACC_PRIVATE
+                            | Opcodes.ACC_PROTECTED
+                            | Opcodes.ACC_STATIC
+                            | Opcodes.ACC_FINAL
+                            | Opcodes.ACC_SYNCHRONIZED
+                            | Opcodes.ACC_NATIVE
+                            | Opcodes.ACC_ABSTRACT
+                            | Opcodes.ACC_STRICT);
 
             // all non private methods
             if ((access & Opcodes.ACC_PRIVATE) == 0) {
@@ -256,8 +263,12 @@ public class SerialVersionUIDAdder extends ClassVisitor {
      * if the class already has a SVUID.
      */
     @Override
-    public FieldVisitor visitField(final int access, final String name,
-                                   final String desc, final String signature, final Object value) {
+    public FieldVisitor visitField(
+            final int access,
+            final String name,
+            final String desc,
+            final String signature,
+            final Object value) {
         if (computeSVUID) {
             if ("serialVersionUID".equals(name)) {
                 // since the class already has SVUID, we won't be computing it.
@@ -272,10 +283,15 @@ public class SerialVersionUIDAdder extends ClassVisitor {
              */
             if ((access & Opcodes.ACC_PRIVATE) == 0
                     || (access & (Opcodes.ACC_STATIC | Opcodes.ACC_TRANSIENT)) == 0) {
-                int mods = access
-                        & (Opcodes.ACC_PUBLIC | Opcodes.ACC_PRIVATE
-                        | Opcodes.ACC_PROTECTED | Opcodes.ACC_STATIC
-                        | Opcodes.ACC_FINAL | Opcodes.ACC_VOLATILE | Opcodes.ACC_TRANSIENT);
+                int mods =
+                        access
+                                & (Opcodes.ACC_PUBLIC
+                                | Opcodes.ACC_PRIVATE
+                                | Opcodes.ACC_PROTECTED
+                                | Opcodes.ACC_STATIC
+                                | Opcodes.ACC_FINAL
+                                | Opcodes.ACC_VOLATILE
+                                | Opcodes.ACC_TRANSIENT);
                 svuidFields.add(new Item(name, mods, desc));
             }
         }
@@ -284,15 +300,14 @@ public class SerialVersionUIDAdder extends ClassVisitor {
     }
 
     /**
-     * Handle a bizarre special case. Nested classes (static classes declared
-     * inside another class) that are protected have their access bit set to
-     * public in their class files to deal with some odd reflection situation.
-     * Our SVUID computation must do as the JVM does and ignore access bits in
-     * the class file in favor of the access bits InnerClass attribute.
+     * Handle a bizarre special case. Nested classes (static classes declared inside another class)
+     * that are protected have their access bit set to public in their class files to deal with some
+     * odd reflection situation. Our SVUID computation must do as the JVM does and ignore access bits
+     * in the class file in favor of the access bits InnerClass attribute.
      */
     @Override
-    public void visitInnerClass(final String aname, final String outerName,
-                                final String innerName, final int attr_access) {
+    public void visitInnerClass(
+            final String aname, final String outerName, final String innerName, final int attr_access) {
         if ((name != null) && name.equals(aname)) {
             this.access = attr_access;
         }
@@ -309,8 +324,7 @@ public class SerialVersionUIDAdder extends ClassVisitor {
             try {
                 addSVUID(computeSVUID());
             } catch (Throwable e) {
-                throw new RuntimeException("Error while computing SVUID for "
-                        + name, e);
+                throw new RuntimeException("Error while computing SVUID for " + name, e);
             }
         }
 
@@ -322,8 +336,8 @@ public class SerialVersionUIDAdder extends ClassVisitor {
     // ------------------------------------------------------------------------
 
     /**
-     * Returns true if the class already has a SVUID field. The result of this
-     * method is only valid when visitEnd is or has been called.
+     * Returns true if the class already has a SVUID field. The result of this method is only valid
+     * when visitEnd is or has been called.
      *
      * @return true if the class already has a SVUID field.
      */
@@ -332,8 +346,9 @@ public class SerialVersionUIDAdder extends ClassVisitor {
     }
 
     protected void addSVUID(long svuid) {
-        FieldVisitor fv = super.visitField(Opcodes.ACC_FINAL
-                + Opcodes.ACC_STATIC, "serialVersionUID", "J", null, svuid);
+        FieldVisitor fv =
+                super.visitField(
+                        Opcodes.ACC_FINAL + Opcodes.ACC_STATIC, "serialVersionUID", "J", null, svuid);
         if (fv != null) {
             fv.visitEnd();
         }
@@ -364,12 +379,17 @@ public class SerialVersionUIDAdder extends ClassVisitor {
              */
             int access = this.access;
             if ((access & Opcodes.ACC_INTERFACE) != 0) {
-                access = (svuidMethods.size() > 0) ? (access | Opcodes.ACC_ABSTRACT)
-                        : (access & ~Opcodes.ACC_ABSTRACT);
+                access =
+                        (svuidMethods.size() > 0)
+                                ? (access | Opcodes.ACC_ABSTRACT)
+                                : (access & ~Opcodes.ACC_ABSTRACT);
             }
-            dos.writeInt(access
-                    & (Opcodes.ACC_PUBLIC | Opcodes.ACC_FINAL
-                    | Opcodes.ACC_INTERFACE | Opcodes.ACC_ABSTRACT));
+            dos.writeInt(
+                    access
+                            & (Opcodes.ACC_PUBLIC
+                            | Opcodes.ACC_FINAL
+                            | Opcodes.ACC_INTERFACE
+                            | Opcodes.ACC_ABSTRACT));
 
             /*
              * 3. The name of each interface sorted by name written using UTF
@@ -479,16 +499,16 @@ public class SerialVersionUIDAdder extends ClassVisitor {
      * @param dotted         a <code>boolean</code> value
      * @throws IOException if an error occurs
      */
-    private static void writeItems(final Collection<Item> itemCollection,
-                                   final DataOutput dos, final boolean dotted) throws IOException {
+    private static void writeItems(
+            final Collection<Item> itemCollection, final DataOutput dos, final boolean dotted)
+            throws IOException {
         int size = itemCollection.size();
         Item[] items = itemCollection.toArray(new Item[size]);
         Arrays.sort(items);
         for (int i = 0; i < size; i++) {
             dos.writeUTF(items[i].name);
             dos.writeInt(items[i].access);
-            dos.writeUTF(dotted ? items[i].desc.replace('/', '.')
-                    : items[i].desc);
+            dos.writeUTF(dotted ? items[i].desc.replace('/', '.') : items[i].desc);
         }
     }
 

@@ -1,32 +1,30 @@
-/***
- * ASM: a very small and fast Java bytecode manipulation framework
- * Copyright (c) 2000-2011 INRIA, France Telecom
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of the copyright holders nor the names of its
- *    contributors may be used to endorse or promote products derived from
- *    this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
- * THE POSSIBILITY OF SUCH DAMAGE.
- */
+// ASM: a very small and fast Java bytecode manipulation framework
+// Copyright (c) 2000-2011 INRIA, France Telecom
+// All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions
+// are met:
+// 1. Redistributions of source code must retain the above copyright
+//    notice, this list of conditions and the following disclaimer.
+// 2. Redistributions in binary form must reproduce the above copyright
+//    notice, this list of conditions and the following disclaimer in the
+//    documentation and/or other materials provided with the distribution.
+// 3. Neither the name of the copyright holders nor the names of its
+//    contributors may be used to endorse or promote products derived from
+//    this software without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+// THE POSSIBILITY OF SUCH DAMAGE.
 package org.objectweb.asm.commons;
 
 import java.util.ArrayList;
@@ -41,20 +39,17 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 
 /**
- * A {@link org.objectweb.asm.MethodVisitor} to insert before, after and around
- * advices in methods and constructors.
- * <p>
- * The behavior for constructors is like this:
+ * A {@link org.objectweb.asm.MethodVisitor} to insert before, after and around advices in methods
+ * and constructors.
+ *
+ * <p>The behavior for constructors is like this:
+ *
  * <ol>
- * <p>
- * <li>as long as the INVOKESPECIAL for the object initialization has not been
- * reached, every bytecode instruction is dispatched in the ctor code visitor</li>
- * <p>
- * <li>when this one is reached, it is only added in the ctor code visitor and a
- * JP invoke is added</li>
- * <p>
- * <li>after that, only the other code visitor receives the instructions</li>
- * <p>
+ * <li>as long as the INVOKESPECIAL for the object initialization has not been reached, every
+ * bytecode instruction is dispatched in the ctor code visitor
+ * <li>when this one is reached, it is only added in the ctor code visitor and a JP invoke is
+ * added
+ * <li>after that, only the other code visitor receives the instructions
  * </ol>
  *
  * @author Eugene Kuleshov
@@ -79,17 +74,21 @@ public abstract class AdviceAdapter extends GeneratorAdapter implements Opcodes 
     private Map<Label, List<Object>> branches;
 
     /**
-     * Creates a new {@link AdviceAdapter}.
+     * Constructs a new {@link AdviceAdapter}.
      *
-     * @param api    the ASM API version implemented by this visitor. Must be one
-     *               of {@link Opcodes#ASM4}, {@link Opcodes#ASM5} or {@link Opcodes#ASM6}.
+     * @param api    the ASM API version implemented by this visitor. Must be one of {@link
+     *               Opcodes#ASM4}, {@link Opcodes#ASM5} or {@link Opcodes#ASM6}.
      * @param mv     the method visitor to which this adapter delegates calls.
      * @param access the method's access flags (see {@link Opcodes}).
      * @param name   the method's name.
      * @param desc   the method's descriptor (see {@link Type Type}).
      */
-    protected AdviceAdapter(final int api, final MethodVisitor mv,
-                            final int access, final String name, final String desc) {
+    protected AdviceAdapter(
+            final int api,
+            final MethodVisitor mv,
+            final int access,
+            final String name,
+            final String desc) {
         super(api, mv, access, name, desc);
         methodAccess = access;
         methodDesc = desc;
@@ -98,7 +97,7 @@ public abstract class AdviceAdapter extends GeneratorAdapter implements Opcodes 
 
     @Override
     public void visitCode() {
-        mv.visitCode();
+        super.visitCode();
         if (constructor) {
             stackFrame = new ArrayList<Object>();
             branches = new HashMap<Label, List<Object>>();
@@ -110,7 +109,7 @@ public abstract class AdviceAdapter extends GeneratorAdapter implements Opcodes 
 
     @Override
     public void visitLabel(final Label label) {
-        mv.visitLabel(label);
+        super.visitLabel(label);
         if (constructor && branches != null) {
             List<Object> frame = branches.get(label);
             if (frame != null) {
@@ -299,7 +298,7 @@ public abstract class AdviceAdapter extends GeneratorAdapter implements Opcodes 
                     break;
             }
         }
-        mv.visitInsn(opcode);
+        super.visitInsn(opcode);
     }
 
     @Override
@@ -334,9 +333,9 @@ public abstract class AdviceAdapter extends GeneratorAdapter implements Opcodes 
     }
 
     @Override
-    public void visitFieldInsn(final int opcode, final String owner,
-                               final String name, final String desc) {
-        mv.visitFieldInsn(opcode, owner, name, desc);
+    public void visitFieldInsn(
+            final int opcode, final String owner, final String name, final String desc) {
+        super.visitFieldInsn(opcode, owner, name, desc);
         if (constructor) {
             char c = desc.charAt(0);
             boolean longOrDouble = c == 'J' || c == 'D';
@@ -371,7 +370,7 @@ public abstract class AdviceAdapter extends GeneratorAdapter implements Opcodes 
 
     @Override
     public void visitIntInsn(final int opcode, final int operand) {
-        mv.visitIntInsn(opcode, operand);
+        super.visitIntInsn(opcode, operand);
         if (constructor && opcode != NEWARRAY) {
             pushValue(OTHER);
         }
@@ -379,7 +378,7 @@ public abstract class AdviceAdapter extends GeneratorAdapter implements Opcodes 
 
     @Override
     public void visitLdcInsn(final Object cst) {
-        mv.visitLdcInsn(cst);
+        super.visitLdcInsn(cst);
         if (constructor) {
             pushValue(OTHER);
             if (cst instanceof Double || cst instanceof Long) {
@@ -390,7 +389,7 @@ public abstract class AdviceAdapter extends GeneratorAdapter implements Opcodes 
 
     @Override
     public void visitMultiANewArrayInsn(final String desc, final int dims) {
-        mv.visitMultiANewArrayInsn(desc, dims);
+        super.visitMultiANewArrayInsn(desc, dims);
         if (constructor) {
             for (int i = 0; i < dims; i++) {
                 popValue();
@@ -401,7 +400,7 @@ public abstract class AdviceAdapter extends GeneratorAdapter implements Opcodes 
 
     @Override
     public void visitTypeInsn(final int opcode, final String type) {
-        mv.visitTypeInsn(opcode, type);
+        super.visitTypeInsn(opcode, type);
         // ANEWARRAY, CHECKCAST or INSTANCEOF don't change stack
         if (constructor && opcode == NEW) {
             pushValue(OTHER);
@@ -410,19 +409,22 @@ public abstract class AdviceAdapter extends GeneratorAdapter implements Opcodes 
 
     @Deprecated
     @Override
-    public void visitMethodInsn(final int opcode, final String owner,
-                                final String name, final String desc) {
+    public void visitMethodInsn(
+            final int opcode, final String owner, final String name, final String desc) {
         if (api >= Opcodes.ASM5) {
             super.visitMethodInsn(opcode, owner, name, desc);
             return;
         }
-        doVisitMethodInsn(opcode, owner, name, desc,
-                opcode == Opcodes.INVOKEINTERFACE);
+        doVisitMethodInsn(opcode, owner, name, desc, opcode == Opcodes.INVOKEINTERFACE);
     }
 
     @Override
-    public void visitMethodInsn(final int opcode, final String owner,
-                                final String name, final String desc, final boolean itf) {
+    public void visitMethodInsn(
+            final int opcode,
+            final String owner,
+            final String name,
+            final String desc,
+            final boolean itf) {
         if (api < Opcodes.ASM5) {
             super.visitMethodInsn(opcode, owner, name, desc, itf);
             return;
@@ -430,8 +432,8 @@ public abstract class AdviceAdapter extends GeneratorAdapter implements Opcodes 
         doVisitMethodInsn(opcode, owner, name, desc, itf);
     }
 
-    private void doVisitMethodInsn(int opcode, final String owner,
-                                   final String name, final String desc, final boolean itf) {
+    private void doVisitMethodInsn(
+            int opcode, final String owner, final String name, final String desc, final boolean itf) {
         mv.visitMethodInsn(opcode, owner, name, desc, itf);
         if (constructor) {
             Type[] types = Type.getArgumentTypes(desc);
@@ -471,9 +473,8 @@ public abstract class AdviceAdapter extends GeneratorAdapter implements Opcodes 
     }
 
     @Override
-    public void visitInvokeDynamicInsn(String name, String desc, Handle bsm,
-                                       Object... bsmArgs) {
-        mv.visitInvokeDynamicInsn(name, desc, bsm, bsmArgs);
+    public void visitInvokeDynamicInsn(String name, String desc, Handle bsm, Object... bsmArgs) {
+        super.visitInvokeDynamicInsn(name, desc, bsm, bsmArgs);
         if (constructor) {
             Type[] types = Type.getArgumentTypes(desc);
             for (int i = 0; i < types.length; i++) {
@@ -495,7 +496,7 @@ public abstract class AdviceAdapter extends GeneratorAdapter implements Opcodes 
 
     @Override
     public void visitJumpInsn(final int opcode, final Label label) {
-        mv.visitJumpInsn(opcode, label);
+        super.visitJumpInsn(opcode, label);
         if (constructor) {
             switch (opcode) {
                 case IFEQ:
@@ -528,9 +529,8 @@ public abstract class AdviceAdapter extends GeneratorAdapter implements Opcodes 
     }
 
     @Override
-    public void visitLookupSwitchInsn(final Label dflt, final int[] keys,
-                                      final Label[] labels) {
-        mv.visitLookupSwitchInsn(dflt, keys, labels);
+    public void visitLookupSwitchInsn(final Label dflt, final int[] keys, final Label[] labels) {
+        super.visitLookupSwitchInsn(dflt, keys, labels);
         if (constructor) {
             popValue();
             addBranches(dflt, labels);
@@ -538,9 +538,9 @@ public abstract class AdviceAdapter extends GeneratorAdapter implements Opcodes 
     }
 
     @Override
-    public void visitTableSwitchInsn(final int min, final int max,
-                                     final Label dflt, final Label... labels) {
-        mv.visitTableSwitchInsn(min, max, dflt, labels);
+    public void visitTableSwitchInsn(
+            final int min, final int max, final Label dflt, final Label... labels) {
+        super.visitTableSwitchInsn(min, max, dflt, labels);
         if (constructor) {
             popValue();
             addBranches(dflt, labels);
@@ -548,8 +548,7 @@ public abstract class AdviceAdapter extends GeneratorAdapter implements Opcodes 
     }
 
     @Override
-    public void visitTryCatchBlock(Label start, Label end, Label handler,
-                                   String type) {
+    public void visitTryCatchBlock(Label start, Label end, Label handler, String type) {
         super.visitTryCatchBlock(start, end, handler, type);
         if (constructor && !branches.containsKey(handler)) {
             List<Object> stackFrame = new ArrayList<Object>();
@@ -585,21 +584,18 @@ public abstract class AdviceAdapter extends GeneratorAdapter implements Opcodes 
     }
 
     /**
-     * Called at the beginning of the method or after super class call in
-     * the constructor. <br>
+     * Called at the beginning of the method or after super class call in the constructor. <br>
      * <br>
-     * <p>
-     * <i>Custom code can use or change all the local variables, but should not
-     * change state of the stack.</i>
+     * <i>Custom code can use or change all the local variables, but should not change state of the
+     * stack.</i>
      */
     protected void onMethodEnter() {
     }
 
     /**
-     * Called before explicit exit from the method using either return or throw.
-     * Top element on the stack contains the return value or exception instance.
-     * For example:
-     * <p>
+     * Called before explicit exit from the method using either return or throw. Top element on the
+     * stack contains the return value or exception instance. For example:
+     *
      * <pre>
      *   public void onMethodExit(int opcode) {
      *     if(opcode==RETURN) {
@@ -622,15 +618,13 @@ public abstract class AdviceAdapter extends GeneratorAdapter implements Opcodes 
      *   public static void onExit(Object param, int opcode) {
      *     ...
      * </pre>
-     * <p>
-     * <br>
-     * <br>
-     * <p>
-     * <i>Custom code can use or change all the local variables, but should not
-     * change state of the stack.</i>
      *
-     * @param opcode one of the RETURN, IRETURN, FRETURN, ARETURN, LRETURN, DRETURN
-     *               or ATHROW
+     * <br>
+     * <br>
+     * <i>Custom code can use or change all the local variables, but should not change state of the
+     * stack.</i>
+     *
+     * @param opcode one of the RETURN, IRETURN, FRETURN, ARETURN, LRETURN, DRETURN or ATHROW
      */
     protected void onMethodExit(int opcode) {
     }

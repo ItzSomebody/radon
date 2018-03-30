@@ -1,32 +1,30 @@
-/***
- * ASM: a very small and fast Java bytecode manipulation framework
- * Copyright (c) 2000-2011 INRIA, France Telecom
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of the copyright holders nor the names of its
- *    contributors may be used to endorse or promote products derived from
- *    this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
- * THE POSSIBILITY OF SUCH DAMAGE.
- */
+// ASM: a very small and fast Java bytecode manipulation framework
+// Copyright (c) 2000-2011 INRIA, France Telecom
+// All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions
+// are met:
+// 1. Redistributions of source code must retain the above copyright
+//    notice, this list of conditions and the following disclaimer.
+// 2. Redistributions in binary form must reproduce the above copyright
+//    notice, this list of conditions and the following disclaimer in the
+//    documentation and/or other materials provided with the distribution.
+// 3. Neither the name of the copyright holders nor the names of its
+//    contributors may be used to endorse or promote products derived from
+//    this software without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+// ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+// LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+// THE POSSIBILITY OF SUCH DAMAGE.
 package org.objectweb.asm.tree;
 
 import java.util.ArrayList;
@@ -36,8 +34,8 @@ import java.util.Map;
 import org.objectweb.asm.MethodVisitor;
 
 /**
- * A node that represents a bytecode instruction. <i>An instruction can appear
- * at most once in at most one {@link InsnList} at a time</i>.
+ * A node that represents a bytecode instruction. <i>An instruction can appear at most once in at
+ * most one {@link InsnList} at a time</i>.
  *
  * @author Eric Bruneton
  */
@@ -129,42 +127,33 @@ public abstract class AbstractInsnNode {
     protected int opcode;
 
     /**
-     * The runtime visible type annotations of this instruction. This field is
-     * only used for real instructions (i.e. not for labels, frames, or line
-     * number nodes). This list is a list of {@link TypeAnnotationNode} objects.
-     * May be <tt>null</tt>.
-     *
-     * @associates org.objectweb.asm.tree.TypeAnnotationNode
-     * @label visible
+     * The runtime visible type annotations of this instruction. This field is only used for real
+     * instructions (i.e. not for labels, frames, or line number nodes). This list is a list of {@link
+     * TypeAnnotationNode} objects. May be <tt>null</tt>.
      */
     public List<TypeAnnotationNode> visibleTypeAnnotations;
 
     /**
-     * The runtime invisible type annotations of this instruction. This field is
-     * only used for real instructions (i.e. not for labels, frames, or line
-     * number nodes). This list is a list of {@link TypeAnnotationNode} objects.
-     * May be <tt>null</tt>.
-     *
-     * @associates org.objectweb.asm.tree.TypeAnnotationNode
-     * @label invisible
+     * The runtime invisible type annotations of this instruction. This field is only used for real
+     * instructions (i.e. not for labels, frames, or line number nodes). This list is a list of {@link
+     * TypeAnnotationNode} objects. May be <tt>null</tt>.
      */
     public List<TypeAnnotationNode> invisibleTypeAnnotations;
 
     /**
-     * Previous instruction in the list to which this instruction belongs.
+     * The previous instruction in the list to which this instruction belongs.
      */
-    AbstractInsnNode prev;
+    AbstractInsnNode previousInsn;
 
     /**
-     * Next instruction in the list to which this instruction belongs.
+     * The next instruction in the list to which this instruction belongs.
      */
-    AbstractInsnNode next;
+    AbstractInsnNode nextInsn;
 
     /**
-     * Index of this instruction in the list to which it belongs. The value of
-     * this field is correct only when {@link InsnList#cache} is not null. A
-     * value of -1 indicates that this instruction does not belong to any
-     * {@link InsnList}.
+     * The index of this instruction in the list to which it belongs. The value of this field is
+     * correct only when {@link InsnList#cache} is not null. A value of -1 indicates that this
+     * instruction does not belong to any {@link InsnList}.
      */
     int index;
 
@@ -190,96 +179,93 @@ public abstract class AbstractInsnNode {
     /**
      * Returns the type of this instruction.
      *
-     * @return the type of this instruction, i.e. one the constants defined in
-     * this class.
+     * @return the type of this instruction, i.e. one the constants defined in this class.
      */
     public abstract int getType();
 
     /**
-     * Returns the previous instruction in the list to which this instruction
-     * belongs, if any.
+     * Returns the previous instruction in the list to which this instruction belongs, if any.
      *
-     * @return the previous instruction in the list to which this instruction
-     * belongs, if any. May be <tt>null</tt>.
+     * @return the previous instruction in the list to which this instruction belongs, if any. May be
+     * <tt>null</tt>.
      */
     public AbstractInsnNode getPrevious() {
-        return prev;
+        return previousInsn;
     }
 
     /**
-     * Returns the next instruction in the list to which this instruction
-     * belongs, if any.
+     * Returns the next instruction in the list to which this instruction belongs, if any.
      *
-     * @return the next instruction in the list to which this instruction
-     * belongs, if any. May be <tt>null</tt>.
+     * @return the next instruction in the list to which this instruction belongs, if any. May be
+     * <tt>null</tt>.
      */
     public AbstractInsnNode getNext() {
-        return next;
+        return nextInsn;
     }
 
     /**
-     * Makes the given code visitor visit this instruction.
+     * Makes the given method visitor visit this instruction.
      *
-     * @param cv a code visitor.
+     * @param methodVisitor a method visitor.
      */
-    public abstract void accept(final MethodVisitor cv);
+    public abstract void accept(MethodVisitor methodVisitor);
 
     /**
      * Makes the given visitor visit the annotations of this instruction.
      *
-     * @param mv a method visitor.
+     * @param methodVisitor a method visitor.
      */
-    protected final void acceptAnnotations(final MethodVisitor mv) {
-        int n = visibleTypeAnnotations == null ? 0 : visibleTypeAnnotations
-                .size();
-        for (int i = 0; i < n; ++i) {
-            TypeAnnotationNode an = visibleTypeAnnotations.get(i);
-            an.accept(mv.visitInsnAnnotation(an.typeRef, an.typePath, an.desc,
-                    true));
+    protected final void acceptAnnotations(final MethodVisitor methodVisitor) {
+        if (visibleTypeAnnotations != null) {
+            for (int i = 0, n = visibleTypeAnnotations.size(); i < n; ++i) {
+                TypeAnnotationNode typeAnnotation = visibleTypeAnnotations.get(i);
+                typeAnnotation.accept(
+                        methodVisitor.visitInsnAnnotation(
+                                typeAnnotation.typeRef, typeAnnotation.typePath, typeAnnotation.desc, true));
+            }
         }
-        n = invisibleTypeAnnotations == null ? 0 : invisibleTypeAnnotations
-                .size();
-        for (int i = 0; i < n; ++i) {
-            TypeAnnotationNode an = invisibleTypeAnnotations.get(i);
-            an.accept(mv.visitInsnAnnotation(an.typeRef, an.typePath, an.desc,
-                    false));
+        if (invisibleTypeAnnotations != null) {
+            for (int i = 0, n = invisibleTypeAnnotations.size(); i < n; ++i) {
+                TypeAnnotationNode typeAnnotation = invisibleTypeAnnotations.get(i);
+                typeAnnotation.accept(
+                        methodVisitor.visitInsnAnnotation(
+                                typeAnnotation.typeRef, typeAnnotation.typePath, typeAnnotation.desc, false));
+            }
         }
     }
 
     /**
      * Returns a copy of this instruction.
      *
-     * @param labels a map from LabelNodes to cloned LabelNodes.
-     * @return a copy of this instruction. The returned instruction does not
-     * belong to any {@link InsnList}.
+     * @param clonedLabels a map from LabelNodes to cloned LabelNodes.
+     * @return a copy of this instruction. The returned instruction does not belong to any {@link
+     * InsnList}.
      */
-    public abstract AbstractInsnNode clone(
-            final Map<LabelNode, LabelNode> labels);
+    public abstract AbstractInsnNode clone(Map<LabelNode, LabelNode> clonedLabels);
 
     /**
      * Returns the clone of the given label.
      *
-     * @param label a label.
-     * @param map   a map from LabelNodes to cloned LabelNodes.
+     * @param label        a label.
+     * @param clonedLabels a map from LabelNodes to cloned LabelNodes.
      * @return the clone of the given label.
      */
-    static LabelNode clone(final LabelNode label,
-                           final Map<LabelNode, LabelNode> map) {
-        return map.get(label);
+    static LabelNode clone(final LabelNode label, final Map<LabelNode, LabelNode> clonedLabels) {
+        return clonedLabels.get(label);
     }
 
     /**
      * Returns the clones of the given labels.
      *
-     * @param labels a list of labels.
-     * @param map    a map from LabelNodes to cloned LabelNodes.
+     * @param labels       a list of labels.
+     * @param clonedLabels a map from LabelNodes to cloned LabelNodes.
      * @return the clones of the given labels.
      */
-    static LabelNode[] clone(final List<LabelNode> labels,
-                             final Map<LabelNode, LabelNode> map) {
+    static LabelNode[] clone(
+            final List<LabelNode> labels, final Map<LabelNode, LabelNode> clonedLabels) {
         LabelNode[] clones = new LabelNode[labels.size()];
-        for (int i = 0; i < clones.length; ++i) {
-            clones[i] = map.get(labels.get(i));
+        for (int i = 0, n = clones.length; i < n; ++i) {
+            clones[i] = clonedLabels.get(labels.get(i));
         }
         return clones;
     }
@@ -287,29 +273,30 @@ public abstract class AbstractInsnNode {
     /**
      * Clones the annotations of the given instruction into this instruction.
      *
-     * @param insn the source instruction.
+     * @param insnNode the source instruction.
      * @return this instruction.
      */
-    protected final AbstractInsnNode cloneAnnotations(
-            final AbstractInsnNode insn) {
-        if (insn.visibleTypeAnnotations != null) {
+    protected final AbstractInsnNode cloneAnnotations(final AbstractInsnNode insnNode) {
+        if (insnNode.visibleTypeAnnotations != null) {
             this.visibleTypeAnnotations = new ArrayList<TypeAnnotationNode>();
-            for (int i = 0; i < insn.visibleTypeAnnotations.size(); ++i) {
-                TypeAnnotationNode src = insn.visibleTypeAnnotations.get(i);
-                TypeAnnotationNode ann = new TypeAnnotationNode(src.typeRef,
-                        src.typePath, src.desc);
-                src.accept(ann);
-                this.visibleTypeAnnotations.add(ann);
+            for (int i = 0, n = insnNode.visibleTypeAnnotations.size(); i < n; ++i) {
+                TypeAnnotationNode sourceAnnotation = insnNode.visibleTypeAnnotations.get(i);
+                TypeAnnotationNode cloneAnnotation =
+                        new TypeAnnotationNode(
+                                sourceAnnotation.typeRef, sourceAnnotation.typePath, sourceAnnotation.desc);
+                sourceAnnotation.accept(cloneAnnotation);
+                this.visibleTypeAnnotations.add(cloneAnnotation);
             }
         }
-        if (insn.invisibleTypeAnnotations != null) {
+        if (insnNode.invisibleTypeAnnotations != null) {
             this.invisibleTypeAnnotations = new ArrayList<TypeAnnotationNode>();
-            for (int i = 0; i < insn.invisibleTypeAnnotations.size(); ++i) {
-                TypeAnnotationNode src = insn.invisibleTypeAnnotations.get(i);
-                TypeAnnotationNode ann = new TypeAnnotationNode(src.typeRef,
-                        src.typePath, src.desc);
-                src.accept(ann);
-                this.invisibleTypeAnnotations.add(ann);
+            for (int i = 0, n = insnNode.invisibleTypeAnnotations.size(); i < n; ++i) {
+                TypeAnnotationNode sourceAnnotation = insnNode.invisibleTypeAnnotations.get(i);
+                TypeAnnotationNode cloneAnnotation =
+                        new TypeAnnotationNode(
+                                sourceAnnotation.typeRef, sourceAnnotation.typePath, sourceAnnotation.desc);
+                sourceAnnotation.accept(cloneAnnotation);
+                this.invisibleTypeAnnotations.add(cloneAnnotation);
             }
         }
         return this;

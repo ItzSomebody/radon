@@ -81,6 +81,11 @@ public class Bootstrap { // Eyyy bootstrap bill
     private List<AbstractTransformer> transformers;
 
     /**
+     * Dictionary type to use
+     */
+    private int dictionary;
+
+    /**
      * Integer that determines how many trash classes to generate if any at all.
      */
     private int trashClasses;
@@ -132,6 +137,7 @@ public class Bootstrap { // Eyyy bootstrap bill
      * @param watermarkMsg  {@link String} to watermark into the output.
      * @param watermarkType watermark type as {@link Integer}.
      * @param watermarkKey  {@link String} to encrypt watermark message.
+     * @param dictionary    dictionary type used for string generation.
      */
     public Bootstrap(
             File input,
@@ -142,7 +148,8 @@ public class Bootstrap { // Eyyy bootstrap bill
             int trashClasses,
             String watermarkMsg,
             int watermarkType,
-            String watermarkKey) {
+            String watermarkKey,
+            int dictionary) {
         this.input = input;
         this.output = output;
         this.libs = libs;
@@ -152,6 +159,7 @@ public class Bootstrap { // Eyyy bootstrap bill
         this.watermarkMsg = watermarkMsg;
         this.watermarkType = watermarkType;
         this.watermarkKey = watermarkKey;
+        this.dictionary = dictionary;
     }
 
     /**
@@ -181,9 +189,9 @@ public class Bootstrap { // Eyyy bootstrap bill
 
             for (AbstractTransformer transformer : this.transformers) {
                 if (transformer instanceof Renamer) {
-                    transformer.init(this.classes, this.classPath, this.exempts);
+                    transformer.init(this.classes, this.classPath, this.exempts, this.dictionary);
                 } else {
-                    transformer.init(this.classes, this.exempts);
+                    transformer.init(this.classes, this.exempts, this.dictionary);
                 }
                 transformer.obfuscate();
                 this.logStrings.addAll(transformer.getLogStrings());
@@ -193,7 +201,7 @@ public class Bootstrap { // Eyyy bootstrap bill
                 this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
                 for (int i = 0; i < this.trashClasses; i++) {
                     TrashClasses trashClass =
-                            new TrashClasses(StringUtils.randomClassName(this.classes.keySet()));
+                            new TrashClasses(StringUtils.randomClassName(this.classes.keySet(), this.dictionary));
                     ClassNode classNode = trashClass.returnTrashClass();
                     this.extraClasses.put(classNode.name, classNode);
                 }
@@ -370,6 +378,7 @@ public class Bootstrap { // Eyyy bootstrap bill
             this.watermarkMsg = this.config.getWatermarkMsg();
             this.watermarkType = this.config.getWatermarkType();
             this.watermarkKey = this.config.getWatermarkKey();
+            this.dictionary = this.config.getDictionaryType();
             if (this.output.exists()) {
                 this.logStrings.add(LoggerUtils.stdOut("Output already exists, renamed to "
                         + FileUtils.renameExistingFile(this.output)));

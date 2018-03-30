@@ -27,10 +27,9 @@ public class NormalFlowObfuscation extends AbstractTransformer {
         long current = System.currentTimeMillis();
         this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
         this.logStrings.add(LoggerUtils.stdOut("Started normal flow obfuscation transformer"));
-        String s = StringUtils.bigLDC();
         classNodes().stream().filter(classNode -> !this.exempted(classNode.name, "Flow")).forEach(classNode -> {
             FieldNode field = new FieldNode(ACC_PUBLIC + ACC_STATIC +
-                    ACC_FINAL, StringUtils.crazyString(), "Z", null, null);
+                    ACC_FINAL, StringUtils.randomString(this.dictionary), "Z", null, null);
             classNode.fields.add(field);
             classNode.methods.stream().filter(methodNode ->
                     !this.exempted(classNode.name + '.' + methodNode.name + methodNode.desc, "Flow")
@@ -53,10 +52,10 @@ public class NormalFlowObfuscation extends AbstractTransformer {
                         }
                     }
                     if (insn != methodNode.instructions.getFirst()
-                            //&& !(insn instanceof LineNumberNode)
-                            //&& insn.getPrevious() != null
-                            //&& insn.getPrevious().getOpcode() != ASTORE
-                            /*&& insn.getOpcode() != ASTORE*/) {
+                        //&& !(insn instanceof LineNumberNode)
+                        //&& insn.getPrevious() != null
+                        //&& insn.getPrevious().getOpcode() != ASTORE
+                        /*&& insn.getOpcode() != ASTORE*/) {
                         if (methodNode.name.equals("<init>") && !calledSuper)
                             continue;
                         StackAnalyzer sa = new StackAnalyzer(methodNode, insn);
@@ -96,6 +95,15 @@ public class NormalFlowObfuscation extends AbstractTransformer {
         this.logStrings.add(LoggerUtils.stdOut("Finished. [" + tookThisLong(current) + "ms]"));
     }
 
+    /**
+     * Inserts an "exit" label into the start of the method node which is used
+     * by the transformer to branch the stack into a false jump.
+     *
+     * @param methodNode current {@link MethodNode} to insert an exit code
+     *                   block into.
+     * @return a {@link LabelNode} used to branch the stack with a false
+     * conditional.
+     */
     private LabelNode exitLabel(MethodNode methodNode) {
         LabelNode lb = new LabelNode();
         LabelNode escapeNode = new LabelNode();

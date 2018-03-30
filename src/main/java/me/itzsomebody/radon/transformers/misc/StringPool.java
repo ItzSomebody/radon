@@ -37,7 +37,7 @@ public class StringPool extends AbstractTransformer {
         long current = System.currentTimeMillis();
         this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
         this.logStrings.add(LoggerUtils.stdOut("Started string pool transformer."));
-        this.randName = StringUtils.crazyString();
+        this.randName = StringUtils.randomString(this.dictionary);
         this.classNodes().stream().filter(classNode -> !this.exempted(classNode.name, "StringPool")).forEach(classNode -> {
             List<String> stringslist = new ArrayList<>();
             classNode.methods.stream().filter(methodNode ->

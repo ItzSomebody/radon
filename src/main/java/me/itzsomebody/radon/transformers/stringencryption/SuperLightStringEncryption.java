@@ -44,7 +44,7 @@ public class SuperLightStringEncryption extends AbstractTransformer {
         long current = System.currentTimeMillis();
         this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
         this.logStrings.add(LoggerUtils.stdOut("Started super light string encryption transformer"));
-        String[] decryptorPath = new String[]{StringUtils.randomClass(classNames()), StringUtils.crazyString()};
+        String[] decryptorPath = new String[]{StringUtils.randomClass(classNames()), StringUtils.randomString(this.dictionary)};
         this.classNodes().stream().filter(classNode -> !this.exempted(classNode.name, "StringEncryption")).forEach(classNode -> {
             classNode.methods.stream().filter(methodNode ->
                     !this.exempted(classNode.name + '.' + methodNode.name + methodNode.desc, "StringEncryption")

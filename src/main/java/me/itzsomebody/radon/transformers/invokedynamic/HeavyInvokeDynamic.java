@@ -42,7 +42,7 @@ public class HeavyInvokeDynamic extends AbstractTransformer {
         long current = System.currentTimeMillis();
         this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
         this.logStrings.add(LoggerUtils.stdOut("Started heavy invokedynamic transformer"));
-        String[] bsmPath = new String[]{StringUtils.randomClass(classNames()), StringUtils.crazyString()};
+        String[] bsmPath = new String[]{StringUtils.randomClass(classNames()), StringUtils.randomString(this.dictionary)};
         Handle bsmHandle = new Handle(H_INVOKESTATIC,
                 bsmPath[0],
                 bsmPath[1],
@@ -73,7 +73,7 @@ public class HeavyInvokeDynamic extends AbstractTransformer {
                         switch (methodInsnNode.getOpcode()) {
                             case INVOKESTATIC: // invokestatic opcode
                                 methodNode.instructions.set(insn, new InvokeDynamicInsnNode(
-                                        StringUtils.crazyString(),
+                                        StringUtils.randomString(this.dictionary),
                                         newSig,
                                         bsmHandle,
                                         this.METHOD_INVOCATION,
@@ -86,7 +86,7 @@ public class HeavyInvokeDynamic extends AbstractTransformer {
                             case INVOKEVIRTUAL: // invokevirtual opcode
                             case INVOKEINTERFACE: // invokeinterface opcode
                                 methodNode.instructions.set(insn, new InvokeDynamicInsnNode(
-                                        StringUtils.crazyString(),
+                                        StringUtils.randomString(this.dictionary),
                                         newSig,
                                         bsmHandle,
                                         this.METHOD_INVOCATION,
@@ -118,7 +118,7 @@ public class HeavyInvokeDynamic extends AbstractTransformer {
                         switch (fieldInsnNode.getOpcode()) {
                             case GETFIELD:
                                 methodNode.instructions.set(insn, new InvokeDynamicInsnNode(
-                                        StringUtils.crazyString(),
+                                        StringUtils.randomString(this.dictionary),
                                         newSig,
                                         bsmHandle,
                                         this.FIELD_INVOCATION,
@@ -130,7 +130,7 @@ public class HeavyInvokeDynamic extends AbstractTransformer {
                                 break;
                             case GETSTATIC:
                                 methodNode.instructions.set(insn, new InvokeDynamicInsnNode(
-                                        StringUtils.crazyString(),
+                                        StringUtils.randomString(this.dictionary),
                                         newSig,
                                         bsmHandle,
                                         this.FIELD_INVOCATION,
@@ -142,7 +142,7 @@ public class HeavyInvokeDynamic extends AbstractTransformer {
                                 break;
                             case PUTFIELD:
                                 methodNode.instructions.set(insn, new InvokeDynamicInsnNode(
-                                        StringUtils.crazyString(),
+                                        StringUtils.randomString(this.dictionary),
                                         newSig,
                                         bsmHandle,
                                         this.FIELD_INVOCATION,
@@ -154,7 +154,7 @@ public class HeavyInvokeDynamic extends AbstractTransformer {
                                 break;
                             case PUTSTATIC:
                                 methodNode.instructions.set(insn, new InvokeDynamicInsnNode(
-                                        StringUtils.crazyString(),
+                                        StringUtils.randomString(this.dictionary),
                                         newSig,
                                         bsmHandle,
                                         this.FIELD_INVOCATION,
