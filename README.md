@@ -70,6 +70,17 @@ Valid config options you can use:
 | InnerClassRemover | Boolean | Determines if obfuscator should remove inner-class information |
 | ExpiryTime | String | Message to insert for expiry obfuscation (useful for trialware) |
 | ExpiryMessage | String | Message to show when set your trialware goes past expiration date (rip) |
+| Dictionary | Integer | Type of string generation to use in obfuscation. |
+
+## Dictionary types
+
+Valid dictionary types you can use:
+
+| Option | Description |
+| --- | --- |
+| 0 | (Default) Generates a string containing 10 characters composed entirely out of space-like characters. |
+| 1 | Generates a string containing 10 characters unrecognized by the JVM causing them to show as white-boxes. |
+| 2 | Generates an alpha-numeric string of length 4. |
 
 ## Exempting
 

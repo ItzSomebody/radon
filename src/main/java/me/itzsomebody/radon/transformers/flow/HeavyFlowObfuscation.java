@@ -12,8 +12,9 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * This transformer does... idk.
- * TODO: DO THIS
+ * This transformer attempts to increase flow obsucurity by making additional
+ * jumps to other inserted flow obfuscation instructions.
+ * TODO: Fix this
  *
  * @author ItzSomebody
  */
