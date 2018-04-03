@@ -1,3 +1,11 @@
+## 0.5.4
+
+* GUI updates:
+    * You can add multiple libraries at a time rather than one.
+    * You can remove multiple libraries at a time rather than one.
+    * You can remove multiple exempts at a time rather than one.
+    * Added GC button which invokes System.gc().
+
 ## 0.5.3
 
 * Added the ability to change between Radon's built-in dictionaries.

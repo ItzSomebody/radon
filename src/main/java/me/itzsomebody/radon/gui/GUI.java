@@ -62,7 +62,7 @@ public class GUI {
     private JPasswordField watermarkPassword;
     private JTextField extractorInput;
     private JPasswordField extractorKey;
-    private String lastPath; // TODO: Use this for last file selection path
+    private File lastPath; // TODO: Use this for last file selection path
 
     /**
      * Create the application.
@@ -140,6 +140,8 @@ public class GUI {
                 }
                 chooser.setMultiSelectionEnabled(false);
                 chooser.setFileSelectionMode(0);
+                if (lastPath != null)
+                    chooser.setCurrentDirectory(lastPath);
                 int result = chooser.showOpenDialog(frmRadonObfuscator);
                 if (result == 0) {
                     SwingUtilities.invokeLater(new Runnable() {
@@ -147,6 +149,7 @@ public class GUI {
                         public void run() {
                             inputField.setText(chooser.getSelectedFile()
                                     .getAbsolutePath());
+                            lastPath = chooser.getSelectedFile();
                         }
                     });
                 }
@@ -189,6 +192,8 @@ public class GUI {
                 }
                 chooser.setMultiSelectionEnabled(false);
                 chooser.setFileSelectionMode(0);
+                if (lastPath != null)
+                    chooser.setCurrentDirectory(lastPath);
                 int result = chooser.showOpenDialog(frmRadonObfuscator);
                 if (result == 0) {
                     SwingUtilities.invokeLater(new Runnable() {
@@ -196,6 +201,7 @@ public class GUI {
                         public void run() {
                             outputField.setText(chooser.getSelectedFile()
                                     .getAbsolutePath());
+                            lastPath = chooser.getSelectedFile();
                         }
                     });
                 }
@@ -238,7 +244,7 @@ public class GUI {
         }
 
         JList<String> list_2 = new JList<>(libList);
-        list_2.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        list_2.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         scrollPane_2.setViewportView(list_2);
 
         JButton btnNewButton_6 = new JButton("Add");
@@ -250,22 +256,20 @@ public class GUI {
                         && !inputField.getText().isEmpty()) {
                     chooser.setSelectedFile(new File(inputField.getText()));
                 }
-                chooser.setMultiSelectionEnabled(false);
+                chooser.setMultiSelectionEnabled(true);
                 chooser.setFileSelectionMode(0);
+                if (lastPath != null)
+                    chooser.setCurrentDirectory(lastPath);
                 int result = chooser.showOpenDialog(frmRadonObfuscator);
                 if (result == 0) {
                     SwingUtilities.invokeLater(new Runnable() {
                         @Override
                         public void run() {
-                            if (chooser.getSelectedFile().getAbsolutePath()
-                                    .endsWith(".jar")) {
-                                libList.addElement(chooser.getSelectedFile()
-                                        .getAbsolutePath());
-                            } else {
-                                JOptionPane.showMessageDialog(null,
-                                        "Only Jars are allowed!", "Error",
-                                        JOptionPane.ERROR_MESSAGE);
+                            for (File file : chooser.getSelectedFiles()) {
+                                libList.addElement(file.getAbsolutePath());
                             }
+
+                            lastPath = chooser.getSelectedFile();
                         }
                     });
                 }
@@ -281,10 +285,12 @@ public class GUI {
         JButton btnNewButton_7 = new JButton("Remove");
         btnNewButton_7.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent arg0) {
-                if (!(list_2.getSelectedIndex() == -1)) {
-                    if (list_2.getSelectedIndices().length == 1) {
-                        libList.remove(list_2.getSelectedIndex());
-                    }
+                List<String> removeList = list_2.getSelectedValuesList();
+                if (removeList.isEmpty())
+                    return;
+
+                for (String s : removeList) {
+                    libList.removeElement(s);
                 }
             }
         });
@@ -308,7 +314,7 @@ public class GUI {
                 Double.MIN_VALUE};
         panel.setLayout(gbl_panel);
 
-        JComboBox<String> comboBox = new JComboBox<String>();
+        JComboBox<String> comboBox = new JComboBox<>();
         comboBox.setEnabled(false);
         GridBagConstraints gbc_comboBox = new GridBagConstraints();
         gbc_comboBox.fill = GridBagConstraints.HORIZONTAL;
@@ -342,7 +348,7 @@ public class GUI {
         });
         panel.add(chckbxStringEncryption, gbc_chckbxStringEncryption);
 
-        JComboBox<String> comboBox_1 = new JComboBox<String>();
+        JComboBox<String> comboBox_1 = new JComboBox<>();
         comboBox_1.setEnabled(false);
         GridBagConstraints gbc_comboBox_1 = new GridBagConstraints();
         gbc_comboBox_1.fill = GridBagConstraints.HORIZONTAL;
@@ -377,7 +383,7 @@ public class GUI {
 
         panel.add(chckbxInvokeDynamic, gbc_chckbxNewCheckBox_1);
 
-        JComboBox<String> comboBox_2 = new JComboBox<String>();
+        JComboBox<String> comboBox_2 = new JComboBox<>();
         comboBox_2.setEnabled(false);
         GridBagConstraints gbc_comboBox_2 = new GridBagConstraints();
         gbc_comboBox_2.fill = GridBagConstraints.HORIZONTAL;
@@ -412,7 +418,7 @@ public class GUI {
         });
         panel.add(chckbxFlow, gbc_chckbxFlow);
 
-        JComboBox<String> comboBox_3 = new JComboBox<String>();
+        JComboBox<String> comboBox_3 = new JComboBox<>();
         comboBox_3.setEnabled(false);
         GridBagConstraints gbc_comboBox_3 = new GridBagConstraints();
         gbc_comboBox_3.fill = GridBagConstraints.HORIZONTAL;
@@ -991,6 +997,26 @@ public class GUI {
         gbc_chckbxDictionary.gridy = 5;
         otherPanel.add(chckbxDictionary, gbc_chckbxDictionary);
 
+        JButton garbageCollector = new JButton("GC");
+        GridBagConstraints gbc_garbageCollector = new GridBagConstraints();
+        gbc_garbageCollector.fill = GridBagConstraints.HORIZONTAL;
+        gbc_garbageCollector.insets = new Insets(0, 0, 5, 5);
+        gbc_garbageCollector.gridx = 11;
+        gbc_garbageCollector.gridy = 6;
+        garbageCollector.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        JOptionPane.showMessageDialog(null, ((Runtime.getRuntime().maxMemory() / 1000000) - (Runtime.getRuntime().freeMemory() / 1000000)) + "mb in use before garbage collector.");
+                        System.gc();
+                    }
+                });
+            }
+        });
+        otherPanel.add(garbageCollector, gbc_garbageCollector);
+
         JPanel panel_3 = new JPanel();
         tabbedPane.addTab("Exempt", null, panel_3, null);
         GridBagLayout gbl_panel_3 = new GridBagLayout();
@@ -1013,7 +1039,7 @@ public class GUI {
         String[] options = {"Class", "Method", "Field", "StringEncryption", "InvokeDynamic",
                 "Flow", "LocalVars", "SourceName", "SourceDebug", "LineNumbers", "StringPool",
                 "Crasher", "HideCode", "Numbers", "Shuffler", "InnerClasses", "Renamer",
-        "Expiry"};
+                "Expiry"};
 
         for (String s : options) {
             comboBox_04.addItem(s);
@@ -1029,10 +1055,10 @@ public class GUI {
         gbc_scrollPane_1.gridy = 1;
         panel_3.add(scrollPane_1, gbc_scrollPane_1);
 
-        DefaultListModel<String> exemptList = new DefaultListModel<String>();
+        DefaultListModel<String> exemptList = new DefaultListModel<>();
 
         JList<String> list = new JList<>(exemptList);
-        list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        list.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         scrollPane_1.setViewportView(list);
         panel_3.add(comboBox_04, gbc_comboBox_04);
 
@@ -1121,10 +1147,12 @@ public class GUI {
         btnNewButton_3.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (list.getSelectedIndex() != -1) {
-                    if (list.getSelectedIndices().length == 1) {
-                        exemptList.remove(list.getSelectedIndex());
-                    }
+                List<String> removeList = list.getSelectedValuesList();
+                if (removeList.isEmpty())
+                    return;
+
+                for (String s : removeList) {
+                    exemptList.removeElement(s);
                 }
             }
         });
