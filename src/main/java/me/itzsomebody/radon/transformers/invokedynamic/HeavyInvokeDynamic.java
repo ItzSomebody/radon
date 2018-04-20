@@ -70,9 +70,10 @@ public class HeavyInvokeDynamic extends AbstractTransformer {
                         boolean isStatic = (methodInsnNode.getOpcode() == INVOKESTATIC);
                         String newSig =
                                 isStatic ? methodInsnNode.desc : methodInsnNode.desc.replace("(", "(Ljava/lang/Object;");
+                        Type returnType = Type.getReturnType(methodInsnNode.desc);
                         switch (methodInsnNode.getOpcode()) {
-                            case INVOKESTATIC: // invokestatic opcode
-                                methodNode.instructions.set(insn, new InvokeDynamicInsnNode(
+                            case INVOKESTATIC: {// invokestatic opcode
+                                InvokeDynamicInsnNode indy = new InvokeDynamicInsnNode(
                                         StringUtils.randomString(this.dictionary),
                                         newSig,
                                         bsmHandle,
@@ -80,12 +81,17 @@ public class HeavyInvokeDynamic extends AbstractTransformer {
                                         this.STATIC_INVOCATION,
                                         this.encOwner(methodInsnNode.owner.replaceAll("/", ".")),
                                         this.encName(methodInsnNode.name),
-                                        this.encDesc(methodInsnNode.desc)));
+                                        this.encDesc(methodInsnNode.desc));
+                                methodNode.instructions.set(insn, indy);
+                                if (returnType.getSort() == Type.ARRAY) {
+                                    methodNode.instructions.insert(indy, new TypeInsnNode(CHECKCAST, returnType.getInternalName()));
+                                }
                                 counter.incrementAndGet();
                                 break;
+                            }
                             case INVOKEVIRTUAL: // invokevirtual opcode
-                            case INVOKEINTERFACE: // invokeinterface opcode
-                                methodNode.instructions.set(insn, new InvokeDynamicInsnNode(
+                            case INVOKEINTERFACE: {// invokeinterface opcode
+                                InvokeDynamicInsnNode indy = new InvokeDynamicInsnNode(
                                         StringUtils.randomString(this.dictionary),
                                         newSig,
                                         bsmHandle,
@@ -93,11 +99,17 @@ public class HeavyInvokeDynamic extends AbstractTransformer {
                                         this.VIRTUAL_INVOCATION,
                                         this.encOwner(methodInsnNode.owner.replaceAll("/", ".")),
                                         this.encName(methodInsnNode.name),
-                                        this.encDesc(methodInsnNode.desc)));
+                                        this.encDesc(methodInsnNode.desc));
+                                methodNode.instructions.set(insn, indy);
+                                if (returnType.getSort() == Type.ARRAY) {
+                                    methodNode.instructions.insert(indy, new TypeInsnNode(CHECKCAST, returnType.getInternalName()));
+                                }
                                 counter.incrementAndGet();
                                 break;
-                            default:
+                            }
+                            default: {
                                 break;
+                            }
                         }
                     } else if (insn instanceof FieldInsnNode) {
                         FieldInsnNode fieldInsnNode = (FieldInsnNode) insn;
@@ -116,8 +128,9 @@ public class HeavyInvokeDynamic extends AbstractTransformer {
                         Type type = Type.getType(fieldInsnNode.desc);
                         String wrappedDescription = type.getClassName();
                         switch (fieldInsnNode.getOpcode()) {
-                            case GETFIELD:
-                                methodNode.instructions.set(insn, new InvokeDynamicInsnNode(
+                            case GETFIELD: {
+                                Type returnType = Type.getType(fieldInsnNode.desc);
+                                InvokeDynamicInsnNode indy = new InvokeDynamicInsnNode(
                                         StringUtils.randomString(this.dictionary),
                                         newSig,
                                         bsmHandle,
@@ -125,11 +138,17 @@ public class HeavyInvokeDynamic extends AbstractTransformer {
                                         this.VIRTUAL_GETTER,
                                         this.encOwner(fieldInsnNode.owner.replaceAll("/", ".")),
                                         this.encName(fieldInsnNode.name),
-                                        this.encDesc(wrappedDescription)));
+                                        this.encDesc(wrappedDescription));
+                                methodNode.instructions.set(insn, indy);
+                                if (returnType.getSort() == Type.ARRAY) {
+                                    methodNode.instructions.insert(indy, new TypeInsnNode(CHECKCAST, returnType.getInternalName()));
+                                }
                                 counter.incrementAndGet();
                                 break;
-                            case GETSTATIC:
-                                methodNode.instructions.set(insn, new InvokeDynamicInsnNode(
+                            }
+                            case GETSTATIC: {
+                                Type returnType = Type.getType(fieldInsnNode.desc);
+                                InvokeDynamicInsnNode indy = new InvokeDynamicInsnNode(
                                         StringUtils.randomString(this.dictionary),
                                         newSig,
                                         bsmHandle,
@@ -137,10 +156,15 @@ public class HeavyInvokeDynamic extends AbstractTransformer {
                                         this.STATIC_GETTER,
                                         this.encOwner(fieldInsnNode.owner.replaceAll("/", ".")),
                                         this.encName(fieldInsnNode.name),
-                                        this.encDesc(wrappedDescription)));
+                                        this.encDesc(wrappedDescription));
+                                methodNode.instructions.set(insn, indy);
+                                if (returnType.getSort() == Type.ARRAY) {
+                                    methodNode.instructions.insert(indy, new TypeInsnNode(CHECKCAST, returnType.getInternalName()));
+                                }
                                 counter.incrementAndGet();
                                 break;
-                            case PUTFIELD:
+                            }
+                            case PUTFIELD: {
                                 methodNode.instructions.set(insn, new InvokeDynamicInsnNode(
                                         StringUtils.randomString(this.dictionary),
                                         newSig,
@@ -152,7 +176,8 @@ public class HeavyInvokeDynamic extends AbstractTransformer {
                                         this.encDesc(wrappedDescription)));
                                 counter.incrementAndGet();
                                 break;
-                            case PUTSTATIC:
+                            }
+                            case PUTSTATIC: {
                                 methodNode.instructions.set(insn, new InvokeDynamicInsnNode(
                                         StringUtils.randomString(this.dictionary),
                                         newSig,
@@ -164,8 +189,10 @@ public class HeavyInvokeDynamic extends AbstractTransformer {
                                         this.encDesc(wrappedDescription)));
                                 counter.incrementAndGet();
                                 break;
-                            default:
+                            }
+                            default: {
                                 break;
+                            }
                         }
                     }
                 }

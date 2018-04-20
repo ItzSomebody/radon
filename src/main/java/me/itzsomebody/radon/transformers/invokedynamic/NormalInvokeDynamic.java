@@ -2,6 +2,7 @@ package me.itzsomebody.radon.transformers.invokedynamic;
 
 import org.objectweb.asm.Handle;
 import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
 import me.itzsomebody.radon.methods.InvokeDynamicBSM;
 import me.itzsomebody.radon.transformers.AbstractTransformer;
@@ -57,16 +58,21 @@ public class NormalInvokeDynamic extends AbstractTransformer {
 
                         String newSig =
                                 isStatic ? methodInsnNode.desc : methodInsnNode.desc.replace("(", "(Ljava/lang/Object;");
+                        Type returnType = Type.getReturnType(methodInsnNode.desc);
                         int opcode = (isStatic) ? this.STATIC_INVOCATION : this.VIRTUAL_INVOCATION;
 
-                        methodNode.instructions.set(insn, new InvokeDynamicInsnNode(
+                        InvokeDynamicInsnNode indy = new InvokeDynamicInsnNode(
                                 StringUtils.randomString(this.dictionary),
                                 newSig,
                                 bsmHandle,
                                 opcode,
                                 encryptOwner(methodInsnNode.owner.replaceAll("/", ".")),
                                 encryptName(methodInsnNode.name),
-                                encryptDesc(methodInsnNode.desc)));
+                                encryptDesc(methodInsnNode.desc));
+                        methodNode.instructions.set(insn, indy);
+                        if (returnType.getSort() == Type.ARRAY) {
+                            methodNode.instructions.insert(indy, new TypeInsnNode(CHECKCAST, returnType.getInternalName()));
+                        }
                         counter.incrementAndGet();
                     }
                 }

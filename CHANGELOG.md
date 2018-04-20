@@ -1,3 +1,7 @@
+## 0.6.1
+
+* Fixed an issue with the invokedynamic transformers which sometimes caused programs to crash with an access exception.
+
 ## 0.6.0
 
 * Added GUI console for GUI users.
