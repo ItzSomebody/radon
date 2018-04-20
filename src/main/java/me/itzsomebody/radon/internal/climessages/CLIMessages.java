@@ -29,6 +29,6 @@ public class CLIMessages {
         LoggerUtils.stdOut("Help Menu:\t\tjava -jar Radon.jar --help");
         LoggerUtils.stdOut("Watermark Extraction:\tjava -jar Radon.jar " +
                 "--extract Input.jar exampleKey");
-        LoggerUtils.stdOut("GUI Usage:\t\tjava -jar Radon.jar");
+        LoggerUtils.stdOut("MainGUI Usage:\t\tjava -jar Radon.jar");
     }
 }

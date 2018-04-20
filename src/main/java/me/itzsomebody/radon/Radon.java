@@ -1,7 +1,6 @@
 package me.itzsomebody.radon;
 
-import me.itzsomebody.radon.gui.GUI;
-import me.itzsomebody.radon.internal.Bootstrap;
+import me.itzsomebody.radon.gui.MainGUI;
 import me.itzsomebody.radon.internal.CLI;
 import me.itzsomebody.radon.utils.LoggerUtils;
 
@@ -15,7 +14,7 @@ public class Radon {
      * Static abuse variables xD
      */
     public static String PREFIX = "[Radon]";
-    public static String VERSION = "0.5.4";
+    public static String VERSION = "0.6.0";
     public static String AUTHORS = "ItzSomebody";
 
     /**
@@ -28,7 +27,7 @@ public class Radon {
 
         switch (args.length) {
             case 0:
-                new GUI();
+                new MainGUI();
                 break;
             default:
                 new CLI(args);

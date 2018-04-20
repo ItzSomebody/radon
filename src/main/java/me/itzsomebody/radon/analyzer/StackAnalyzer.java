@@ -62,7 +62,7 @@ public class StackAnalyzer implements Opcodes {
             AbstractInsnNode insn = this.methodNode.instructions.get(i);
             if (insn instanceof LabelNode
                     && excHandlers.contains(insn)) {
-                stack.clear(); // Stack gets cleared an exception is pushed.
+                stack.clear(); // Stack gets cleared and exception is pushed.
                 stack.push(null);
             }
             if (this.breakPoint == insn)

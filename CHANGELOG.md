@@ -1,3 +1,7 @@
+## 0.6.0
+
+* Added GUI console for GUI users.
+
 ## 0.5.4
 
 * GUI updates:

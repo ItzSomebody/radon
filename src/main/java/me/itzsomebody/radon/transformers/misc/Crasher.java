@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * Transformer that applies a crashing technique by exploiting class signature parsing.
  * <p>
  * Crashes:
- * - JD-GUI
+ * - JD-MainGUI
  * - ProCyon
  * - CFR
  * </p>

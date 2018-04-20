@@ -13,7 +13,6 @@ import me.itzsomebody.radon.config.Config;
 import me.itzsomebody.radon.transformers.*;
 import me.itzsomebody.radon.utils.*;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -125,7 +124,7 @@ public class Bootstrap { // Eyyy bootstrap bill
     }
 
     /**
-     * Constructor used for GUI to create a {@link Bootstrap} object.
+     * Constructor used for MainGUI to create a {@link Bootstrap} object.
      *
      * @param input         the input {@link File}.
      * @param output        the output {@link File}.
