@@ -1,4 +1,4 @@
-**Which version of Radon are you using?**
+**Which version of Radon are you using? (Do not say "latest", if you do, your issue will be immediately closed)**
 
 **What kind of Jar file did you obfuscate?**
 
