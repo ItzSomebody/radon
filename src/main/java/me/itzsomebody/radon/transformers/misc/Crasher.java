@@ -9,7 +9,7 @@ import me.itzsomebody.radon.utils.StringUtils;
  * Transformer that applies a crashing technique by exploiting class signature parsing.
  * <p>
  * Crashes:
- * - JD-MainGUI
+ * - JD-GUI
  * - ProCyon
  * - CFR
  * </p>
