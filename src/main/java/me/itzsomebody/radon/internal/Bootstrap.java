@@ -235,41 +235,41 @@ public class Bootstrap { // Eyyy bootstrap bill
             this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
             this.logStrings.add(LoggerUtils.stdOut("Writing classes to output"));
             for (ClassNode classNode : this.classes.values()) {
-                ClassWriter cw = new CustomClassWriter(ClassWriter.COMPUTE_FRAMES);
+                ClassWriter cw;
 
-                if (this.watermarkMsg != null) {
-                    if (this.watermarkType == 0
-                            && NumberUtils.getRandomInt(10) >= 5) {
-                        cw.newUTF8("WMID: "
-                                + StringUtils.aesEncrypt(this.watermarkMsg, this.watermarkKey));
-
-                        this.logStrings.add(LoggerUtils.stdOut("Watermarking "
-                                + this.watermarkMsg + " into " + classNode.name));
-                    } else if (this.watermarkType == 1
-                            && NumberUtils.getRandomInt(10) >= 5) {
-                        classNode.signature =
-                                StringUtils.aesEncrypt("WMID: " + this.watermarkMsg,
-                                        this.watermarkKey);
-
-                        this.logStrings.add(LoggerUtils.stdOut("Watermarking "
-                                + this.watermarkMsg + " into " + classNode.name));
-                    }
+                if (classNode.version > Opcodes.V1_5) {
+                    cw = new CustomClassWriter(ClassWriter.COMPUTE_FRAMES);
+                } else {
+                    cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
                 }
 
-                cw.newUTF8("RADON" + Radon.VERSION); // :D
                 try {
                     classNode.accept(cw);
-                } catch (Throwable t) {
-                    if (t.getMessage() != null
-                            && t.getMessage().contains("JSR/RET")) {
-                        cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
-                        classNode.accept(cw);
-                    } else {
-                        this.logStrings.add(LoggerUtils
-                                .stdOut("Error while writing "
-                                        + classNode.name + " -> " + t.getMessage()));
-                        throw t;
+                    if (this.watermarkMsg != null) {
+                        if (this.watermarkType == 0
+                                && NumberUtils.getRandomInt(10) >= 5) {
+                            cw.newUTF8("WMID: "
+                                    + StringUtils.aesEncrypt(this.watermarkMsg, this.watermarkKey));
+
+                            this.logStrings.add(LoggerUtils.stdOut("Watermarking "
+                                    + this.watermarkMsg + " into " + classNode.name));
+                        } else if (this.watermarkType == 1
+                                && NumberUtils.getRandomInt(10) >= 5) {
+                            classNode.signature =
+                                    StringUtils.aesEncrypt("WMID: " + this.watermarkMsg,
+                                            this.watermarkKey);
+
+                            this.logStrings.add(LoggerUtils.stdOut("Watermarking "
+                                    + this.watermarkMsg + " into " + classNode.name));
+                        }
                     }
+
+                    cw.newUTF8("RADON" + Radon.VERSION); // :D
+                } catch (Throwable t) {
+                    this.logStrings.add(LoggerUtils
+                            .stdOut("Error while writing "
+                                    + classNode.name + " -> " + t.getMessage()));
+                    throw t;
                 }
 
                 ZipEntry newEntry = new ZipEntry(classNode.name
