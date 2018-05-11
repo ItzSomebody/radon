@@ -1,3 +1,8 @@
+## 0.7.0
+
+* Completely rewrote StackAnalyzer.
+* Changed some internals.
+
 ## 0.6.1
 
 * Fixed an issue with the invokedynamic transformers which sometimes caused programs to crash with an access exception.
