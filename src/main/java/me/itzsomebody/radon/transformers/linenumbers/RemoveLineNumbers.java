@@ -1,13 +1,11 @@
 package me.itzsomebody.radon.transformers.linenumbers;
 
-import org.objectweb.asm.tree.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import me.itzsomebody.radon.transformers.AbstractTransformer;
 import me.itzsomebody.radon.utils.BytecodeUtils;
 import me.itzsomebody.radon.utils.LoggerUtils;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
+import org.objectweb.asm.tree.AbstractInsnNode;
+import org.objectweb.asm.tree.LineNumberNode;
 
 /**
  * Transformer that applies a line number obfuscation by removing them.

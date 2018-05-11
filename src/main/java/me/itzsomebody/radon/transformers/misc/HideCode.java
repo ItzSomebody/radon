@@ -1,10 +1,9 @@
 package me.itzsomebody.radon.transformers.misc;
 
+import java.util.concurrent.atomic.AtomicInteger;
 import me.itzsomebody.radon.transformers.AbstractTransformer;
 import me.itzsomebody.radon.utils.BytecodeUtils;
 import me.itzsomebody.radon.utils.LoggerUtils;
-
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Transformer that applies a code hiding technique by applying synthetic modifiers to the class, fields, and methods.

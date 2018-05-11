@@ -1,10 +1,10 @@
 package me.itzsomebody.radon.templates;
 
-import javax.crypto.*;
-import javax.crypto.spec.SecretKeySpec;
 import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.Base64;
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
 
 public class HeavyStringEncryption {
     public static String decrypt(Object strToDecrypt, Object random, Object secret) {

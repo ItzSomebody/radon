@@ -1,10 +1,9 @@
 package me.itzsomebody.radon.transformers.misc;
 
-import me.itzsomebody.radon.transformers.AbstractTransformer;
-import me.itzsomebody.radon.utils.LoggerUtils;
-
 import java.util.Collections;
 import java.util.concurrent.atomic.AtomicInteger;
+import me.itzsomebody.radon.transformers.AbstractTransformer;
+import me.itzsomebody.radon.utils.LoggerUtils;
 
 /**
  * Transformer which shuffles class members.

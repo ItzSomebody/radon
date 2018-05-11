@@ -1,9 +1,12 @@
 package me.itzsomebody.radon.methods;
 
+import me.itzsomebody.radon.transformers.stringencryption.HeavyStringEncryption;
+import me.itzsomebody.radon.transformers.stringencryption.LightStringEncryption;
+import me.itzsomebody.radon.transformers.stringencryption.NormalStringEncryption;
+import me.itzsomebody.radon.transformers.stringencryption.SuperLightStringEncryption;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.MethodNode;
-import me.itzsomebody.radon.transformers.stringencryption.*;
 
 /**
  * Class containing {@link MethodNode}s needed to decrypt a {@link String} for the

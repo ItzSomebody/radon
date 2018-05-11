@@ -1,16 +1,18 @@
 package me.itzsomebody.radon.transformers.invokedynamic;
 
-import org.objectweb.asm.Handle;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
-import org.objectweb.asm.tree.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import me.itzsomebody.radon.methods.InvokeDynamicBSM;
 import me.itzsomebody.radon.transformers.AbstractTransformer;
 import me.itzsomebody.radon.utils.BytecodeUtils;
 import me.itzsomebody.radon.utils.LoggerUtils;
 import me.itzsomebody.radon.utils.StringUtils;
-
-import java.util.concurrent.atomic.AtomicInteger;
+import org.objectweb.asm.Handle;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
+import org.objectweb.asm.tree.AbstractInsnNode;
+import org.objectweb.asm.tree.InvokeDynamicInsnNode;
+import org.objectweb.asm.tree.MethodInsnNode;
+import org.objectweb.asm.tree.TypeInsnNode;
 
 /**
  * Transformer that applies an InvokeDynamic which attempts to prevent

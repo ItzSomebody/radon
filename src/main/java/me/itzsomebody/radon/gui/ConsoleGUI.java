@@ -1,12 +1,11 @@
 package me.itzsomebody.radon.gui;
 
-import me.itzsomebody.radon.Radon;
-
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.PrintStream;
+import javax.swing.*;
+import me.itzsomebody.radon.Radon;
 
 /**
  * Makes a "console" GUI so users can see log events when they use the
@@ -69,10 +68,11 @@ public class ConsoleGUI {
                 thisFrame.dispose();
             }
         });
-        this.thisFrame.setBounds(400, 400, 400, 400);
+        this.thisFrame.setBounds(400, 400, 600, 400);
 
         this.consolePanel = new JPanel(new BorderLayout());
         this.consoleOutput = new JTextArea();
+        this.consoleOutput.setFont(new Font("Arial", Font.PLAIN, 12));
         this.consoleOutput.setEditable(false);
         this.consoleScrollPane = new JScrollPane(this.consoleOutput);
         this.consolePanel.add(this.consoleScrollPane, "Center");

@@ -1,12 +1,14 @@
 package me.itzsomebody.radon.transformers;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import me.itzsomebody.radon.utils.CustomRegexUtils;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.commons.CodeSizeEvaluator;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
-import me.itzsomebody.radon.utils.CustomRegexUtils;
-
-import java.util.*;
 
 /**
  * Abstract class used to make transformers.

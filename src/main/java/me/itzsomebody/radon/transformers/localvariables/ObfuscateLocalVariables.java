@@ -1,12 +1,9 @@
 package me.itzsomebody.radon.transformers.localvariables;
 
+import java.util.concurrent.atomic.AtomicInteger;
 import me.itzsomebody.radon.transformers.AbstractTransformer;
 import me.itzsomebody.radon.utils.LoggerUtils;
 import me.itzsomebody.radon.utils.StringUtils;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Transformer that applies a local variable obfuscation by changing the names.

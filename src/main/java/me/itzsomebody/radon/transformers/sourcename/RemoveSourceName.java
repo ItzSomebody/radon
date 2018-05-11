@@ -1,11 +1,8 @@
 package me.itzsomebody.radon.transformers.sourcename;
 
+import java.util.concurrent.atomic.AtomicInteger;
 import me.itzsomebody.radon.transformers.AbstractTransformer;
 import me.itzsomebody.radon.utils.LoggerUtils;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Transformer that obfuscates the source name attribute by removing the

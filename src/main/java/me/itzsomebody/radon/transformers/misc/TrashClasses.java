@@ -1,11 +1,22 @@
 package me.itzsomebody.radon.transformers.misc;
 
+import me.itzsomebody.radon.utils.NumberUtils;
+import me.itzsomebody.radon.utils.StringUtils;
 import org.objectweb.asm.Handle;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.tree.*;
-import me.itzsomebody.radon.utils.NumberUtils;
-import me.itzsomebody.radon.utils.StringUtils;
+import org.objectweb.asm.tree.AbstractInsnNode;
+import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.FieldInsnNode;
+import org.objectweb.asm.tree.IincInsnNode;
+import org.objectweb.asm.tree.InsnList;
+import org.objectweb.asm.tree.InsnNode;
+import org.objectweb.asm.tree.IntInsnNode;
+import org.objectweb.asm.tree.InvokeDynamicInsnNode;
+import org.objectweb.asm.tree.LdcInsnNode;
+import org.objectweb.asm.tree.MethodInsnNode;
+import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.tree.VarInsnNode;
 
 /**
  * Not really a transformer. This "transformer" generates trash classes full

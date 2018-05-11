@@ -1,11 +1,10 @@
 package me.itzsomebody.radon.transformers.renamer;
 
+import java.util.HashSet;
+import java.util.Set;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.MethodNode;
-
-import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Specifies subclasses and parents of a class.

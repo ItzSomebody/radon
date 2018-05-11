@@ -1,18 +1,16 @@
 package me.itzsomebody.radon.transformers.stringencryption;
 
+import java.util.concurrent.atomic.AtomicInteger;
 import me.itzsomebody.radon.methods.StringEncryption;
 import me.itzsomebody.radon.transformers.AbstractTransformer;
 import me.itzsomebody.radon.utils.BytecodeUtils;
 import me.itzsomebody.radon.utils.LoggerUtils;
-import me.itzsomebody.radon.utils.NumberUtils;
 import me.itzsomebody.radon.utils.StringUtils;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
-
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class HeavyStringEncryption extends AbstractTransformer {
     /**

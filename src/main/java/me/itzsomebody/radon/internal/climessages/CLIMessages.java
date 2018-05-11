@@ -1,6 +1,5 @@
 package me.itzsomebody.radon.internal.climessages;
 
-import me.itzsomebody.radon.Radon;
 import me.itzsomebody.radon.utils.LoggerUtils;
 
 /**

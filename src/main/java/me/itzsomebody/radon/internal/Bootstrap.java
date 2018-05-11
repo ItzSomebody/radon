@@ -1,26 +1,32 @@
 package me.itzsomebody.radon.internal;
 
-import me.itzsomebody.radon.Radon;
-import me.itzsomebody.radon.transformers.misc.Expiry;
-import me.itzsomebody.radon.transformers.misc.TrashClasses;
-import me.itzsomebody.radon.transformers.renamer.Renamer;
-import org.apache.commons.io.IOUtils;
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.tree.*;
-import me.itzsomebody.radon.config.Config;
-import me.itzsomebody.radon.transformers.*;
-import me.itzsomebody.radon.utils.*;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
+import me.itzsomebody.radon.Radon;
+import me.itzsomebody.radon.config.Config;
+import me.itzsomebody.radon.transformers.AbstractTransformer;
+import me.itzsomebody.radon.transformers.misc.Expiry;
+import me.itzsomebody.radon.transformers.misc.TrashClasses;
+import me.itzsomebody.radon.transformers.renamer.Renamer;
+import me.itzsomebody.radon.utils.FileUtils;
+import me.itzsomebody.radon.utils.LoggerUtils;
+import me.itzsomebody.radon.utils.NumberUtils;
+import me.itzsomebody.radon.utils.StringUtils;
+import org.apache.commons.io.IOUtils;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.tree.ClassNode;
 
 /**
  * Bootstraps and runs the obfuscation process.

@@ -2,7 +2,6 @@ package me.itzsomebody.radon.utils;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.zip.ZipOutputStream;
 
 /**
@@ -37,7 +36,7 @@ public class FileUtils {
     /**
      * Writes a bytes to a {@link ZipOutputStream}.
      *
-     * @param zos the {@link ZipOutputStream} to write to.
+     * @param zos  the {@link ZipOutputStream} to write to.
      * @param data bytes to write to output
      * @throws IOException if an error happens while writing to output stream.
      */

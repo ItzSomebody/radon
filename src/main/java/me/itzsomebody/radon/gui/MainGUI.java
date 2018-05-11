@@ -1,9 +1,20 @@
 package me.itzsomebody.radon.gui;
 
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import javax.swing.*;
 import me.itzsomebody.radon.Radon;
 import me.itzsomebody.radon.config.Config;
 import me.itzsomebody.radon.internal.Bootstrap;
-import me.itzsomebody.radon.transformers.*;
+import me.itzsomebody.radon.transformers.AbstractTransformer;
 import me.itzsomebody.radon.transformers.flow.LightFlowObfuscation;
 import me.itzsomebody.radon.transformers.flow.NormalFlowObfuscation;
 import me.itzsomebody.radon.transformers.invokedynamic.HeavyInvokeDynamic;
@@ -13,7 +24,13 @@ import me.itzsomebody.radon.transformers.linenumbers.ObfuscateLineNumbers;
 import me.itzsomebody.radon.transformers.linenumbers.RemoveLineNumbers;
 import me.itzsomebody.radon.transformers.localvariables.ObfuscateLocalVariables;
 import me.itzsomebody.radon.transformers.localvariables.RemoveLocalVariables;
-import me.itzsomebody.radon.transformers.misc.*;
+import me.itzsomebody.radon.transformers.misc.Crasher;
+import me.itzsomebody.radon.transformers.misc.Expiry;
+import me.itzsomebody.radon.transformers.misc.HideCode;
+import me.itzsomebody.radon.transformers.misc.InnerClassRemover;
+import me.itzsomebody.radon.transformers.misc.NumberObfuscation;
+import me.itzsomebody.radon.transformers.misc.Shuffler;
+import me.itzsomebody.radon.transformers.misc.StringPool;
 import me.itzsomebody.radon.transformers.renamer.Renamer;
 import me.itzsomebody.radon.transformers.sourcedebug.ObfuscateSourceDebug;
 import me.itzsomebody.radon.transformers.sourcedebug.RemoveSourceDebug;
@@ -24,24 +41,6 @@ import me.itzsomebody.radon.transformers.stringencryption.LightStringEncryption;
 import me.itzsomebody.radon.transformers.stringencryption.NormalStringEncryption;
 import me.itzsomebody.radon.transformers.stringencryption.SuperLightStringEncryption;
 import me.itzsomebody.radon.utils.WatermarkUtils;
-
-import javax.swing.*;
-import java.awt.BorderLayout;
-import java.awt.GridBagLayout;
-import java.awt.GridBagConstraints;
-
-import java.awt.Insets;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
-import java.awt.Font;
 
 
 /**
@@ -1279,201 +1278,6 @@ public class MainGUI {
                 }
                 btnObfuscate.setText("Processing...");
                 btnObfuscate.setEnabled(false);
-                /*SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        File output = null;
-                        try {
-
-                            HashMap<String, File> libs = new HashMap<>();
-                            for (int i = 0; i < libList.getSize(); i++) {
-                                libs.put(libList.get(i), new File(libList.get(i)));
-                            }
-
-                            File input = new File(inputField.getText());
-                            if (!input.exists()) {
-                                JOptionPane.showMessageDialog(null,
-                                        "Input JAR does not exist.",
-                                        "Error", JOptionPane.ERROR_MESSAGE);
-                                return;
-                            }
-                            output = new File(outputField.getText());
-
-                            int trashChance;
-                            try {
-                                trashChance =
-                                        Integer.valueOf(trashChanceField.getText());
-                            } catch (Throwable t) {
-                                JOptionPane.showMessageDialog(null,
-                                        "Please enter numbers only for the " +
-                                                "number of desired trash " +
-                                                "classes.", "Error",
-                                        JOptionPane.ERROR_MESSAGE);
-                                return;
-                            }
-                            List<String> exempts = new ArrayList<>();
-                            for (int i = 0; i < exemptList.size(); i++) {
-                                exempts.add(exemptList.get(i));
-                            }
-                            boolean spigotMode = chckbxSpigotPlugin.isSelected();
-                            List<AbstractTransformer> transformers
-                                    = new ArrayList<>();
-
-                            if (chckbxClassRenammer.isSelected()) {
-                                transformers.add(new Renamer(spigotMode));
-                            }
-                            if (chckbxInnerClasses.isSelected()) {
-                                transformers.add(new InnerClassRemover());
-                            }
-                            if (chckbxNumberObfuscation.isSelected()) {
-                                transformers.add(new NumberObfuscation());
-                            }
-                            if (chckbxInvokeDynamic.isSelected()) {
-                                switch (comboBox_1.getSelectedIndex()) {
-                                    case 0:
-                                        transformers.add(new LightInvokeDynamic());
-                                        break;
-                                    case 1:
-                                        transformers.add(new NormalInvokeDynamic());
-                                        break;
-                                    case 2:
-                                        transformers.add(new HeavyInvokeDynamic());
-                                        break;
-                                }
-                            }
-                            if (chckbxAddExpiration.isSelected()) {
-                                if (!expirationDateField.getText().isEmpty()
-                                        && !expirationMessageField.getText()
-                                        .isEmpty()) {
-                                    long expireTime =
-                                            new SimpleDateFormat("MM/dd/yyyy")
-                                                    .parse(expirationDateField
-                                                            .getText()).getTime();
-                                    transformers.add(new Expiry(expireTime,
-                                            expirationMessageField.getText()));
-                                }
-                            }
-                            if (chckbxStringEncryption.isSelected()) {
-                                switch (comboBox.getSelectedIndex()) {
-                                    case 0:
-                                        transformers.add(new SuperLightStringEncryption(spigotMode));
-                                        break;
-                                    case 1:
-                                        transformers.add(new LightStringEncryption(spigotMode));
-                                        break;
-                                    case 2:
-                                        transformers.add(new NormalStringEncryption(spigotMode));
-                                        break;
-                                    case 3:
-                                        transformers.add(new HeavyStringEncryption(spigotMode));
-                                        break;
-                                }
-                            }
-                            if (chckbxFlow.isSelected()) {
-                                switch (comboBox_2.getSelectedIndex()) {
-                                    case 0:
-                                        transformers.add(new LightFlowObfuscation());
-                                        break;
-                                    case 1:
-                                        transformers.add(new NormalFlowObfuscation());
-                                        break;
-                                }
-                            }
-                            if (chckbxSpringPool.isSelected()) {
-                                transformers.add(new StringPool());
-                            }
-                            if (chckbxShuffler.isSelected()) {
-                                transformers.add(new Shuffler());
-                            }
-                            if (chckbxLocalVariables.isSelected()) {
-                                switch (comboBox_3.getSelectedIndex()) {
-                                    case 0:
-                                        transformers.add(new ObfuscateLocalVariables());
-                                        break;
-                                    case 1:
-                                        transformers.add(new RemoveLocalVariables());
-                                        break;
-                                }
-                            }
-                            if (chckbxLineObfuscation.isSelected()) {
-                                switch (comboBox_5.getSelectedIndex()) {
-                                    case 0:
-                                        transformers.add(new ObfuscateLineNumbers());
-                                        break;
-                                    case 1:
-                                        transformers.add(new RemoveLineNumbers());
-                                        break;
-                                }
-                            }
-                            if (chckbxSourceName.isSelected()) {
-                                switch (comboBox_123.getSelectedIndex()) {
-                                    case 0:
-                                        transformers.add(new ObfuscateSourceName());
-                                        break;
-                                    case 1:
-                                        transformers.add(new RemoveSourceName());
-                                        break;
-                                }
-                            }
-                            if (chckbxSourceDebug.isSelected()) {
-                                switch (comboBox_1234.getSelectedIndex()) {
-                                    case 0:
-                                        transformers.add(new ObfuscateSourceDebug());
-                                        break;
-                                    case 1:
-                                        transformers.add(new RemoveSourceDebug());
-                                        break;
-                                }
-                            }
-                            if (chckbxCrasher.isSelected()) {
-                                transformers.add(new Crasher());
-                            }
-                            if (chckbxHidecode.isSelected()) {
-                                transformers.add(new HideCode(spigotMode));
-                            }
-
-                            int trashClasses = -1;
-                            if (chckbxTrashClasses.isSelected()) {
-                                trashClasses = trashChance;
-                            }
-
-                            int watermarkType = -1;
-                            if (chckbxAddWatermark.isSelected()) {
-                                watermarkType = comboBox_05.getSelectedIndex();
-                            }
-
-                            int dictionary = dictionaryComboBox.getSelectedIndex();
-
-                            new ConsoleGUI();
-                            Bootstrap bootstrap = new Bootstrap(
-                                    input,
-                                    output,
-                                    libs,
-                                    exempts,
-                                    transformers,
-                                    trashClasses,
-                                    waterMarkMessageField.getText(),
-                                    watermarkType,
-                                    new String(watermarkPassword.getPassword()),
-                                    dictionary);
-                            bootstrap.startTheParty(false);
-                            JOptionPane.showMessageDialog(null,
-                                    "Successfully processed file!",
-                                    "Done", JOptionPane.INFORMATION_MESSAGE);
-                        } catch (Throwable t) {
-                            JOptionPane.showMessageDialog(null, t.getMessage(),
-                                    "Error", JOptionPane.ERROR_MESSAGE);
-                            t.printStackTrace();
-                            if (output != null) {
-                                output.delete();
-                            }
-                        } finally {
-                            btnObfuscate.setEnabled(true);
-                            btnObfuscate.setText("    Process    ");
-                        }
-                    }
-                });*/
-
                 SwingWorker sw = new SwingWorker() {
                     @Override
                     protected Object doInBackground() throws Exception {

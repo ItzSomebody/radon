@@ -1,12 +1,13 @@
 package me.itzsomebody.radon.methods;
 
+import java.lang.invoke.ConstantCallSite;
+import me.itzsomebody.radon.transformers.invokedynamic.HeavyInvokeDynamic;
+import me.itzsomebody.radon.transformers.invokedynamic.LightInvokeDynamic;
+import me.itzsomebody.radon.transformers.invokedynamic.NormalInvokeDynamic;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
-import me.itzsomebody.radon.transformers.invokedynamic.*;
 import org.objectweb.asm.tree.MethodNode;
-
-import java.lang.invoke.ConstantCallSite;
 
 /**
  * That returns methods needed to produce a {@link ConstantCallSite} for
@@ -724,7 +725,7 @@ public class InvokeDynamicBSM implements Opcodes {
         mv.visitMethodInsn(INVOKESPECIAL, "java/lang/BootstrapMethodError", "<init>", "()V", false);
         mv.visitInsn(ATHROW);
         mv.visitLabel(l9);
-        mv.visitFrame(Opcodes.F_APPEND,2, new Object[] {"java/lang/Object", "java/lang/Object"}, 0, null);
+        mv.visitFrame(Opcodes.F_APPEND, 2, new Object[]{"java/lang/Object", "java/lang/Object"}, 0, null);
         mv.visitVarInsn(ALOAD, 3);
         mv.visitVarInsn(ASTORE, 11);
         Label l11 = new Label();
@@ -752,7 +753,7 @@ public class InvokeDynamicBSM implements Opcodes {
         mv.visitJumpInsn(GOTO, l15);
         Label l16 = new Label();
         mv.visitLabel(l16);
-        mv.visitFrame(Opcodes.F_FULL, 16, new Object[] {"java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", Opcodes.TOP, "java/lang/Object", "java/lang/Object", "[C", "[C", Opcodes.INTEGER}, 0, new Object[] {});
+        mv.visitFrame(Opcodes.F_FULL, 16, new Object[]{"java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", Opcodes.TOP, "java/lang/Object", "java/lang/Object", "[C", "[C", Opcodes.INTEGER}, 0, new Object[]{});
         mv.visitVarInsn(ALOAD, 14);
         mv.visitVarInsn(ILOAD, 15);
         mv.visitVarInsn(ALOAD, 13);
@@ -801,7 +802,7 @@ public class InvokeDynamicBSM implements Opcodes {
         mv.visitJumpInsn(GOTO, l23);
         Label l24 = new Label();
         mv.visitLabel(l24);
-        mv.visitFrame(Opcodes.F_FULL, 19, new Object[] {"java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", Opcodes.TOP, "java/lang/Object", "java/lang/Object", "[C", "[C", "java/lang/Class", "[C", "[C", Opcodes.INTEGER}, 0, new Object[] {});
+        mv.visitFrame(Opcodes.F_FULL, 19, new Object[]{"java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", Opcodes.TOP, "java/lang/Object", "java/lang/Object", "[C", "[C", "java/lang/Class", "[C", "[C", Opcodes.INTEGER}, 0, new Object[]{});
         mv.visitVarInsn(ALOAD, 17);
         mv.visitVarInsn(ILOAD, 18);
         mv.visitVarInsn(ALOAD, 16);
@@ -849,7 +850,7 @@ public class InvokeDynamicBSM implements Opcodes {
         mv.visitJumpInsn(GOTO, l31);
         Label l32 = new Label();
         mv.visitLabel(l32);
-        mv.visitFrame(Opcodes.F_FULL, 22, new Object[] {"java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", Opcodes.TOP, "java/lang/Object", "java/lang/Object", "[C", "[C", "java/lang/Class", "[C", "[C", "java/lang/String", "[C", "[C", Opcodes.INTEGER}, 0, new Object[] {});
+        mv.visitFrame(Opcodes.F_FULL, 22, new Object[]{"java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", Opcodes.TOP, "java/lang/Object", "java/lang/Object", "[C", "[C", "java/lang/Class", "[C", "[C", "java/lang/String", "[C", "[C", Opcodes.INTEGER}, 0, new Object[]{});
         mv.visitVarInsn(ALOAD, 20);
         mv.visitVarInsn(ILOAD, 21);
         mv.visitVarInsn(ALOAD, 19);
@@ -883,9 +884,9 @@ public class InvokeDynamicBSM implements Opcodes {
         Label l36 = new Label();
         Label l37 = new Label();
         Label l38 = new Label();
-        mv.visitTableSwitchInsn(0, 1, l38, new Label[] { l36, l37 });
+        mv.visitTableSwitchInsn(0, 1, l38, new Label[]{l36, l37});
         mv.visitLabel(l36);
-        mv.visitFrame(Opcodes.F_FULL, 22, new Object[] {"java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", Opcodes.TOP, "java/lang/Object", "java/lang/Object", "[C", "[C", "java/lang/Class", "[C", "[C", "java/lang/String", "[C", "[C", "java/lang/String"}, 0, new Object[] {});
+        mv.visitFrame(Opcodes.F_FULL, 22, new Object[]{"java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", Opcodes.TOP, "java/lang/Object", "java/lang/Object", "[C", "[C", "java/lang/Class", "[C", "[C", "java/lang/String", "[C", "[C", "java/lang/String"}, 0, new Object[]{});
         mv.visitVarInsn(ALOAD, 4);
         mv.visitVarInsn(ASTORE, 22);
         Label l39 = new Label();
@@ -901,7 +902,7 @@ public class InvokeDynamicBSM implements Opcodes {
         mv.visitMethodInsn(INVOKESTATIC, "java/lang/Class", "forName", "(Ljava/lang/String;)Ljava/lang/Class;", false);
         mv.visitVarInsn(ASTORE, 24);
         mv.visitLabel(l0);
-        mv.visitFrame(Opcodes.F_APPEND,3, new Object[] {"java/lang/Object", "java/lang/reflect/Field", "java/lang/Class"}, 0, null);
+        mv.visitFrame(Opcodes.F_APPEND, 3, new Object[]{"java/lang/Object", "java/lang/reflect/Field", "java/lang/Class"}, 0, null);
         mv.visitVarInsn(ALOAD, 24);
         mv.visitVarInsn(ALOAD, 18);
         mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Class", "getDeclaredField", "(Ljava/lang/String;)Ljava/lang/reflect/Field;", false);
@@ -910,7 +911,7 @@ public class InvokeDynamicBSM implements Opcodes {
         Label l41 = new Label();
         mv.visitJumpInsn(GOTO, l41);
         mv.visitLabel(l2);
-        mv.visitFrame(Opcodes.F_SAME1, 0, null, 1, new Object[] {"java/lang/NoSuchFieldException"});
+        mv.visitFrame(Opcodes.F_SAME1, 0, null, 1, new Object[]{"java/lang/NoSuchFieldException"});
         mv.visitVarInsn(ASTORE, 25);
         Label l42 = new Label();
         mv.visitLabel(l42);
@@ -940,7 +941,7 @@ public class InvokeDynamicBSM implements Opcodes {
         Label l47 = new Label();
         Label l48 = new Label();
         Label l49 = new Label();
-        mv.visitTableSwitchInsn(0, 3, l49, new Label[] { l45, l46, l47, l48 });
+        mv.visitTableSwitchInsn(0, 3, l49, new Label[]{l45, l46, l47, l48});
         mv.visitLabel(l45);
         mv.visitFrame(Opcodes.F_SAME, 0, null, 0, null);
         mv.visitVarInsn(ALOAD, 12);
@@ -1002,7 +1003,7 @@ public class InvokeDynamicBSM implements Opcodes {
         mv.visitLabel(l55);
         mv.visitJumpInsn(GOTO, l51);
         mv.visitLabel(l37);
-        mv.visitFrame(Opcodes.F_CHOP,3, null, 0, null);
+        mv.visitFrame(Opcodes.F_CHOP, 3, null, 0, null);
         mv.visitVarInsn(ALOAD, 4);
         mv.visitVarInsn(ASTORE, 25);
         Label l56 = new Label();
@@ -1020,9 +1021,9 @@ public class InvokeDynamicBSM implements Opcodes {
         Label l58 = new Label();
         Label l59 = new Label();
         Label l60 = new Label();
-        mv.visitTableSwitchInsn(0, 1, l60, new Label[] { l58, l59 });
+        mv.visitTableSwitchInsn(0, 1, l60, new Label[]{l58, l59});
         mv.visitLabel(l58);
-        mv.visitFrame(Opcodes.F_FULL, 27, new Object[] {"java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", Opcodes.TOP, "java/lang/Object", "java/lang/Object", "[C", "[C", "java/lang/Class", "[C", "[C", "java/lang/String", "[C", "[C", "java/lang/String", Opcodes.TOP, Opcodes.TOP, Opcodes.TOP, "java/lang/Object", "java/lang/invoke/MethodType"}, 0, new Object[] {});
+        mv.visitFrame(Opcodes.F_FULL, 27, new Object[]{"java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", Opcodes.TOP, "java/lang/Object", "java/lang/Object", "[C", "[C", "java/lang/Class", "[C", "[C", "java/lang/String", "[C", "[C", "java/lang/String", Opcodes.TOP, Opcodes.TOP, Opcodes.TOP, "java/lang/Object", "java/lang/invoke/MethodType"}, 0, new Object[]{});
         mv.visitVarInsn(ALOAD, 12);
         mv.visitTypeInsn(CHECKCAST, "java/lang/invoke/MethodHandles$Lookup");
         mv.visitVarInsn(ALOAD, 15);
@@ -1053,11 +1054,11 @@ public class InvokeDynamicBSM implements Opcodes {
         mv.visitLabel(l63);
         mv.visitJumpInsn(GOTO, l51);
         mv.visitLabel(l38);
-        mv.visitFrame(Opcodes.F_FULL, 22, new Object[] {"java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", Opcodes.TOP, "java/lang/Object", "java/lang/Object", "[C", "[C", "java/lang/Class", "[C", "[C", "java/lang/String", "[C", "[C", "java/lang/String"}, 0, new Object[] {});
+        mv.visitFrame(Opcodes.F_FULL, 22, new Object[]{"java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", Opcodes.TOP, "java/lang/Object", "java/lang/Object", "[C", "[C", "java/lang/Class", "[C", "[C", "java/lang/String", "[C", "[C", "java/lang/String"}, 0, new Object[]{});
         mv.visitInsn(ACONST_NULL);
         mv.visitVarInsn(ASTORE, 10);
         mv.visitLabel(l51);
-        mv.visitFrame(Opcodes.F_FULL, 22, new Object[] {"java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/invoke/MethodHandle", "java/lang/Object", "java/lang/Object", "[C", "[C", "java/lang/Class", "[C", "[C", "java/lang/String", "[C", "[C", "java/lang/String"}, 0, new Object[] {});
+        mv.visitFrame(Opcodes.F_FULL, 22, new Object[]{"java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/invoke/MethodHandle", "java/lang/Object", "java/lang/Object", "[C", "[C", "java/lang/Class", "[C", "[C", "java/lang/String", "[C", "[C", "java/lang/String"}, 0, new Object[]{});
         mv.visitVarInsn(ALOAD, 10);
         mv.visitVarInsn(ALOAD, 2);
         mv.visitTypeInsn(CHECKCAST, "java/lang/invoke/MethodType");
@@ -1072,7 +1073,7 @@ public class InvokeDynamicBSM implements Opcodes {
         mv.visitLabel(l4);
         mv.visitInsn(ARETURN);
         mv.visitLabel(l5);
-        mv.visitFrame(Opcodes.F_FULL, 13, new Object[] {"java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", Opcodes.TOP, "java/lang/Object", "java/lang/Object"}, 1, new Object[] {"java/lang/Throwable"});
+        mv.visitFrame(Opcodes.F_FULL, 13, new Object[]{"java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", "java/lang/Object", Opcodes.TOP, "java/lang/Object", "java/lang/Object"}, 1, new Object[]{"java/lang/Throwable"});
         mv.visitVarInsn(ASTORE, 13);
         Label l65 = new Label();
         mv.visitLabel(l65);

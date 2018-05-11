@@ -1,7 +1,7 @@
 package me.itzsomebody.radon.gui;
 
-import javax.swing.*;
 import java.io.OutputStream;
+import javax.swing.*;
 
 /**
  * Redirects all PrintStreams to the provided JTextArea.

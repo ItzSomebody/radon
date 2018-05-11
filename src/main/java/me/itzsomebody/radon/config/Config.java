@@ -1,6 +1,15 @@
 package me.itzsomebody.radon.config;
 
-import me.itzsomebody.radon.transformers.*;
+import java.io.File;
+import java.io.InputStream;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import me.itzsomebody.radon.transformers.AbstractTransformer;
 import me.itzsomebody.radon.transformers.flow.HeavyFlowObfuscation;
 import me.itzsomebody.radon.transformers.flow.LightFlowObfuscation;
 import me.itzsomebody.radon.transformers.flow.NormalFlowObfuscation;
@@ -11,7 +20,12 @@ import me.itzsomebody.radon.transformers.linenumbers.ObfuscateLineNumbers;
 import me.itzsomebody.radon.transformers.linenumbers.RemoveLineNumbers;
 import me.itzsomebody.radon.transformers.localvariables.ObfuscateLocalVariables;
 import me.itzsomebody.radon.transformers.localvariables.RemoveLocalVariables;
-import me.itzsomebody.radon.transformers.misc.*;
+import me.itzsomebody.radon.transformers.misc.Crasher;
+import me.itzsomebody.radon.transformers.misc.HideCode;
+import me.itzsomebody.radon.transformers.misc.InnerClassRemover;
+import me.itzsomebody.radon.transformers.misc.NumberObfuscation;
+import me.itzsomebody.radon.transformers.misc.Shuffler;
+import me.itzsomebody.radon.transformers.misc.StringPool;
 import me.itzsomebody.radon.transformers.renamer.Renamer;
 import me.itzsomebody.radon.transformers.sourcedebug.ObfuscateSourceDebug;
 import me.itzsomebody.radon.transformers.sourcedebug.RemoveSourceDebug;
@@ -22,12 +36,6 @@ import me.itzsomebody.radon.transformers.stringencryption.LightStringEncryption;
 import me.itzsomebody.radon.transformers.stringencryption.NormalStringEncryption;
 import me.itzsomebody.radon.transformers.stringencryption.SuperLightStringEncryption;
 import org.yaml.snakeyaml.Yaml;
-
-import java.io.File;
-import java.io.InputStream;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
 
 /**
  * Big config class that looks horrible and has lots of docs to make the code

@@ -1,14 +1,13 @@
 package me.itzsomebody.radon.transformers.misc;
 
+import java.util.concurrent.atomic.AtomicInteger;
 import me.itzsomebody.radon.transformers.AbstractTransformer;
-import org.objectweb.asm.tree.*;
 import me.itzsomebody.radon.utils.BytecodeUtils;
 import me.itzsomebody.radon.utils.LoggerUtils;
 import me.itzsomebody.radon.utils.NumberUtils;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
+import org.objectweb.asm.tree.AbstractInsnNode;
+import org.objectweb.asm.tree.InsnList;
+import org.objectweb.asm.tree.InsnNode;
 
 /**
  * Transformer that splits up integers into simple arithmetic evaluations.

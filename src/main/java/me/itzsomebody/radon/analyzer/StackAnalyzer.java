@@ -1,19 +1,22 @@
 package me.itzsomebody.radon.analyzer;
 
-import me.itzsomebody.radon.utils.OpcodeUtils;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
-import org.objectweb.asm.tree.*;
-
 import java.util.EmptyStackException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Stack;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
+import org.objectweb.asm.tree.AbstractInsnNode;
+import org.objectweb.asm.tree.FieldInsnNode;
+import org.objectweb.asm.tree.InvokeDynamicInsnNode;
+import org.objectweb.asm.tree.LabelNode;
+import org.objectweb.asm.tree.LdcInsnNode;
+import org.objectweb.asm.tree.MethodInsnNode;
+import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.tree.MultiANewArrayInsnNode;
 
 /**
- * Attempts to make a virtual machine-like object which attempts to mimic the
- * JVM stack.
- * TODO: MAKE IT ACTUALLY WORK LOL
+ * Attempts to emulate the stack in a method up to a breakpoint.
  *
  * @author ItzSomebody
  */
@@ -69,6 +72,33 @@ public class StackAnalyzer implements Opcodes {
                 break;
             try {
                 switch (insn.getOpcode()) {
+                    case NOP:
+                    case LALOAD: // (index, arrayref) -> (long, long_top)
+                    case DALOAD: // (index, arrayref) -> (double, double_top)
+                    case SWAP: // (value1, value2) -> (value2, value1)
+                    case INEG:
+                    case LNEG:
+                    case FNEG:
+                    case DNEG:
+                    case IINC:
+                    case I2F:
+                    case L2D:
+                    case F2I:
+                    case D2L:
+                    case I2B:
+                    case I2C:
+                    case I2S:
+                    case GOTO:
+                    case RET:
+                    case RETURN:
+                    case NEWARRAY:
+                    case ANEWARRAY:
+                    case ARRAYLENGTH:
+                    case CHECKCAST:
+                    case INSTANCEOF: {
+                        // Does nothing
+                        break;
+                    }
                     case ACONST_NULL:
                     case ICONST_M1:
                     case ICONST_0:
@@ -77,108 +107,120 @@ public class StackAnalyzer implements Opcodes {
                     case ICONST_3:
                     case ICONST_4:
                     case ICONST_5:
-                    case LCONST_0:
-                    case LCONST_1:
                     case FCONST_0:
                     case FCONST_1:
                     case FCONST_2:
-                    case DCONST_0:
-                    case DCONST_1:
                     case BIPUSH:
                     case SIPUSH:
-                    case LDC:
                     case ILOAD:
-                    case LLOAD:
                     case FLOAD:
-                    case DLOAD:
                     case ALOAD:
-                    case IALOAD:
-                    case LALOAD:
-                    case FALOAD:
-                    case DALOAD:
-                    case AALOAD:
-                    case BALOAD:
-                    case CALOAD:
-                    case SALOAD:
                     case DUP:
                     case DUP_X1:
                     case DUP_X2:
-                    case NEW:
-                    case GETSTATIC:
-                    case GETFIELD:
-                        if (DEBUG)
-                            System.out.println("Pushing - Opcode = " +
-                                    OpcodeUtils.getOpcodeName(insn.getOpcode()));
+                    case I2L:
+                    case I2D:
+                    case F2L:
+                    case F2D:
+                    case JSR:
+                    case NEW: {
+                        // Pushes one-word constant to stack
                         stack.push(null);
                         break;
+                    }
+                    case LDC: {
+                        LdcInsnNode ldc = (LdcInsnNode) insn;
+                        if (ldc.cst instanceof Long || ldc.cst instanceof Double)
+                            stack.push(null);
+
+                        stack.push(null);
+                        break;
+                    }
+                    case LCONST_0:
+                    case LCONST_1:
+                    case DCONST_0:
+                    case DCONST_1:
+                    case LLOAD:
+                    case DLOAD:
+                    case DUP2:
+                    case DUP2_X1:
+                    case DUP2_X2: {
+                        // Pushes two-word constant or two one-word constants to stack
+                        stack.push(null);
+                        stack.push(null);
+                        break;
+                    }
+                    case IALOAD: // (index, arrayref) -> (int)
+                    case FALOAD: // (index, arrayref) -> (float)
+                    case AALOAD: // (index, arrayref) -> (Object)
+                    case BALOAD: // (index, arrayref) -> (byte)
+                    case CALOAD: // (index, arrayref) -> (char)
+                    case SALOAD: // (index, arrayref) -> (short)
                     case ISTORE:
-                    case LSTORE:
                     case FSTORE:
-                    case DSTORE:
                     case ASTORE:
-                    case IASTORE:
-                    case LASTORE:
-                    case DASTORE:
-                    case AASTORE:
-                    case BASTORE:
-                    case CASTORE:
-                    case SASTORE:
                     case POP:
-                    case SWAP:
                     case IADD:
-                    case LADD:
                     case FADD:
-                    case DADD:
                     case ISUB:
-                    case LSUB:
                     case FSUB:
-                    case DSUB:
                     case IMUL:
-                    case LMUL:
                     case FMUL:
-                    case DMUL:
                     case IDIV:
-                    case LDIV:
                     case FDIV:
-                    case DDIV:
                     case IREM:
-                    case LREM:
                     case FREM:
-                    case DREM:
                     case ISHL:
-                    case LSHL:
                     case ISHR:
-                    case LSHR:
                     case IUSHR:
+                    case LSHL:
+                    case LSHR:
                     case LUSHR:
                     case IAND:
-                    case LAND:
                     case IOR:
-                    case LOR:
                     case IXOR:
-                    case LXOR:
-                    case LCMP:
+                    case L2I:
+                    case L2F:
+                    case D2I:
+                    case D2F:
                     case FCMPL:
                     case FCMPG:
-                    case DCMPL:
-                    case DCMPG:
-                    case TABLESWITCH:
-                    case LOOKUPSWITCH:
-                    case IRETURN:
-                    case LRETURN:
-                    case FRETURN:
-                    case DRETURN:
-                    case ARETURN:
-                    case PUTSTATIC:
-                    case PUTFIELD:
-                    case MONITORENTER:
-                    case MONITOREXIT:
                     case IFEQ:
                     case IFNE:
                     case IFLT:
                     case IFGE:
                     case IFGT:
                     case IFLE:
+                    case TABLESWITCH:
+                    case LOOKUPSWITCH:
+                    case IRETURN:
+                    case FRETURN:
+                    case ATHROW:
+                    case MONITORENTER:
+                    case MONITOREXIT:
+                    case IFNULL:
+                    case IFNONNULL:
+                    case ARETURN: {
+                        // Pops one-word constant off stack
+                        stack.pop();
+                        break;
+                    }
+                    case LSTORE:
+                    case DSTORE:
+                    case POP2:
+                    case LADD:
+                    case DADD:
+                    case LSUB:
+                    case DSUB:
+                    case LMUL:
+                    case DMUL:
+                    case LDIV:
+                    case DDIV:
+                    case LREM:
+                    case DREM:
+                    case LAND:
+                    case LOR:
+                    case LXOR:
                     case IF_ICMPEQ:
                     case IF_ICMPNE:
                     case IF_ICMPLT:
@@ -187,123 +229,133 @@ public class StackAnalyzer implements Opcodes {
                     case IF_ICMPLE:
                     case IF_ACMPEQ:
                     case IF_ACMPNE:
-                    case IFNULL:
-                    case IFNONNULL:
-                        if (DEBUG)
-                            System.out.println("Popping - Opcode = " +
-                                    OpcodeUtils.getOpcodeName(insn.getOpcode()));
-                        stack.pop();
-                        break;
-                    case POP2:
-                        if (DEBUG)
-                            System.out.println("Double popping - Opcode = " +
-                                    OpcodeUtils.getOpcodeName(insn.getOpcode()));
+                    case LRETURN:
+                    case DRETURN: {
+                        // Pops two-word or two one-word constant(s) off stack
                         stack.pop();
                         stack.pop();
                         break;
-                    case DUP2:
-                    case DUP2_X1:
-                    case DUP2_X2:
-                        if (DEBUG)
-                            System.out.println("Double pushing - Opcode = " +
-                                    OpcodeUtils.getOpcodeName(insn.getOpcode()));
+                    }
+                    case IASTORE:
+                    case FASTORE:
+                    case AASTORE:
+                    case BASTORE:
+                    case CASTORE:
+                    case SASTORE:
+                    case LCMP:
+                    case DCMPL:
+                    case DCMPG: {
+                        // Pops three one-word constants off stack
+                        stack.pop();
+                        stack.pop();
+                        stack.pop();
+                        break;
+                    }
+                    case LASTORE:
+                    case DASTORE: {
+                        // Pops two one-word constants and one two-word constant off stack
+                        stack.pop();
+                        stack.pop();
+                        stack.pop();
+                        stack.pop();
+                        break;
+                    }
+                    case GETSTATIC: {
+                        Type type = Type.getType(((FieldInsnNode) insn).desc);
                         stack.push(null);
+
+                        if (type.getSort() == Type.LONG || type.getSort() == Type.DOUBLE)
+                            stack.push(null);
+                        break;
+                    }
+                    case PUTSTATIC: {
+                        Type type = Type.getType(((FieldInsnNode) insn).desc);
+                        stack.pop();
+
+                        if (type.getSort() == Type.LONG || type.getSort() == Type.DOUBLE)
+                            stack.pop();
+                        break;
+                    }
+                    case GETFIELD: {
+                        stack.pop(); // Objectref
+                        Type type = Type.getType(((FieldInsnNode) insn).desc);
                         stack.push(null);
+
+                        if (type.getSort() == Type.LONG || type.getSort() == Type.DOUBLE)
+                            stack.push(null);
                         break;
-                    case INEG:
-                    case LNEG:
-                    case FNEG:
-                    case DNEG:
-                    case IINC:
-                    case I2L:
-                    case I2F:
-                    case I2D:
-                    case L2I:
-                    case L2F:
-                    case L2D:
-                    case F2I:
-                    case F2L:
-                    case F2D:
-                    case D2I:
-                    case D2L:
-                    case D2F:
-                    case I2B:
-                    case I2C:
-                    case I2S:
-                    case RETURN:
-                    case NEWARRAY:
-                    case ANEWARRAY:
-                    case ARRAYLENGTH:
-                    case ATHROW:
-                    case CHECKCAST:
-                    case INSTANCEOF:
-                    case GOTO:
-                        if (DEBUG)
-                            System.out.println("Doing nothing - Opcode = " +
-                                    OpcodeUtils.getOpcodeName(insn.getOpcode()));
+                    }
+                    case PUTFIELD: {
+                        stack.pop(); // Objectref
+                        Type type = Type.getType(((FieldInsnNode) insn).desc);
+                        stack.pop();
+
+                        if (type.getSort() == Type.LONG || type.getSort() == Type.DOUBLE)
+                            stack.pop();
                         break;
-                    case JSR:
-                    case RET:
-                        throw new IllegalArgumentException("Unsupported " +
-                                "opcode (JSR/RET)");
+                    }
                     case INVOKEVIRTUAL:
                     case INVOKESPECIAL:
-                    case INVOKEINTERFACE:
-                        if (DEBUG)
-                            System.out.println("Processing static method " +
-                                    "invocation - Opcode = " + OpcodeUtils
-                                    .getOpcodeName(insn.getOpcode()));
-                        MethodInsnNode virtualInvoke = (MethodInsnNode) insn;
+                    case INVOKEINTERFACE: {
                         stack.pop(); // Objectref
-                        for (int j = 0; j < Type.getArgumentTypes
-                                (virtualInvoke.desc).length; j++) {
+                        Type[] args = Type.getArgumentTypes(((MethodInsnNode) insn).desc);
+                        Type returnType = Type.getReturnType(((MethodInsnNode) insn).desc);
+                        for (Type type : args) {
+                            if (type.getSort() == Type.LONG
+                                    || type.getSort() == Type.DOUBLE)
+                                stack.pop();
+
                             stack.pop();
                         }
-                        if (!virtualInvoke.desc.endsWith(")V")) {
+                        if (returnType.getSort() == Type.LONG
+                                || returnType.getSort() == Type.DOUBLE)
                             stack.push(null);
-                        }
-                        break;
-                    case INVOKESTATIC:
-                        if (DEBUG)
-                            System.out.println("Processing virtual method " +
-                                    "invocation - Opcode = " + OpcodeUtils
-                                    .getOpcodeName(insn.getOpcode()));
-                        MethodInsnNode staticInvoke = (MethodInsnNode) insn;
-                        for (int j = 0; j < Type.getArgumentTypes
-                                (staticInvoke.desc).length; j++) {
-                            stack.pop();
-                        }
-                        if (!staticInvoke.desc.endsWith(")V")) {
+                        if (returnType.getSort() != Type.VOID)
                             stack.push(null);
-                        }
                         break;
-                    case INVOKEDYNAMIC:
-                        if (DEBUG)
-                            System.out.println("Processing dynamic invocation" +
-                                    " - Opcode = " + OpcodeUtils
-                                    .getOpcodeName(insn.getOpcode()));
-                        InvokeDynamicInsnNode indy =
-                                (InvokeDynamicInsnNode) insn;
-                        for (int j = 0; j < Type.getArgumentTypes(indy.desc)
-                                .length; j++) {
+                    }
+                    case INVOKESTATIC: {
+                        Type[] args = Type.getArgumentTypes(((MethodInsnNode) insn).desc);
+                        Type returnType = Type.getReturnType(((MethodInsnNode) insn).desc);
+                        for (Type type : args) {
+                            if (type.getSort() == Type.LONG
+                                    || type.getSort() == Type.DOUBLE)
+                                stack.pop();
+
                             stack.pop();
                         }
-                        if (!indy.desc.endsWith(")V")) {
+                        if (returnType.getSort() == Type.LONG
+                                || returnType.getSort() == Type.DOUBLE)
                             stack.push(null);
-                        }
+                        if (returnType.getSort() != Type.VOID)
+                            stack.push(null);
                         break;
-                    case MULTIANEWARRAY:
-                        if (DEBUG)
-                            System.out.println("Processing multi-dimension " +
-                                    "array - Opcode = " + OpcodeUtils.
-                                    getOpcodeName(insn.getOpcode()));
-                        MultiANewArrayInsnNode arrays
-                                = (MultiANewArrayInsnNode) insn;
-                        for (int j = 0; j < arrays.dims; j++) {
+                    }
+                    case INVOKEDYNAMIC: {
+                        Type[] args = Type.getArgumentTypes(((InvokeDynamicInsnNode) insn).desc);
+                        Type returnType = Type.getReturnType(((InvokeDynamicInsnNode) insn).desc);
+                        for (Type type : args) {
+                            if (type.getSort() == Type.LONG
+                                    || type.getSort() == Type.DOUBLE)
+                                stack.pop();
+
                             stack.pop();
                         }
-                        stack.push(null); // Arrayref
+                        if (returnType.getSort() == Type.LONG
+                                || returnType.getSort() == Type.DOUBLE)
+                            stack.push(null);
+                        if (returnType.getSort() != Type.VOID)
+                            stack.push(null);
                         break;
+                    }
+                    case MULTIANEWARRAY: {
+                        for (int j = 0; j < ((MultiANewArrayInsnNode) insn).dims; j++) {
+                            stack.pop();
+                        }
+
+                        stack.push(null); // arrayref
+                        break;
+                    }
                 }
             } catch (EmptyStackException empty) {
                 if (DEBUG) empty.printStackTrace();

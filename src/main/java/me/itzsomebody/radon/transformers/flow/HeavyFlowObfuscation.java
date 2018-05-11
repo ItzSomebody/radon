@@ -1,15 +1,23 @@
 package me.itzsomebody.radon.transformers.flow;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Stack;
+import java.util.concurrent.atomic.AtomicInteger;
 import me.itzsomebody.radon.analyzer.StackAnalyzer;
 import me.itzsomebody.radon.transformers.AbstractTransformer;
 import me.itzsomebody.radon.utils.BytecodeUtils;
 import me.itzsomebody.radon.utils.LoggerUtils;
 import me.itzsomebody.radon.utils.NumberUtils;
 import me.itzsomebody.radon.utils.StringUtils;
-import org.objectweb.asm.tree.*;
-
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
+import org.objectweb.asm.tree.AbstractInsnNode;
+import org.objectweb.asm.tree.FieldInsnNode;
+import org.objectweb.asm.tree.FieldNode;
+import org.objectweb.asm.tree.InsnNode;
+import org.objectweb.asm.tree.JumpInsnNode;
+import org.objectweb.asm.tree.LabelNode;
+import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.tree.VarInsnNode;
 
 /**
  * This transformer attempts to increase flow obsucurity by making additional

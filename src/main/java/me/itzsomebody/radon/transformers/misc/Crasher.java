@@ -1,11 +1,9 @@
 package me.itzsomebody.radon.transformers.misc;
 
+import java.util.concurrent.atomic.AtomicInteger;
 import me.itzsomebody.radon.transformers.AbstractTransformer;
 import me.itzsomebody.radon.utils.LoggerUtils;
 import me.itzsomebody.radon.utils.StringUtils;
-
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Transformer that applies a crashing technique by exploiting class signature parsing.

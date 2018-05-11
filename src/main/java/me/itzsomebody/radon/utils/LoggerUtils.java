@@ -1,13 +1,13 @@
 package me.itzsomebody.radon.utils;
 
-import me.itzsomebody.radon.Radon;
-
-import java.io.*;
-import java.nio.charset.StandardCharsets;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import me.itzsomebody.radon.Radon;
 
 /**
  * Utils to print fancy stuff in the console and to write log file.

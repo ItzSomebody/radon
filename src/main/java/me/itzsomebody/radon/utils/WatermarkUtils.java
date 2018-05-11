@@ -1,8 +1,5 @@
 package me.itzsomebody.radon.utils;
 
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.tree.ClassNode;
-
 import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -10,6 +7,8 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.tree.ClassNode;
 
 /**
  * Watermarking utils for the obfuscator.

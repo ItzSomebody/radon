@@ -1,5 +1,10 @@
 package me.itzsomebody.radon.transformers.renamer;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import me.itzsomebody.radon.transformers.AbstractTransformer;
 import me.itzsomebody.radon.utils.BytecodeUtils;
 import me.itzsomebody.radon.utils.LoggerUtils;
@@ -8,10 +13,9 @@ import me.itzsomebody.radon.utils.StringUtils;
 import org.objectweb.asm.commons.ClassRemapper;
 import org.objectweb.asm.commons.Remapper;
 import org.objectweb.asm.commons.SimpleRemapper;
-import org.objectweb.asm.tree.*;
-
-import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
+import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.FieldNode;
+import org.objectweb.asm.tree.MethodNode;
 
 /**
  * Transformer that renames classes and their members.

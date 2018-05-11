@@ -7,12 +7,12 @@ import java.lang.invoke.MethodType;
 
 class LightInvokeDynamic {
     public static Object LightInvokeDynamic(Object lookupName,
-                                             Object callerName,
-                                             Object callerType,
-                                             Object opcodeIndicator,
-                                             Object originalClassName,
-                                             Object originalMethodName,
-                                             Object originalMethodSignature) {
+                                            Object callerName,
+                                            Object callerType,
+                                            Object opcodeIndicator,
+                                            Object originalClassName,
+                                            Object originalMethodName,
+                                            Object originalMethodSignature) {
         try {
             char[] encClassNameChars = originalClassName.toString().toCharArray();
             char[] classNameChars = new char[encClassNameChars.length];

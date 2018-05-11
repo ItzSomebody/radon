@@ -1,15 +1,14 @@
 package me.itzsomebody.radon.internal;
 
-import me.itzsomebody.radon.config.Config;
-import me.itzsomebody.radon.internal.climessages.CLIMessages;
-import me.itzsomebody.radon.utils.LoggerUtils;
-import me.itzsomebody.radon.Radon;
-import me.itzsomebody.radon.utils.WatermarkUtils;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.List;
+import me.itzsomebody.radon.Radon;
+import me.itzsomebody.radon.config.Config;
+import me.itzsomebody.radon.internal.climessages.CLIMessages;
+import me.itzsomebody.radon.utils.LoggerUtils;
+import me.itzsomebody.radon.utils.WatermarkUtils;
 
 /**
  * CLI class to manage command line usage
