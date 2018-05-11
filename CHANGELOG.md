@@ -1,3 +1,8 @@
+## 0.8.0
+
+* Changed even more internals.
+* Resources can now be processed by obfuscator.
+
 ## 0.7.0
 
 * Completely rewrote StackAnalyzer.

@@ -3,7 +3,6 @@ package me.itzsomebody.radon.utils;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.IntInsnNode;
@@ -20,32 +19,6 @@ import org.objectweb.asm.tree.TypeInsnNode;
  * @author ItzSomebody
  */
 public class BytecodeUtils {
-    /**
-     * Checks if the input class is a main method.
-     *
-     * @param clazz      {@link ClassNode} to check for main methods.
-     * @param spigotMode if obfuscator should consider the input
-     *                   {@link ClassNode} as a Spigot/Bukkit/Bungee plugin.
-     * @return true if the input {@link ClassNode} contains a main method,
-     * false if not.
-     */
-    public static boolean isMain(ClassNode clazz, boolean spigotMode) {
-        if (spigotMode) {
-            if (clazz.superName.equals("org/bukkit/plugin/java/JavaPlugin")
-                    || clazz.superName.equals("net/md_5/bungee/api/plugin/Plugin")) {
-                return true;
-            }
-        }
-
-        for (MethodNode methodNode : clazz.methods) {
-            if (methodNode.name.equals("main")
-                    || methodNode.name.equals("premain")) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     /**
      * Returns access modifier without private or protected so that class
      * renaming works properly.

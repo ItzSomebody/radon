@@ -10,9 +10,12 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.swing.*;
 import me.itzsomebody.radon.Radon;
 import me.itzsomebody.radon.config.Config;
+import me.itzsomebody.radon.config.ConfigEnum;
+import me.itzsomebody.radon.config.ConfigWriter;
 import me.itzsomebody.radon.internal.Bootstrap;
 import me.itzsomebody.radon.transformers.AbstractTransformer;
 import me.itzsomebody.radon.transformers.flow.LightFlowObfuscation;
@@ -1501,8 +1504,9 @@ public class MainGUI {
                                     throw new IOException("Config file does " +
                                             "not exist.");
 
+                                FileInputStream fis = new FileInputStream(config);
                                 Config configParser
-                                        = new Config(new FileInputStream(config));
+                                        = new Config(fis);
                                 configParser.loadIntoMap();
                                 configParser.sortExempts();
                                 configParser.checkConfig();
@@ -1756,6 +1760,9 @@ public class MainGUI {
 
                                 int dictionary = configParser.getDictionaryType();
                                 dictionaryComboBox.setSelectedIndex(dictionary);
+                                fis.close();
+
+                                lastPath = chooser.getSelectedFile();
                             } catch (Throwable t) {
                                 JOptionPane.showMessageDialog(null,
                                         t.getMessage(), "Error",
@@ -1770,6 +1777,222 @@ public class MainGUI {
         btnLoadConfiguration.setToolTipText("Loads config for pre-defined " +
                 "settings.");
         panel_6.add(btnLoadConfiguration);
+        JButton saveConfigButton = new JButton("Save configuration");
+        saveConfigButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JFileChooser chooser = new JFileChooser();
+                chooser.setMultiSelectionEnabled(false);
+                chooser.setFileSelectionMode(0);
+                int result = chooser.showOpenDialog(frmRadonObfuscator);
+                if (result == 0) {
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                Map<ConfigEnum, Object> settings = new HashMap<>();
+                                if (inputField.getText() != null
+                                        && !inputField.getText().isEmpty()) {
+                                    settings.put(ConfigEnum.INPUT, inputField.getText());
+                                }
+
+                                if (outputField.getText() != null
+                                        && !outputField.getText().isEmpty()) {
+                                    settings.put(ConfigEnum.OUTPUT, outputField.getText());
+                                }
+
+                                if (chckbxStringEncryption.isSelected()) {
+                                    switch (comboBox.getSelectedIndex()) {
+                                        case 0:
+                                            settings.put(ConfigEnum.STRING_ENCRYPTION, "SuperLight");
+                                            break;
+                                        case 1:
+                                            settings.put(ConfigEnum.STRING_ENCRYPTION, "Light");
+                                            break;
+                                        case 2:
+                                            settings.put(ConfigEnum.STRING_ENCRYPTION, "Normal");
+                                            break;
+                                        case 3:
+                                            settings.put(ConfigEnum.STRING_ENCRYPTION, "Heavy");
+                                            break;
+                                    }
+                                }
+
+                                if (chckbxInvokeDynamic.isSelected()) {
+                                    switch (comboBox_1.getSelectedIndex()) {
+                                        case 0:
+                                            settings.put(ConfigEnum.INVOKEDYNAMIC, "Light");
+                                            break;
+                                        case 1:
+                                            settings.put(ConfigEnum.INVOKEDYNAMIC, "Normal");
+                                            break;
+                                        case 2:
+                                            settings.put(ConfigEnum.INVOKEDYNAMIC, "Heavy");
+                                            break;
+                                    }
+                                }
+
+                                if (chckbxFlow.isSelected()) {
+                                    switch (comboBox_2.getSelectedIndex()) {
+                                        case 0:
+                                            settings.put(ConfigEnum.FLOW_OBFUSCATION, "Light");
+                                            break;
+                                        case 1:
+                                            settings.put(ConfigEnum.FLOW_OBFUSCATION, "Normal");
+                                            break;
+                                        case 2:
+                                            settings.put(ConfigEnum.FLOW_OBFUSCATION, "Heavy");
+                                            break;
+                                    }
+                                }
+
+                                if (chckbxLocalVariables.isSelected()) {
+                                    switch (comboBox_3.getSelectedIndex()) {
+                                        case 0:
+                                            settings.put(ConfigEnum.LOCAL_VARIABLES, "Obfuscate");
+                                            break;
+                                        case 1:
+                                            settings.put(ConfigEnum.LOCAL_VARIABLES, "Remove");
+                                            break;
+                                    }
+                                }
+
+                                if (chckbxCrasher.isSelected()) {
+                                    settings.put(ConfigEnum.CRASHER, "true");
+                                }
+
+                                if (chckbxHidecode.isSelected()) {
+                                    settings.put(ConfigEnum.HIDER, "true");
+                                }
+
+                                if (chckbxSpringPool.isSelected()) {
+                                    settings.put(ConfigEnum.STRING_POOL, "true");
+                                }
+
+                                if (chckbxLineObfuscation.isSelected()) {
+                                    switch (comboBox_5.getSelectedIndex()) {
+                                        case 0:
+                                            settings.put(ConfigEnum.LINE_NUMBERS, "Obfuscate");
+                                            break;
+                                        case 1:
+                                            settings.put(ConfigEnum.LINE_NUMBERS, "Remove");
+                                            break;
+                                    }
+                                }
+
+                                if (chckbxNumberObfuscation.isSelected()) {
+                                    settings.put(ConfigEnum.NUMBERS, "true");
+                                }
+
+                                if (chckbxSourceName.isSelected()) {
+                                    switch (comboBox_123.getSelectedIndex()) {
+                                        case 0:
+                                            settings.put(ConfigEnum.SOURCE_NAME, "Obfuscate");
+                                            break;
+                                        case 1:
+                                            settings.put(ConfigEnum.SOURCE_NAME, "Remove");
+                                            break;
+                                    }
+                                }
+
+                                if (chckbxSourceDebug.isSelected()) {
+                                    switch (comboBox_1234.getSelectedIndex()) {
+                                        case 0:
+                                            settings.put(ConfigEnum.SOURCE_DEBUG, "Obfuscate");
+                                            break;
+                                        case 1:
+                                            settings.put(ConfigEnum.SOURCE_DEBUG, "Remove");
+                                            break;
+                                    }
+                                }
+
+                                if (chckbxTrashClasses.isSelected()) {
+                                    if (trashChanceField.getText() != null
+                                            && !trashChanceField.getText().isEmpty()) {
+                                        settings.put(ConfigEnum.TRASH_CLASSES, trashChanceField.getText());
+                                    }
+                                }
+
+                                if (chckbxAddWatermark.isSelected()) {
+                                    if (waterMarkMessageField.getText() != null
+                                            && !waterMarkMessageField.getText().isEmpty()
+                                            && watermarkPassword.getText() != null
+                                            && !watermarkPassword.getText().isEmpty()) {
+                                        switch (comboBox_05.getSelectedIndex()) {
+                                            case 0:
+                                                settings.put(ConfigEnum.WATERMARK_TYPE, "ConstantPool");
+                                                break;
+                                            case 1:
+                                                settings.put(ConfigEnum.WATERMARK_TYPE, "Signature");
+                                                break;
+                                        }
+
+                                        settings.put(ConfigEnum.WATERMARK_MSG, waterMarkMessageField.getText());
+                                        settings.put(ConfigEnum.WATERMARK_KEY, watermarkPassword.getText());
+                                    }
+                                }
+
+                                if (chckbxSpigotPlugin.isSelected()) {
+                                    settings.put(ConfigEnum.SPIGOT_PLUGIN, "true");
+                                }
+
+                                if (chckbxClassRenammer.isSelected()) {
+                                    settings.put(ConfigEnum.RENAMER, "true");
+                                }
+
+                                if (chckbxAddExpiration.isSelected()) {
+                                    if (expirationMessageField.getText() != null
+                                            && !expireMessageLabel.getText().isEmpty()
+                                            && expirationDateField.getText() != null
+                                            && !expirationDateField.getText().isEmpty()) {
+                                        settings.put(ConfigEnum.EXPIRATION_MESSAGE, expirationMessageField.getText());
+                                        settings.put(ConfigEnum.EXPIRATION_TIME, expirationDateField.getText());
+                                    }
+                                }
+
+                                if (chckbxShuffler.isSelected()) {
+                                    settings.put(ConfigEnum.SHUFFLER, "true");
+                                }
+
+                                settings.put(ConfigEnum.DICTIONARY, String.valueOf(dictionaryComboBox.getSelectedIndex()));
+
+                                if (chckbxInnerClasses.isSelected()) {
+                                    settings.put(ConfigEnum.INNERCLASSES, "true");
+                                }
+
+                                List<String> libs = new ArrayList<>();
+                                for (int i = 0; i < libList.size(); i++) {
+                                    String lib = libList.get(i);
+                                    libs.add(lib);
+                                }
+
+                                settings.put(ConfigEnum.LIBRARIES, libs);
+
+                                List<String> exempts = new ArrayList<>();
+                                for (int i = 0; i < exemptList.size(); i++) {
+                                    String exempt = exemptList.get(i);
+                                    exempts.add(exempt);
+                                }
+
+                                settings.put(ConfigEnum.EXEMPTS, exempts);
+
+                                ConfigWriter writer = new ConfigWriter(settings);
+                                writer.parseOptions();
+                                writer.writeConfig(chooser.getSelectedFile().getAbsolutePath());
+
+                                lastPath = chooser.getSelectedFile();
+                            } catch (Throwable t) {
+                                JOptionPane.showMessageDialog(null,
+                                        t.getMessage(), "Error",
+                                        JOptionPane.ERROR_MESSAGE);
+                                t.printStackTrace();
+                            }
+                        }
+                    });
+                }
+            }
+        });
+        panel_6.add(saveConfigButton);
         this.frmRadonObfuscator.setVisible(true);
     }
 }

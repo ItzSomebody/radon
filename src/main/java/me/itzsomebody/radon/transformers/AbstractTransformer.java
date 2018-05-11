@@ -27,6 +27,11 @@ public abstract class AbstractTransformer implements Opcodes {
     private Map<String, ClassNode> classPath;
 
     /**
+     * Resources.
+     */
+    protected Map<String, byte[]> passThru;
+
+    /**
      * Exempt information.
      */
     private List<String> exempts;
@@ -68,6 +73,27 @@ public abstract class AbstractTransformer implements Opcodes {
         this.classes = classes;
         this.classPath = classPath;
         this.exempts = exempts;
+        this.dictionary = dictionary;
+        this.logStrings = new ArrayList<>();
+    }
+
+    /**
+     * The other-other init method.
+     *
+     * @param classes   the classes.
+     * @param classPath the almighty classpath. (Bow down to it)
+     * @param passThru  the manifest.
+     * @param exempts   the exempted classes.
+     */
+    public void init(Map<String, ClassNode> classes,
+                     Map<String, ClassNode> classPath,
+                     Map<String, byte[]> passThru,
+                     List<String> exempts,
+                     int dictionary) {
+        this.classes = classes;
+        this.classPath = classPath;
+        this.exempts = exempts;
+        this.passThru = passThru;
         this.dictionary = dictionary;
         this.logStrings = new ArrayList<>();
     }

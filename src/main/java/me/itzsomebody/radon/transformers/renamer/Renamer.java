@@ -1,5 +1,6 @@
 package me.itzsomebody.radon.transformers.renamer;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -75,8 +76,7 @@ public class Renamer extends AbstractTransformer {
                 }
             });
 
-            if (!this.exempted(classNode.name, "Renamer")
-                    && !BytecodeUtils.isMain(classNode, this.spigotMode)) {
+            if (!this.exempted(classNode.name, "Renamer")) {
                 int packages = NumberUtils.getRandomInt(2) + 1;
                 StringBuilder newName = new StringBuilder();
                 for (int i = 0; i < packages; i++) {
@@ -114,6 +114,31 @@ public class Renamer extends AbstractTransformer {
         }
 
         this.logStrings.add(LoggerUtils.stdOut("Mapped " + counter + " members."));
+        current = System.currentTimeMillis();
+
+        // Fix screw ups in resources.
+        this.logStrings.add(LoggerUtils.stdOut("Attempting to map class names in resources"));
+        AtomicInteger fixed = new AtomicInteger();
+        passThru.forEach((name, byteArray) -> {
+            if (name.equals("META-INF/MANIFEST.MF")
+                    || (name.equals("plugin.yml") && spigotMode)) {
+                String stringVer = new String(byteArray);
+                for (String mapping : mappings.keySet()) {
+                    if (stringVer.contains(mapping.replace("/", "."))) {
+                        stringVer = stringVer.replace(mapping.replace("/", "."), mappings.get(mapping).replace("/", "."));
+                    }
+                }
+
+                try {
+                    passThru.put(name, stringVer.getBytes("UTF-8"));
+                    fixed.incrementAndGet();
+                } catch (UnsupportedEncodingException e) {
+                    e.printStackTrace();
+                    throw new RuntimeException(e.getMessage());
+                }
+            }
+        });
+        this.logStrings.add(LoggerUtils.stdOut("Mapped " + fixed + " names in resources. [" + tookThisLong(current) + "ms]"));
         this.logStrings.add(LoggerUtils.stdOut("Finished applying mappings. [" +
                 String.valueOf(System.currentTimeMillis() - current) + "ms]"));
     }
