@@ -1,3 +1,9 @@
+## 0.8.1
+
+* Changed the CustomClassWriter a bit.
+* Heavy Flow transformer now implemented into GUI.
+* Changed up the way the heavy flow transformer works due to the old one not working whatsoever.
+
 ## 0.8.0
 
 * Changed even more internals.
