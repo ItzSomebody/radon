@@ -3,11 +3,15 @@ package me.itzsomebody.radon.internal;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
@@ -17,6 +21,7 @@ import me.itzsomebody.radon.config.Config;
 import me.itzsomebody.radon.transformers.AbstractTransformer;
 import me.itzsomebody.radon.transformers.misc.Expiry;
 import me.itzsomebody.radon.transformers.misc.TrashClasses;
+import me.itzsomebody.radon.transformers.renamer.ClassTree;
 import me.itzsomebody.radon.transformers.renamer.Renamer;
 import me.itzsomebody.radon.utils.FileUtils;
 import me.itzsomebody.radon.utils.LoggerUtils;
@@ -52,6 +57,11 @@ public class Bootstrap { // Eyyy bootstrap bill
      * Resources which "pass through" the obfuscator.
      */
     private Map<String, byte[]> passThru = new HashMap<>();
+
+    /**
+     * Class hiearchy.
+     */
+    private Map<String, ClassTree> hierarchy = new HashMap<>();
 
     /**
      * Config object
@@ -217,6 +227,9 @@ public class Bootstrap { // Eyyy bootstrap bill
                 this.logStrings.add(LoggerUtils.stdOut("Generated "
                         + String.valueOf(this.trashClasses) + " trash classes"));
             }
+
+            this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
+            this.createTrees();
 
             if (this.extraClasses.values().size() != 0) {
                 this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
@@ -503,7 +516,43 @@ public class Bootstrap { // Eyyy bootstrap bill
     }
 
     /**
+     * Creates {@link ClassTree}s needed for renaming.
+     */
+    private void createTrees() {
+        long executionTime = System.currentTimeMillis();
+        this.logStrings.add(LoggerUtils.stdOut("Creating class hierarchy."));
+        classPath.values().forEach(classNode -> {
+            classNode.methods.forEach(methodNode -> {
+                methodNode.owner = classNode.name;
+            });
+            classNode.fields.forEach(fieldNode -> {
+                fieldNode.owner = classNode.name;
+            });
+            ClassTree classTree = new ClassTree(classNode.name, classNode.libraryNode);
+            classTree.parentClasses.add(classNode.superName);
+            classTree.parentClasses.addAll(classNode.interfaces);
+            classes.values().forEach(anotherClass -> {
+                if (anotherClass.interfaces != null
+                        && anotherClass.interfaces.contains(classNode.name)) {
+                    classTree.subClasses.add(anotherClass.name);
+                }
+
+                if (anotherClass.superName != null
+                        && anotherClass.superName.equals(classNode.name)) {
+                    classTree.subClasses.add(anotherClass.name);
+                }
+            });
+
+            classTree.methods.addAll(classNode.methods);
+            classTree.fields.addAll(classNode.fields);
+            hierarchy.put(classNode.name, classTree);
+        });
+        this.logStrings.add(LoggerUtils.stdOut("Finished creating class hierarchy. [" + (System.currentTimeMillis() - executionTime) + "ms]"));
+    }
+
+    /**
      * CustomClassWriter that doesn't use the internal Java classpath.
+     * Concept taken from Java-Deobfuscator by samczsun
      *
      * @author ItzSomebody
      */
@@ -520,7 +569,16 @@ public class Bootstrap { // Eyyy bootstrap bill
                 return "java/lang/Object";
             }
 
-            return deriveCommonSuperName(type1, type2);
+            String first = deriveCommonSuperName(type1, type2);
+            String second = deriveCommonSuperName(type2, type1);
+            if (!first.equals("java/lang/Object")) {
+                return first;
+            }
+            if (!second.equals("java/lang/Object")) {
+                return second;
+            }
+
+            return getCommonSuperClass(returnClazz(type1).superName, returnClazz(type2).superName);
         }
 
         /**
@@ -533,23 +591,18 @@ public class Bootstrap { // Eyyy bootstrap bill
         private String deriveCommonSuperName(String type1, String type2) {
             ClassNode first = returnClazz(type1);
             ClassNode second = returnClazz(type2);
-
             if (isAssignableFrom(first, second)) {
                 return type1;
-            }
-
-            if (isAssignableFrom(second, first)) {
+            } else if (isAssignableFrom(first, second)) {
                 return type2;
-            }
-
-            if ((first.access & Opcodes.ACC_INTERFACE) == 0
-                    || (second.access & Opcodes.ACC_INTERFACE) == 0) {
+            } else if (Modifier.isInterface(first.access) || Modifier.isInterface(second.access)) {
                 return "java/lang/Object";
             } else {
                 do {
-                    first = returnClazz(first.superName);
+                    type1 = first.superName;
+                    first = returnClazz(type1);
                 } while (!isAssignableFrom(first, second));
-                return first.name;
+                return type1;
             }
         }
 
@@ -578,8 +631,26 @@ public class Bootstrap { // Eyyy bootstrap bill
          * @return true/false based on if clazz1 is the superclass of clazz2.
          */
         private boolean isAssignableFrom(ClassNode clazz1, ClassNode clazz2) {
-            return (clazz1.name.equals("java/lang/Object")
-                    || clazz1.superName.equals(clazz2.name));
+            if (clazz1.name.equals("java/lang/Object")) {
+                return true;
+            }
+            if (clazz1.name.equals(clazz2.name)) {
+                return true;
+            }
+            ClassTree firstTree = hierarchy.get(clazz1.name);
+            if (firstTree == null) {
+                throw new RuntimeException("Could not find " + clazz1.name + " in the built class hiearchy");
+            }
+            Set<String> children = new HashSet<>();
+            LinkedList<String> searchThese = new LinkedList<>(firstTree.subClasses);
+            while (!searchThese.isEmpty()) {
+                String s = searchThese.poll();
+                if (children.add(s)) {
+                    ClassTree tempTree = hierarchy.get(s);
+                    searchThese.addAll(tempTree.subClasses);
+                }
+            }
+            return children.contains(clazz2.name);
         }
     }
 }

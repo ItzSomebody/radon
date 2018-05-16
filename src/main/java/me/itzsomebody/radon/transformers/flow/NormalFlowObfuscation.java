@@ -1,24 +1,28 @@
 package me.itzsomebody.radon.transformers.flow;
 
+import java.lang.reflect.Modifier;
 import java.util.Stack;
 import java.util.concurrent.atomic.AtomicInteger;
 import me.itzsomebody.radon.analyzer.StackAnalyzer;
 import me.itzsomebody.radon.transformers.AbstractTransformer;
-import me.itzsomebody.radon.utils.BytecodeUtils;
 import me.itzsomebody.radon.utils.LoggerUtils;
 import me.itzsomebody.radon.utils.StringUtils;
+import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.LabelNode;
+import org.objectweb.asm.tree.LineNumberNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
 /**
- * Transformer that applies multiple (skidded) flow obfuscations.
+ * Transformer that does the same as {@link LightFlowObfuscation}, but also
+ * inserts conditionals which always evaluate to false where the stack is
+ * empty.
  *
  * @author ItzSomebody
  */
@@ -31,13 +35,13 @@ public class NormalFlowObfuscation extends AbstractTransformer {
         long current = System.currentTimeMillis();
         this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
         this.logStrings.add(LoggerUtils.stdOut("Started normal flow obfuscation transformer"));
-        classNodes().stream().filter(classNode -> !this.exempted(classNode.name, "Flow")).forEach(classNode -> {
+        classNodes().parallelStream().filter(classNode -> !this.exempted(classNode.name, "Flow")).forEach(classNode -> {
             FieldNode field = new FieldNode(ACC_PUBLIC + ACC_STATIC +
                     ACC_FINAL, StringUtils.randomString(this.dictionary), "Z", null, null);
             classNode.fields.add(field);
-            classNode.methods.stream().filter(methodNode ->
+            classNode.methods.parallelStream().filter(methodNode ->
                     !this.exempted(classNode.name + '.' + methodNode.name + methodNode.desc, "Flow")
-                            && !BytecodeUtils.isAbstractMethod(methodNode.access)).forEach(methodNode -> {
+                            && !Modifier.isAbstract(methodNode.access)).forEach(methodNode -> {
                 int varIndex = methodNode.maxLocals;
                 methodNode.maxLocals++;
                 methodNode.owner = classNode.name;
@@ -56,10 +60,7 @@ public class NormalFlowObfuscation extends AbstractTransformer {
                         }
                     }
                     if (insn != methodNode.instructions.getFirst()
-                        //&& !(insn instanceof LineNumberNode)
-                        //&& insn.getPrevious() != null
-                        //&& insn.getPrevious().getOpcode() != ASTORE
-                        /*&& insn.getOpcode() != ASTORE*/) {
+                            && !(insn instanceof LineNumberNode)) {
                         if (methodNode.name.equals("<init>") && !calledSuper)
                             continue;
                         StackAnalyzer sa = new StackAnalyzer(methodNode, insn);
@@ -114,29 +115,37 @@ public class NormalFlowObfuscation extends AbstractTransformer {
         AbstractInsnNode target = methodNode.instructions.getFirst();
         methodNode.instructions.insertBefore(target, new JumpInsnNode(GOTO, escapeNode));
         methodNode.instructions.insertBefore(target, lb);
-        if (methodNode.desc.endsWith(")V")) {
-            methodNode.instructions.insertBefore(target, new InsnNode(RETURN));
-        } else if (methodNode.desc.endsWith(")B")
-                || methodNode.desc.endsWith(")S")
-                || methodNode.desc.endsWith(")I")
-                || methodNode.desc.endsWith(")Z")
-                || methodNode.desc.endsWith(")C")) {
-            methodNode.instructions.insertBefore(target, new InsnNode(ICONST_0));
-            methodNode.instructions.insertBefore(target, new InsnNode(IRETURN));
-        } else if (methodNode.desc.endsWith(")J")) {
-            methodNode.instructions.insertBefore(target, new InsnNode(LCONST_0));
-            methodNode.instructions.insertBefore(target, new InsnNode(LRETURN));
-        } else if (methodNode.desc.endsWith(")F")) {
-            methodNode.instructions.insertBefore(target, new InsnNode(FCONST_0));
-            methodNode.instructions.insertBefore(target, new InsnNode(FRETURN));
-        } else if (methodNode.desc.endsWith(")D")) {
-            methodNode.instructions.insertBefore(target, new InsnNode(DCONST_0));
-            methodNode.instructions.insertBefore(target, new InsnNode(DRETURN));
-        } else {
-            methodNode.instructions.insertBefore(target, new InsnNode(ACONST_NULL));
-            methodNode.instructions.insertBefore(target, new InsnNode(ARETURN));
+        Type returnType = Type.getReturnType(methodNode.desc);
+        switch (returnType.getSort()) {
+            case Type.VOID:
+                methodNode.instructions.insertBefore(target, new InsnNode(RETURN));
+                break;
+            case Type.BOOLEAN:
+            case Type.CHAR:
+            case Type.BYTE:
+            case Type.SHORT:
+            case Type.INT:
+                methodNode.instructions.insertBefore(target, new InsnNode(ICONST_0));
+                methodNode.instructions.insertBefore(target, new InsnNode(IRETURN));
+                break;
+            case Type.LONG:
+                methodNode.instructions.insertBefore(target, new InsnNode(LCONST_0));
+                methodNode.instructions.insertBefore(target, new InsnNode(LRETURN));
+                break;
+            case Type.FLOAT:
+                methodNode.instructions.insertBefore(target, new InsnNode(FCONST_0));
+                methodNode.instructions.insertBefore(target, new InsnNode(FRETURN));
+                break;
+            case Type.DOUBLE:
+                methodNode.instructions.insertBefore(target, new InsnNode(DCONST_0));
+                methodNode.instructions.insertBefore(target, new InsnNode(DRETURN));
+                break;
+            default:
+                methodNode.instructions.insertBefore(target, new InsnNode(ACONST_NULL));
+                methodNode.instructions.insertBefore(target, new InsnNode(ARETURN));
+                break;
         }
-        methodNode.instructions.insert(target, escapeNode);
+        methodNode.instructions.insertBefore(target, escapeNode);
 
         return lb;
     }

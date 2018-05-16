@@ -1,28 +1,27 @@
 package me.itzsomebody.radon.transformers.flow;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.lang.reflect.Modifier;
 import java.util.Stack;
 import java.util.concurrent.atomic.AtomicInteger;
 import me.itzsomebody.radon.analyzer.StackAnalyzer;
 import me.itzsomebody.radon.transformers.AbstractTransformer;
-import me.itzsomebody.radon.utils.BytecodeUtils;
 import me.itzsomebody.radon.utils.LoggerUtils;
-import me.itzsomebody.radon.utils.NumberUtils;
 import me.itzsomebody.radon.utils.StringUtils;
+import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.LabelNode;
+import org.objectweb.asm.tree.LineNumberNode;
+import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
 /**
- * This transformer attempts to increase flow obsucurity by making additional
- * jumps to other inserted flow obfuscation instructions.
- * TODO: Fix this
+ * Transformer that does the same as {@link NormalFlowObfuscation}, but with
+ * a couple extra fake jumps.
  *
  * @author ItzSomebody
  */
@@ -35,57 +34,63 @@ public class HeavyFlowObfuscation extends AbstractTransformer {
         long current = System.currentTimeMillis();
         this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
         this.logStrings.add(LoggerUtils.stdOut("Started heavy flow obfuscation transformer"));
-        this.classNodes().stream().filter(classNode -> !this.exempted(classNode.name, "Flow")).forEach(classNode -> {
+        classNodes().parallelStream().filter(classNode -> !this.exempted(classNode.name, "Flow")).forEach(classNode -> {
             FieldNode field = new FieldNode(ACC_PUBLIC + ACC_STATIC +
                     ACC_FINAL, StringUtils.randomString(this.dictionary), "Z", null, null);
             classNode.fields.add(field);
-            classNode.methods.stream().filter(methodNode ->
-                    !exempted(classNode.name + '.' + methodNode.name + methodNode.desc, "Flow")
-                            && !methodNode.name.equals("<init>")
-                            && !BytecodeUtils.isAbstractMethod(methodNode.access)).forEach(methodNode -> {
-                methodNode.owner = classNode.name;
+            classNode.methods.parallelStream().filter(methodNode ->
+                    !this.exempted(classNode.name + '.' + methodNode.name + methodNode.desc, "Flow")
+                            && !Modifier.isAbstract(methodNode.access)).forEach(methodNode -> {
                 int varIndex = methodNode.maxLocals;
-                List<JumpInsnNode> jumps = new ArrayList<>();
-                AbstractInsnNode[] untouched = methodNode.instructions.toArray();
-                LabelNode exitNode = exitLabel(methodNode);
-                for (AbstractInsnNode insn : untouched) {
+                methodNode.maxLocals++;
+                methodNode.owner = classNode.name;
+                AbstractInsnNode[] untouchedList = methodNode.instructions.toArray();
+                LabelNode labelNode = exitLabel(methodNode);
+                boolean calledSuper = false;
+                for (AbstractInsnNode insn : untouchedList) {
+                    if (this.methodSize(methodNode) > 60000) break;
+                    if (methodNode.name.equals("<init>")) {
+                        if (insn instanceof MethodInsnNode) {
+                            if (insn.getOpcode() == INVOKESPECIAL
+                                    && insn.getPrevious() instanceof VarInsnNode
+                                    && ((VarInsnNode) insn.getPrevious()).var == 0) {
+                                calledSuper = true;
+                            }
+                        }
+                    }
                     if (insn != methodNode.instructions.getFirst()
-                            && insn != methodNode.instructions.getLast()) {
+                            && !(insn instanceof LineNumberNode)) {
+                        if (methodNode.name.equals("<init>") && !calledSuper)
+                            continue;
                         StackAnalyzer sa = new StackAnalyzer(methodNode, insn);
                         Stack<Object> stack = sa.returnStackAtBreak();
                         if (stack.isEmpty()) { // We need to make sure stack is empty before making jumps
                             methodNode.instructions.insertBefore(insn, new VarInsnNode(ILOAD, varIndex));
-                            JumpInsnNode jump = new JumpInsnNode(IFNE, exitNode);
-                            jumps.add(jump);
-                            methodNode.instructions.insertBefore(insn, jump);
+                            methodNode.instructions.insertBefore(insn,
+                                    new JumpInsnNode(IFNE, labelNode));
                             counter.incrementAndGet();
                         }
                     }
-
-                    if (insn.getOpcode() == GOTO) {
-                        methodNode.instructions.insertBefore(insn,
-                                new VarInsnNode(ILOAD, varIndex));
-                        methodNode.instructions.insertBefore(insn,
-                                new InsnNode(ICONST_0));
-                        methodNode.instructions.insert(insn,
-                                new InsnNode(ATHROW));
-                        methodNode.instructions.insert(insn,
-                                new InsnNode(ACONST_NULL));
-                        methodNode.instructions.set(insn,
-                                new JumpInsnNode(IF_ICMPEQ,
-                                        ((JumpInsnNode) insn).label));
-                        counter.incrementAndGet();
-                    }
-                }
-
-                if (jumps.size() > 1) {
-                    JumpInsnNode exitJump = jumps.get(NumberUtils.getRandomInt(jumps.size()));
-                    LabelNode exitJumpLb = new LabelNode();
-                    methodNode.instructions.insertBefore(exitJump.getPrevious(), exitJumpLb);
-                    jumps.remove(exitJump);
-
-                    for (JumpInsnNode jump : jumps) {
-                        jump.label = exitJumpLb;
+                    if (insn instanceof JumpInsnNode) {
+                        if (insn.getOpcode() == GOTO) {
+                            methodNode.instructions.insertBefore(insn,
+                                    new VarInsnNode(ILOAD, varIndex));
+                            methodNode.instructions.insertBefore(insn,
+                                    new InsnNode(ICONST_0));
+                            methodNode.instructions.insert(insn,
+                                    new InsnNode(ATHROW));
+                            methodNode.instructions.insert(insn,
+                                    new InsnNode(ACONST_NULL));
+                            methodNode.instructions.set(insn,
+                                    new JumpInsnNode(IF_ICMPEQ,
+                                            ((JumpInsnNode) insn).label));
+                            counter.incrementAndGet();
+                        } else if (insn.getOpcode() >= IFEQ
+                                || insn.getOpcode() <= IF_ICMPLE) {
+                            methodNode.instructions.insert(insn, new JumpInsnNode(IFNE, ((JumpInsnNode) insn).label));
+                            methodNode.instructions.insert(insn, new VarInsnNode(ILOAD, varIndex));
+                            counter.incrementAndGet();
+                        }
                     }
                 }
                 methodNode.instructions.insertBefore(methodNode.instructions
@@ -114,29 +119,37 @@ public class HeavyFlowObfuscation extends AbstractTransformer {
         AbstractInsnNode target = methodNode.instructions.getFirst();
         methodNode.instructions.insertBefore(target, new JumpInsnNode(GOTO, escapeNode));
         methodNode.instructions.insertBefore(target, lb);
-        if (methodNode.desc.endsWith(")V")) {
-            methodNode.instructions.insertBefore(target, new InsnNode(RETURN));
-        } else if (methodNode.desc.endsWith(")B")
-                || methodNode.desc.endsWith(")S")
-                || methodNode.desc.endsWith(")I")
-                || methodNode.desc.endsWith(")Z")
-                || methodNode.desc.endsWith(")C")) {
-            methodNode.instructions.insertBefore(target, new InsnNode(ICONST_0));
-            methodNode.instructions.insertBefore(target, new InsnNode(IRETURN));
-        } else if (methodNode.desc.endsWith(")J")) {
-            methodNode.instructions.insertBefore(target, new InsnNode(LCONST_0));
-            methodNode.instructions.insertBefore(target, new InsnNode(LRETURN));
-        } else if (methodNode.desc.endsWith(")F")) {
-            methodNode.instructions.insertBefore(target, new InsnNode(FCONST_0));
-            methodNode.instructions.insertBefore(target, new InsnNode(FRETURN));
-        } else if (methodNode.desc.endsWith(")D")) {
-            methodNode.instructions.insertBefore(target, new InsnNode(DCONST_0));
-            methodNode.instructions.insertBefore(target, new InsnNode(DRETURN));
-        } else {
-            methodNode.instructions.insertBefore(target, new InsnNode(ACONST_NULL));
-            methodNode.instructions.insertBefore(target, new InsnNode(ARETURN));
+        Type returnType = Type.getReturnType(methodNode.desc);
+        switch (returnType.getSort()) {
+            case Type.VOID:
+                methodNode.instructions.insertBefore(target, new InsnNode(RETURN));
+                break;
+            case Type.BOOLEAN:
+            case Type.CHAR:
+            case Type.BYTE:
+            case Type.SHORT:
+            case Type.INT:
+                methodNode.instructions.insertBefore(target, new InsnNode(ICONST_0));
+                methodNode.instructions.insertBefore(target, new InsnNode(IRETURN));
+                break;
+            case Type.LONG:
+                methodNode.instructions.insertBefore(target, new InsnNode(LCONST_0));
+                methodNode.instructions.insertBefore(target, new InsnNode(LRETURN));
+                break;
+            case Type.FLOAT:
+                methodNode.instructions.insertBefore(target, new InsnNode(FCONST_0));
+                methodNode.instructions.insertBefore(target, new InsnNode(FRETURN));
+                break;
+            case Type.DOUBLE:
+                methodNode.instructions.insertBefore(target, new InsnNode(DCONST_0));
+                methodNode.instructions.insertBefore(target, new InsnNode(DRETURN));
+                break;
+            default:
+                methodNode.instructions.insertBefore(target, new InsnNode(ACONST_NULL));
+                methodNode.instructions.insertBefore(target, new InsnNode(ARETURN));
+                break;
         }
-        methodNode.instructions.insert(target, escapeNode);
+        methodNode.instructions.insertBefore(target, escapeNode);
 
         return lb;
     }

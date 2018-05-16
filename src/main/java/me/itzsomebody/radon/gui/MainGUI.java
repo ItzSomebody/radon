@@ -18,6 +18,7 @@ import me.itzsomebody.radon.config.ConfigEnum;
 import me.itzsomebody.radon.config.ConfigWriter;
 import me.itzsomebody.radon.internal.Bootstrap;
 import me.itzsomebody.radon.transformers.AbstractTransformer;
+import me.itzsomebody.radon.transformers.flow.HeavyFlowObfuscation;
 import me.itzsomebody.radon.transformers.flow.LightFlowObfuscation;
 import me.itzsomebody.radon.transformers.flow.NormalFlowObfuscation;
 import me.itzsomebody.radon.transformers.invokedynamic.HeavyInvokeDynamic;
@@ -393,7 +394,7 @@ public class MainGUI {
         gbc_comboBox_2.gridx = 9;
         gbc_comboBox_2.gridy = 2;
 
-        String[] flows = {"Light", "Normal"};
+        String[] flows = {"Light", "Normal", "Heavy"};
         for (String s : flows) {
             comboBox_2.addItem(s);
         }
@@ -1379,6 +1380,9 @@ public class MainGUI {
                                     case 1:
                                         transformers.add(new NormalFlowObfuscation());
                                         break;
+                                    case 2:
+                                        transformers.add(new HeavyFlowObfuscation());
+                                        break;
                                 }
                             }
                             if (chckbxSpringPool.isSelected()) {
@@ -1568,6 +1572,11 @@ public class MainGUI {
                                         instanceof NormalFlowObfuscation) {
                                     chckbxFlow.setSelected(true);
                                     comboBox_2.setSelectedIndex(1);
+                                    comboBox_2.setEnabled(true);
+                                } else if (flowObfuscationMode
+                                        instanceof HeavyFlowObfuscation) {
+                                    chckbxFlow.setSelected(true);
+                                    comboBox_2.setSelectedIndex(2);
                                     comboBox_2.setEnabled(true);
                                 }
 
