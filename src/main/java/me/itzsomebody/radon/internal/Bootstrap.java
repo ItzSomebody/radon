@@ -418,6 +418,9 @@ public class Bootstrap { // Eyyy bootstrap bill
                 this.logStrings.add(LoggerUtils.stdOut("Output already exists, renamed to "
                         + FileUtils.renameExistingFile(this.output)));
             }
+            if (this.trashClasses != 1 && this.config.getSpigotBool()) {
+                throw new RuntimeException("Trash classes are not compatible with Spigot's anti-piracy injection.");
+            }
             this.zos = new ZipOutputStream(new FileOutputStream(this.output));
         } catch (Throwable t) {
             t.printStackTrace();

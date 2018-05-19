@@ -1,3 +1,7 @@
+## 0.8.2
+
+* Added warning about mixing Spigot's anti-piracy and trash classes together.
+
 ## 0.8.1
 
 * Changed the CustomClassWriter a bit.
