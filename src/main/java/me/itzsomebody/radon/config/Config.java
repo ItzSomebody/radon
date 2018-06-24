@@ -763,7 +763,7 @@ public class Config {
                             "true/false");
                 boolean s = (Boolean) value;
                 if (s) {
-                    return new HideCode(getSpigotBool());
+                    return new HideCode();
                 }
             } else {
                 throw new IllegalArgumentException("HideCode arg is null");

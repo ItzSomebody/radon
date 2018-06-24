@@ -20,7 +20,6 @@ package me.itzsomebody.radon.transformers.linenumbers;
 import java.lang.reflect.Modifier;
 import java.util.concurrent.atomic.AtomicInteger;
 import me.itzsomebody.radon.transformers.AbstractTransformer;
-import me.itzsomebody.radon.utils.BytecodeUtils;
 import me.itzsomebody.radon.utils.LoggerUtils;
 import me.itzsomebody.radon.utils.NumberUtils;
 import org.objectweb.asm.tree.AbstractInsnNode;

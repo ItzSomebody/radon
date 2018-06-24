@@ -20,6 +20,8 @@ package me.itzsomebody.radon.utils;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
+import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.IntInsnNode;
@@ -247,5 +249,35 @@ public class BytecodeUtils {
         }
 
         return false;
+    }
+
+    /**
+     * Returns true if provided {@link MethodNode} has any annotations. Otherwise, false.
+     *
+     * @param methodNode {@link MethodNode} to check.
+     * @return true if provided {@link MethodNode} has any annotations. Otherwise, false.
+     */
+    public static boolean hasAnnotations(MethodNode methodNode) {
+        return (methodNode.visibleAnnotations != null && methodNode.visibleAnnotations.isEmpty());
+    }
+
+    /**
+     * Returns true if provided {@link FieldNode} has any annotations. Otherwise, false.
+     *
+     * @param fieldNode {@link FieldNode} to check.
+     * @return true if provided {@link FieldNode} has any annotations. Otherwise, false.
+     */
+    public static boolean hasAnnotations(FieldNode fieldNode) {
+        return (fieldNode.visibleAnnotations != null && fieldNode.visibleAnnotations.isEmpty());
+    }
+
+    /**
+     * Returns true if provided {@link ClassNode} has any annotations. Otherwise, false.
+     *
+     * @param classNode {@link ClassNode} to check.
+     * @return true if provided {@link ClassNode} has any annotations. Otherwise, false.
+     */
+    public static boolean hasAnnotations(ClassNode classNode) {
+        return (classNode.visibleAnnotations != null && classNode.visibleAnnotations.isEmpty());
     }
 }

@@ -1452,7 +1452,7 @@ public class MainGUI {
                                 transformers.add(new Crasher());
                             }
                             if (chckbxHidecode.isSelected()) {
-                                transformers.add(new HideCode(spigotMode));
+                                transformers.add(new HideCode());
                             }
 
                             int trashClasses = -1;

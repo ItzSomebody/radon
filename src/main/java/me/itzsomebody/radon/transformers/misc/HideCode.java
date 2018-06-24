@@ -24,25 +24,10 @@ import me.itzsomebody.radon.utils.LoggerUtils;
 
 /**
  * Transformer that applies a code hiding technique by applying synthetic modifiers to the class, fields, and methods.
- * Known to have problems with Spigot plugins with EventHandlers.
  *
  * @author ItzSomebody
  */
 public class HideCode extends AbstractTransformer {
-    /**
-     * TODO: Indication to check for EventHandlers before attempting to add synthetic modifier.
-     */
-    private boolean spigotMode;
-
-    /**
-     * Constructor used to create a {@link HideCode} object.
-     *
-     * @param spigotMode TODO: indication to check for EventHandlers.
-     */
-    public HideCode(boolean spigotMode) {
-        this.spigotMode = spigotMode;
-    }
-
     /**
      * Applies obfuscation.
      */
@@ -52,32 +37,34 @@ public class HideCode extends AbstractTransformer {
         this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
         this.logStrings.add(LoggerUtils.stdOut("Started hide code transformer"));
         this.classNodes().stream().filter(classNode -> !this.exempted(classNode.name, "HideCode")).forEach(classNode -> {
-            if (!BytecodeUtils.isSyntheticMethod(classNode.access)) {
+            if (!BytecodeUtils.isSyntheticMethod(classNode.access)
+                    && !BytecodeUtils.hasAnnotations(classNode)) {
                 classNode.access |= ACC_SYNTHETIC;
                 counter.incrementAndGet();
             }
 
             classNode.methods.stream().filter(methodNode ->
-                    !this.exempted(classNode.name + '.' + methodNode.name + methodNode.desc, "HideCode"))
-                    .forEach(methodNode -> {
-                        boolean hidOnce = false;
-                        if (!BytecodeUtils.isSyntheticMethod(methodNode.access)) {
-                            methodNode.access |= ACC_SYNTHETIC;
-                            hidOnce = true;
-                        }
+                    !this.exempted(classNode.name + '.' + methodNode.name + methodNode.desc, "HideCode")
+                            && !BytecodeUtils.hasAnnotations(methodNode)).forEach(methodNode -> {
+                boolean hidOnce = false;
+                if (!BytecodeUtils.isSyntheticMethod(methodNode.access)) {
+                    methodNode.access |= ACC_SYNTHETIC;
+                    hidOnce = true;
+                }
 
-                        if (!BytecodeUtils.isBridgeMethod(methodNode.access)
-                                && !methodNode.name.startsWith("<")) {
-                            methodNode.access |= ACC_BRIDGE;
-                            hidOnce = true;
-                        }
+                if (!BytecodeUtils.isBridgeMethod(methodNode.access)
+                        && !methodNode.name.startsWith("<")) {
+                    methodNode.access |= ACC_BRIDGE;
+                    hidOnce = true;
+                }
 
-                        if (hidOnce) counter.incrementAndGet();
-                    });
+                if (hidOnce) counter.incrementAndGet();
+            });
 
             if (classNode.fields != null)
                 classNode.fields.stream().filter(fieldNode ->
-                        !exempted(classNode.name + '.' + fieldNode.name, "HideCode")).forEach(fieldNode -> {
+                        !exempted(classNode.name + '.' + fieldNode.name, "HideCode")
+                                && !BytecodeUtils.hasAnnotations(fieldNode)).forEach(fieldNode -> {
                     if (!BytecodeUtils.isSyntheticMethod(fieldNode.access)) {
                         fieldNode.access |= ACC_SYNTHETIC;
                         counter.incrementAndGet();

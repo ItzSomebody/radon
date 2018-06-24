@@ -37,8 +37,8 @@ public class RemoveLocalVariables extends AbstractTransformer {
         this.logStrings.add(LoggerUtils.stdOut("Started local variable removal transformer"));
         this.classNodes().stream().filter(classNode -> !this.exempted(classNode.name, "LocalVars")).forEach(classNode -> {
             classNode.methods.stream().filter(methodNode ->
-                    !this.exempted(classNode.name + '.' + methodNode.name + methodNode.desc, "LocalVars"))
-                    .filter(methodNode -> methodNode.localVariables != null).forEach(methodNode -> {
+                    !this.exempted(classNode.name + '.' + methodNode.name + methodNode.desc, "LocalVars")
+                            && methodNode.localVariables != null).forEach(methodNode -> {
                 counter.addAndGet(methodNode.localVariables.size());
                 methodNode.localVariables = null;
             });
