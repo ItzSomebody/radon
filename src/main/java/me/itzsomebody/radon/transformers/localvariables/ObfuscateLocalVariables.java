@@ -38,8 +38,8 @@ public class ObfuscateLocalVariables extends AbstractTransformer {
         this.logStrings.add(LoggerUtils.stdOut("Started local variable obfuscation transformer"));
         this.classNodes().stream().filter(classNode -> !this.exempted(classNode.name, "LocalVars")).forEach(classNode -> {
             classNode.methods.stream().filter(methodNode ->
-                    !this.exempted(classNode.name + '.' + methodNode.name + methodNode.desc, "LocalVars"))
-                    .filter(methodNode -> methodNode.localVariables != null).forEach(methodNode -> {
+                    !this.exempted(classNode.name + '.' + methodNode.name + methodNode.desc, "LocalVars")
+                            && methodNode.localVariables != null).forEach(methodNode -> {
                 methodNode.localVariables.forEach(localVariableNode -> {
                     localVariableNode.name = StringUtils.crazyString();
                     counter.incrementAndGet();

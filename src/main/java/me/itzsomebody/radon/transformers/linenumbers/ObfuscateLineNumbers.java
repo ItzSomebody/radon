@@ -17,6 +17,7 @@
 
 package me.itzsomebody.radon.transformers.linenumbers;
 
+import java.lang.reflect.Modifier;
 import java.util.concurrent.atomic.AtomicInteger;
 import me.itzsomebody.radon.transformers.AbstractTransformer;
 import me.itzsomebody.radon.utils.BytecodeUtils;
@@ -43,8 +44,8 @@ public class ObfuscateLineNumbers extends AbstractTransformer {
         this.logStrings.add(LoggerUtils.stdOut("Started line obfuscation transformer"));
         this.classNodes().stream().filter(classNode -> !this.exempted(classNode.name, "LineNumbers")).forEach(classNode -> {
             classNode.methods.stream().filter(methodNode ->
-                    !this.exempted(classNode.name + '.' + methodNode.name + methodNode.desc, "LineNumbers"))
-                    .filter(methodNode -> !BytecodeUtils.isAbstractMethod(methodNode.access)).forEach(methodNode -> {
+                    !this.exempted(classNode.name + '.' + methodNode.name + methodNode.desc, "LineNumbers")
+                            && !Modifier.isAbstract(methodNode.access)).forEach(methodNode -> {
                 for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
                     if (insn instanceof LineNumberNode) {
                         LineNumberNode lineNumberNode = (LineNumberNode) insn;
