@@ -51,13 +51,13 @@ public class HeavyFlowObfuscation extends AbstractTransformer {
         long current = System.currentTimeMillis();
         this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
         this.logStrings.add(LoggerUtils.stdOut("Started heavy flow obfuscation transformer"));
-        classNodes().parallelStream().filter(classNode -> !this.exempted(classNode.name, "Flow")).forEach(classNode -> {
+        classNodes().stream().filter(classNode -> !this.exempted(classNode.name, "Flow")).forEach(classNode -> {
             FieldNode field = new FieldNode(ACC_PUBLIC + ACC_STATIC +
                     ACC_FINAL, StringUtils.randomString(this.dictionary), "Z", null, null);
             classNode.fields.add(field);
-            classNode.methods.parallelStream().filter(methodNode ->
+            classNode.methods.stream().filter(methodNode ->
                     !this.exempted(classNode.name + '.' + methodNode.name + methodNode.desc, "Flow")
-                            && !Modifier.isAbstract(methodNode.access)).forEach(methodNode -> {
+                            && hasInstructions(methodNode)).forEach(methodNode -> {
                 int varIndex = methodNode.maxLocals;
                 methodNode.maxLocals++;
                 methodNode.owner = classNode.name;

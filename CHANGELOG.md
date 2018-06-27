@@ -1,3 +1,8 @@
+## 0.8.3
+
+* Added compensation for the fact that methods with the native flag don't have instructions in them.
+* Fixed the trash classes & spigot mode warning reported by kangarko.
+
 ## 0.8.2
 
 * Added warning about mixing Spigot's anti-piracy and trash classes together.

@@ -44,7 +44,7 @@ public class ObfuscateLineNumbers extends AbstractTransformer {
         this.classNodes().stream().filter(classNode -> !this.exempted(classNode.name, "LineNumbers")).forEach(classNode -> {
             classNode.methods.stream().filter(methodNode ->
                     !this.exempted(classNode.name + '.' + methodNode.name + methodNode.desc, "LineNumbers")
-                            && !Modifier.isAbstract(methodNode.access)).forEach(methodNode -> {
+                            && hasInstructions(methodNode)).forEach(methodNode -> {
                 for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
                     if (insn instanceof LineNumberNode) {
                         LineNumberNode lineNumberNode = (LineNumberNode) insn;

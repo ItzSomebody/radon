@@ -126,37 +126,27 @@ public class BytecodeUtils {
      * @param access method access to check.
      * @return true if access has native modifier.
      */
-    public static boolean isNativeMethod(int access) {
-        return (access & Opcodes.ACC_NATIVE) != 0;
-    }
-
-    /**
-     * Returns true if access has abstract modifier.
-     *
-     * @param access method access to check.
-     * @return true if access has abstract modifier.
-     */
-    public static boolean isAbstractMethod(int access) {
-        return (access & Opcodes.ACC_ABSTRACT) != 0;
+    public static boolean isNative(int access) {
+        return (access & Opcodes.ACC_SYNTHETIC) != 0;
     }
 
     /**
      * Returns true if access has synthetic modifier.
      *
      * @param access method access to check.
-     * @return true if access has abstract modifier.
+     * @return true if access has synthetic modifier.
      */
-    public static boolean isSyntheticMethod(int access) {
+    public static boolean isSynthetic(int access) {
         return (access & Opcodes.ACC_SYNTHETIC) != 0;
     }
 
     /**
-     * Returns true if access has bride modifier.
+     * Returns true if access has bridge modifier.
      *
      * @param access method access to check.
-     * @return true if access has abstract modifier.
+     * @return true if access has bridge modifier.
      */
-    public static boolean isBridgeMethod(int access) {
+    public static boolean isBridge(int access) {
         return (access & Opcodes.ACC_BRIDGE) != 0;
     }
 

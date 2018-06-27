@@ -80,7 +80,7 @@ public class HeavyInvokeDynamic extends AbstractTransformer {
                 && classNode.version >= 51).forEach(classNode -> {
             classNode.methods.stream().filter(methodNode ->
                     !this.exempted(classNode.name + '.' + methodNode.name + methodNode.desc, "InvokeDynamic")
-                            && !BytecodeUtils.isAbstractMethod(methodNode.access)).forEach(methodNode -> {
+                            && hasInstructions(methodNode)).forEach(methodNode -> {
                 for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
                     if (this.methodSize(methodNode) > 60000) break;
                     if (insn instanceof MethodInsnNode) {

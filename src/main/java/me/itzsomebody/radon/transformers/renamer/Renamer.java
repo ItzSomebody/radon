@@ -75,7 +75,7 @@ public class Renamer extends AbstractTransformer {
         long current = System.currentTimeMillis();
         AtomicInteger counter = new AtomicInteger();
         this.classNodes().forEach(classNode -> {
-            classNode.methods.stream().filter(methodNode -> !BytecodeUtils.isNativeMethod(methodNode.access)
+            classNode.methods.stream().filter(methodNode -> !BytecodeUtils.isNative(methodNode.access)
                     && !methodNode.name.equals("main")
                     && !methodNode.name.equals("premain")
                     && !methodNode.name.startsWith("<")

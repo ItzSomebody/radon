@@ -61,7 +61,7 @@ public class StringPool extends AbstractTransformer {
             List<String> stringslist = new ArrayList<>();
             classNode.methods.stream().filter(methodNode ->
                     !this.exempted(classNode.name + '.' + methodNode.name + methodNode.desc, "StringPool")
-                            && !BytecodeUtils.isAbstractMethod(methodNode.access)).forEach(methodNode -> {
+                            && hasInstructions(methodNode)).forEach(methodNode -> {
                 for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
                     if (insn instanceof LdcInsnNode) {
                         Object cst = ((LdcInsnNode) insn).cst;

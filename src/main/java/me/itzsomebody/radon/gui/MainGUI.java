@@ -1467,7 +1467,7 @@ public class MainGUI {
 
                             int dictionary = dictionaryComboBox.getSelectedIndex();
 
-                            if (trashClasses != 1 && spigotMode) {
+                            if (chckbxTrashClasses.isSelected() && spigotMode) {
                                 throw new RuntimeException("Trash classes are not compatible with Spigot's anti-piracy injection.");
                             }
 

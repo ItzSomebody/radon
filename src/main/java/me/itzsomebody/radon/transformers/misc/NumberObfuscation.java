@@ -43,8 +43,8 @@ public class NumberObfuscation extends AbstractTransformer {
         this.logStrings.add(LoggerUtils.stdOut("Started number obfuscation transformer"));
         this.classNodes().stream().filter(classNode -> !this.exempted(classNode.name, "Numbers")).forEach(classNode -> {
             classNode.methods.stream().filter(methodNode ->
-                    !this.exempted(classNode.name + '.' + methodNode.name + methodNode.desc, "Numbers"))
-                    .filter(methodNode -> !BytecodeUtils.isAbstractMethod(methodNode.access)).forEach(methodNode -> {
+                    !this.exempted(classNode.name + '.' + methodNode.name + methodNode.desc, "Numbers")
+                            && hasInstructions(methodNode)).forEach(methodNode -> {
                 for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
                     if (methodSize(methodNode) > 60000) break;
                     if (BytecodeUtils.isIntInsn(insn)) {

@@ -37,7 +37,7 @@ public class HideCode extends AbstractTransformer {
         this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
         this.logStrings.add(LoggerUtils.stdOut("Started hide code transformer"));
         this.classNodes().stream().filter(classNode -> !this.exempted(classNode.name, "HideCode")).forEach(classNode -> {
-            if (!BytecodeUtils.isSyntheticMethod(classNode.access)
+            if (!BytecodeUtils.isSynthetic(classNode.access)
                     && !BytecodeUtils.hasAnnotations(classNode)) {
                 classNode.access |= ACC_SYNTHETIC;
                 counter.incrementAndGet();
@@ -47,12 +47,12 @@ public class HideCode extends AbstractTransformer {
                     !this.exempted(classNode.name + '.' + methodNode.name + methodNode.desc, "HideCode")
                             && !BytecodeUtils.hasAnnotations(methodNode)).forEach(methodNode -> {
                 boolean hidOnce = false;
-                if (!BytecodeUtils.isSyntheticMethod(methodNode.access)) {
+                if (!BytecodeUtils.isSynthetic(methodNode.access)) {
                     methodNode.access |= ACC_SYNTHETIC;
                     hidOnce = true;
                 }
 
-                if (!BytecodeUtils.isBridgeMethod(methodNode.access)
+                if (!BytecodeUtils.isBridge(methodNode.access)
                         && !methodNode.name.startsWith("<")) {
                     methodNode.access |= ACC_BRIDGE;
                     hidOnce = true;
@@ -65,7 +65,7 @@ public class HideCode extends AbstractTransformer {
                 classNode.fields.stream().filter(fieldNode ->
                         !exempted(classNode.name + '.' + fieldNode.name, "HideCode")
                                 && !BytecodeUtils.hasAnnotations(fieldNode)).forEach(fieldNode -> {
-                    if (!BytecodeUtils.isSyntheticMethod(fieldNode.access)) {
+                    if (!BytecodeUtils.isSynthetic(fieldNode.access)) {
                         fieldNode.access |= ACC_SYNTHETIC;
                         counter.incrementAndGet();
                     }

@@ -17,6 +17,7 @@
 
 package me.itzsomebody.radon.transformers;
 
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -29,6 +30,7 @@ import org.objectweb.asm.tree.MethodNode;
 
 /**
  * Abstract class used to make transformers.
+ * TODO: Allow dependency injection of class trees.
  *
  * @author ItzSomebody
  */
@@ -205,6 +207,16 @@ public abstract class AbstractTransformer implements Opcodes {
         CodeSizeEvaluator cse = new CodeSizeEvaluator(null);
         methodNode.accept(cse);
         return cse.getMaxSize();
+    }
+
+    /**
+     * Returns true if this is not either an abstract method, or a native method.
+     *
+     * @param methodNode the {@link MethodNode} to check.
+     * @return true if this is not either an abstract method, or a native method.
+     */
+    protected boolean hasInstructions(MethodNode methodNode) {
+        return (Modifier.isNative(methodNode.access) || Modifier.isAbstract(methodNode.access));
     }
 
     /**
