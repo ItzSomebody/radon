@@ -216,7 +216,7 @@ public abstract class AbstractTransformer implements Opcodes {
      * @return true if this is not either an abstract method, or a native method.
      */
     protected boolean hasInstructions(MethodNode methodNode) {
-        return (Modifier.isNative(methodNode.access) || Modifier.isAbstract(methodNode.access));
+        return (!Modifier.isNative(methodNode.access) && !Modifier.isAbstract(methodNode.access));
     }
 
     /**

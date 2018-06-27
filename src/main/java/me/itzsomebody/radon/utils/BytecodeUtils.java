@@ -121,16 +121,6 @@ public class BytecodeUtils {
     }
 
     /**
-     * Returns true if access has native modifier.
-     *
-     * @param access method access to check.
-     * @return true if access has native modifier.
-     */
-    public static boolean isNative(int access) {
-        return (access & Opcodes.ACC_SYNTHETIC) != 0;
-    }
-
-    /**
      * Returns true if access has synthetic modifier.
      *
      * @param access method access to check.

@@ -18,6 +18,7 @@
 package me.itzsomebody.radon.transformers.renamer;
 
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -75,7 +76,7 @@ public class Renamer extends AbstractTransformer {
         long current = System.currentTimeMillis();
         AtomicInteger counter = new AtomicInteger();
         this.classNodes().forEach(classNode -> {
-            classNode.methods.stream().filter(methodNode -> !BytecodeUtils.isNative(methodNode.access)
+            classNode.methods.stream().filter(methodNode -> !Modifier.isNative(methodNode.access)
                     && !methodNode.name.equals("main")
                     && !methodNode.name.equals("premain")
                     && !methodNode.name.startsWith("<")
