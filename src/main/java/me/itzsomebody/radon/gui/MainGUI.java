@@ -150,29 +150,22 @@ public class MainGUI {
         gbc_btnNewButton.insets = new Insets(0, 0, 5, 5);
         gbc_btnNewButton.gridx = 11;
         gbc_btnNewButton.gridy = 1;
-        btnNewButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JFileChooser chooser = new JFileChooser();
-                if (inputField.getText() != null
-                        && !inputField.getText().isEmpty()) {
-                    chooser.setSelectedFile(new File(inputField.getText()));
-                }
-                chooser.setMultiSelectionEnabled(false);
-                chooser.setFileSelectionMode(0);
-                if (lastPath != null)
-                    chooser.setCurrentDirectory(lastPath);
-                int result = chooser.showOpenDialog(frmRadonObfuscator);
-                if (result == 0) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            inputField.setText(chooser.getSelectedFile()
-                                    .getAbsolutePath());
-                            lastPath = chooser.getSelectedFile();
-                        }
-                    });
-                }
+        btnNewButton.addActionListener((e) -> {
+            JFileChooser chooser = new JFileChooser();
+            if (inputField.getText() != null
+                    && !inputField.getText().isEmpty()) {
+                chooser.setSelectedFile(new File(inputField.getText()));
+            }
+            chooser.setMultiSelectionEnabled(false);
+            chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+            if (lastPath != null)
+                chooser.setCurrentDirectory(lastPath);
+            int result = chooser.showOpenDialog(frmRadonObfuscator);
+            if (result == 0) {
+                SwingUtilities.invokeLater(() -> {
+                    inputField.setText(chooser.getSelectedFile().getAbsolutePath());
+                    lastPath = chooser.getSelectedFile();
+                });
             }
         });
         panel_4.add(btnNewButton, gbc_btnNewButton);
@@ -202,29 +195,22 @@ public class MainGUI {
                 5);
         gbc_btnNewButton_1.gridx = 11;
         gbc_btnNewButton_1.gridy = 2;
-        btnNewButton_1.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JFileChooser chooser = new JFileChooser();
-                if (outputField.getText() != null
-                        && !outputField.getText().isEmpty()) {
-                    chooser.setSelectedFile(new File(outputField.getText()));
-                }
-                chooser.setMultiSelectionEnabled(false);
-                chooser.setFileSelectionMode(0);
-                if (lastPath != null)
-                    chooser.setCurrentDirectory(lastPath);
-                int result = chooser.showOpenDialog(frmRadonObfuscator);
-                if (result == 0) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            outputField.setText(chooser.getSelectedFile()
-                                    .getAbsolutePath());
-                            lastPath = chooser.getSelectedFile();
-                        }
-                    });
-                }
+        btnNewButton_1.addActionListener((e) -> {
+            JFileChooser chooser = new JFileChooser();
+            if (outputField.getText() != null
+                    && !outputField.getText().isEmpty()) {
+                chooser.setSelectedFile(new File(outputField.getText()));
+            }
+            chooser.setMultiSelectionEnabled(false);
+            chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+            if (lastPath != null)
+                chooser.setCurrentDirectory(lastPath);
+            int result = chooser.showOpenDialog(frmRadonObfuscator);
+            if (result == 0) {
+                SwingUtilities.invokeLater(() -> {
+                    outputField.setText(chooser.getSelectedFile().getAbsolutePath());
+                    lastPath = chooser.getSelectedFile();
+                });
             }
         });
         panel_4.add(btnNewButton_1, gbc_btnNewButton_1);
@@ -268,31 +254,25 @@ public class MainGUI {
         scrollPane_2.setViewportView(list_2);
 
         JButton btnNewButton_6 = new JButton("Add");
-        btnNewButton_6.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JFileChooser chooser = new JFileChooser();
-                if (inputField.getText() != null
-                        && !inputField.getText().isEmpty()) {
-                    chooser.setSelectedFile(new File(inputField.getText()));
-                }
-                chooser.setMultiSelectionEnabled(true);
-                chooser.setFileSelectionMode(0);
-                if (lastPath != null)
-                    chooser.setCurrentDirectory(lastPath);
-                int result = chooser.showOpenDialog(frmRadonObfuscator);
-                if (result == 0) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            for (File file : chooser.getSelectedFiles()) {
-                                libList.addElement(file.getAbsolutePath());
-                            }
+        btnNewButton_6.addActionListener((e) -> {
+            JFileChooser chooser = new JFileChooser();
+            if (inputField.getText() != null
+                    && !inputField.getText().isEmpty()) {
+                chooser.setSelectedFile(new File(inputField.getText()));
+            }
+            chooser.setMultiSelectionEnabled(true);
+            chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+            if (lastPath != null)
+                chooser.setCurrentDirectory(lastPath);
+            int result = chooser.showOpenDialog(frmRadonObfuscator);
+            if (result == 0) {
+                SwingUtilities.invokeLater(() -> {
+                    for (File file : chooser.getSelectedFiles()) {
+                        libList.addElement(file.getAbsolutePath());
+                    }
 
-                            lastPath = chooser.getSelectedFile();
-                        }
-                    });
-                }
+                    lastPath = chooser.getSelectedFile();
+                });
             }
         });
         GridBagConstraints gbc_btnNewButton_6 = new GridBagConstraints();
@@ -303,15 +283,13 @@ public class MainGUI {
         panel_4.add(btnNewButton_6, gbc_btnNewButton_6);
 
         JButton btnNewButton_7 = new JButton("Remove");
-        btnNewButton_7.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent arg0) {
-                List<String> removeList = list_2.getSelectedValuesList();
-                if (removeList.isEmpty())
-                    return;
+        btnNewButton_7.addActionListener((e) -> {
+            List<String> removeList = list_2.getSelectedValuesList();
+            if (removeList.isEmpty())
+                return;
 
-                for (String s : removeList) {
-                    libList.removeElement(s);
-                }
+            for (String s : removeList) {
+                libList.removeElement(s);
             }
         });
         GridBagConstraints gbc_btnNewButton_7 = new GridBagConstraints();
@@ -345,7 +323,6 @@ public class MainGUI {
         for (String s : encryptions) {
             comboBox.addItem(s);
         }
-
         panel.add(comboBox, gbc_comboBox);
 
         JCheckBox chckbxStringEncryption = new JCheckBox("String Encryption");
@@ -354,17 +331,12 @@ public class MainGUI {
         gbc_chckbxStringEncryption.insets = new Insets(0, 0, 5, 5);
         gbc_chckbxStringEncryption.gridx = 0;
         gbc_chckbxStringEncryption.gridy = 0;
-        chckbxStringEncryption.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (chckbxStringEncryption.isSelected()) {
-                    comboBox.setEnabled(true);
-                } else if (!chckbxStringEncryption.isSelected()) {
-                    comboBox.setEnabled(false);
-                }
+        chckbxStringEncryption.addActionListener((e) -> {
+            if (chckbxStringEncryption.isSelected()) {
+                comboBox.setEnabled(true);
+            } else if (!chckbxStringEncryption.isSelected()) {
+                comboBox.setEnabled(false);
             }
-
         });
         panel.add(chckbxStringEncryption, gbc_chckbxStringEncryption);
 
@@ -379,7 +351,6 @@ public class MainGUI {
         for (String s : invokeDynamics) {
             comboBox_1.addItem(s);
         }
-
         panel.add(comboBox_1, gbc_comboBox_1);
 
         JCheckBox chckbxInvokeDynamic = new JCheckBox("InvokeDynamic");
@@ -388,17 +359,12 @@ public class MainGUI {
         gbc_chckbxNewCheckBox_1.insets = new Insets(0, 0, 5, 5);
         gbc_chckbxNewCheckBox_1.gridx = 0;
         gbc_chckbxNewCheckBox_1.gridy = 1;
-        chckbxInvokeDynamic.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (chckbxInvokeDynamic.isSelected()) {
-                    comboBox_1.setEnabled(true);
-                } else if (!chckbxInvokeDynamic.isSelected()) {
-                    comboBox_1.setEnabled(false);
-                }
+        chckbxInvokeDynamic.addActionListener((e) -> {
+            if (chckbxInvokeDynamic.isSelected()) {
+                comboBox_1.setEnabled(true);
+            } else if (!chckbxInvokeDynamic.isSelected()) {
+                comboBox_1.setEnabled(false);
             }
-
         });
 
         panel.add(chckbxInvokeDynamic, gbc_chckbxNewCheckBox_1);
@@ -410,12 +376,10 @@ public class MainGUI {
         gbc_comboBox_2.insets = new Insets(0, 0, 5, 5);
         gbc_comboBox_2.gridx = 9;
         gbc_comboBox_2.gridy = 2;
-
         String[] flows = {"Light", "Normal", "Heavy"};
         for (String s : flows) {
             comboBox_2.addItem(s);
         }
-
         panel.add(comboBox_2, gbc_comboBox_2);
 
         JCheckBox chckbxFlow = new JCheckBox("Flow");
@@ -424,17 +388,12 @@ public class MainGUI {
         gbc_chckbxFlow.anchor = GridBagConstraints.WEST;
         gbc_chckbxFlow.gridx = 0;
         gbc_chckbxFlow.gridy = 2;
-        chckbxFlow.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (chckbxFlow.isSelected()) {
-                    comboBox_2.setEnabled(true);
-                } else if (!chckbxFlow.isSelected()) {
-                    comboBox_2.setEnabled(false);
-                }
+        chckbxFlow.addActionListener((e) -> {
+            if (chckbxFlow.isSelected()) {
+                comboBox_2.setEnabled(true);
+            } else if (!chckbxFlow.isSelected()) {
+                comboBox_2.setEnabled(false);
             }
-
         });
         panel.add(chckbxFlow, gbc_chckbxFlow);
 
@@ -445,12 +404,10 @@ public class MainGUI {
         gbc_comboBox_3.insets = new Insets(0, 0, 5, 5);
         gbc_comboBox_3.gridx = 9;
         gbc_comboBox_3.gridy = 3;
-
         String[] localVariables = {"Obfuscate", "Remove"};
         for (String s : localVariables) {
             comboBox_3.addItem(s);
         }
-
         panel.add(comboBox_3, gbc_comboBox_3);
 
         JCheckBox chckbxLocalVariables = new JCheckBox("Local Variables");
@@ -459,17 +416,12 @@ public class MainGUI {
         gbc_chckbxNewCheckBox_2.anchor = GridBagConstraints.WEST;
         gbc_chckbxNewCheckBox_2.gridx = 0;
         gbc_chckbxNewCheckBox_2.gridy = 3;
-        chckbxLocalVariables.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (chckbxLocalVariables.isSelected()) {
-                    comboBox_3.setEnabled(true);
-                } else if (!chckbxLocalVariables.isSelected()) {
-                    comboBox_3.setEnabled(false);
-                }
+        chckbxLocalVariables.addActionListener((e) -> {
+            if (chckbxLocalVariables.isSelected()) {
+                comboBox_3.setEnabled(true);
+            } else if (!chckbxLocalVariables.isSelected()) {
+                comboBox_3.setEnabled(false);
             }
-
         });
         panel.add(chckbxLocalVariables, gbc_chckbxNewCheckBox_2);
 
@@ -492,17 +444,12 @@ public class MainGUI {
         gbc_chckbxNewCheckBox_3.anchor = GridBagConstraints.WEST;
         gbc_chckbxNewCheckBox_3.gridx = 0;
         gbc_chckbxNewCheckBox_3.gridy = 7;
-        chckbxTrashClasses.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (chckbxTrashClasses.isSelected()) {
-                    trashChanceField.setEditable(true);
-                } else if (!chckbxTrashClasses.isSelected()) {
-                    trashChanceField.setEditable(false);
-                }
+        chckbxTrashClasses.addActionListener((e) -> {
+            if (chckbxTrashClasses.isSelected()) {
+                trashChanceField.setEditable(true);
+            } else if (!chckbxTrashClasses.isSelected()) {
+                trashChanceField.setEditable(false);
             }
-
         });
         panel.add(chckbxTrashClasses, gbc_chckbxNewCheckBox_3);
 
@@ -513,12 +460,10 @@ public class MainGUI {
         gbc_comboBox_4.insets = new Insets(0, 0, 5, 5);
         gbc_comboBox_4.gridx = 9;
         gbc_comboBox_4.gridy = 5;
-
         String[] sourceNameTypes = {"Obfuscate", "Remove"};
         for (String s : sourceNameTypes) {
             comboBox_123.addItem(s);
         }
-
         panel.add(comboBox_123, gbc_comboBox_4);
 
         JCheckBox chckbxSourceName = new JCheckBox("Source Name");
@@ -527,14 +472,11 @@ public class MainGUI {
         gbc_chckbxNewCheckBox_123.insets = new Insets(0, 0, 5, 5);
         gbc_chckbxNewCheckBox_123.gridx = 0;
         gbc_chckbxNewCheckBox_123.gridy = 5;
-        chckbxSourceName.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (chckbxSourceName.isSelected()) {
-                    comboBox_123.setEnabled(true);
-                } else {
-                    comboBox_123.setEnabled(false);
-                }
+        chckbxSourceName.addActionListener((e) -> {
+            if (chckbxSourceName.isSelected()) {
+                comboBox_123.setEnabled(true);
+            } else {
+                comboBox_123.setEnabled(false);
             }
         });
         panel.add(chckbxSourceName, gbc_chckbxNewCheckBox_123);
@@ -546,7 +488,6 @@ public class MainGUI {
         gbc_comboBox1234.insets = new Insets(0, 0, 5, 5);
         gbc_comboBox1234.gridx = 9;
         gbc_comboBox1234.gridy = 6;
-
         String[] sourceDebugTypes = {"Obfuscate", "Remove"};
         for (String s : sourceDebugTypes) {
             comboBox_1234.addItem(s);
@@ -559,14 +500,11 @@ public class MainGUI {
         gbc_SourceDebug.insets = new Insets(0, 0, 5, 5);
         gbc_SourceDebug.gridx = 0;
         gbc_SourceDebug.gridy = 6;
-        chckbxSourceDebug.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (chckbxSourceDebug.isSelected()) {
-                    comboBox_1234.setEnabled(true);
-                } else {
-                    comboBox_1234.setEnabled(false);
-                }
+        chckbxSourceDebug.addActionListener((e) -> {
+            if (chckbxSourceDebug.isSelected()) {
+                comboBox_1234.setEnabled(true);
+            } else {
+                comboBox_1234.setEnabled(false);
             }
         });
         panel.add(chckbxSourceDebug, gbc_SourceDebug);
@@ -578,12 +516,10 @@ public class MainGUI {
         gbc_comboBox_5.insets = new Insets(0, 0, 5, 5);
         gbc_comboBox_5.gridx = 9;
         gbc_comboBox_5.gridy = 4;
-
         String[] lineTypes = {"Obfuscate", "Remove"};
         for (String s : lineTypes) {
             comboBox_5.addItem(s);
         }
-
         panel.add(comboBox_5, gbc_comboBox_5);
 
         JCheckBox chckbxLineObfuscation = new JCheckBox("Lines");
@@ -592,14 +528,11 @@ public class MainGUI {
         gbc_chckbxNewCheckBox_10.insets = new Insets(0, 0, 5, 5);
         gbc_chckbxNewCheckBox_10.gridx = 0;
         gbc_chckbxNewCheckBox_10.gridy = 4;
-        chckbxLineObfuscation.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (chckbxLineObfuscation.isSelected()) {
-                    comboBox_5.setEnabled(true);
-                } else {
-                    comboBox_5.setEnabled(false);
-                }
+        chckbxLineObfuscation.addActionListener((e) -> {
+            if (chckbxLineObfuscation.isSelected()) {
+                comboBox_5.setEnabled(true);
+            } else {
+                comboBox_5.setEnabled(false);
             }
         });
         panel.add(chckbxLineObfuscation, gbc_chckbxNewCheckBox_10);
@@ -750,21 +683,16 @@ public class MainGUI {
         gbc_chckbxNewCheckBox_8.insets = new Insets(0, 0, 5, 5);
         gbc_chckbxNewCheckBox_8.gridx = 0;
         gbc_chckbxNewCheckBox_8.gridy = 0;
-        chckbxAddWatermark.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                if (chckbxAddWatermark.isSelected()) {
-                    watermarkPassword.setEnabled(true);
-                    waterMarkMessageField.setEnabled(true);
-                    comboBox_05.setEnabled(true);
-                } else if (!chckbxAddWatermark.isSelected()) {
-                    watermarkPassword.setEnabled(false);
-                    waterMarkMessageField.setEnabled(false);
-                    comboBox_05.setEnabled(false);
-                }
+        chckbxAddWatermark.addActionListener((e) -> {
+            if (chckbxAddWatermark.isSelected()) {
+                watermarkPassword.setEnabled(true);
+                waterMarkMessageField.setEnabled(true);
+                comboBox_05.setEnabled(true);
+            } else if (!chckbxAddWatermark.isSelected()) {
+                watermarkPassword.setEnabled(false);
+                waterMarkMessageField.setEnabled(false);
+                comboBox_05.setEnabled(false);
             }
-
         });
         panel_2.add(chckbxAddWatermark, gbc_chckbxNewCheckBox_8);
 
@@ -803,25 +731,19 @@ public class MainGUI {
         this.extractorInput.setColumns(10);
 
         JButton btnNewButton_4 = new JButton("Select");
-        btnNewButton_4.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                JFileChooser chooser = new JFileChooser();
-                if (extractorInput.getText() != null
-                        && !extractorInput.getText().isEmpty()) {
-                    chooser.setSelectedFile(new File(extractorInput.getText()));
-                }
-                chooser.setMultiSelectionEnabled(false);
-                chooser.setFileSelectionMode(0);
-                int result = chooser.showOpenDialog(frmRadonObfuscator);
-                if (result == 0) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            extractorInput.setText(chooser.getSelectedFile()
-                                    .getAbsolutePath());
-                        }
-                    });
-                }
+        btnNewButton_4.addActionListener((e) -> {
+            JFileChooser chooser = new JFileChooser();
+            if (extractorInput.getText() != null
+                    && !extractorInput.getText().isEmpty()) {
+                chooser.setSelectedFile(new File(extractorInput.getText()));
+            }
+            chooser.setMultiSelectionEnabled(false);
+            chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+            int result = chooser.showOpenDialog(frmRadonObfuscator);
+            if (result == 0) {
+                SwingUtilities.invokeLater(() ->
+                        extractorInput.setText(chooser.getSelectedFile().getAbsolutePath())
+                );
             }
         });
         GridBagConstraints gbc_btnNewButton_4 = new GridBagConstraints();
@@ -848,7 +770,7 @@ public class MainGUI {
         gbc_passwordField_1.gridy = 9;
         panel_2.add(this.extractorKey, gbc_passwordField_1);
 
-        DefaultListModel<String> listModel = new DefaultListModel<String>();
+        DefaultListModel<String> listModel = new DefaultListModel<>();
 
         JScrollPane scrollPane = new JScrollPane();
         GridBagConstraints gbc_scrollPane = new GridBagConstraints();
@@ -859,7 +781,7 @@ public class MainGUI {
         gbc_scrollPane.gridy = 10;
         panel_2.add(scrollPane, gbc_scrollPane);
 
-        JList<String> list_1 = new JList<String>(listModel);
+        JList<String> list_1 = new JList<>(listModel);
         scrollPane.setViewportView(list_1);
 
         JButton btnNewButton_5 = new JButton("Extract");
@@ -867,50 +789,44 @@ public class MainGUI {
         gbc_btnNewButton_5.insets = new Insets(0, 0, 5, 5);
         gbc_btnNewButton_5.gridx = 11;
         gbc_btnNewButton_5.gridy = 9;
-        btnNewButton_5.addActionListener(new ActionListener() {
+        btnNewButton_5.addActionListener((e) -> {
+            listModel.clear();
 
-            @SuppressWarnings("deprecation")
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                listModel.clear();
-
-                if (extractorInput.getText() == null
-                        || extractorInput.getText().isEmpty()) {
-                    JOptionPane.showMessageDialog(null, "No file specified!",
-                            "Error", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-
-                if (extractorKey.getText() == null || extractorKey.getText().isEmpty()) {
-                    JOptionPane.showMessageDialog(null, "No key entered!",
-                            "Error", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-
-                if (!extractorInput.getText().endsWith(".jar")) {
-                    JOptionPane.showMessageDialog(null,
-                            "Only Jars are allowed!", "Error",
-                            JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-                try {
-                    File input = new File(extractorInput.getText());
-                    List<String> foundIds =
-                            WatermarkUtils.extractWatermark(input,
-                                    new String(extractorKey.getPassword()));
-                    for (String s : foundIds) {
-                        listModel.addElement(s);
-                    }
-
-                    JOptionPane.showMessageDialog(null,
-                            "Finished! Found: " +
-                                    String.valueOf(foundIds.size()) + " IDs",
-                            "Info", JOptionPane.INFORMATION_MESSAGE);
-                } catch (Throwable t) {
-                    t.printStackTrace();
-                }
+            if (extractorInput.getText() == null
+                    || extractorInput.getText().isEmpty()) {
+                JOptionPane.showMessageDialog(null, "No file specified!",
+                        "Error", JOptionPane.ERROR_MESSAGE);
+                return;
             }
 
+            if (extractorKey.getPassword() == null || new String(extractorKey.getPassword()).isEmpty()) {
+                JOptionPane.showMessageDialog(null, "No key entered!",
+                        "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            if (!extractorInput.getText().endsWith(".jar")) {
+                JOptionPane.showMessageDialog(null,
+                        "Only Jars are allowed!", "Error",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            try {
+                File input = new File(extractorInput.getText());
+                List<String> foundIds =
+                        WatermarkUtils.extractWatermark(input,
+                                new String(extractorKey.getPassword()));
+                for (String s : foundIds) {
+                    listModel.addElement(s);
+                }
+
+                JOptionPane.showMessageDialog(null,
+                        "Finished! Found: " +
+                                String.valueOf(foundIds.size()) + " IDs",
+                        "Info", JOptionPane.INFORMATION_MESSAGE);
+            } catch (Throwable t) {
+                t.printStackTrace();
+            }
         });
         panel_2.add(btnNewButton_5, gbc_btnNewButton_5);
 
@@ -969,19 +885,14 @@ public class MainGUI {
         gbc_AddExpiration.insets = new Insets(0, 0, 5, 5);
         gbc_AddExpiration.gridx = 0;
         gbc_AddExpiration.gridy = 0;
-        chckbxAddExpiration.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent arg0) {
-                if (chckbxAddExpiration.isSelected()) {
-                    expirationDateField.setEnabled(true);
-                    expirationMessageField.setEnabled(true);
-                } else if (!chckbxAddExpiration.isSelected()) {
-                    expirationDateField.setEnabled(false);
-                    expirationMessageField.setEnabled(false);
-                }
+        chckbxAddExpiration.addActionListener((e) -> {
+            if (chckbxAddExpiration.isSelected()) {
+                expirationDateField.setEnabled(true);
+                expirationMessageField.setEnabled(true);
+            } else if (!chckbxAddExpiration.isSelected()) {
+                expirationDateField.setEnabled(false);
+                expirationMessageField.setEnabled(false);
             }
-
         });
         otherPanel.add(chckbxAddExpiration, gbc_AddExpiration);
 
@@ -1001,12 +912,10 @@ public class MainGUI {
         gbc_dictionaryComboBox.insets = new Insets(0, 0, 5, 5);
         gbc_dictionaryComboBox.gridx = 11;
         gbc_dictionaryComboBox.gridy = 5;
-
         String[] dictionaries = {"0", "1", "2"};
         for (String s : dictionaries) {
             dictionaryComboBox.addItem(s);
         }
-
         otherPanel.add(dictionaryComboBox, gbc_dictionaryComboBox);
 
         JLabel chckbxDictionary = new JLabel("Dictionary:");
@@ -1023,18 +932,12 @@ public class MainGUI {
         gbc_garbageCollector.insets = new Insets(0, 0, 5, 5);
         gbc_garbageCollector.gridx = 11;
         gbc_garbageCollector.gridy = 6;
-        garbageCollector.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        JOptionPane.showMessageDialog(null, ((Runtime.getRuntime().maxMemory() / 1000000) - (Runtime.getRuntime().freeMemory() / 1000000)) + "mb in use before garbage collector.");
-                        System.gc();
-                    }
-                });
-            }
-        });
+        garbageCollector.addActionListener((e) ->
+                SwingUtilities.invokeLater(() -> {
+                    JOptionPane.showMessageDialog(null, ((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1000000) + "mb in use before garbage collector.");
+                    System.gc();
+                })
+        );
         otherPanel.add(garbageCollector, gbc_garbageCollector);
 
         JPanel panel_3 = new JPanel();
@@ -1060,7 +963,6 @@ public class MainGUI {
                 "Flow", "LocalVars", "SourceName", "SourceDebug", "LineNumbers", "StringPool",
                 "Crasher", "HideCode", "Numbers", "Shuffler", "InnerClasses", "Renamer",
                 "Expiry"};
-
         for (String s : options) {
             comboBox_04.addItem(s);
         }
@@ -1093,67 +995,64 @@ public class MainGUI {
         this.exemptField.setColumns(10);
 
         JButton btnNewButton_2 = new JButton("Add");
-        btnNewButton_2.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (!exemptField.getText().equals("")
-                        && exemptField.getText() != null
-                        && !exemptField.getText().isEmpty()) {
-                    if (comboBox_04.getSelectedIndex() == 0) {
-                        exemptList.addElement("Class: " + exemptField.getText());
-                        exemptField.setText("");
-                    } else if (comboBox_04.getSelectedIndex() == 1) {
-                        exemptList.addElement("Method: " + exemptField.getText());
-                        exemptField.setText("");
-                    } else if (comboBox_04.getSelectedIndex() == 2) {
-                        exemptList.addElement("Field: " + exemptField.getText());
-                        exemptField.setText("");
-                    } else if (comboBox_04.getSelectedIndex() == 3) {
-                        exemptList.addElement("StringEncryption: " + exemptField.getText());
-                        exemptField.setText("");
-                    } else if (comboBox_04.getSelectedIndex() == 4) {
-                        exemptList.addElement("InvokeDynamic: " + exemptField.getText());
-                        exemptField.setText("");
-                    } else if (comboBox_04.getSelectedIndex() == 5) {
-                        exemptList.addElement("Flow: " + exemptField.getText());
-                        exemptField.setText("");
-                    } else if (comboBox_04.getSelectedIndex() == 6) {
-                        exemptList.addElement("LocalVars: " + exemptField.getText());
-                        exemptField.setText("");
-                    } else if (comboBox_04.getSelectedIndex() == 7) {
-                        exemptList.addElement("SourceName: " + exemptField.getText());
-                        exemptField.setText("");
-                    } else if (comboBox_04.getSelectedIndex() == 8) {
-                        exemptList.addElement("SourceDebug: " + exemptField.getText());
-                        exemptField.setText("");
-                    } else if (comboBox_04.getSelectedIndex() == 9) {
-                        exemptList.addElement("LineNumbers: " + exemptField.getText());
-                        exemptField.setText("");
-                    } else if (comboBox_04.getSelectedIndex() == 10) {
-                        exemptList.addElement("StringPool: " + exemptField.getText());
-                        exemptField.setText("");
-                    } else if (comboBox_04.getSelectedIndex() == 11) {
-                        exemptList.addElement("Crasher: " + exemptField.getText());
-                        exemptField.setText("");
-                    } else if (comboBox_04.getSelectedIndex() == 12) {
-                        exemptList.addElement("HideCode: " + exemptField.getText());
-                        exemptField.setText("");
-                    } else if (comboBox_04.getSelectedIndex() == 13) {
-                        exemptList.addElement("Numbers: " + exemptField.getText());
-                        exemptField.setText("");
-                    } else if (comboBox_04.getSelectedIndex() == 14) {
-                        exemptList.addElement("Shuffler: " + exemptField.getText());
-                        exemptField.setText("");
-                    } else if (comboBox_04.getSelectedIndex() == 15) {
-                        exemptList.addElement("InnerClasses: " + exemptField.getText());
-                        exemptField.setText("");
-                    } else if (comboBox_04.getSelectedIndex() == 16) {
-                        exemptList.addElement("Renamer: " + exemptField.getText());
-                        exemptField.setText("");
-                    } else if (comboBox_04.getSelectedIndex() == 17) {
-                        exemptList.addElement("Expiry: " + exemptField.getText());
-                        exemptField.setText("");
-                    }
+        btnNewButton_2.addActionListener((e) -> {
+            if (!exemptField.getText().equals("")
+                    && exemptField.getText() != null
+                    && !exemptField.getText().isEmpty()) {
+                if (comboBox_04.getSelectedIndex() == 0) {
+                    exemptList.addElement("Class: " + exemptField.getText());
+                    exemptField.setText("");
+                } else if (comboBox_04.getSelectedIndex() == 1) {
+                    exemptList.addElement("Method: " + exemptField.getText());
+                    exemptField.setText("");
+                } else if (comboBox_04.getSelectedIndex() == 2) {
+                    exemptList.addElement("Field: " + exemptField.getText());
+                    exemptField.setText("");
+                } else if (comboBox_04.getSelectedIndex() == 3) {
+                    exemptList.addElement("StringEncryption: " + exemptField.getText());
+                    exemptField.setText("");
+                } else if (comboBox_04.getSelectedIndex() == 4) {
+                    exemptList.addElement("InvokeDynamic: " + exemptField.getText());
+                    exemptField.setText("");
+                } else if (comboBox_04.getSelectedIndex() == 5) {
+                    exemptList.addElement("Flow: " + exemptField.getText());
+                    exemptField.setText("");
+                } else if (comboBox_04.getSelectedIndex() == 6) {
+                    exemptList.addElement("LocalVars: " + exemptField.getText());
+                    exemptField.setText("");
+                } else if (comboBox_04.getSelectedIndex() == 7) {
+                    exemptList.addElement("SourceName: " + exemptField.getText());
+                    exemptField.setText("");
+                } else if (comboBox_04.getSelectedIndex() == 8) {
+                    exemptList.addElement("SourceDebug: " + exemptField.getText());
+                    exemptField.setText("");
+                } else if (comboBox_04.getSelectedIndex() == 9) {
+                    exemptList.addElement("LineNumbers: " + exemptField.getText());
+                    exemptField.setText("");
+                } else if (comboBox_04.getSelectedIndex() == 10) {
+                    exemptList.addElement("StringPool: " + exemptField.getText());
+                    exemptField.setText("");
+                } else if (comboBox_04.getSelectedIndex() == 11) {
+                    exemptList.addElement("Crasher: " + exemptField.getText());
+                    exemptField.setText("");
+                } else if (comboBox_04.getSelectedIndex() == 12) {
+                    exemptList.addElement("HideCode: " + exemptField.getText());
+                    exemptField.setText("");
+                } else if (comboBox_04.getSelectedIndex() == 13) {
+                    exemptList.addElement("Numbers: " + exemptField.getText());
+                    exemptField.setText("");
+                } else if (comboBox_04.getSelectedIndex() == 14) {
+                    exemptList.addElement("Shuffler: " + exemptField.getText());
+                    exemptField.setText("");
+                } else if (comboBox_04.getSelectedIndex() == 15) {
+                    exemptList.addElement("InnerClasses: " + exemptField.getText());
+                    exemptField.setText("");
+                } else if (comboBox_04.getSelectedIndex() == 16) {
+                    exemptList.addElement("Renamer: " + exemptField.getText());
+                    exemptField.setText("");
+                } else if (comboBox_04.getSelectedIndex() == 17) {
+                    exemptList.addElement("Expiry: " + exemptField.getText());
+                    exemptField.setText("");
                 }
             }
         });
@@ -1164,16 +1063,13 @@ public class MainGUI {
         panel_3.add(btnNewButton_2, gbc_btnNewButton_2);
 
         JButton btnNewButton_3 = new JButton("Remove");
-        btnNewButton_3.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                List<String> removeList = list.getSelectedValuesList();
-                if (removeList.isEmpty())
-                    return;
+        btnNewButton_3.addActionListener((e) -> {
+            List<String> removeList = list.getSelectedValuesList();
+            if (removeList.isEmpty())
+                return;
 
-                for (String s : removeList) {
-                    exemptList.removeElement(s);
-                }
+            for (String s : removeList) {
+                exemptList.removeElement(s);
             }
         });
         GridBagConstraints gbc_btnNewButton_3 = new GridBagConstraints();
@@ -1213,297 +1109,297 @@ public class MainGUI {
         panel_1.add(panel_5, BorderLayout.EAST);
 
         JButton btnObfuscate = new JButton("    Process    ");
-        btnObfuscate.addActionListener(new ActionListener() {
-            @SuppressWarnings("deprecation")
-            public void actionPerformed(ActionEvent arg0) {
-                if (inputField.getText().isEmpty()
-                        || inputField.getText() == null
-                        || !inputField.getText().endsWith(".jar")) {
-                    JOptionPane.showMessageDialog(null,
-                            "Invalid input JAR", "Error",
-                            JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-
-                if (outputField.getText().isEmpty()
-                        || outputField.getText() == null
-                        || !outputField.getText().endsWith(".jar")) {
-                    JOptionPane.showMessageDialog(null,
-                            "Invalid output JAR", "Error",
-                            JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-
-                if (outputField.getText().equals(inputField.getText())) {
-                    JOptionPane.showMessageDialog(null,
-                            "Output JAR can not have the same name as input " +
-                                    "JAR", "Error", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-
-                if (!chckbxStringEncryption.isSelected()
-                        && !chckbxInvokeDynamic.isSelected()
-                        && !chckbxFlow.isSelected()
-                        && !chckbxLocalVariables.isSelected()
-                        && !chckbxTrashClasses.isSelected()
-                        && !chckbxSpringPool.isSelected()
-                        && !chckbxCrasher.isSelected()
-                        && !chckbxHidecode.isSelected()
-                        && !chckbxClassRenammer.isSelected()
-                        && !chckbxNumberObfuscation.isSelected()
-                        && !chckbxAddWatermark.isSelected()
-                        && !chckbxLineObfuscation.isSelected()
-                        && !chckbxSourceName.isSelected()
-                        && !chckbxSourceDebug.isSelected()
-                        && !chckbxShuffler.isSelected()
-                        && !chckbxAddExpiration.isSelected()
-                        && !chckbxInnerClasses.isSelected()) {
-                    JOptionPane.showMessageDialog(null,
-                            "Please select an obfuscation " +
-                                    "setting!\nThe Spigot-Plugin setting " +
-                                    "alone is not counted as an option.",
-                            "Error", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-
-                if (chckbxAddWatermark.isSelected()
-                        && waterMarkMessageField.getText().isEmpty()) {
-                    JOptionPane.showMessageDialog(null,
-                            "You must enter a message to be watermarked.",
-                            "Error", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-
-                if (chckbxAddWatermark.isSelected()
-                        && watermarkPassword.getText().isEmpty()) {
-                    JOptionPane.showMessageDialog(null,
-                            "You must enter a key to encrypt the watermark message.",
-                            "Error", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-
-                if (chckbxAddExpiration.isSelected()
-                        && expirationMessageField.getText().isEmpty()) {
-                    JOptionPane.showMessageDialog(null,
-                            "You must enter an expiration message.", "Error",
-                            JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-
-                if (chckbxAddExpiration.isSelected()
-                        && expirationDateField.getText().isEmpty()) {
-                    JOptionPane.showMessageDialog(null,
-                            "You must enter an expiration date.",
-                            "Error", JOptionPane.ERROR_MESSAGE);
-                    return;
-                }
-                btnObfuscate.setText("Processing...");
-                btnObfuscate.setEnabled(false);
-                SwingWorker sw = new SwingWorker() {
-                    @Override
-                    protected Object doInBackground() throws Exception {
-                        File output = null;
-                        try {
-
-                            HashMap<String, File> libs = new HashMap<>();
-                            for (int i = 0; i < libList.getSize(); i++) {
-                                libs.put(libList.get(i), new File(libList.get(i)));
-                            }
-
-                            File input = new File(inputField.getText());
-                            if (!input.exists()) {
-                                JOptionPane.showMessageDialog(null,
-                                        "Input JAR does not exist.",
-                                        "Error", JOptionPane.ERROR_MESSAGE);
-                                return null;
-                            }
-                            output = new File(outputField.getText());
-
-                            int trashChance;
-                            try {
-                                trashChance =
-                                        Integer.valueOf(trashChanceField.getText());
-                            } catch (Throwable t) {
-                                JOptionPane.showMessageDialog(null,
-                                        "Please enter numbers only for the " +
-                                                "number of desired trash " +
-                                                "classes.", "Error",
-                                        JOptionPane.ERROR_MESSAGE);
-                                return null;
-                            }
-                            List<String> exempts = new ArrayList<>();
-                            for (int i = 0; i < exemptList.size(); i++) {
-                                exempts.add(exemptList.get(i));
-                            }
-                            boolean spigotMode = chckbxSpigotPlugin.isSelected();
-                            List<AbstractTransformer> transformers
-                                    = new ArrayList<>();
-
-                            if (chckbxClassRenammer.isSelected()) {
-                                transformers.add(new Renamer(spigotMode));
-                            }
-                            if (chckbxInnerClasses.isSelected()) {
-                                transformers.add(new InnerClassRemover());
-                            }
-                            if (chckbxNumberObfuscation.isSelected()) {
-                                transformers.add(new NumberObfuscation());
-                            }
-                            if (chckbxInvokeDynamic.isSelected()) {
-                                switch (comboBox_1.getSelectedIndex()) {
-                                    case 0:
-                                        transformers.add(new LightInvokeDynamic());
-                                        break;
-                                    case 1:
-                                        transformers.add(new NormalInvokeDynamic());
-                                        break;
-                                    case 2:
-                                        transformers.add(new HeavyInvokeDynamic());
-                                        break;
-                                }
-                            }
-                            if (chckbxAddExpiration.isSelected()) {
-                                if (!expirationDateField.getText().isEmpty()
-                                        && !expirationMessageField.getText()
-                                        .isEmpty()) {
-                                    long expireTime =
-                                            new SimpleDateFormat("MM/dd/yyyy")
-                                                    .parse(expirationDateField
-                                                            .getText()).getTime();
-                                    transformers.add(new Expiry(expireTime,
-                                            expirationMessageField.getText()));
-                                }
-                            }
-                            if (chckbxStringEncryption.isSelected()) {
-                                switch (comboBox.getSelectedIndex()) {
-                                    case 0:
-                                        transformers.add(new SuperLightStringEncryption(spigotMode));
-                                        break;
-                                    case 1:
-                                        transformers.add(new LightStringEncryption(spigotMode));
-                                        break;
-                                    case 2:
-                                        transformers.add(new NormalStringEncryption(spigotMode));
-                                        break;
-                                    case 3:
-                                        transformers.add(new HeavyStringEncryption(spigotMode));
-                                        break;
-                                }
-                            }
-                            if (chckbxFlow.isSelected()) {
-                                switch (comboBox_2.getSelectedIndex()) {
-                                    case 0:
-                                        transformers.add(new LightFlowObfuscation());
-                                        break;
-                                    case 1:
-                                        transformers.add(new NormalFlowObfuscation());
-                                        break;
-                                    case 2:
-                                        transformers.add(new HeavyFlowObfuscation());
-                                        break;
-                                }
-                            }
-                            if (chckbxSpringPool.isSelected()) {
-                                transformers.add(new StringPool());
-                            }
-                            if (chckbxShuffler.isSelected()) {
-                                transformers.add(new Shuffler());
-                            }
-                            if (chckbxLocalVariables.isSelected()) {
-                                switch (comboBox_3.getSelectedIndex()) {
-                                    case 0:
-                                        transformers.add(new ObfuscateLocalVariables());
-                                        break;
-                                    case 1:
-                                        transformers.add(new RemoveLocalVariables());
-                                        break;
-                                }
-                            }
-                            if (chckbxLineObfuscation.isSelected()) {
-                                switch (comboBox_5.getSelectedIndex()) {
-                                    case 0:
-                                        transformers.add(new ObfuscateLineNumbers());
-                                        break;
-                                    case 1:
-                                        transformers.add(new RemoveLineNumbers());
-                                        break;
-                                }
-                            }
-                            if (chckbxSourceName.isSelected()) {
-                                switch (comboBox_123.getSelectedIndex()) {
-                                    case 0:
-                                        transformers.add(new ObfuscateSourceName());
-                                        break;
-                                    case 1:
-                                        transformers.add(new RemoveSourceName());
-                                        break;
-                                }
-                            }
-                            if (chckbxSourceDebug.isSelected()) {
-                                switch (comboBox_1234.getSelectedIndex()) {
-                                    case 0:
-                                        transformers.add(new ObfuscateSourceDebug());
-                                        break;
-                                    case 1:
-                                        transformers.add(new RemoveSourceDebug());
-                                        break;
-                                }
-                            }
-                            if (chckbxCrasher.isSelected()) {
-                                transformers.add(new Crasher());
-                            }
-                            if (chckbxHidecode.isSelected()) {
-                                transformers.add(new HideCode());
-                            }
-
-                            int trashClasses = -1;
-                            if (chckbxTrashClasses.isSelected()) {
-                                trashClasses = trashChance;
-                            }
-
-                            int watermarkType = -1;
-                            if (chckbxAddWatermark.isSelected()) {
-                                watermarkType = comboBox_05.getSelectedIndex();
-                            }
-
-                            int dictionary = dictionaryComboBox.getSelectedIndex();
-
-                            if (chckbxTrashClasses.isSelected() && spigotMode) {
-                                throw new RuntimeException("Trash classes are not compatible with Spigot's anti-piracy injection.");
-                            }
-
-                            new ConsoleGUI();
-                            Bootstrap bootstrap = new Bootstrap(
-                                    input,
-                                    output,
-                                    libs,
-                                    exempts,
-                                    transformers,
-                                    trashClasses,
-                                    waterMarkMessageField.getText(),
-                                    watermarkType,
-                                    new String(watermarkPassword.getPassword()),
-                                    dictionary);
-                            bootstrap.startTheParty(false);
-                            JOptionPane.showMessageDialog(null,
-                                    "Successfully processed file!",
-                                    "Done", JOptionPane.INFORMATION_MESSAGE);
-                        } catch (Throwable t) {
-                            JOptionPane.showMessageDialog(null, t.getMessage(),
-                                    "Error", JOptionPane.ERROR_MESSAGE);
-                            t.printStackTrace();
-                            if (output != null) {
-                                output.delete();
-                            }
-                        } finally {
-                            btnObfuscate.setEnabled(true);
-                            btnObfuscate.setText("    Process    ");
-                        }
-                        return null;
-                    }
-                };
-
-                sw.execute();
+        btnObfuscate.addActionListener((e) -> {
+            if (inputField.getText().isEmpty()
+                    || inputField.getText() == null
+                    || !inputField.getText().endsWith(".jar")) {
+                JOptionPane.showMessageDialog(null,
+                        "Invalid input JAR", "Error",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
             }
+
+            if (outputField.getText().isEmpty()
+                    || outputField.getText() == null
+                    || !outputField.getText().endsWith(".jar")) {
+                JOptionPane.showMessageDialog(null,
+                        "Invalid output JAR", "Error",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            if (outputField.getText().equals(inputField.getText())) {
+                JOptionPane.showMessageDialog(null,
+                        "Output JAR can not have the same name as input " +
+                                "JAR", "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            if (!chckbxStringEncryption.isSelected()
+                    && !chckbxInvokeDynamic.isSelected()
+                    && !chckbxFlow.isSelected()
+                    && !chckbxLocalVariables.isSelected()
+                    && !chckbxTrashClasses.isSelected()
+                    && !chckbxSpringPool.isSelected()
+                    && !chckbxCrasher.isSelected()
+                    && !chckbxHidecode.isSelected()
+                    && !chckbxClassRenammer.isSelected()
+                    && !chckbxNumberObfuscation.isSelected()
+                    && !chckbxAddWatermark.isSelected()
+                    && !chckbxLineObfuscation.isSelected()
+                    && !chckbxSourceName.isSelected()
+                    && !chckbxSourceDebug.isSelected()
+                    && !chckbxShuffler.isSelected()
+                    && !chckbxAddExpiration.isSelected()
+                    && !chckbxInnerClasses.isSelected()) {
+                JOptionPane.showMessageDialog(null,
+                        "Please select an obfuscation " +
+                                "setting!\nThe Spigot-Plugin setting " +
+                                "alone is not counted as an option.",
+                        "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            if (chckbxAddWatermark.isSelected()
+                    && waterMarkMessageField.getText().isEmpty()) {
+                JOptionPane.showMessageDialog(null,
+                        "You must enter a message to be watermarked.",
+                        "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            if (chckbxAddWatermark.isSelected()
+                    && new String(watermarkPassword.getPassword()).isEmpty()) {
+                JOptionPane.showMessageDialog(null,
+                        "You must enter a key to encrypt the watermark message.",
+                        "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            if (chckbxAddExpiration.isSelected()
+                    && expirationMessageField.getText().isEmpty()) {
+                JOptionPane.showMessageDialog(null,
+                        "You must enter an expiration message.", "Error",
+                        JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            if (chckbxAddExpiration.isSelected()
+                    && expirationDateField.getText().isEmpty()) {
+                JOptionPane.showMessageDialog(null,
+                        "You must enter an expiration date.",
+                        "Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            btnObfuscate.setText("Processing...");
+            btnObfuscate.setEnabled(false);
+            SwingWorker sw = new SwingWorker() {
+                @Override
+                protected Object doInBackground() {
+                    File output = null;
+                    try {
+
+                        HashMap<String, File> libs = new HashMap<>();
+                        for (int i = 0; i < libList.getSize(); i++) {
+                            libs.put(libList.get(i), new File(libList.get(i)));
+                        }
+
+                        File input = new File(inputField.getText());
+                        if (!input.exists()) {
+                            JOptionPane.showMessageDialog(null,
+                                    "Input JAR does not exist.",
+                                    "Error", JOptionPane.ERROR_MESSAGE);
+                            return null;
+                        }
+                        output = new File(outputField.getText());
+
+                        int trashChance;
+                        try {
+                            trashChance =
+                                    Integer.valueOf(trashChanceField.getText());
+                        } catch (Throwable t) {
+                            JOptionPane.showMessageDialog(null,
+                                    "Please enter numbers only for the " +
+                                            "number of desired trash " +
+                                            "classes.", "Error",
+                                    JOptionPane.ERROR_MESSAGE);
+                            return null;
+                        }
+                        List<String> exempts = new ArrayList<>();
+                        for (int i = 0; i < exemptList.size(); i++) {
+                            exempts.add(exemptList.get(i));
+                        }
+                        boolean spigotMode = chckbxSpigotPlugin.isSelected();
+                        List<AbstractTransformer> transformers
+                                = new ArrayList<>();
+
+                        if (chckbxClassRenammer.isSelected()) {
+                            transformers.add(new Renamer(spigotMode));
+                        }
+                        if (chckbxInnerClasses.isSelected()) {
+                            transformers.add(new InnerClassRemover());
+                        }
+                        if (chckbxNumberObfuscation.isSelected()) {
+                            transformers.add(new NumberObfuscation());
+                        }
+                        if (chckbxInvokeDynamic.isSelected()) {
+                            switch (comboBox_1.getSelectedIndex()) {
+                                case 0:
+                                    transformers.add(new LightInvokeDynamic());
+                                    break;
+                                case 1:
+                                    transformers.add(new NormalInvokeDynamic());
+                                    break;
+                                case 2:
+                                    transformers.add(new HeavyInvokeDynamic());
+                                    break;
+                            }
+                        }
+                        if (chckbxAddExpiration.isSelected()) {
+                            if (!expirationDateField.getText().isEmpty()
+                                    && !expirationMessageField.getText()
+                                    .isEmpty()) {
+                                long expireTime =
+                                        new SimpleDateFormat("MM/dd/yyyy")
+                                                .parse(expirationDateField
+                                                        .getText()).getTime();
+                                transformers.add(new Expiry(expireTime,
+                                        expirationMessageField.getText()));
+                            }
+                        }
+                        if (chckbxStringEncryption.isSelected()) {
+                            switch (comboBox.getSelectedIndex()) {
+                                case 0:
+                                    transformers.add(new SuperLightStringEncryption(spigotMode));
+                                    break;
+                                case 1:
+                                    transformers.add(new LightStringEncryption(spigotMode));
+                                    break;
+                                case 2:
+                                    transformers.add(new NormalStringEncryption(spigotMode));
+                                    break;
+                                case 3:
+                                    transformers.add(new HeavyStringEncryption(spigotMode));
+                                    break;
+                            }
+                        }
+                        if (chckbxFlow.isSelected()) {
+                            switch (comboBox_2.getSelectedIndex()) {
+                                case 0:
+                                    transformers.add(new LightFlowObfuscation());
+                                    break;
+                                case 1:
+                                    transformers.add(new NormalFlowObfuscation());
+                                    break;
+                                case 2:
+                                    transformers.add(new HeavyFlowObfuscation());
+                                    break;
+                            }
+                        }
+                        if (chckbxSpringPool.isSelected()) {
+                            transformers.add(new StringPool());
+                        }
+                        if (chckbxShuffler.isSelected()) {
+                            transformers.add(new Shuffler());
+                        }
+                        if (chckbxLocalVariables.isSelected()) {
+                            switch (comboBox_3.getSelectedIndex()) {
+                                case 0:
+                                    transformers.add(new ObfuscateLocalVariables());
+                                    break;
+                                case 1:
+                                    transformers.add(new RemoveLocalVariables());
+                                    break;
+                            }
+                        }
+                        if (chckbxLineObfuscation.isSelected()) {
+                            switch (comboBox_5.getSelectedIndex()) {
+                                case 0:
+                                    transformers.add(new ObfuscateLineNumbers());
+                                    break;
+                                case 1:
+                                    transformers.add(new RemoveLineNumbers());
+                                    break;
+                            }
+                        }
+                        if (chckbxSourceName.isSelected()) {
+                            switch (comboBox_123.getSelectedIndex()) {
+                                case 0:
+                                    transformers.add(new ObfuscateSourceName());
+                                    break;
+                                case 1:
+                                    transformers.add(new RemoveSourceName());
+                                    break;
+                            }
+                        }
+                        if (chckbxSourceDebug.isSelected()) {
+                            switch (comboBox_1234.getSelectedIndex()) {
+                                case 0:
+                                    transformers.add(new ObfuscateSourceDebug());
+                                    break;
+                                case 1:
+                                    transformers.add(new RemoveSourceDebug());
+                                    break;
+                            }
+                        }
+                        if (chckbxCrasher.isSelected()) {
+                            transformers.add(new Crasher());
+                        }
+                        if (chckbxHidecode.isSelected()) {
+                            transformers.add(new HideCode());
+                        }
+
+                        int trashClasses = -1;
+                        if (chckbxTrashClasses.isSelected()) {
+                            trashClasses = trashChance;
+                        }
+
+                        int watermarkType = -1;
+                        if (chckbxAddWatermark.isSelected()) {
+                            watermarkType = comboBox_05.getSelectedIndex();
+                        }
+
+                        int dictionary = dictionaryComboBox.getSelectedIndex();
+
+                        if (chckbxTrashClasses.isSelected() && spigotMode) {
+                            throw new RuntimeException("Trash classes are not compatible with Spigot's anti-piracy injection.");
+                        }
+
+                        new ConsoleGUI();
+                        Bootstrap bootstrap = new Bootstrap(
+                                input,
+                                output,
+                                libs,
+                                exempts,
+                                transformers,
+                                trashClasses,
+                                waterMarkMessageField.getText(),
+                                watermarkType,
+                                new String(watermarkPassword.getPassword()),
+                                dictionary);
+                        bootstrap.startTheParty(false);
+                        JOptionPane.showMessageDialog(null,
+                                "Successfully processed file!",
+                                "Done", JOptionPane.INFORMATION_MESSAGE);
+                    } catch (Throwable t) {
+                        JOptionPane.showMessageDialog(null, t.getMessage(),
+                                "Error", JOptionPane.ERROR_MESSAGE);
+                        t.printStackTrace();
+                        if (output != null) {
+                            if (!output.delete()) {
+                                JOptionPane.showMessageDialog(null, "Failed to delete fault output.",
+                                        "Error", JOptionPane.ERROR_MESSAGE);
+                            }
+                        }
+                    } finally {
+                        btnObfuscate.setEnabled(true);
+                        btnObfuscate.setText("    Process    ");
+                    }
+                    return null;
+                }
+            };
+
+            sw.execute();
         });
         panel_5.add(btnObfuscate);
 
@@ -1511,515 +1407,506 @@ public class MainGUI {
         panel_1.add(panel_6, BorderLayout.WEST);
 
         JButton btnLoadConfiguration = new JButton("Load Configuration");
-        btnLoadConfiguration.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JFileChooser chooser = new JFileChooser();
-                chooser.setMultiSelectionEnabled(false);
-                chooser.setFileSelectionMode(0);
-                int result = chooser.showOpenDialog(frmRadonObfuscator);
-                if (result == 0) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                File config = new File(chooser.getSelectedFile()
-                                        .getAbsolutePath());
-                                if (!config.exists())
-                                    throw new IOException("Config file does " +
-                                            "not exist.");
+        btnLoadConfiguration.addActionListener((e) -> {
+            JFileChooser chooser = new JFileChooser();
+            chooser.setMultiSelectionEnabled(false);
+            chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+            int result = chooser.showOpenDialog(frmRadonObfuscator);
+            if (result == 0) {
+                SwingUtilities.invokeLater(() -> {
+                    try {
+                        File config = new File(chooser.getSelectedFile()
+                                .getAbsolutePath());
+                        if (!config.exists())
+                            throw new IOException("Config file does " +
+                                    "not exist.");
 
-                                FileInputStream fis = new FileInputStream(config);
-                                Config configParser
-                                        = new Config(fis);
-                                configParser.loadIntoMap();
-                                configParser.sortExempts();
-                                configParser.checkConfig();
+                        FileInputStream fis = new FileInputStream(config);
+                        Config configParser
+                                = new Config(fis);
+                        configParser.loadIntoMap();
+                        configParser.sortExempts();
+                        configParser.checkConfig();
 
-                                inputField.setText(configParser.getInput()
-                                        .getAbsolutePath());
-                                outputField.setText(configParser.getOutput()
-                                        .getAbsolutePath());
-                                libList.clear();
-                                for (String s : configParser.getLibraries()
-                                        .keySet()) {
-                                    libList.addElement(s);
-                                }
+                        inputField.setText(configParser.getInput()
+                                .getAbsolutePath());
+                        outputField.setText(configParser.getOutput()
+                                .getAbsolutePath());
+                        libList.clear();
+                        for (String s : configParser.getLibraries()
+                                .keySet()) {
+                            libList.addElement(s);
+                        }
 
-                                List<String> exempts = configParser.getExempts();
-                                if (exempts != null) {
-                                    exemptList.clear();
-                                    for (String s : exempts) {
-                                        exemptList.addElement(s);
-                                    }
-                                }
-
-                                AbstractTransformer stringEncryptionMode
-                                        = configParser.getStringEncryptionType();
-                                if (stringEncryptionMode == null) {
-                                    chckbxStringEncryption.setSelected(false);
-                                } else if (stringEncryptionMode
-                                        instanceof SuperLightStringEncryption) {
-                                    chckbxStringEncryption.setSelected(true);
-                                    comboBox.setSelectedIndex(0);
-                                    comboBox.setEnabled(true);
-                                } else if (stringEncryptionMode
-                                        instanceof LightStringEncryption) {
-                                    chckbxStringEncryption.setSelected(true);
-                                    comboBox.setSelectedIndex(1);
-                                    comboBox.setEnabled(true);
-                                } else if (stringEncryptionMode
-                                        instanceof NormalStringEncryption) {
-                                    chckbxStringEncryption.setSelected(true);
-                                    comboBox.setSelectedIndex(2);
-                                    comboBox.setEnabled(true);
-                                } else if (stringEncryptionMode
-                                        instanceof HeavyStringEncryption) {
-                                    chckbxStringEncryption.setSelected(true);
-                                    comboBox.setSelectedIndex(3);
-                                    comboBox.setEnabled(true);
-                                }
-
-                                AbstractTransformer flowObfuscationMode =
-                                        configParser.getFlowObfuscationType();
-                                if (flowObfuscationMode == null) {
-                                    chckbxFlow.setSelected(false);
-                                } else if (flowObfuscationMode
-                                        instanceof LightFlowObfuscation) {
-                                    chckbxFlow.setSelected(true);
-                                    comboBox_2.setSelectedIndex(0);
-                                    comboBox_2.setEnabled(true);
-                                } else if (flowObfuscationMode
-                                        instanceof NormalFlowObfuscation) {
-                                    chckbxFlow.setSelected(true);
-                                    comboBox_2.setSelectedIndex(1);
-                                    comboBox_2.setEnabled(true);
-                                } else if (flowObfuscationMode
-                                        instanceof HeavyFlowObfuscation) {
-                                    chckbxFlow.setSelected(true);
-                                    comboBox_2.setSelectedIndex(2);
-                                    comboBox_2.setEnabled(true);
-                                }
-
-                                AbstractTransformer invokeDynamicMode =
-                                        configParser.getInvokeDynamicType();
-                                if (invokeDynamicMode == null) {
-                                    chckbxInvokeDynamic.setSelected(false);
-                                } else if (invokeDynamicMode
-                                        instanceof LightInvokeDynamic) {
-                                    chckbxInvokeDynamic.setSelected(true);
-                                    comboBox_1.setSelectedIndex(0);
-                                    comboBox_1.setEnabled(true);
-                                } else if (invokeDynamicMode
-                                        instanceof NormalInvokeDynamic) {
-                                    chckbxInvokeDynamic.setSelected(true);
-                                    comboBox_1.setSelectedIndex(1);
-                                    comboBox_1.setEnabled(true);
-                                } else if (invokeDynamicMode
-                                        instanceof HeavyInvokeDynamic) {
-                                    chckbxInvokeDynamic.setSelected(true);
-                                    comboBox_1.setSelectedIndex(2);
-                                    comboBox_1.setEnabled(true);
-                                }
-
-                                AbstractTransformer localVariablesMode =
-                                        configParser.getLocalVariableObfuscationType();
-                                if (localVariablesMode == null) {
-                                    chckbxLocalVariables.setSelected(false);
-                                } else if (localVariablesMode
-                                        instanceof ObfuscateLocalVariables) {
-                                    chckbxLocalVariables.setSelected(true);
-                                    comboBox_3.setSelectedIndex(0);
-                                    comboBox_3.setEnabled(true);
-                                } else if (localVariablesMode
-                                        instanceof RemoveLocalVariables) {
-                                    chckbxLocalVariables.setSelected(true);
-                                    comboBox_3.setSelectedIndex(1);
-                                    comboBox_3.setEnabled(true);
-                                }
-
-                                AbstractTransformer crasherMode =
-                                        configParser.getCrasherType();
-                                if (crasherMode instanceof Crasher) {
-                                    chckbxCrasher.setSelected(true);
-                                } else {
-                                    chckbxCrasher.setSelected(false);
-                                }
-
-                                AbstractTransformer hideCodeMode =
-                                        configParser.getHideCodeType();
-                                if (hideCodeMode instanceof HideCode) {
-                                    chckbxHidecode.setSelected(true);
-                                } else {
-                                    chckbxHidecode.setSelected(false);
-                                }
-
-                                AbstractTransformer lineRemoverMode =
-                                        configParser.getLineNumberObfuscationType();
-                                if (lineRemoverMode == null) {
-                                    chckbxLineObfuscation.setSelected(false);
-                                } else if (lineRemoverMode
-                                        instanceof ObfuscateLineNumbers) {
-                                    chckbxLineObfuscation.setSelected(true);
-                                    comboBox_5.setSelectedIndex(0);
-                                    comboBox_5.setEnabled(true);
-                                } else if (lineRemoverMode
-                                        instanceof RemoveLineNumbers) {
-                                    chckbxLineObfuscation.setSelected(true);
-                                    comboBox_5.setSelectedIndex(1);
-                                    comboBox_5.setEnabled(true);
-                                }
-
-                                AbstractTransformer numberObfuscationMode =
-                                        configParser.getNumberObfuscationType();
-                                if (numberObfuscationMode
-                                        instanceof NumberObfuscation) {
-                                    chckbxNumberObfuscation.setSelected(true);
-                                } else {
-                                    chckbxNumberObfuscation.setSelected(false);
-                                }
-
-                                AbstractTransformer sourceNameObfuscationMode =
-                                        configParser.getSourceNameObfuscationType();
-                                if (sourceNameObfuscationMode == null) {
-                                    chckbxSourceName.setSelected(false);
-                                } else if (sourceNameObfuscationMode
-                                        instanceof ObfuscateSourceName) {
-                                    chckbxSourceName.setSelected(true);
-                                    comboBox_123.setSelectedIndex(0);
-                                    comboBox_123.setEnabled(true);
-                                } else if (sourceNameObfuscationMode
-                                        instanceof RemoveSourceName) {
-                                    chckbxSourceName.setSelected(true);
-                                    comboBox_123.setSelectedIndex(1);
-                                    comboBox_123.setEnabled(true);
-                                }
-
-                                AbstractTransformer sourceDebugObfuscationMode =
-                                        configParser.getSourceDebugObfuscationType();
-                                if (sourceDebugObfuscationMode == null) {
-                                    chckbxSourceDebug.setSelected(false);
-                                } else if (sourceDebugObfuscationMode
-                                        instanceof ObfuscateSourceDebug) {
-                                    chckbxSourceDebug.setSelected(true);
-                                    comboBox_1234.setSelectedIndex(0);
-                                    comboBox_1234.setEnabled(true);
-                                } else if (sourceDebugObfuscationMode
-                                        instanceof RemoveSourceDebug) {
-                                    chckbxSourceDebug.setSelected(true);
-                                    comboBox_1234.setSelectedIndex(1);
-                                    comboBox_1234.setEnabled(true);
-                                }
-
-
-                                AbstractTransformer stringPoolMode =
-                                        configParser.getStringPoolType();
-                                if (stringPoolMode instanceof StringPool) {
-                                    chckbxSpringPool.setSelected(true);
-                                } else {
-                                    chckbxSpringPool.setSelected(false);
-                                }
-
-                                AbstractTransformer shufflerMode =
-                                        configParser.getShufflerType();
-                                if (shufflerMode instanceof Shuffler) {
-                                    chckbxShuffler.setSelected(true);
-                                } else {
-                                    chckbxShuffler.setSelected(false);
-                                }
-
-                                AbstractTransformer innerClassMode =
-                                        configParser.getInnerClassRemoverType();
-                                if (innerClassMode instanceof InnerClassRemover) {
-                                    chckbxInnerClasses.setSelected(true);
-                                } else {
-                                    chckbxInnerClasses.setSelected(false);
-                                }
-
-                                AbstractTransformer renamer =
-                                        configParser.getRenamerType();
-                                if (renamer instanceof Renamer) {
-                                    chckbxClassRenammer.setSelected(true);
-                                } else {
-                                    chckbxClassRenammer.setSelected(false);
-                                }
-
-                                if (configParser.getSpigotBool()) {
-                                    chckbxSpigotPlugin.setSelected(true);
-                                } else {
-                                    chckbxSpigotPlugin.setSelected(false);
-                                }
-
-                                int trashClassesChance =
-                                        configParser.getTrashClasses();
-                                if (trashClassesChance == -1) {
-                                    chckbxTrashClasses.setSelected(false);
-                                } else {
-                                    chckbxTrashClasses.setSelected(true);
-                                    trashChanceField.setText(String
-                                            .valueOf(trashClassesChance));
-                                    trashChanceField.setEditable(true);
-                                }
-
-                                waterMarkMessageField.setText(configParser
-                                        .getWatermarkMsg());
-                                watermarkPassword.setText(configParser
-                                        .getWatermarkKey());
-
-                                int watermarkType =
-                                        configParser.getWatermarkType();
-                                if (configParser.getWatermarkType() != -1) {
-                                    chckbxAddWatermark.setSelected(true);
-                                    waterMarkMessageField.setEnabled(true);
-                                    watermarkPassword.setEnabled(true);
-                                    comboBox_05.setEnabled(true);
-                                    comboBox_05.setSelectedIndex(watermarkType);
-                                }
-
-                                if (configParser.getExpiryMsg() != null
-                                        && configParser.getExpiryTime() != -1) {
-                                    expirationMessageField.setText(configParser
-                                            .getExpiryMsg());
-                                    expirationMessageField.setEnabled(true);
-                                    expirationDateField.setText(String
-                                            .valueOf(new SimpleDateFormat("MM/dd/yyyy")
-                                                    .format(configParser.getExpiryTime())));
-                                    expirationDateField.setEnabled(true);
-                                    chckbxAddExpiration.setSelected(true);
-                                }
-
-                                int dictionary = configParser.getDictionaryType();
-                                dictionaryComboBox.setSelectedIndex(dictionary);
-                                fis.close();
-
-                                lastPath = chooser.getSelectedFile();
-                            } catch (Throwable t) {
-                                JOptionPane.showMessageDialog(null,
-                                        t.getMessage(), "Error",
-                                        JOptionPane.ERROR_MESSAGE);
-                                t.printStackTrace();
+                        List<String> exempts = configParser.getExempts();
+                        if (exempts != null) {
+                            exemptList.clear();
+                            for (String s : exempts) {
+                                exemptList.addElement(s);
                             }
                         }
-                    });
-                }
+
+                        AbstractTransformer stringEncryptionMode
+                                = configParser.getStringEncryptionType();
+                        if (stringEncryptionMode == null) {
+                            chckbxStringEncryption.setSelected(false);
+                        } else if (stringEncryptionMode
+                                instanceof SuperLightStringEncryption) {
+                            chckbxStringEncryption.setSelected(true);
+                            comboBox.setSelectedIndex(0);
+                            comboBox.setEnabled(true);
+                        } else if (stringEncryptionMode
+                                instanceof LightStringEncryption) {
+                            chckbxStringEncryption.setSelected(true);
+                            comboBox.setSelectedIndex(1);
+                            comboBox.setEnabled(true);
+                        } else if (stringEncryptionMode
+                                instanceof NormalStringEncryption) {
+                            chckbxStringEncryption.setSelected(true);
+                            comboBox.setSelectedIndex(2);
+                            comboBox.setEnabled(true);
+                        } else if (stringEncryptionMode
+                                instanceof HeavyStringEncryption) {
+                            chckbxStringEncryption.setSelected(true);
+                            comboBox.setSelectedIndex(3);
+                            comboBox.setEnabled(true);
+                        }
+
+                        AbstractTransformer flowObfuscationMode =
+                                configParser.getFlowObfuscationType();
+                        if (flowObfuscationMode == null) {
+                            chckbxFlow.setSelected(false);
+                        } else if (flowObfuscationMode
+                                instanceof LightFlowObfuscation) {
+                            chckbxFlow.setSelected(true);
+                            comboBox_2.setSelectedIndex(0);
+                            comboBox_2.setEnabled(true);
+                        } else if (flowObfuscationMode
+                                instanceof NormalFlowObfuscation) {
+                            chckbxFlow.setSelected(true);
+                            comboBox_2.setSelectedIndex(1);
+                            comboBox_2.setEnabled(true);
+                        } else if (flowObfuscationMode
+                                instanceof HeavyFlowObfuscation) {
+                            chckbxFlow.setSelected(true);
+                            comboBox_2.setSelectedIndex(2);
+                            comboBox_2.setEnabled(true);
+                        }
+
+                        AbstractTransformer invokeDynamicMode =
+                                configParser.getInvokeDynamicType();
+                        if (invokeDynamicMode == null) {
+                            chckbxInvokeDynamic.setSelected(false);
+                        } else if (invokeDynamicMode
+                                instanceof LightInvokeDynamic) {
+                            chckbxInvokeDynamic.setSelected(true);
+                            comboBox_1.setSelectedIndex(0);
+                            comboBox_1.setEnabled(true);
+                        } else if (invokeDynamicMode
+                                instanceof NormalInvokeDynamic) {
+                            chckbxInvokeDynamic.setSelected(true);
+                            comboBox_1.setSelectedIndex(1);
+                            comboBox_1.setEnabled(true);
+                        } else if (invokeDynamicMode
+                                instanceof HeavyInvokeDynamic) {
+                            chckbxInvokeDynamic.setSelected(true);
+                            comboBox_1.setSelectedIndex(2);
+                            comboBox_1.setEnabled(true);
+                        }
+
+                        AbstractTransformer localVariablesMode =
+                                configParser.getLocalVariableObfuscationType();
+                        if (localVariablesMode == null) {
+                            chckbxLocalVariables.setSelected(false);
+                        } else if (localVariablesMode
+                                instanceof ObfuscateLocalVariables) {
+                            chckbxLocalVariables.setSelected(true);
+                            comboBox_3.setSelectedIndex(0);
+                            comboBox_3.setEnabled(true);
+                        } else if (localVariablesMode
+                                instanceof RemoveLocalVariables) {
+                            chckbxLocalVariables.setSelected(true);
+                            comboBox_3.setSelectedIndex(1);
+                            comboBox_3.setEnabled(true);
+                        }
+
+                        AbstractTransformer crasherMode =
+                                configParser.getCrasherType();
+                        if (crasherMode instanceof Crasher) {
+                            chckbxCrasher.setSelected(true);
+                        } else {
+                            chckbxCrasher.setSelected(false);
+                        }
+
+                        AbstractTransformer hideCodeMode =
+                                configParser.getHideCodeType();
+                        if (hideCodeMode instanceof HideCode) {
+                            chckbxHidecode.setSelected(true);
+                        } else {
+                            chckbxHidecode.setSelected(false);
+                        }
+
+                        AbstractTransformer lineRemoverMode =
+                                configParser.getLineNumberObfuscationType();
+                        if (lineRemoverMode == null) {
+                            chckbxLineObfuscation.setSelected(false);
+                        } else if (lineRemoverMode
+                                instanceof ObfuscateLineNumbers) {
+                            chckbxLineObfuscation.setSelected(true);
+                            comboBox_5.setSelectedIndex(0);
+                            comboBox_5.setEnabled(true);
+                        } else if (lineRemoverMode
+                                instanceof RemoveLineNumbers) {
+                            chckbxLineObfuscation.setSelected(true);
+                            comboBox_5.setSelectedIndex(1);
+                            comboBox_5.setEnabled(true);
+                        }
+
+                        AbstractTransformer numberObfuscationMode =
+                                configParser.getNumberObfuscationType();
+                        if (numberObfuscationMode
+                                instanceof NumberObfuscation) {
+                            chckbxNumberObfuscation.setSelected(true);
+                        } else {
+                            chckbxNumberObfuscation.setSelected(false);
+                        }
+
+                        AbstractTransformer sourceNameObfuscationMode =
+                                configParser.getSourceNameObfuscationType();
+                        if (sourceNameObfuscationMode == null) {
+                            chckbxSourceName.setSelected(false);
+                        } else if (sourceNameObfuscationMode
+                                instanceof ObfuscateSourceName) {
+                            chckbxSourceName.setSelected(true);
+                            comboBox_123.setSelectedIndex(0);
+                            comboBox_123.setEnabled(true);
+                        } else if (sourceNameObfuscationMode
+                                instanceof RemoveSourceName) {
+                            chckbxSourceName.setSelected(true);
+                            comboBox_123.setSelectedIndex(1);
+                            comboBox_123.setEnabled(true);
+                        }
+
+                        AbstractTransformer sourceDebugObfuscationMode =
+                                configParser.getSourceDebugObfuscationType();
+                        if (sourceDebugObfuscationMode == null) {
+                            chckbxSourceDebug.setSelected(false);
+                        } else if (sourceDebugObfuscationMode
+                                instanceof ObfuscateSourceDebug) {
+                            chckbxSourceDebug.setSelected(true);
+                            comboBox_1234.setSelectedIndex(0);
+                            comboBox_1234.setEnabled(true);
+                        } else if (sourceDebugObfuscationMode
+                                instanceof RemoveSourceDebug) {
+                            chckbxSourceDebug.setSelected(true);
+                            comboBox_1234.setSelectedIndex(1);
+                            comboBox_1234.setEnabled(true);
+                        }
+
+
+                        AbstractTransformer stringPoolMode =
+                                configParser.getStringPoolType();
+                        if (stringPoolMode instanceof StringPool) {
+                            chckbxSpringPool.setSelected(true);
+                        } else {
+                            chckbxSpringPool.setSelected(false);
+                        }
+
+                        AbstractTransformer shufflerMode =
+                                configParser.getShufflerType();
+                        if (shufflerMode instanceof Shuffler) {
+                            chckbxShuffler.setSelected(true);
+                        } else {
+                            chckbxShuffler.setSelected(false);
+                        }
+
+                        AbstractTransformer innerClassMode =
+                                configParser.getInnerClassRemoverType();
+                        if (innerClassMode instanceof InnerClassRemover) {
+                            chckbxInnerClasses.setSelected(true);
+                        } else {
+                            chckbxInnerClasses.setSelected(false);
+                        }
+
+                        AbstractTransformer renamer =
+                                configParser.getRenamerType();
+                        if (renamer instanceof Renamer) {
+                            chckbxClassRenammer.setSelected(true);
+                        } else {
+                            chckbxClassRenammer.setSelected(false);
+                        }
+
+                        if (configParser.getSpigotBool()) {
+                            chckbxSpigotPlugin.setSelected(true);
+                        } else {
+                            chckbxSpigotPlugin.setSelected(false);
+                        }
+
+                        int trashClassesChance =
+                                configParser.getTrashClasses();
+                        if (trashClassesChance == -1) {
+                            chckbxTrashClasses.setSelected(false);
+                        } else {
+                            chckbxTrashClasses.setSelected(true);
+                            trashChanceField.setText(String
+                                    .valueOf(trashClassesChance));
+                            trashChanceField.setEditable(true);
+                        }
+
+                        waterMarkMessageField.setText(configParser
+                                .getWatermarkMsg());
+                        watermarkPassword.setText(configParser
+                                .getWatermarkKey());
+
+                        int watermarkType =
+                                configParser.getWatermarkType();
+                        if (configParser.getWatermarkType() != -1) {
+                            chckbxAddWatermark.setSelected(true);
+                            waterMarkMessageField.setEnabled(true);
+                            watermarkPassword.setEnabled(true);
+                            comboBox_05.setEnabled(true);
+                            comboBox_05.setSelectedIndex(watermarkType);
+                        }
+
+                        if (configParser.getExpiryMsg() != null
+                                && configParser.getExpiryTime() != -1) {
+                            expirationMessageField.setText(configParser
+                                    .getExpiryMsg());
+                            expirationMessageField.setEnabled(true);
+                            expirationDateField.setText(String
+                                    .valueOf(new SimpleDateFormat("MM/dd/yyyy")
+                                            .format(configParser.getExpiryTime())));
+                            expirationDateField.setEnabled(true);
+                            chckbxAddExpiration.setSelected(true);
+                        }
+
+                        int dictionary = configParser.getDictionaryType();
+                        dictionaryComboBox.setSelectedIndex(dictionary);
+                        fis.close();
+
+                        lastPath = chooser.getSelectedFile();
+                    } catch (Throwable t) {
+                        JOptionPane.showMessageDialog(null,
+                                t.getMessage(), "Error",
+                                JOptionPane.ERROR_MESSAGE);
+                        t.printStackTrace();
+                    }
+                });
             }
         });
         btnLoadConfiguration.setToolTipText("Loads config for pre-defined " +
                 "settings.");
         panel_6.add(btnLoadConfiguration);
         JButton saveConfigButton = new JButton("Save configuration");
-        saveConfigButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JFileChooser chooser = new JFileChooser();
-                chooser.setMultiSelectionEnabled(false);
-                chooser.setFileSelectionMode(0);
-                int result = chooser.showOpenDialog(frmRadonObfuscator);
-                if (result == 0) {
-                    SwingUtilities.invokeLater(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                Map<ConfigEnum, Object> settings = new HashMap<>();
-                                if (inputField.getText() != null
-                                        && !inputField.getText().isEmpty()) {
-                                    settings.put(ConfigEnum.INPUT, inputField.getText());
-                                }
-
-                                if (outputField.getText() != null
-                                        && !outputField.getText().isEmpty()) {
-                                    settings.put(ConfigEnum.OUTPUT, outputField.getText());
-                                }
-
-                                if (chckbxStringEncryption.isSelected()) {
-                                    switch (comboBox.getSelectedIndex()) {
-                                        case 0:
-                                            settings.put(ConfigEnum.STRING_ENCRYPTION, "SuperLight");
-                                            break;
-                                        case 1:
-                                            settings.put(ConfigEnum.STRING_ENCRYPTION, "Light");
-                                            break;
-                                        case 2:
-                                            settings.put(ConfigEnum.STRING_ENCRYPTION, "Normal");
-                                            break;
-                                        case 3:
-                                            settings.put(ConfigEnum.STRING_ENCRYPTION, "Heavy");
-                                            break;
-                                    }
-                                }
-
-                                if (chckbxInvokeDynamic.isSelected()) {
-                                    switch (comboBox_1.getSelectedIndex()) {
-                                        case 0:
-                                            settings.put(ConfigEnum.INVOKEDYNAMIC, "Light");
-                                            break;
-                                        case 1:
-                                            settings.put(ConfigEnum.INVOKEDYNAMIC, "Normal");
-                                            break;
-                                        case 2:
-                                            settings.put(ConfigEnum.INVOKEDYNAMIC, "Heavy");
-                                            break;
-                                    }
-                                }
-
-                                if (chckbxFlow.isSelected()) {
-                                    switch (comboBox_2.getSelectedIndex()) {
-                                        case 0:
-                                            settings.put(ConfigEnum.FLOW_OBFUSCATION, "Light");
-                                            break;
-                                        case 1:
-                                            settings.put(ConfigEnum.FLOW_OBFUSCATION, "Normal");
-                                            break;
-                                        case 2:
-                                            settings.put(ConfigEnum.FLOW_OBFUSCATION, "Heavy");
-                                            break;
-                                    }
-                                }
-
-                                if (chckbxLocalVariables.isSelected()) {
-                                    switch (comboBox_3.getSelectedIndex()) {
-                                        case 0:
-                                            settings.put(ConfigEnum.LOCAL_VARIABLES, "Obfuscate");
-                                            break;
-                                        case 1:
-                                            settings.put(ConfigEnum.LOCAL_VARIABLES, "Remove");
-                                            break;
-                                    }
-                                }
-
-                                if (chckbxCrasher.isSelected()) {
-                                    settings.put(ConfigEnum.CRASHER, "true");
-                                }
-
-                                if (chckbxHidecode.isSelected()) {
-                                    settings.put(ConfigEnum.HIDER, "true");
-                                }
-
-                                if (chckbxSpringPool.isSelected()) {
-                                    settings.put(ConfigEnum.STRING_POOL, "true");
-                                }
-
-                                if (chckbxLineObfuscation.isSelected()) {
-                                    switch (comboBox_5.getSelectedIndex()) {
-                                        case 0:
-                                            settings.put(ConfigEnum.LINE_NUMBERS, "Obfuscate");
-                                            break;
-                                        case 1:
-                                            settings.put(ConfigEnum.LINE_NUMBERS, "Remove");
-                                            break;
-                                    }
-                                }
-
-                                if (chckbxNumberObfuscation.isSelected()) {
-                                    settings.put(ConfigEnum.NUMBERS, "true");
-                                }
-
-                                if (chckbxSourceName.isSelected()) {
-                                    switch (comboBox_123.getSelectedIndex()) {
-                                        case 0:
-                                            settings.put(ConfigEnum.SOURCE_NAME, "Obfuscate");
-                                            break;
-                                        case 1:
-                                            settings.put(ConfigEnum.SOURCE_NAME, "Remove");
-                                            break;
-                                    }
-                                }
-
-                                if (chckbxSourceDebug.isSelected()) {
-                                    switch (comboBox_1234.getSelectedIndex()) {
-                                        case 0:
-                                            settings.put(ConfigEnum.SOURCE_DEBUG, "Obfuscate");
-                                            break;
-                                        case 1:
-                                            settings.put(ConfigEnum.SOURCE_DEBUG, "Remove");
-                                            break;
-                                    }
-                                }
-
-                                if (chckbxTrashClasses.isSelected()) {
-                                    if (trashChanceField.getText() != null
-                                            && !trashChanceField.getText().isEmpty()) {
-                                        settings.put(ConfigEnum.TRASH_CLASSES, trashChanceField.getText());
-                                    }
-                                }
-
-                                if (chckbxAddWatermark.isSelected()) {
-                                    if (waterMarkMessageField.getText() != null
-                                            && !waterMarkMessageField.getText().isEmpty()
-                                            && watermarkPassword.getText() != null
-                                            && !watermarkPassword.getText().isEmpty()) {
-                                        switch (comboBox_05.getSelectedIndex()) {
-                                            case 0:
-                                                settings.put(ConfigEnum.WATERMARK_TYPE, "ConstantPool");
-                                                break;
-                                            case 1:
-                                                settings.put(ConfigEnum.WATERMARK_TYPE, "Signature");
-                                                break;
-                                        }
-
-                                        settings.put(ConfigEnum.WATERMARK_MSG, waterMarkMessageField.getText());
-                                        settings.put(ConfigEnum.WATERMARK_KEY, watermarkPassword.getText());
-                                    }
-                                }
-
-                                if (chckbxSpigotPlugin.isSelected()) {
-                                    settings.put(ConfigEnum.SPIGOT_PLUGIN, "true");
-                                }
-
-                                if (chckbxClassRenammer.isSelected()) {
-                                    settings.put(ConfigEnum.RENAMER, "true");
-                                }
-
-                                if (chckbxAddExpiration.isSelected()) {
-                                    if (expirationMessageField.getText() != null
-                                            && !expireMessageLabel.getText().isEmpty()
-                                            && expirationDateField.getText() != null
-                                            && !expirationDateField.getText().isEmpty()) {
-                                        settings.put(ConfigEnum.EXPIRATION_MESSAGE, expirationMessageField.getText());
-                                        settings.put(ConfigEnum.EXPIRATION_TIME, expirationDateField.getText());
-                                    }
-                                }
-
-                                if (chckbxShuffler.isSelected()) {
-                                    settings.put(ConfigEnum.SHUFFLER, "true");
-                                }
-
-                                settings.put(ConfigEnum.DICTIONARY, String.valueOf(dictionaryComboBox.getSelectedIndex()));
-
-                                if (chckbxInnerClasses.isSelected()) {
-                                    settings.put(ConfigEnum.INNERCLASSES, "true");
-                                }
-
-                                List<String> libs = new ArrayList<>();
-                                for (int i = 0; i < libList.size(); i++) {
-                                    String lib = libList.get(i);
-                                    libs.add(lib);
-                                }
-
-                                settings.put(ConfigEnum.LIBRARIES, libs);
-
-                                List<String> exempts = new ArrayList<>();
-                                for (int i = 0; i < exemptList.size(); i++) {
-                                    String exempt = exemptList.get(i);
-                                    exempts.add(exempt);
-                                }
-
-                                settings.put(ConfigEnum.EXEMPTS, exempts);
-
-                                ConfigWriter writer = new ConfigWriter(settings);
-                                writer.parseOptions();
-                                writer.writeConfig(chooser.getSelectedFile().getAbsolutePath());
-
-                                lastPath = chooser.getSelectedFile();
-                            } catch (Throwable t) {
-                                JOptionPane.showMessageDialog(null,
-                                        t.getMessage(), "Error",
-                                        JOptionPane.ERROR_MESSAGE);
-                                t.printStackTrace();
+        saveConfigButton.addActionListener((e) -> {
+            JFileChooser chooser = new JFileChooser();
+            chooser.setMultiSelectionEnabled(false);
+            chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+            int result = chooser.showOpenDialog(frmRadonObfuscator);
+            if (result == 0) {
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            Map<ConfigEnum, Object> settings = new HashMap<>();
+                            if (inputField.getText() != null
+                                    && !inputField.getText().isEmpty()) {
+                                settings.put(ConfigEnum.INPUT, inputField.getText());
                             }
+
+                            if (outputField.getText() != null
+                                    && !outputField.getText().isEmpty()) {
+                                settings.put(ConfigEnum.OUTPUT, outputField.getText());
+                            }
+
+                            if (chckbxStringEncryption.isSelected()) {
+                                switch (comboBox.getSelectedIndex()) {
+                                    case 0:
+                                        settings.put(ConfigEnum.STRING_ENCRYPTION, "SuperLight");
+                                        break;
+                                    case 1:
+                                        settings.put(ConfigEnum.STRING_ENCRYPTION, "Light");
+                                        break;
+                                    case 2:
+                                        settings.put(ConfigEnum.STRING_ENCRYPTION, "Normal");
+                                        break;
+                                    case 3:
+                                        settings.put(ConfigEnum.STRING_ENCRYPTION, "Heavy");
+                                        break;
+                                }
+                            }
+
+                            if (chckbxInvokeDynamic.isSelected()) {
+                                switch (comboBox_1.getSelectedIndex()) {
+                                    case 0:
+                                        settings.put(ConfigEnum.INVOKEDYNAMIC, "Light");
+                                        break;
+                                    case 1:
+                                        settings.put(ConfigEnum.INVOKEDYNAMIC, "Normal");
+                                        break;
+                                    case 2:
+                                        settings.put(ConfigEnum.INVOKEDYNAMIC, "Heavy");
+                                        break;
+                                }
+                            }
+
+                            if (chckbxFlow.isSelected()) {
+                                switch (comboBox_2.getSelectedIndex()) {
+                                    case 0:
+                                        settings.put(ConfigEnum.FLOW_OBFUSCATION, "Light");
+                                        break;
+                                    case 1:
+                                        settings.put(ConfigEnum.FLOW_OBFUSCATION, "Normal");
+                                        break;
+                                    case 2:
+                                        settings.put(ConfigEnum.FLOW_OBFUSCATION, "Heavy");
+                                        break;
+                                }
+                            }
+
+                            if (chckbxLocalVariables.isSelected()) {
+                                switch (comboBox_3.getSelectedIndex()) {
+                                    case 0:
+                                        settings.put(ConfigEnum.LOCAL_VARIABLES, "Obfuscate");
+                                        break;
+                                    case 1:
+                                        settings.put(ConfigEnum.LOCAL_VARIABLES, "Remove");
+                                        break;
+                                }
+                            }
+
+                            if (chckbxCrasher.isSelected()) {
+                                settings.put(ConfigEnum.CRASHER, "true");
+                            }
+
+                            if (chckbxHidecode.isSelected()) {
+                                settings.put(ConfigEnum.HIDER, "true");
+                            }
+
+                            if (chckbxSpringPool.isSelected()) {
+                                settings.put(ConfigEnum.STRING_POOL, "true");
+                            }
+
+                            if (chckbxLineObfuscation.isSelected()) {
+                                switch (comboBox_5.getSelectedIndex()) {
+                                    case 0:
+                                        settings.put(ConfigEnum.LINE_NUMBERS, "Obfuscate");
+                                        break;
+                                    case 1:
+                                        settings.put(ConfigEnum.LINE_NUMBERS, "Remove");
+                                        break;
+                                }
+                            }
+
+                            if (chckbxNumberObfuscation.isSelected()) {
+                                settings.put(ConfigEnum.NUMBERS, "true");
+                            }
+
+                            if (chckbxSourceName.isSelected()) {
+                                switch (comboBox_123.getSelectedIndex()) {
+                                    case 0:
+                                        settings.put(ConfigEnum.SOURCE_NAME, "Obfuscate");
+                                        break;
+                                    case 1:
+                                        settings.put(ConfigEnum.SOURCE_NAME, "Remove");
+                                        break;
+                                }
+                            }
+
+                            if (chckbxSourceDebug.isSelected()) {
+                                switch (comboBox_1234.getSelectedIndex()) {
+                                    case 0:
+                                        settings.put(ConfigEnum.SOURCE_DEBUG, "Obfuscate");
+                                        break;
+                                    case 1:
+                                        settings.put(ConfigEnum.SOURCE_DEBUG, "Remove");
+                                        break;
+                                }
+                            }
+
+                            if (chckbxTrashClasses.isSelected()) {
+                                if (trashChanceField.getText() != null
+                                        && !trashChanceField.getText().isEmpty()) {
+                                    settings.put(ConfigEnum.TRASH_CLASSES, trashChanceField.getText());
+                                }
+                            }
+
+                            if (chckbxAddWatermark.isSelected()) {
+                                if (waterMarkMessageField.getText() != null
+                                        && !waterMarkMessageField.getText().isEmpty()
+                                        && watermarkPassword.getText() != null
+                                        && !watermarkPassword.getText().isEmpty()) {
+                                    switch (comboBox_05.getSelectedIndex()) {
+                                        case 0:
+                                            settings.put(ConfigEnum.WATERMARK_TYPE, "ConstantPool");
+                                            break;
+                                        case 1:
+                                            settings.put(ConfigEnum.WATERMARK_TYPE, "Signature");
+                                            break;
+                                    }
+
+                                    settings.put(ConfigEnum.WATERMARK_MSG, waterMarkMessageField.getText());
+                                    settings.put(ConfigEnum.WATERMARK_KEY, watermarkPassword.getText());
+                                }
+                            }
+
+                            if (chckbxSpigotPlugin.isSelected()) {
+                                settings.put(ConfigEnum.SPIGOT_PLUGIN, "true");
+                            }
+
+                            if (chckbxClassRenammer.isSelected()) {
+                                settings.put(ConfigEnum.RENAMER, "true");
+                            }
+
+                            if (chckbxAddExpiration.isSelected()) {
+                                if (expirationMessageField.getText() != null
+                                        && !expireMessageLabel.getText().isEmpty()
+                                        && expirationDateField.getText() != null
+                                        && !expirationDateField.getText().isEmpty()) {
+                                    settings.put(ConfigEnum.EXPIRATION_MESSAGE, expirationMessageField.getText());
+                                    settings.put(ConfigEnum.EXPIRATION_TIME, expirationDateField.getText());
+                                }
+                            }
+
+                            if (chckbxShuffler.isSelected()) {
+                                settings.put(ConfigEnum.SHUFFLER, "true");
+                            }
+
+                            settings.put(ConfigEnum.DICTIONARY, String.valueOf(dictionaryComboBox.getSelectedIndex()));
+
+                            if (chckbxInnerClasses.isSelected()) {
+                                settings.put(ConfigEnum.INNERCLASSES, "true");
+                            }
+
+                            List<String> libs = new ArrayList<>();
+                            for (int i = 0; i < libList.size(); i++) {
+                                String lib = libList.get(i);
+                                libs.add(lib);
+                            }
+
+                            settings.put(ConfigEnum.LIBRARIES, libs);
+
+                            List<String> exempts = new ArrayList<>();
+                            for (int i = 0; i < exemptList.size(); i++) {
+                                String exempt = exemptList.get(i);
+                                exempts.add(exempt);
+                            }
+
+                            settings.put(ConfigEnum.EXEMPTS, exempts);
+
+                            ConfigWriter writer = new ConfigWriter(settings);
+                            writer.parseOptions();
+                            writer.writeConfig(chooser.getSelectedFile().getAbsolutePath());
+
+                            lastPath = chooser.getSelectedFile();
+                        } catch (Throwable t) {
+                            JOptionPane.showMessageDialog(null,
+                                    t.getMessage(), "Error",
+                                    JOptionPane.ERROR_MESSAGE);
+                            t.printStackTrace();
                         }
-                    });
-                }
+                    }
+                });
             }
         });
         panel_6.add(saveConfigButton);
