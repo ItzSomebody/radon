@@ -108,7 +108,6 @@ public class Renamer extends AbstractTransformer {
         this.logStrings.add(LoggerUtils.stdOut("Finished generated mappings. [" +
                 String.valueOf(System.currentTimeMillis() - current) + "ms]"));
         this.logStrings.add(LoggerUtils.stdOut("Applying mappings."));
-        current = System.currentTimeMillis();
 
         // Apply mapping
         Remapper simpleRemapper = new SimpleRemapper(this.mappings);
@@ -137,7 +136,7 @@ public class Renamer extends AbstractTransformer {
         // Fix screw ups in resources.
         this.logStrings.add(LoggerUtils.stdOut("Attempting to map class names in resources"));
         AtomicInteger fixed = new AtomicInteger();
-        passThru.forEach((name, byteArray) -> {
+        getPassThru().forEach((name, byteArray) -> {
             if (name.equals("META-INF/MANIFEST.MF")
                     || (name.equals("plugin.yml") && spigotMode)) {
                 String stringVer = new String(byteArray);
@@ -148,7 +147,7 @@ public class Renamer extends AbstractTransformer {
                 }
 
                 try {
-                    passThru.put(name, stringVer.getBytes("UTF-8"));
+                    getPassThru().put(name, stringVer.getBytes("UTF-8"));
                     fixed.incrementAndGet();
                 } catch (UnsupportedEncodingException e) {
                     e.printStackTrace();
@@ -168,19 +167,19 @@ public class Renamer extends AbstractTransformer {
         long current = System.currentTimeMillis();
         this.logStrings.add(LoggerUtils.stdOut("Creating class hierarchy."));
         this.getClassPathMap().values().forEach(classNode -> {
-            classNode.methods.forEach(methodNode -> {
-                methodNode.owner = classNode.name;
-            });
-            classNode.fields.forEach(fieldNode -> {
-                fieldNode.owner = classNode.name;
-            });
+            classNode.methods.forEach(methodNode ->
+                methodNode.owner = classNode.name
+            );
+            classNode.fields.forEach(fieldNode ->
+                fieldNode.owner = classNode.name
+            );
             ClassTree classTree = new ClassTree(classNode.name, classNode.libraryNode);
             classTree.parentClasses.add(classNode.superName);
             classTree.parentClasses.addAll(classNode.interfaces);
             this.classNodes().stream().filter(node -> node.superName.equals(classNode.name)
-                    || node.interfaces.contains(classNode.name)).forEach(node -> {
-                classTree.subClasses.add(node.name);
-            });
+                    || node.interfaces.contains(classNode.name)).forEach(node ->
+                classTree.subClasses.add(node.name)
+            );
 
             classTree.methods.addAll(classNode.methods);
             classTree.fields.addAll(classNode.fields);

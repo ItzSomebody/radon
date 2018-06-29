@@ -39,7 +39,6 @@ import me.itzsomebody.radon.transformers.AbstractTransformer;
 import me.itzsomebody.radon.transformers.misc.Expiry;
 import me.itzsomebody.radon.transformers.misc.TrashClasses;
 import me.itzsomebody.radon.transformers.renamer.ClassTree;
-import me.itzsomebody.radon.transformers.renamer.Renamer;
 import me.itzsomebody.radon.utils.FileUtils;
 import me.itzsomebody.radon.utils.LoggerUtils;
 import me.itzsomebody.radon.utils.NumberUtils;
@@ -147,16 +146,11 @@ public class Bootstrap { // Eyyy bootstrap bill
     private List<String> logStrings;
 
     /**
-     * {@link Long} used for entry times.
-     */
-    private long currentTime;
-
-    /**
      * Constructor used for CLI to create a {@link Bootstrap} object.
      *
      * @param config {@link Config} object.
      */
-    public Bootstrap(Config config) {
+    Bootstrap(Config config) {
         this.config = config;
     }
 
@@ -219,16 +213,12 @@ public class Bootstrap { // Eyyy bootstrap bill
                 }
                 this.zos = new ZipOutputStream(new FileOutputStream(output));
             }
-            this.currentTime = System.currentTimeMillis();
+            long currentTime = System.currentTimeMillis();
             this.loadClassPath();
             this.loadInput();
 
             for (AbstractTransformer transformer : this.transformers) {
-                if (transformer instanceof Renamer) {
-                    transformer.init(this.classes, this.classPath, this.passThru, this.exempts, this.dictionary);
-                } else {
-                    transformer.init(this.classes, this.extraClasses, this.exempts, this.dictionary);
-                }
+                transformer.init(this, this.exempts, this.dictionary);
                 transformer.obfuscate();
                 this.logStrings.addAll(transformer.getLogStrings());
             }
@@ -258,7 +248,7 @@ public class Bootstrap { // Eyyy bootstrap bill
                     classNode.accept(cw);
 
                     ZipEntry newEntry = new ZipEntry(classNode.name + ".class");
-                    newEntry.setTime(this.currentTime);
+                    newEntry.setTime(currentTime);
                     newEntry.setCompressedSize(-1);
                     this.zos.putNextEntry(newEntry);
                     this.zos.write(cw.toByteArray());
@@ -309,7 +299,7 @@ public class Bootstrap { // Eyyy bootstrap bill
 
                 ZipEntry newEntry = new ZipEntry(classNode.name
                         + ".class");
-                newEntry.setTime(this.currentTime);
+                newEntry.setTime(currentTime);
                 newEntry.setCompressedSize(-1);
                 this.zos.putNextEntry(newEntry);
                 this.zos.write(cw.toByteArray());
@@ -321,7 +311,7 @@ public class Bootstrap { // Eyyy bootstrap bill
             this.logStrings.add(LoggerUtils.stdOut("Writing resources to output"));
             for (String name : this.passThru.keySet()) {
                 ZipEntry newEntry = new ZipEntry(name);
-                newEntry.setTime(this.currentTime);
+                newEntry.setTime(currentTime);
                 this.zos.putNextEntry(newEntry);
                 this.zos.write(this.passThru.get(name));
                 this.zos.closeEntry();
@@ -542,12 +532,12 @@ public class Bootstrap { // Eyyy bootstrap bill
         long executionTime = System.currentTimeMillis();
         this.logStrings.add(LoggerUtils.stdOut("Creating class hierarchy."));
         classPath.values().forEach(classNode -> {
-            classNode.methods.forEach(methodNode -> {
-                methodNode.owner = classNode.name;
-            });
-            classNode.fields.forEach(fieldNode -> {
-                fieldNode.owner = classNode.name;
-            });
+            classNode.methods.forEach(methodNode ->
+                methodNode.owner = classNode.name
+            );
+            classNode.fields.forEach(fieldNode ->
+                fieldNode.owner = classNode.name
+            );
             ClassTree classTree = new ClassTree(classNode.name, classNode.libraryNode);
             classTree.parentClasses.add(classNode.superName);
             classTree.parentClasses.addAll(classNode.interfaces);
@@ -568,6 +558,42 @@ public class Bootstrap { // Eyyy bootstrap bill
             hierarchy.put(classNode.name, classTree);
         });
         this.logStrings.add(LoggerUtils.stdOut("Finished creating class hierarchy. [" + (System.currentTimeMillis() - executionTime) + "ms]"));
+    }
+
+    /**
+     * Returns the loaded input {@link ClassNode}s.
+     *
+     * @return the loaded input {@link ClassNode}s.
+     */
+    public Map<String, ClassNode> getClasses() {
+        return this.classes;
+    }
+
+    /**
+     * Returns the loaded class path.
+     *
+     * @return the loaded class path.
+     */
+    public Map<String, ClassNode> getClassPath() {
+        return this.classPath;
+    }
+
+    /**
+     * Returns the map of extra classes.
+     *
+     * @return the map of extra classes.
+     */
+    public Map<String, ClassNode> getExtraClasses() {
+        return this.extraClasses;
+    }
+
+    /**
+     * Returns the loaded resources.
+     *
+     * @return the loaded resources.
+     */
+    public Map<String, byte[]> getPassThru() {
+        return this.passThru;
     }
 
     /**

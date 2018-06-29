@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import me.itzsomebody.radon.internal.Bootstrap;
 import me.itzsomebody.radon.utils.CustomRegexUtils;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.commons.CodeSizeEvaluator;
@@ -36,19 +37,9 @@ import org.objectweb.asm.tree.MethodNode;
  */
 public abstract class AbstractTransformer implements Opcodes {
     /**
-     * The classes in the input.
+     * Bootstrap instance.
      */
-    private Map<String, ClassNode> classes;
-
-    /**
-     * The almighty classpath.
-     */
-    private Map<String, ClassNode> classPath;
-
-    /**
-     * Resources.
-     */
-    protected Map<String, byte[]> passThru;
+    private Bootstrap bootstrap;
 
     /**
      * Exempt information.
@@ -66,91 +57,71 @@ public abstract class AbstractTransformer implements Opcodes {
     protected List<String> logStrings;
 
     /**
-     * Init method.
+     * Dependency injection method.
      *
-     * @param classes the classes.
+     * @param bootstrap instance of {@link Bootstrap}.
      * @param exempts exempt information.
      */
-    public void init(Map<String, ClassNode> classes,
+    public void init(Bootstrap bootstrap,
                      List<String> exempts, int dictionary) {
-        this.classes = classes;
+        this.bootstrap = bootstrap;
         this.exempts = exempts;
         this.dictionary = dictionary;
         this.logStrings = new ArrayList<>();
     }
 
     /**
-     * The other init method.
+     * Returns the loaded input {@link ClassNode}s.
      *
-     * @param classes   the classes.
-     * @param classPath the almighty classpath. (Bow down to it)
-     * @param exempts   the exempted classes.
-     */
-    public void init(Map<String, ClassNode> classes,
-                     Map<String, ClassNode> classPath,
-                     List<String> exempts, int dictionary) {
-        this.classes = classes;
-        this.classPath = classPath;
-        this.exempts = exempts;
-        this.dictionary = dictionary;
-        this.logStrings = new ArrayList<>();
-    }
-
-    /**
-     * The other-other init method.
-     *
-     * @param classes   the classes.
-     * @param classPath the almighty classpath. (Bow down to it)
-     * @param passThru  the manifest.
-     * @param exempts   the exempted classes.
-     */
-    public void init(Map<String, ClassNode> classes,
-                     Map<String, ClassNode> classPath,
-                     Map<String, byte[]> passThru,
-                     List<String> exempts,
-                     int dictionary) {
-        this.classes = classes;
-        this.classPath = classPath;
-        this.exempts = exempts;
-        this.passThru = passThru;
-        this.dictionary = dictionary;
-        this.logStrings = new ArrayList<>();
-    }
-
-    /**
-     * Returns {@link AbstractTransformer#classes}.
-     *
-     * @return {@link AbstractTransformer#classes}.
+     * @return the loaded input {@link ClassNode}s.
      */
     protected Map<String, ClassNode> getClassMap() {
-        return this.classes;
+        return this.bootstrap.getClasses();
     }
 
     /**
-     * Returns {@link AbstractTransformer#classPath}.
+     * Returns the map of extra classes.
      *
-     * @return {@link AbstractTransformer#classPath}.
+     * @return the map of extra classes.
+     */
+    protected Map<String, ClassNode> getExtraClassesMap() {
+        return this.bootstrap.getExtraClasses();
+    }
+
+    /**
+     * Returns the loaded class path.
+     *
+     * @return the loaded class path.
      */
     protected Map<String, ClassNode> getClassPathMap() {
-        return this.classPath;
+        return this.bootstrap.getClassPath();
     }
 
     /**
-     * Returns the values of {@link AbstractTransformer#classes}.
+     * Returns the loaded resources.
      *
-     * @return the values of {@link AbstractTransformer#classes}.
+     * @return the loaded resources.
+     */
+    protected Map<String, byte[]> getPassThru() {
+        return this.bootstrap.getPassThru();
+    }
+
+    /**
+     * Returns only the loaded {@link ClassNode}s.
+     *
+     * @return only the loaded {@link ClassNode}s.
      */
     protected Collection<ClassNode> classNodes() {
-        return this.classes.values();
+        return this.getClassMap().values();
     }
 
     /**
-     * Returns the keyset of {@link AbstractTransformer#classes}.
+     * Returns only the names of the loaded {@link ClassNode}s.
      *
-     * @return the keyset of {@link AbstractTransformer#classes}.
+     * @return only the names of the loaded {@link ClassNode}s.
      */
     protected Collection<String> classNames() {
-        return this.classes.keySet();
+        return this.getClassMap().keySet();
     }
 
     /**
