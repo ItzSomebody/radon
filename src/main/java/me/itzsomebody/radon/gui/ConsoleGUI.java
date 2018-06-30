@@ -76,7 +76,7 @@ public class ConsoleGUI {
         this.thisFrame = new JFrame();
         this.thisFrame.setTitle(Radon.PREFIX + " " + Radon.VERSION);
         this.thisFrame.setResizable(true);
-        this.thisFrame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+        this.thisFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         this.thisFrame.setLocationRelativeTo(null);
         this.thisFrame.addWindowListener(new WindowAdapter() {
             @Override

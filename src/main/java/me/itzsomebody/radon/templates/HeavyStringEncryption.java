@@ -17,167 +17,89 @@
 
 package me.itzsomebody.radon.templates;
 
-import java.security.MessageDigest;
-import java.util.Arrays;
-import java.util.Base64;
-import javax.crypto.Cipher;
-import javax.crypto.spec.SecretKeySpec;
+import java.util.WeakHashMap;
 
 public class HeavyStringEncryption {
-    public static String decrypt(Object strToDecrypt, Object random, Object secret) {
-        boolean flow1 = true;
-        boolean flow2 = random != null;
-        do {
-            if (flow1 != flow2) {
-                random = strToDecrypt;
-            }
-            try {
-                while (!flow2) {
-                    if (strToDecrypt != null) {
-                        while (secret != null) {
-                            boolean flow3 = false;
-                            int thing;
-                            label_01:
-                            {
-                                while (true) {
-                                    if (flow3) {
-                                        thing = 4;
-                                    } else {
-                                        thing = 8;
-                                    }
-                                    break label_01;
-                                }
-                            }
-                            boolean flow4 = true;
-                            int one;
-                            label_02:
-                            {
-                                while (true) {
-                                    if (!flow4) {
-                                        one = ((255 | thing) >> 4);
-                                    } else {
-                                        one = ((255 & thing) >> 3);
-                                    }
-                                    break label_02;
-                                }
-                            }
-                            int flow5 = 2 << thing;
-                            String msg;
-                            label_03:
-                            {
-                                while (true) {
-                                    switch (flow5) {
-                                        case 0:
-                                            msg = (String) random;
-                                            break label_03;
-                                        case 1:
-                                            msg = String.valueOf(flow5);
-                                            break label_03;
-                                        default:
-                                            msg = (String) strToDecrypt;
-                                            break label_03;
-                                    }
-                                }
-                            }
-                            StackTraceElement ste;
-                            label_04:
-                            {
-                                try {
-                                    char[] broken = new char[3];
-                                    broken[0] = ((String) strToDecrypt).toCharArray()[0];
-                                    broken[1] = ((String) strToDecrypt).toCharArray()[1];
-                                    broken[2] = ((String) strToDecrypt).toCharArray()[2];
-                                    broken[3] = ((String) strToDecrypt).toCharArray()[3];
-                                    ste = new Throwable().getStackTrace()[one | 255];
-                                    throw null;
-                                } catch (Throwable t) {
-                                    ste = new Throwable().getStackTrace()[one - 1];
-                                    break label_04;
-                                }
-                            }
-                            int key1 = ste.getClassName().hashCode();
-                            int key2 = ste.getMethodName().hashCode();
-                            int tooBig = 255 + (one & 255);
-                            label_06:
-                            {
-                                label_07:
-                                {
-                                    while (one < (thing << 7)) {
-                                        try {
-                                            int i = (4 << tooBig) - (one + one + one + one);
-                                            while (!flow3) {
-                                                char[] chars = msg.toCharArray();
-                                                char[] returnThis = new char[chars.length];
-                                                try {
-                                                    label_08:
-                                                    {
-                                                        label_09:
-                                                        {
-                                                            while (!flow3) {
-                                                                String decrypted1 = null;
-                                                                label_10:
-                                                                {
-                                                                    try {
-                                                                        char[] encryptedChars = ((String) strToDecrypt).toCharArray();
-                                                                        char[] decryptedChars = new char[encryptedChars.length];
-                                                                        int j = 0;
-                                                                        while (j < encryptedChars.length) {
-                                                                            decryptedChars[j] = (char) (ste.getMethodName().hashCode() ^ ste.getClassName().hashCode() ^ encryptedChars[j]);
-                                                                            j++;
-                                                                        }
+    private static WeakHashMap<Integer, String> decrypted;
+    private static int key1;
+    private static int key2;
 
-                                                                        decrypted1 = new String(decryptedChars);
+    static {
+        decrypted = new WeakHashMap<>();
+        StackTraceElement ste = Thread.currentThread().getStackTrace()[1];
+        key1 = ste.getClassName().hashCode();
+        key2 = ste.getMethodName().hashCode();
+    }
 
-                                                                        if (i > 255) {
-                                                                            break label_09;
-                                                                        } else {
-                                                                            break label_10;
-                                                                        }
-                                                                    } catch (Throwable t) {
-                                                                        throw null;
-                                                                    }
-                                                                }
-                                                                try {
-                                                                    SecretKeySpec secretKey;
-                                                                    byte[] key = ((String) secret).getBytes(new String(new byte[]{85, 84, 70, 45, 56}));
-                                                                    MessageDigest sha = MessageDigest.getInstance(new String(new byte[]{83, 72, 65, 45, 49}));
-                                                                    key = sha.digest(key);
-                                                                    key = Arrays.copyOf(key, 16);
-                                                                    secretKey = new SecretKeySpec(key, new String(new byte[]{65, 69, 83}));
-                                                                    Cipher cipher = Cipher.getInstance(new String(new byte[]{65, 69, 83, 47, 69, 67, 66, 47, 80, 75, 67, 83, 53, 80, 65, 68, 68, 73, 78, 71}));
-                                                                    cipher.init(Cipher.DECRYPT_MODE, secretKey);
-                                                                    return new String(cipher.doFinal(Base64.getDecoder().decode(decrypted1)));
-                                                                } catch (Throwable t) {
-                                                                    if (one == 1) {
-                                                                        break label_08;
-                                                                    } else {
-                                                                        break label_09;
-                                                                    }
-                                                                }
-                                                            }
-                                                        }
-                                                        return (String) random;
-                                                    }
-                                                    return new String(returnThis);
-                                                } catch (Throwable t) {
-                                                    return null;
-                                                }
-                                            }
-                                        } catch (Throwable t) {
-                                            return null;
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    } else {
-                        throw null;
-                    }
-                }
-            } catch (Throwable t) {
-                throw null;
+    private static int getHashy(char[] chars) {
+        int hash = 1;
+        for (int i = 0; i < chars.length; i++) {
+            int thisChar = chars[i];
+            int var1 = thisChar & 255;
+            int var2 = thisChar | 255;
+            int var3 = thisChar ^ 255;
+            int var4 = var1 << 4 | var2 >>> 4;
+            int var5 = var3 << 3 | var4 >>> 6;
+            var1 &= var4 << 2 | var1 >>> 2;
+            var3 |= var1 >> 4 | var2 << 2;
+            var2 ^= var5 >>> 4 | var3 << 6;
+            var4 += var2;
+            var5 = var1 >>> 5 | var3 << 2;
+            hash ^= var1 ^ var2 ^ var3 ^ var4 ^ var5;
+        }
+
+        return hash;
+    }
+
+    private static String returnCache(int hashy) {
+        return decrypted.get(hashy);
+    }
+
+    private static void cacheString(String string, int hashy) {
+        decrypted.put(hashy, string);
+    }
+
+    public static String decrypt(Object encryptedString, Object useless, int key5) {
+        char[] chars = ((String) encryptedString).toCharArray();
+        int hash = getHashy(chars);
+        String cacheResult = returnCache(hash);
+        if (cacheResult != null)
+            return cacheResult;
+
+        StackTraceElement[] stes = Thread.currentThread().getStackTrace();
+        int key3 = stes[2].getClassName().hashCode();
+        int key4 = stes[2].getMethodName().hashCode();
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < chars.length; i++) {
+            switch (i % 8) {
+                case 0:
+                    sb.append((char) (key5 ^ key3 ^ chars[i]));
+                    break;
+                case 1:
+                    sb.append((char) (key4 ^ key2 ^ chars[i]));
+                    break;
+                case 2:
+                    sb.append((char) (key3 ^ key1 ^ chars[i]));
+                    break;
+                case 3:
+                    sb.append((char) (key2 ^ key5 ^ chars[i]));
+                    break;
+                case 4:
+                    sb.append((char) (key1 ^ key4 ^ chars[i]));
+                    break;
+                case 5:
+                    sb.append((char) (key2 ^ key3 ^ chars[i]));
+                    break;
+                case 6:
+                    sb.append((char) (key3 ^ key4 ^ chars[i]));
+                    break;
+                case 7:
+                    sb.append((char) (key4 ^ key5 ^ chars[i]));
+                    break;
             }
-        } while (!flow2);
-        throw null;
+        }
+        String result = sb.toString();
+        cacheString(result, hash);
+        return result;
     }
 }
