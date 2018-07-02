@@ -51,6 +51,7 @@ import org.objectweb.asm.tree.ClassNode;
 /**
  * Bootstraps and runs the obfuscation process.
  * TODO: Create class hierarchy more efficiently.
+ * TODO: Renaming classes causes exempts on other classes to not work.
  *
  * @author ItzSomebody
  */
