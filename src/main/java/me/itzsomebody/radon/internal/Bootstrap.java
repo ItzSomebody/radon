@@ -50,6 +50,7 @@ import org.objectweb.asm.tree.ClassNode;
 
 /**
  * Bootstraps and runs the obfuscation process.
+ * TODO: Create class hierarchy more efficiently.
  *
  * @author ItzSomebody
  */

@@ -278,8 +278,7 @@ public class StringUtils {
      * @return a generated classname based on current class packages.
      */
     public static String randomClassName(Collection<String> theClassNames, int dictionary) {
-        List<String> classNames = new ArrayList<>();
-        classNames.addAll(theClassNames);
+        List<String> classNames = new ArrayList<>(theClassNames);
 
         String randomClass = classNames.get(NumberUtils.
                 getRandomInt(classNames.size()));
@@ -302,12 +301,9 @@ public class StringUtils {
      * @return a generated classname based on current class packages.
      */
     public static String randomClass(Collection<String> theClassNames) {
-        List<String> classNames = new ArrayList<>();
-        classNames.addAll(theClassNames);
+        List<String> classNames = new ArrayList<>(theClassNames);
 
-        String randomClass = classNames.get(NumberUtils
-                .getRandomInt(classNames.size()));
-        return randomClass;
+        return classNames.get(NumberUtils.getRandomInt(classNames.size()));
     }
 
     /**
@@ -333,38 +329,49 @@ public class StringUtils {
     }
 
     /**
-     * Returns encrypted {@link String} used by {@link HeavyStringEncryption}.
+     * Encrypts string for use in {@link HeavyStringEncryption}.
      *
-     * @param msg        the string to encrypt.
-     * @param secret     the key for AES to use.
-     * @param className  the class name the string is contained in.
-     * @param methodName the method name the string is contained in.
-     * @return encrypted {@link String} used by {@link HeavyStringEncryption}.
+     * @param msg  {@link String} to encrypt.
+     * @param key1 decryptor's containing class's name's hashcode.
+     * @param key2 hashcode of <clinit>.
+     * @param key3 hashcode of the string's containing class's name's hashcode.
+     * @param key4 hashcode of the string's containing method's name's hashcode.
+     * @param key5 random integer to ensure randomization.
+     * @return {@link String} as the encrypted variant of the inputted string.
      */
-    public static String heavyEncrypt(String msg, String secret,
-                                      String className, String methodName) {
-        char[] base64Chars;
-        try {
-            SecretKeySpec secretKey;
-            byte[] key = secret.getBytes("UTF-8");
-            MessageDigest sha = MessageDigest.getInstance("SHA-1");
-            key = sha.digest(key);
-            key = Arrays.copyOf(key, 16);
-            secretKey = new SecretKeySpec(key, "AES");
-            Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
-            cipher.init(Cipher.ENCRYPT_MODE, secretKey);
-            base64Chars = Base64.getEncoder().encodeToString(cipher.
-                    doFinal(msg.getBytes("UTF-8"))).toCharArray();
-        } catch (Throwable t) {
-            throw new IllegalStateException("Was unable to encrypt string " +
-                    msg + " using " + secret);
-        }
-        char[] returnThis = new char[base64Chars.length];
-        for (int i = 0; i < returnThis.length; i++) {
-            returnThis[i] = (char) (base64Chars[i] ^ className.hashCode() ^
-                    methodName.hashCode());
+    public static String heavyEncrypt(String msg, int key1, int key2, int key3, int key4, int key5) {
+        char[] chars = msg.toCharArray();
+
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < chars.length; i++) {
+            switch (i % 8) {
+                case 0:
+                    sb.append((char) (chars[i] ^ key3 ^ key5));
+                    break;
+                case 1:
+                    sb.append((char) (chars[i] ^ key2 ^ key4));
+                    break;
+                case 2:
+                    sb.append((char) (chars[i] ^ key1 ^ key3));
+                    break;
+                case 3:
+                    sb.append((char) (chars[i] ^ key5 ^ key2));
+                    break;
+                case 4:
+                    sb.append((char) (chars[i] ^ key4 ^ key1));
+                    break;
+                case 5:
+                    sb.append((char) (chars[i] ^ key3 ^ key2));
+                    break;
+                case 6:
+                    sb.append((char) (chars[i] ^ key4 ^ key3));
+                    break;
+                case 7:
+                    sb.append((char) (chars[i] ^ key5 ^ key4));
+                    break;
+            }
         }
 
-        return new String(returnThis);
+        return sb.toString();
     }
 }
