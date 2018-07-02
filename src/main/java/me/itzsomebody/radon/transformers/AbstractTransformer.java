@@ -31,7 +31,6 @@ import org.objectweb.asm.tree.MethodNode;
 
 /**
  * Abstract class used to make transformers.
- * TODO: Allow dependency injection of class trees.
  *
  * @author ItzSomebody
  */
