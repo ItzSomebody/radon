@@ -1,3 +1,8 @@
+## 0.9.0
+* Changed all anonymous inner classes in MainGUI class to lambdas.
+* Brand new heavy string encryption transformer.
+* Rewrote the string pool transformer.
+
 ## 0.8.3
 
 * Added compensation for the fact that methods with the native flag don't have instructions in them.

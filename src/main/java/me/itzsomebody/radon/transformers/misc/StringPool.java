@@ -26,14 +26,18 @@ import me.itzsomebody.radon.utils.LoggerUtils;
 import me.itzsomebody.radon.utils.StringUtils;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.tree.AbstractInsnNode;
+import org.objectweb.asm.tree.FieldInsnNode;
+import org.objectweb.asm.tree.FieldNode;
+import org.objectweb.asm.tree.InsnList;
+import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 
 /**
  * Transformer that takes all the strings in a class and pools them into a
- * method. When the string is needed, the
- * string pool method is called with an index number.
+ * field. When the string is needed, the string pool field is called with
+ * an index number.
  *
  * @author ItzSomebody
  */
@@ -49,6 +53,11 @@ public class StringPool extends AbstractTransformer {
     private String[] strings;
 
     /**
+     * Field path.
+     */
+    private String[] fieldName = new String[2];
+
+    /**
      * Applies obfuscation.
      */
     public void obfuscate() {
@@ -56,11 +65,13 @@ public class StringPool extends AbstractTransformer {
         long current = System.currentTimeMillis();
         this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
         this.logStrings.add(LoggerUtils.stdOut("Started string pool transformer."));
-        this.randName = StringUtils.randomString(this.dictionary);
         this.classNodes().stream().filter(classNode -> !this.exempted(classNode.name, "StringPool")).forEach(classNode -> {
+            this.randName = StringUtils.randomString(this.dictionary);
+            this.fieldName[0] = classNode.name;
+            this.fieldName[1] = StringUtils.randomString(this.dictionary);
             List<String> stringslist = new ArrayList<>();
             classNode.methods.stream().filter(methodNode ->
-                    !this.exempted(classNode.name + '.' + methodNode.name + methodNode.desc, "StringPool")
+                    !this.exempted(classNode.name + '.' + methodNode.name + methodNode.name, "StringPool")
                             && hasInstructions(methodNode)).forEach(methodNode -> {
                 for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
                     if (insn instanceof LdcInsnNode) {
@@ -71,10 +82,9 @@ public class StringPool extends AbstractTransformer {
 
                             int indexNumber = stringslist.size() - 1;
 
-                            methodNode.instructions.insertBefore(insn,
-                                    BytecodeUtils.getNumberInsn(indexNumber));
-                            methodNode.instructions.set(insn,
-                                    new MethodInsnNode(INVOKESTATIC, classNode.name, randName, "(I)Ljava/lang/String;", false));
+                            methodNode.instructions.insertBefore(insn, new FieldInsnNode(GETSTATIC, classNode.name, this.fieldName[1], "[Ljava/lang/String;"));
+                            methodNode.instructions.insertBefore(insn, BytecodeUtils.getNumberInsn(indexNumber));
+                            methodNode.instructions.set(insn, new InsnNode(AALOAD));
                             counter.incrementAndGet();
                         }
                     }
@@ -86,6 +96,22 @@ public class StringPool extends AbstractTransformer {
                     this.strings[i] = stringslist.get(i);
                 }
                 classNode.methods.add(stringPool());
+
+                MethodNode clinit = classNode.methods.stream().filter(methodNode -> methodNode.name.equals("<clinit>")).findFirst().orElse(null);
+                if (clinit == null) {
+                    clinit = new MethodNode(ACC_PRIVATE + ACC_STATIC + ACC_SYNTHETIC, "<clinit>", "()V", null, null);
+                    InsnList insns = new InsnList();
+                    insns.add(new MethodInsnNode(INVOKESTATIC, classNode.name, randName, "()V", false));
+                    insns.add(new InsnNode(RETURN));
+                    clinit.instructions = insns;
+                    classNode.methods.add(clinit);
+                } else {
+                    clinit.instructions.insertBefore(clinit.instructions.getFirst(), new MethodInsnNode(INVOKESTATIC, classNode.name, randName, "()V", false));
+                }
+                FieldNode fieldNode = new FieldNode(ACC_PRIVATE + ACC_STATIC + ACC_SYNTHETIC, this.fieldName[1], "[Ljava/lang/String;", null, null);
+                if (classNode.fields == null)
+                    classNode.fields = new ArrayList<>();
+                classNode.fields.add(fieldNode);
             }
         });
         this.logStrings.add(LoggerUtils.stdOut("Pooled  " + counter + " strings."));
@@ -98,7 +124,7 @@ public class StringPool extends AbstractTransformer {
      * @return string pool method which contains all the strings.
      */
     private MethodNode stringPool() {
-        MethodNode method = new MethodNode(ACC_PUBLIC + ACC_STATIC + ACC_SYNTHETIC + ACC_BRIDGE, randName, "(I)Ljava/lang/String;", null, null);
+        MethodNode method = new MethodNode(ACC_PRIVATE + ACC_STATIC + ACC_SYNTHETIC + ACC_BRIDGE, randName, "()V", null, null);
 
         method.visitCode();
 
@@ -133,19 +159,10 @@ public class StringPool extends AbstractTransformer {
             method.visitLdcInsn(this.strings[i]);
             method.visitInsn(AASTORE);
         }
-        method.visitVarInsn(ASTORE, 1);
-        Label l1 = new Label();
-        method.visitLabel(l1);
-        method.visitVarInsn(ALOAD, 1);
-        method.visitVarInsn(ILOAD, 0);
-        method.visitInsn(AALOAD);
-        method.visitVarInsn(ASTORE, 2);
-        Label l2 = new Label();
-        method.visitLabel(l2);
-        method.visitVarInsn(ALOAD, 2);
-        method.visitInsn(ARETURN);
+        method.visitFieldInsn(PUTSTATIC, this.fieldName[0], this.fieldName[1], "[Ljava/lang/String;");
+        method.visitInsn(RETURN);
 
-        method.visitMaxs(4, 3);
+        method.visitMaxs(3, 0);
 
         method.visitEnd();
 
