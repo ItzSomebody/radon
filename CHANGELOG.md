@@ -2,6 +2,7 @@
 * Changed all anonymous inner classes in MainGUI class to lambdas.
 * Brand new heavy string encryption transformer.
 * Rewrote the string pool transformer.
+* Rewrote some internals including dependency injection of the Bootstrap instance instead of per-case depedency injection.
 
 ## 0.8.3
 
