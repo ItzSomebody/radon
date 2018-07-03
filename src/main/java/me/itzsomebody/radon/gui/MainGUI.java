@@ -1133,31 +1133,6 @@ public class MainGUI {
                 return;
             }
 
-            if (!chckbxStringEncryption.isSelected()
-                    && !chckbxInvokeDynamic.isSelected()
-                    && !chckbxFlow.isSelected()
-                    && !chckbxLocalVariables.isSelected()
-                    && !chckbxTrashClasses.isSelected()
-                    && !chckbxSpringPool.isSelected()
-                    && !chckbxCrasher.isSelected()
-                    && !chckbxHidecode.isSelected()
-                    && !chckbxClassRenammer.isSelected()
-                    && !chckbxNumberObfuscation.isSelected()
-                    && !chckbxAddWatermark.isSelected()
-                    && !chckbxLineObfuscation.isSelected()
-                    && !chckbxSourceName.isSelected()
-                    && !chckbxSourceDebug.isSelected()
-                    && !chckbxShuffler.isSelected()
-                    && !chckbxAddExpiration.isSelected()
-                    && !chckbxInnerClasses.isSelected()) {
-                JOptionPane.showMessageDialog(null,
-                        "Please select an obfuscation " +
-                                "setting!\nThe Spigot-Plugin setting " +
-                                "alone is not counted as an option.",
-                        "Error", JOptionPane.ERROR_MESSAGE);
-                return;
-            }
-
             if (chckbxAddWatermark.isSelected()
                     && waterMarkMessageField.getText().isEmpty()) {
                 JOptionPane.showMessageDialog(null,

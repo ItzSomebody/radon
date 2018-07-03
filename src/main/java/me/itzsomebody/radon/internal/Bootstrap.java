@@ -215,6 +215,11 @@ public class Bootstrap { // Eyyy bootstrap bill
                 }
                 this.zos = new ZipOutputStream(new FileOutputStream(output));
             }
+
+            if (this.transformers.isEmpty()) {
+                throw new RuntimeException("No transformers have been enabled.");
+            }
+
             long currentTime = System.currentTimeMillis();
             this.loadClassPath();
             this.loadInput();
