@@ -132,6 +132,16 @@ This table describes the current obfuscation settings Radon has.
 | InnerClassRemover | This removes innerclass information. |
 | ExpirationObfuscation | This adds a block of expiration code into each class initializer to prevent usage of jar after the expiration date has passed. |
 
+## FAQ
+* **Q: Is this uncrackable/undeobfuscatable?**
+* *A: No. Nothing is impossible to deobfuscate or reverse-engineer. Furthermore, Radon is far from being hard to deobfuscate.*
+* **Q: Why is this open-sourced?**
+* *A: I made Radon as a way to experiment with obfuscation and to become familar with the JVM bytecode instruction set and as a codebase if anyone wants to mess around.*
+* **Q: Doesn't that make it easier to deobfuscate?**
+* *A: Probably.*
+* **Q: Why are concepts taken directly from other obfuscators/bytecode manipulation tools? (i.e. expiration transformer which is directly based on Allatori's expiration obfuscation)**
+* *A: I thought those would be interesting to include in an obfuscation tool. This is also one of the reasons Radon is open-sourced.*
+
 ## Credits
 
 * [OW2 ASM](http://asm.ow2.org) - Bytecode manipulation framework.
@@ -139,7 +149,7 @@ This table describes the current obfuscation settings Radon has.
 * [VincBreaker](https://github.com/Vinc0682) - Author of Smoke obfuscator which I took some ideas from. (i.e. Renaming classes as spaces and splitting numbers into bitwise xor operations)
 * [WindowBuilder by Eclipse](https://www.eclipse.org/windowbuilder/) - Used to make GUI (yes I know it's Java Swing, I didn't feel like remaking it in JavaFX)
 * [Licel](https://licelus.com) - Makers of IndyProtect which I used as a reference for my invokedynamic transformers.
-* [Allatori Dev Team](http://www.allatori.com) - Makers of Allatori Java Obfuscator which I borrowed the concept of watermarking and expiration obfuscation from.
+* [Allatori Dev Team](http://www.allatori.com) - Makers of Allatori Java Obfuscator which I took the concept of watermarking and expiration obfuscation from.
 * [Artel](https://gitlab.com/artel) - Beta tester.
 
 ## License

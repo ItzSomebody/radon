@@ -33,7 +33,7 @@ import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.MultiANewArrayInsnNode;
 
 /**
- * Attempts to emulate the stack in a method up to a breakpoint.
+ * Attempts to weakly emulate the stack in a method up to a breakpoint.
  *
  * @author ItzSomebody
  */

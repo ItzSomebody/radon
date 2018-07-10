@@ -38,7 +38,7 @@ import org.objectweb.asm.tree.MethodNode;
 
 /**
  * Transformer that renames classes and their members.
- * TODO: Figure out why this doesn't work with TestingProject
+ * FIXME: Figure out why this doesn't work with TestingProject
  *
  * @author ItzSomebody
  */
