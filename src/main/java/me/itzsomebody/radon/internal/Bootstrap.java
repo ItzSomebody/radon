@@ -38,7 +38,6 @@ import me.itzsomebody.radon.config.Config;
 import me.itzsomebody.radon.transformers.AbstractTransformer;
 import me.itzsomebody.radon.transformers.misc.Expiry;
 import me.itzsomebody.radon.transformers.misc.TrashClasses;
-import me.itzsomebody.radon.transformers.renamer.ClassTree;
 import me.itzsomebody.radon.utils.FileUtils;
 import me.itzsomebody.radon.utils.LoggerUtils;
 import me.itzsomebody.radon.utils.NumberUtils;

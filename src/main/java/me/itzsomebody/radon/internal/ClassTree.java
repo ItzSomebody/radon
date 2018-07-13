@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package me.itzsomebody.radon.transformers.renamer;
+package me.itzsomebody.radon.internal;
 
 import java.util.HashSet;
 import java.util.Set;
