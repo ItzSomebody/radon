@@ -39,7 +39,7 @@ public class NumberObfuscation extends AbstractTransformer {
         AtomicInteger counter = new AtomicInteger();
         long current = System.currentTimeMillis();
         this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
-        this.logStrings.add(LoggerUtils.stdOut("Started normal number obfuscation transformer"));
+        this.logStrings.add(LoggerUtils.stdOut("Started number obfuscation transformer"));
         this.classNodes().parallelStream().filter(classNode -> !this.exempted(classNode.name, "Numbers")).forEach(classNode ->
                 classNode.methods.parallelStream().filter(methodNode ->
                         !this.exempted(classNode.name + '.' + methodNode.name + methodNode.desc, "Numbers")
@@ -84,7 +84,7 @@ public class NumberObfuscation extends AbstractTransformer {
                     }
                 })
         );
-        this.logStrings.add(LoggerUtils.stdOut("Split " + counter + " numbers into math instructions."));
+        this.logStrings.add(LoggerUtils.stdOut("Split " + counter + " numbers into bitwise xor instructions."));
         this.logStrings.add(LoggerUtils.stdOut("Finished. [" + tookThisLong(current) + "ms]"));
     }
 }
