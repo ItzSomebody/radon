@@ -84,7 +84,7 @@ public class HeavyStringEncryption extends AbstractTransformer {
                                 methodNode.instructions.insert(insn, new MethodInsnNode(INVOKESTATIC, memberNames.className, memberNames.decryptorMethodName, "(Ljava/lang/Object;I)Ljava/lang/String;", false));
                                 methodNode.instructions.insert(insn, new InsnNode(POP));
                                 methodNode.instructions.insert(insn, new InsnNode(DUP_X1));
-                                methodNode.instructions.insertBefore(insn, BytecodeUtils.getNumberInsn(extraKey));
+                                methodNode.instructions.insertBefore(insn, BytecodeUtils.createNumberInsn(extraKey));
 
                                 counter.incrementAndGet();
                             }

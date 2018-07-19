@@ -115,14 +115,14 @@ public class Renamer extends AbstractTransformer {
         for (ClassNode classNode : new ArrayList<>(this.classNodes())) {
             ClassNode copy = new ClassNode();
             classNode.accept(new ClassRemapper(copy, simpleRemapper));
-            copy.access = BytecodeUtils.accessFixer(copy.access);
+            copy.access = BytecodeUtils.makePublic(copy.access);
             for (MethodNode methodNode : copy.methods) {
-                methodNode.access = BytecodeUtils.accessFixer(methodNode.access);
+                methodNode.access = BytecodeUtils.makePublic(methodNode.access);
             }
 
             if (copy.fields != null) {
                 for (FieldNode fieldNode : copy.fields) {
-                    fieldNode.access = BytecodeUtils.accessFixer(fieldNode.access);
+                    fieldNode.access = BytecodeUtils.makePublic(fieldNode.access);
                 }
             }
 

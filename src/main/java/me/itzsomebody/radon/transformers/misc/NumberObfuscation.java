@@ -52,12 +52,12 @@ public class NumberObfuscation extends AbstractTransformer {
                             int value2 = originalNum ^ value1;
 
                             InsnList insnList = new InsnList();
-                            insnList.add(BytecodeUtils.getNumberInsn(value1));
-                            insnList.add(BytecodeUtils.getNumberInsn(NumberUtils.getRandomInt()));
+                            insnList.add(BytecodeUtils.createNumberInsn(value1));
+                            insnList.add(BytecodeUtils.createNumberInsn(NumberUtils.getRandomInt()));
                             insnList.add(new InsnNode(SWAP));
                             insnList.add(new InsnNode(DUP_X1));
                             insnList.add(new InsnNode(POP2));
-                            insnList.add(BytecodeUtils.getNumberInsn(value2));
+                            insnList.add(BytecodeUtils.createNumberInsn(value2));
                             insnList.add(new InsnNode(IXOR));
 
                             methodNode.instructions.insertBefore(insn, insnList);
@@ -69,12 +69,12 @@ public class NumberObfuscation extends AbstractTransformer {
                             long value2 = originalNum ^ value1;
 
                             InsnList insnList = new InsnList();
-                            insnList.add(BytecodeUtils.getNumberInsn(NumberUtils.getRandomLong()));
-                            insnList.add(BytecodeUtils.getNumberInsn(value1));
+                            insnList.add(BytecodeUtils.createNumberInsn(NumberUtils.getRandomLong()));
+                            insnList.add(BytecodeUtils.createNumberInsn(value1));
                             insnList.add(new InsnNode(DUP2_X2));
                             insnList.add(new InsnNode(POP2));
                             insnList.add(new InsnNode(POP2));
-                            insnList.add(BytecodeUtils.getNumberInsn(value2));
+                            insnList.add(BytecodeUtils.createNumberInsn(value2));
                             insnList.add(new InsnNode(LXOR));
 
                             methodNode.instructions.insertBefore(insn, insnList);

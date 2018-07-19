@@ -86,7 +86,7 @@ public class SuperLightStringEncryption extends AbstractTransformer {
                                                     "Ljava/lang/String;",
                                             false));
                             methodNode.instructions.insert(insn,
-                                    BytecodeUtils.getNumberInsn(key));
+                                    BytecodeUtils.createNumberInsn(key));
                             counter.incrementAndGet();
                         }
                     }
@@ -96,7 +96,7 @@ public class SuperLightStringEncryption extends AbstractTransformer {
 
         this.classNodes().stream().filter(classNode -> classNode.name.equals(decryptorPath[0])).forEach(classNode -> {
             classNode.methods.add(StringEncryption.superLightMethod(decryptorPath[1]));
-            classNode.access = BytecodeUtils.accessFixer(classNode.access);
+            classNode.access = BytecodeUtils.makePublic(classNode.access);
         });
         logStrings.add(LoggerUtils.stdOut("Encrypted " + counter + " strings."));
         logStrings.add(LoggerUtils.stdOut("Finished. [" + tookThisLong(current) + "ms]"));

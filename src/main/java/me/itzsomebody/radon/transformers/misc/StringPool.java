@@ -83,7 +83,7 @@ public class StringPool extends AbstractTransformer {
                             int indexNumber = stringslist.size() - 1;
 
                             methodNode.instructions.insertBefore(insn, new FieldInsnNode(GETSTATIC, classNode.name, this.fieldName[1], "[Ljava/lang/String;"));
-                            methodNode.instructions.insertBefore(insn, BytecodeUtils.getNumberInsn(indexNumber));
+                            methodNode.instructions.insertBefore(insn, BytecodeUtils.createNumberInsn(indexNumber));
                             methodNode.instructions.set(insn, new InsnNode(AALOAD));
                             counter.incrementAndGet();
                         }

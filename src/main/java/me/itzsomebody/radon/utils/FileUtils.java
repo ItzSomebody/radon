@@ -37,11 +37,9 @@ public class FileUtils {
      */
     public static String renameExistingFile(File existing) {
         int i = 0;
-
         while (true) {
             i++;
-            String newName = existing.getAbsolutePath() + ".BACKUP-"
-                    + String.valueOf(i);
+            String newName = existing.getAbsolutePath() + ".BACKUP-" + i;
             File backUpName = new File(newName);
             if (!backUpName.exists()) {
                 existing.renameTo(backUpName);
@@ -49,7 +47,6 @@ public class FileUtils {
                 return newName;
             }
         }
-
     }
 
     /**
@@ -59,16 +56,13 @@ public class FileUtils {
      * @return a byte array from the inputted
      */
     public static byte[] toByteArray(InputStream in) {
-        try {
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
+        try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
             byte[] buffer = new byte[1024];
             while (in.available() > 0) {
                 int data = in.read(buffer);
                 out.write(buffer, 0, data);
             }
-
             in.close();
-            out.close();
             return out.toByteArray();
         } catch (IOException ioe) {
             ioe.printStackTrace();

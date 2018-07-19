@@ -25,7 +25,7 @@ import java.util.Collection;
 import java.util.List;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
-import me.itzsomebody.radon.transformers.stringencryption.HeavyStringEncryption;
+
 import me.itzsomebody.radon.transformers.stringencryption.LightStringEncryption;
 import me.itzsomebody.radon.transformers.stringencryption.NormalStringEncryption;
 import me.itzsomebody.radon.transformers.stringencryption.SuperLightStringEncryption;
@@ -36,21 +36,30 @@ import me.itzsomebody.radon.transformers.stringencryption.SuperLightStringEncryp
  * @author ItzSomebody
  */
 public class StringUtils {
+    private final static char[] DICT_ALPHA_NUM = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789".toCharArray();
+    private final static char[] DICT_SPACES = new char[]{
+            '\u2000', '\u2001', '\u2002', '\u2003', '\u2004', '\u2005', '\u2006', '\u2007', '\u2008', '\u2009', '\u200A', '\u200B', '\u200C', '\u200D', '\u200E', '\u200F'
+    };
+    private final static char[] DICT_MISC = new char[]{
+            '\ua6ac', '\ua6ea', '\ua6ba', '\ua6a3', '\ua6a4', '\ua6b5', '\ua6b0', '\ua6a8'
+    };
+
     /**
      * Returns the proper string generation type given a dictionary type to use.
      *
      * @param dictionary an integer indicating which pre-defined string
      *                   generation type to use.
+     * @param len        Length of the string to generate.
      * @return the proper string generation type given a dictionary type to use.
      */
-    public static String randomString(int dictionary) {
+    public static String randomString(int dictionary, int len) {
         switch (dictionary) {
             case 0:
-                return crazyString();
+                return crazyString(len);
             case 1:
-                return crazyKey();
+                return crazyKey(len);
             case 2:
-                return alphaNumString();
+                return alphaNumString(len);
             default:
                 throw new IllegalArgumentException("Illegal dictionary type " + dictionary);
         }
@@ -59,125 +68,44 @@ public class StringUtils {
     /**
      * Generates and returns a pseudo-random alpha-numeric string.
      *
+     * @param len Length of the string to generate.
      * @return a pseudo-random alpha-numeric string.
      */
-    public static String alphaNumString() {
-        int numberOfChars = 4;
-        char[] alphaNum = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789".toCharArray();
-        StringBuilder sb = new StringBuilder();
-
-        for (int i = 0; i < numberOfChars; i++) {
-            sb.append(alphaNum[NumberUtils.getRandomInt(alphaNum.length)]);
+    public static String alphaNumString(int len) {
+        char[] buildString = new char[len];
+        for (int i = 0; i < len; i++) {
+            buildString[i] = DICT_ALPHA_NUM[NumberUtils.getRandomInt(DICT_ALPHA_NUM.length)];
         }
-
-        return sb.toString();
+        return new String(buildString);
     }
 
     /**
-     * Generates a {@link String} with a length of 10 consisting of spaces.
+     * Generates a {@link String} consisting only of DICT_SPACES.
      * Stole this idea from NeonObf and Smoke.
      *
-     * @return a built {@link String} consisting of spaces.
+     * @param len Length of the string to generate.
+     * @return a built {@link String} consisting of DICT_SPACES.
      */
-    public static String crazyString() {
-        int numberOfChars = 10; // Just so I can do a quick switch.
-        char[] buildString = new char[numberOfChars];
-
-        for (int i = 0; i < numberOfChars; i++) {
-            switch (NumberUtils.getRandomInt(16)) {
-                case 0:
-                    buildString[i] = '\u2000';
-                    break;
-                case 1:
-                    buildString[i] = '\u2001';
-                    break;
-                case 2:
-                    buildString[i] = '\u2002';
-                    break;
-                case 3:
-                    buildString[i] = '\u2003';
-                    break;
-                case 4:
-                    buildString[i] = '\u2004';
-                    break;
-                case 5:
-                    buildString[i] = '\u2005';
-                    break;
-                case 6:
-                    buildString[i] = '\u2006';
-                    break;
-                case 7:
-                    buildString[i] = '\u2007';
-                    break;
-                case 8:
-                    buildString[i] = '\u2008';
-                    break;
-                case 9:
-                    buildString[i] = '\u2009';
-                    break;
-                case 10:
-                    buildString[i] = '\u200A';
-                    break;
-                case 11:
-                    buildString[i] = '\u200B';
-                    break;
-                case 12:
-                    buildString[i] = '\u200C';
-                    break;
-                case 13:
-                    buildString[i] = '\u200D';
-                    break;
-                case 14:
-                    buildString[i] = '\u200E';
-                    break;
-                case 15:
-                    buildString[i] = '\u200F';
-                    break;
-            }
+    public static String crazyString(int len) {
+        char[] buildString = new char[len];
+        for (int i = 0; i < len; i++) {
+            buildString[i] = DICT_SPACES[NumberUtils.getRandomInt(DICT_SPACES.length)];
         }
-
         return new String(buildString);
     }
 
     /**
      * Alternative generator to the method above.
      *
+     * @param len Length of the string to generate.
      * @return a {@link String} consisting of characters the JVM doesn't
      * recognize.
      */
-    public static String crazyKey() {
-        int numberOfChars = 10; // Just so I can do a quick switch.
-        char[] buildString = new char[numberOfChars];
-
-        for (int i = 0; i < numberOfChars; i++) {
-            switch (NumberUtils.getRandomInt(8)) {
-                case 0:
-                    buildString[i] = '\ua6ac';
-                    break;
-                case 1:
-                    buildString[i] = '\ua6ea';
-                    break;
-                case 2:
-                    buildString[i] = '\ua6ba';
-                    break;
-                case 3:
-                    buildString[i] = '\ua6a3';
-                    break;
-                case 4:
-                    buildString[i] = '\ua6a4';
-                    break;
-                case 5:
-                    buildString[i] = '\ua6b5';
-                    break;
-                case 6:
-                    buildString[i] = '\ua6b0';
-                    break;
-                case 7:
-                    buildString[i] = '\ua6a8';
-                    break;
-            }
+    public static String crazyKey(int len) {
+        char[] buildString = new char[len];
+        for (int i = 0; i < len; i++) {
+            buildString[i] = DICT_MISC[NumberUtils.getRandomInt(DICT_MISC.length)];
         }
-
         return new String(buildString);
     }
 
@@ -277,7 +205,7 @@ public class StringUtils {
      *
      * @return a generated classname based on current class packages.
      */
-    public static String randomClassName(Collection<String> theClassNames, int dictionary) {
+    public static String randomClassName(Collection<String> theClassNames, int dictionary, int len) {
         List<String> classNames = new ArrayList<>(theClassNames);
 
         String randomClass = classNames.get(NumberUtils.
@@ -290,7 +218,7 @@ public class StringUtils {
             sb.append("/");
         }
 
-        sb.append(StringUtils.randomString(dictionary));
+        sb.append(StringUtils.randomString(dictionary, len));
 
         return new String(sb);
     }

@@ -100,7 +100,7 @@ public class NormalInvokeDynamic extends AbstractTransformer {
 
         this.classNodes().stream().filter(classNode -> classNode.name.equals(bsmPath[0])).forEach(classNode -> {
             classNode.methods.add(InvokeDynamicBSM.normalBSM(bsmPath[1], classNode.name));
-            classNode.access = BytecodeUtils.accessFixer(classNode.access);
+            classNode.access = BytecodeUtils.makePublic(classNode.access);
         });
         this.logStrings.add(LoggerUtils.stdOut("Replaced " + counter + " method invocations with invokedynamics."));
         this.logStrings.add(LoggerUtils.stdOut("Finished. [" + tookThisLong(current) + "ms]"));
