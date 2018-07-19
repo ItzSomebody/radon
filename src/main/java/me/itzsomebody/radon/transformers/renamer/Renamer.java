@@ -138,6 +138,7 @@ public class Renamer extends AbstractTransformer {
         this.logStrings.add(LoggerUtils.stdOut("Attempting to map class names in resources"));
         AtomicInteger fixed = new AtomicInteger();
         getPassThru().forEach((name, byteArray) -> {
+            // TODO: If the class name is "Main" (in default package) then this breaks the manifest.
             if (name.equals("META-INF/MANIFEST.MF")
                     || (name.equals("plugin.yml") && spigotMode)) {
                 String stringVer = new String(byteArray);
