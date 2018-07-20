@@ -42,7 +42,7 @@ public enum ConfigEnum {
     WATERMARK_MSG("WatermarkMessage"),
     WATERMARK_KEY("WatermarkKey"),
     WATERMARK_TYPE("WatermarkType"),
-    SPIGOT_PLUGIN("SpigotPlugin"), // TODO: Remove this
+    SPIGOT_PLUGIN("SpigotPlugin"), // TODO: Remove this, replace with custom rules that allow users to exclude conflicts
     RENAMER("Renamer"),
     EXPIRATION_TIME("ExpiryTime"),
     EXPIRATION_MESSAGE("ExpiryMessage"),
