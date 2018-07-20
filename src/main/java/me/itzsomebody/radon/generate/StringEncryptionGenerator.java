@@ -26,7 +26,7 @@ import org.objectweb.asm.tree.MethodNode;
 
 /**
  * Class containing {@link MethodNode}s needed to decrypt a {@link String} for the
- * appropriate StringEncryptionGenerator transformer.
+ * appropriate StringEncryption transformer.
  *
  * @author ItzSomebody
  * @author ASMifier by OW2

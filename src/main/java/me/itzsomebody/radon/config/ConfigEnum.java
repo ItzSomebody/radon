@@ -27,7 +27,7 @@ public enum ConfigEnum {
     OUTPUT("Output"),
     LIBRARIES("Libraries"),
     EXEMPTS("Exempts"),
-    STRING_ENCRYPTION("StringEncryptionGenerator"),
+    STRING_ENCRYPTION("StringEncryption"),
     FLOW_OBFUSCATION("FlowObfuscation"),
     INVOKEDYNAMIC("InvokeDynamic"),
     LOCAL_VARIABLES("LocalVariableObfuscation"),

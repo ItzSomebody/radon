@@ -333,8 +333,8 @@ public class Config {
                     this.methodExempts.add(exempt.replace("Method: ", ""));
                 } else if (exempt.startsWith("Field: ")) {
                     this.fieldExempts.add(exempt.replace("Field: ", ""));
-                } else if (exempt.startsWith("StringEncryptionGenerator: ")) {
-                    this.stringEncExempts.add(exempt.replace("StringEncryptionGenerator: ", ""));
+                } else if (exempt.startsWith("StringEncryption: ")) {
+                    this.stringEncExempts.add(exempt.replace("StringEncryption: ", ""));
                 } else if (exempt.startsWith("InvokeDynamic: ")) {
                     this.indyExempts.add(exempt.replace("InvokeDynamic: ", ""));
                 } else if (exempt.startsWith("Flow: ")) {
@@ -391,8 +391,8 @@ public class Config {
      */
     public AbstractTransformer getStringEncryptionType()
             throws IllegalArgumentException {
-        if (this.map.containsKey("StringEncryptionGenerator")) {
-            Object value = this.map.get("StringEncryptionGenerator");
+        if (this.map.containsKey("StringEncryption")) {
+            Object value = this.map.get("StringEncryption");
             if (value != null) {
                 if (!(value instanceof String))
                     throw new IllegalArgumentException("String encryption arg" +
