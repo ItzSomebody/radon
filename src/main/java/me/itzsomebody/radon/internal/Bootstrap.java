@@ -372,9 +372,6 @@ public class Bootstrap { // Eyyy bootstrap bill
             AbstractTransformer transformer;
             // Specific order of adding transformers, feel free to change if
             // you wish.
-            if ((transformer = this.config.getRenamerType()) != null) {
-                this.transformers.add(transformer);
-            }
             if ((transformer = this.config.getInnerClassRemoverType()) != null) {
                 this.transformers.add(transformer);
             }
@@ -403,26 +400,27 @@ public class Bootstrap { // Eyyy bootstrap bill
             if ((transformer = this.config.getShufflerType()) != null) {
                 this.transformers.add(transformer);
             }
-            if ((transformer = this.config.getLocalVariableObfuscationType())
-                    != null) {
+            if ((transformer = this.config.getLocalVariableObfuscationType()) != null) {
                 this.transformers.add(transformer);
             }
-            if ((transformer = this.config.getLineNumberObfuscationType()) !=
-                    null) {
+            if ((transformer = this.config.getLineNumberObfuscationType()) != null) {
                 this.transformers.add(transformer);
             }
-            if ((transformer = this.config.getSourceNameObfuscationType()) !=
-                    null) {
+            if ((transformer = this.config.getSourceNameObfuscationType()) != null) {
                 this.transformers.add(transformer);
             }
-            if ((transformer = this.config.getSourceDebugObfuscationType())
-                    != null) {
+            if ((transformer = this.config.getSourceDebugObfuscationType()) != null) {
                 this.transformers.add(transformer);
             }
             if ((transformer = this.config.getCrasherType()) != null) {
                 this.transformers.add(transformer);
             }
             if ((transformer = this.config.getHideCodeType()) != null) {
+                this.transformers.add(transformer);
+            }
+            // This is last to prevent confusing logic when looking up values in the name-to-node map
+            // returning nodes that have their names not matching the key.
+            if ((transformer = this.config.getRenamerType()) != null) {
                 this.transformers.add(transformer);
             }
             this.trashClasses = this.config.getTrashClasses();
