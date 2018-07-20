@@ -959,7 +959,7 @@ public class MainGUI {
         gbc_comboBox_04.fill = GridBagConstraints.HORIZONTAL;
         gbc_comboBox_04.gridx = 1;
         gbc_comboBox_04.gridy = 12;
-        String[] options = {"Class", "Method", "Field", "StringEncryptionGenerator", "InvokeDynamic",
+        String[] options = {"Class", "Method", "Field", "StringEncryption", "InvokeDynamic",
                 "Flow", "LocalVars", "SourceName", "SourceDebug", "LineNumbers", "StringPool",
                 "Crasher", "HideCode", "Numbers", "Shuffler", "InnerClasses", "Renamer",
                 "Expiry"};
@@ -1009,7 +1009,7 @@ public class MainGUI {
                     exemptList.addElement("Field: " + exemptField.getText());
                     exemptField.setText("");
                 } else if (comboBox_04.getSelectedIndex() == 3) {
-                    exemptList.addElement("StringEncryptionGenerator: " + exemptField.getText());
+                    exemptList.addElement("StringEncryption: " + exemptField.getText());
                     exemptField.setText("");
                 } else if (comboBox_04.getSelectedIndex() == 4) {
                     exemptList.addElement("InvokeDynamic: " + exemptField.getText());

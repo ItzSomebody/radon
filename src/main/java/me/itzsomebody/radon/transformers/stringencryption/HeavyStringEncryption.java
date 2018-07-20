@@ -50,9 +50,9 @@ public class HeavyStringEncryption extends VeryLightStringEncryption {
         MemberNames memberNames = new MemberNames(this);
         this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
         this.logStrings.add(LoggerUtils.stdOut("Started heavy string encryption transformer"));
-        this.classNodes().parallelStream().filter(classNode -> !this.exempted(classNode.name, "StringEncryptionGenerator")).forEach(classNode ->
+        this.classNodes().parallelStream().filter(classNode -> !this.exempted(classNode.name, "StringEncryption")).forEach(classNode ->
                 classNode.methods.parallelStream().filter(methodNode ->
-                        !this.exempted(classNode.name + '.' + methodNode.name + methodNode.desc, "StringEncryptionGenerator")
+                        !this.exempted(classNode.name + '.' + methodNode.name + methodNode.desc, "StringEncryption")
                                 && hasInstructions(methodNode)).forEach(methodNode -> {
                     for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
                         if (methodSize(methodNode) > 60000) break;
