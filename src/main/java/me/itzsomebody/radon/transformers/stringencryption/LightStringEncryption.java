@@ -29,7 +29,7 @@ import org.objectweb.asm.tree.*;
  *
  * @author ItzSomebody
  */
-public class LightStringEncryption extends VeryLightStringEncryption {
+public class LightStringEncryption extends SuperLightStringEncryption {
     /**
      * Constructor used to create a {@link LightStringEncryption} object.
      *

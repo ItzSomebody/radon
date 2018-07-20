@@ -28,7 +28,7 @@ import me.itzsomebody.radon.utils.StringUtils;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.*;
 
-public class HeavyStringEncryption extends VeryLightStringEncryption {
+public class HeavyStringEncryption extends SuperLightStringEncryption {
     /**
      * Constructor used to create a {@link HeavyStringEncryption} object.
      *

@@ -19,7 +19,7 @@ package me.itzsomebody.radon.generate;
 
 import me.itzsomebody.radon.transformers.stringencryption.LightStringEncryption;
 import me.itzsomebody.radon.transformers.stringencryption.NormalStringEncryption;
-import me.itzsomebody.radon.transformers.stringencryption.VeryLightStringEncryption;
+import me.itzsomebody.radon.transformers.stringencryption.SuperLightStringEncryption;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.MethodNode;
@@ -34,12 +34,12 @@ import org.objectweb.asm.tree.MethodNode;
 public class StringEncryptionGenerator implements Opcodes {
     /**
      * Returns a {@link MethodNode} that returns a {@link String} needed to
-     * decrypt strings encrypted by {@link VeryLightStringEncryption}.
+     * decrypt strings encrypted by {@link SuperLightStringEncryption}.
      *
      * @param decryptionMethodName used to determine the name of the
      *                             generated {@link MethodNode}.
      * @return a {@link MethodNode} that returns a {@link String} needed to
-     * decrypt strings encrypted by {@link VeryLightStringEncryption}.
+     * decrypt strings encrypted by {@link SuperLightStringEncryption}.
      */
     public static MethodNode superLightMethod(String decryptionMethodName) {
         MethodNode mv = new MethodNode(ACC_PUBLIC + ACC_STATIC

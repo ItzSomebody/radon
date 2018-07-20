@@ -31,7 +31,7 @@ import org.objectweb.asm.tree.*;
  *
  * @author ItzSomebody
  */
-public class NormalStringEncryption extends VeryLightStringEncryption {
+public class NormalStringEncryption extends SuperLightStringEncryption {
     /**
      * Constructor used to create a {@link NormalStringEncryption} object.
      *

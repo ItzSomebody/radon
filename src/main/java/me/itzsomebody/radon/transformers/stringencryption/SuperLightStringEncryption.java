@@ -32,7 +32,7 @@ import org.objectweb.asm.tree.*;
  *
  * @author ItzSomebody
  */
-public class VeryLightStringEncryption extends AbstractTransformer {
+public class SuperLightStringEncryption extends AbstractTransformer {
     /**
      * Length of names to generate.
      */
@@ -49,7 +49,7 @@ public class VeryLightStringEncryption extends AbstractTransformer {
      *                   placeholders (%%__USER__%%, %%__RESOURCE__%%
      *                   and %%__NONCE__%%).
      */
-    public VeryLightStringEncryption(boolean spigotMode) {
+    public SuperLightStringEncryption(boolean spigotMode) {
         this.spigotMode = spigotMode;
     }
 

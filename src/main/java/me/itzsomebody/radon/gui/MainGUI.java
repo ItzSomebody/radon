@@ -59,7 +59,7 @@ import me.itzsomebody.radon.transformers.sourcename.RemoveSourceName;
 import me.itzsomebody.radon.transformers.stringencryption.HeavyStringEncryption;
 import me.itzsomebody.radon.transformers.stringencryption.LightStringEncryption;
 import me.itzsomebody.radon.transformers.stringencryption.NormalStringEncryption;
-import me.itzsomebody.radon.transformers.stringencryption.VeryLightStringEncryption;
+import me.itzsomebody.radon.transformers.stringencryption.SuperLightStringEncryption;
 import me.itzsomebody.radon.utils.WatermarkUtils;
 
 
@@ -1245,7 +1245,7 @@ public class MainGUI {
                         if (chckbxStringEncryption.isSelected()) {
                             switch (comboBox.getSelectedIndex()) {
                                 case 0:
-                                    transformers.add(new VeryLightStringEncryption(spigotMode));
+                                    transformers.add(new SuperLightStringEncryption(spigotMode));
                                     break;
                                 case 1:
                                     transformers.add(new LightStringEncryption(spigotMode));
@@ -1426,7 +1426,7 @@ public class MainGUI {
                         if (stringEncryptionMode == null) {
                             chckbxStringEncryption.setSelected(false);
                         } else if (stringEncryptionMode
-                                instanceof VeryLightStringEncryption) {
+                                instanceof SuperLightStringEncryption) {
                             chckbxStringEncryption.setSelected(true);
                             comboBox.setSelectedIndex(0);
                             comboBox.setEnabled(true);

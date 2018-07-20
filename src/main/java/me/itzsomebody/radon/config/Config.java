@@ -51,7 +51,7 @@ import me.itzsomebody.radon.transformers.sourcename.RemoveSourceName;
 import me.itzsomebody.radon.transformers.stringencryption.HeavyStringEncryption;
 import me.itzsomebody.radon.transformers.stringencryption.LightStringEncryption;
 import me.itzsomebody.radon.transformers.stringencryption.NormalStringEncryption;
-import me.itzsomebody.radon.transformers.stringencryption.VeryLightStringEncryption;
+import me.itzsomebody.radon.transformers.stringencryption.SuperLightStringEncryption;
 import org.yaml.snakeyaml.Yaml;
 
 /**
@@ -399,7 +399,7 @@ public class Config {
                             "  must be a string");
                 String s = (String) value;
                 if (s.equalsIgnoreCase("SuperLight")) {
-                    return new VeryLightStringEncryption(this.getSpigotBool());
+                    return new SuperLightStringEncryption(this.getSpigotBool());
                 } else if (s.equalsIgnoreCase("Light")) {
                     return new LightStringEncryption(this.getSpigotBool());
                 } else if (s.equalsIgnoreCase("Normal")) {
