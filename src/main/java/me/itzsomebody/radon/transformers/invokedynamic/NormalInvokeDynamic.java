@@ -17,7 +17,7 @@
 
 package me.itzsomebody.radon.transformers.invokedynamic;
 
-import me.itzsomebody.radon.methods.InvokeDynamicBSMGenerator;
+import me.itzsomebody.radon.generate.InvokeDynamicBSMGenerator;
 import me.itzsomebody.radon.utils.BytecodeUtils;
 import org.objectweb.asm.tree.*;
 

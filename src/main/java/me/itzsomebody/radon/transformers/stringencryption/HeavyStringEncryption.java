@@ -19,8 +19,8 @@ package me.itzsomebody.radon.transformers.stringencryption;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import me.itzsomebody.radon.classes.StringDecryptor;
-import me.itzsomebody.radon.methods.StringEncryptionGenerator;
+import me.itzsomebody.radon.generate.StringDecryptorGenerator;
+import me.itzsomebody.radon.generate.StringEncryptionGenerator;
 import me.itzsomebody.radon.utils.BytecodeUtils;
 import me.itzsomebody.radon.utils.LoggerUtils;
 import me.itzsomebody.radon.utils.NumberUtils;
@@ -79,7 +79,7 @@ public class HeavyStringEncryption extends VeryLightStringEncryption {
                 })
         );
         // Add decrypt method
-        ClassNode decryptor = StringDecryptor.heavyStringDecryptor(memberNames);
+        ClassNode decryptor = StringDecryptorGenerator.heavyStringDecryptor(memberNames);
         getClassMap().put(decryptor.name, decryptor);
         // Do logging
         logStrings.add(LoggerUtils.stdOut("Encrypted " + counter + " strings."));

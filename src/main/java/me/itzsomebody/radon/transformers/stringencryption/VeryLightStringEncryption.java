@@ -19,7 +19,7 @@ package me.itzsomebody.radon.transformers.stringencryption;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import me.itzsomebody.radon.methods.StringEncryptionGenerator;
+import me.itzsomebody.radon.generate.StringEncryptionGenerator;
 import me.itzsomebody.radon.transformers.AbstractTransformer;
 import me.itzsomebody.radon.utils.BytecodeUtils;
 import me.itzsomebody.radon.utils.LoggerUtils;

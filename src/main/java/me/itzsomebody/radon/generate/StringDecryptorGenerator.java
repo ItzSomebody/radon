@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package me.itzsomebody.radon.classes;
+package me.itzsomebody.radon.generate;
 
 import me.itzsomebody.radon.transformers.stringencryption.HeavyStringEncryption;
 import org.objectweb.asm.FieldVisitor;
@@ -25,7 +25,7 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.ClassNode;
 
-public class StringDecryptor implements Opcodes {
+public class StringDecryptorGenerator implements Opcodes {
     public static ClassNode heavyStringDecryptor(HeavyStringEncryption.MemberNames memberNames) {
         ClassNode cw = new ClassNode();
         FieldVisitor fv;

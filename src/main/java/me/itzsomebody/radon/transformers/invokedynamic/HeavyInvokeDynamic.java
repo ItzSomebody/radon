@@ -20,8 +20,7 @@ package me.itzsomebody.radon.transformers.invokedynamic;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
-import me.itzsomebody.radon.classes.InvokeDynamicBootstrap;
-import me.itzsomebody.radon.transformers.AbstractTransformer;
+import me.itzsomebody.radon.generate.InvokeDynamicBootstrapGenerator;
 import me.itzsomebody.radon.utils.LoggerUtils;
 import me.itzsomebody.radon.utils.StringUtils;
 import org.objectweb.asm.Handle;
@@ -159,7 +158,7 @@ public class HeavyInvokeDynamic extends LightInvokeDynamic {
                 })
         );
 
-        ClassNode decryptor = InvokeDynamicBootstrap.heavyBootstrap(memberNames);
+        ClassNode decryptor = InvokeDynamicBootstrapGenerator.heavyBootstrap(memberNames);
         this.getClassMap().put(decryptor.name, decryptor);
         this.logStrings.add(LoggerUtils.stdOut("Hid " + counter + " field and/or method accesses with invokedynamics."));
         this.logStrings.add(LoggerUtils.stdOut("Finished. [" + tookThisLong(current) + "ms]"));
