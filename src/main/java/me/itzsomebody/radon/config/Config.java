@@ -51,7 +51,7 @@ import me.itzsomebody.radon.transformers.sourcename.RemoveSourceName;
 import me.itzsomebody.radon.transformers.stringencryption.HeavyStringEncryption;
 import me.itzsomebody.radon.transformers.stringencryption.LightStringEncryption;
 import me.itzsomebody.radon.transformers.stringencryption.NormalStringEncryption;
-import me.itzsomebody.radon.transformers.stringencryption.SuperLightStringEncryption;
+import me.itzsomebody.radon.transformers.stringencryption.VeryLightStringEncryption;
 import org.yaml.snakeyaml.Yaml;
 
 /**
@@ -333,8 +333,8 @@ public class Config {
                     this.methodExempts.add(exempt.replace("Method: ", ""));
                 } else if (exempt.startsWith("Field: ")) {
                     this.fieldExempts.add(exempt.replace("Field: ", ""));
-                } else if (exempt.startsWith("StringEncryption: ")) {
-                    this.stringEncExempts.add(exempt.replace("StringEncryption: ", ""));
+                } else if (exempt.startsWith("StringEncryptionGenerator: ")) {
+                    this.stringEncExempts.add(exempt.replace("StringEncryptionGenerator: ", ""));
                 } else if (exempt.startsWith("InvokeDynamic: ")) {
                     this.indyExempts.add(exempt.replace("InvokeDynamic: ", ""));
                 } else if (exempt.startsWith("Flow: ")) {
@@ -391,15 +391,15 @@ public class Config {
      */
     public AbstractTransformer getStringEncryptionType()
             throws IllegalArgumentException {
-        if (this.map.containsKey("StringEncryption")) {
-            Object value = this.map.get("StringEncryption");
+        if (this.map.containsKey("StringEncryptionGenerator")) {
+            Object value = this.map.get("StringEncryptionGenerator");
             if (value != null) {
                 if (!(value instanceof String))
                     throw new IllegalArgumentException("String encryption arg" +
                             "  must be a string");
                 String s = (String) value;
                 if (s.equalsIgnoreCase("SuperLight")) {
-                    return new SuperLightStringEncryption(this.getSpigotBool());
+                    return new VeryLightStringEncryption(this.getSpigotBool());
                 } else if (s.equalsIgnoreCase("Light")) {
                     return new LightStringEncryption(this.getSpigotBool());
                 } else if (s.equalsIgnoreCase("Normal")) {

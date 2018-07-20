@@ -231,9 +231,11 @@ public class Bootstrap { // Eyyy bootstrap bill
 
             if (this.trashClasses != -1) {
                 this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
+                // TODO: make this variable a config option
+                int len = 4;
                 for (int i = 0; i < this.trashClasses; i++) {
                     TrashClasses trashClass =
-                            new TrashClasses(StringUtils.randomClassName(this.classes.keySet(), this.dictionary));
+                            new TrashClasses(StringUtils.randomClassName(this.classes.keySet(), this.dictionary, len));
                     ClassNode classNode = trashClass.returnTrashClass();
                     this.extraClasses.put(classNode.name, classNode);
                 }

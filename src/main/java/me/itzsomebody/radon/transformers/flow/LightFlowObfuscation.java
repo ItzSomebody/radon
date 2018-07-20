@@ -41,6 +41,10 @@ import org.objectweb.asm.tree.JumpInsnNode;
  */
 public class LightFlowObfuscation extends AbstractTransformer {
     /**
+     * Length of names to generate.
+     */
+    protected int len = 10;
+    /**
      * Applies obfuscation.
      */
     public void obfuscate() {
@@ -49,7 +53,7 @@ public class LightFlowObfuscation extends AbstractTransformer {
         this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
         this.logStrings.add(LoggerUtils.stdOut("Started light flow obfuscation transformer."));
         classNodes().stream().filter(classNode -> !this.exempted(classNode.name, "Flow")).forEach(classNode -> {
-            String fieldName = StringUtils.randomString(this.dictionary);
+            String fieldName = StringUtils.randomString(this.dictionary, len);
             classNode.methods.stream().filter(methodNode -> hasInstructions(methodNode)
                     && !this.exempted(classNode.name + '.' + methodNode.name + methodNode.desc, "Flow")
                     && BytecodeUtils.containsGoto(methodNode)).forEach(methodNode -> {

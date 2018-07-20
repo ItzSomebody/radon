@@ -19,27 +19,27 @@ package me.itzsomebody.radon.methods;
 
 import me.itzsomebody.radon.transformers.stringencryption.LightStringEncryption;
 import me.itzsomebody.radon.transformers.stringencryption.NormalStringEncryption;
-import me.itzsomebody.radon.transformers.stringencryption.SuperLightStringEncryption;
+import me.itzsomebody.radon.transformers.stringencryption.VeryLightStringEncryption;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.MethodNode;
 
 /**
  * Class containing {@link MethodNode}s needed to decrypt a {@link String} for the
- * appropriate StringEncryption transformer.
+ * appropriate StringEncryptionGenerator transformer.
  *
  * @author ItzSomebody
  * @author ASMifier by OW2
  */
-public class StringEncryption implements Opcodes {
+public class StringEncryptionGenerator implements Opcodes {
     /**
      * Returns a {@link MethodNode} that returns a {@link String} needed to
-     * decrypt strings encrypted by {@link SuperLightStringEncryption}.
+     * decrypt strings encrypted by {@link VeryLightStringEncryption}.
      *
      * @param decryptionMethodName used to determine the name of the
      *                             generated {@link MethodNode}.
      * @return a {@link MethodNode} that returns a {@link String} needed to
-     * decrypt strings encrypted by {@link SuperLightStringEncryption}.
+     * decrypt strings encrypted by {@link VeryLightStringEncryption}.
      */
     public static MethodNode superLightMethod(String decryptionMethodName) {
         MethodNode mv = new MethodNode(ACC_PUBLIC + ACC_STATIC

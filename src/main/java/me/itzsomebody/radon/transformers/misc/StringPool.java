@@ -43,6 +43,10 @@ import org.objectweb.asm.tree.MethodNode;
  */
 public class StringPool extends AbstractTransformer {
     /**
+     * Length of names to generate.
+     */
+    private int len = 10;
+    /**
      * Path to pool method.
      */
     private String randName;
@@ -66,9 +70,9 @@ public class StringPool extends AbstractTransformer {
         this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
         this.logStrings.add(LoggerUtils.stdOut("Started string pool transformer."));
         this.classNodes().stream().filter(classNode -> !this.exempted(classNode.name, "StringPool")).forEach(classNode -> {
-            this.randName = StringUtils.randomString(this.dictionary);
+            this.randName = StringUtils.randomString(this.dictionary, len);
             this.fieldName[0] = classNode.name;
-            this.fieldName[1] = StringUtils.randomString(this.dictionary);
+            this.fieldName[1] = StringUtils.randomString(this.dictionary, len);
             List<String> stringslist = new ArrayList<>();
             classNode.methods.stream().filter(methodNode ->
                     !this.exempted(classNode.name + '.' + methodNode.name + methodNode.name, "StringPool")

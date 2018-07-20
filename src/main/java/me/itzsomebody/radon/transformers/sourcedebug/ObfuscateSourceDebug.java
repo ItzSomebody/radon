@@ -30,6 +30,10 @@ import me.itzsomebody.radon.utils.StringUtils;
  */
 public class ObfuscateSourceDebug extends AbstractTransformer {
     /**
+     * Length of names to generate.
+     */
+    private int len = 10;
+    /**
      * Applies obfuscation.
      */
     public void obfuscate() {
@@ -37,7 +41,7 @@ public class ObfuscateSourceDebug extends AbstractTransformer {
         long current = System.currentTimeMillis();
         this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
         this.logStrings.add(LoggerUtils.stdOut("Started source debug obfuscation transformer"));
-        String newDebug = StringUtils.crazyString();
+        String newDebug = StringUtils.crazyString(len);
         this.classNodes().stream().filter(classNode -> !this.exempted(classNode.name, "SourceDebug")
                 && classNode.sourceDebug != null).forEach(classNode -> {
             classNode.sourceDebug = newDebug;

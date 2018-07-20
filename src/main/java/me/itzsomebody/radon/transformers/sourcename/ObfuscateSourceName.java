@@ -30,6 +30,10 @@ import me.itzsomebody.radon.utils.StringUtils;
  */
 public class ObfuscateSourceName extends AbstractTransformer {
     /**
+     * Length of names to generate.
+     */
+    private int len = 64;
+    /**
      * Applies obfuscation.
      */
     public void obfuscate() {
@@ -37,7 +41,7 @@ public class ObfuscateSourceName extends AbstractTransformer {
         long current = System.currentTimeMillis();
         this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
         this.logStrings.add(LoggerUtils.stdOut("Started source name obfuscation transformer"));
-        String newName = StringUtils.crazyString() + ".java";
+        String newName = StringUtils.crazyString(len) + ".java";
         this.classNodes().stream().filter(classNode -> !this.exempted(classNode.name, "SourceName")).forEach(classNode -> {
             classNode.sourceFile = newName;
             counter.incrementAndGet();

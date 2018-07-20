@@ -39,16 +39,15 @@ import org.objectweb.asm.tree.TypeInsnNode;
  *
  * @author ItzSomebody.
  */
-public class HeavyInvokeDynamic extends AbstractTransformer {
+public class HeavyInvokeDynamic extends LightInvokeDynamic {
     /**
      * Applies obfuscation.
      */
+    @Override
     public void obfuscate() {
         AtomicInteger counter = new AtomicInteger();
         long current = System.currentTimeMillis();
-
         MemberNames memberNames = new MemberNames(this);
-
         ArrayList<String> finals = new ArrayList<>();
         this.classNodes().forEach(classNode ->
                 classNode.fields.stream().filter(fieldNode -> Modifier.isFinal(fieldNode.access)).forEach(fieldNode ->
@@ -203,10 +202,10 @@ public class HeavyInvokeDynamic extends AbstractTransformer {
         public String searchMethodName;
 
         MemberNames(HeavyInvokeDynamic instance) {
-            this.className = StringUtils.randomClassName(instance.classNames(), instance.dictionary);
-            this.decryptorMethodName = StringUtils.randomString(instance.dictionary);
-            this.bootstrapMethodName = StringUtils.randomString(instance.dictionary);
-            this.searchMethodName = StringUtils.randomString(instance.dictionary);
+            this.className = StringUtils.randomClassName(instance.classNames(), instance.dictionary, len);
+            this.decryptorMethodName = StringUtils.randomString(instance.dictionary, len);
+            this.bootstrapMethodName = StringUtils.randomString(instance.dictionary, len);
+            this.searchMethodName = StringUtils.randomString(instance.dictionary, len);
         }
     }
 }

@@ -18,7 +18,8 @@
 package me.itzsomebody.radon.transformers.invokedynamic;
 
 import java.util.concurrent.atomic.AtomicInteger;
-import me.itzsomebody.radon.methods.InvokeDynamicBSM;
+
+import me.itzsomebody.radon.methods.InvokeDynamicBSMGenerator;
 import me.itzsomebody.radon.transformers.AbstractTransformer;
 import me.itzsomebody.radon.utils.BytecodeUtils;
 import me.itzsomebody.radon.utils.LoggerUtils;
@@ -26,10 +27,7 @@ import me.itzsomebody.radon.utils.StringUtils;
 import org.objectweb.asm.Handle;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
-import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.InvokeDynamicInsnNode;
-import org.objectweb.asm.tree.MethodInsnNode;
-import org.objectweb.asm.tree.TypeInsnNode;
+import org.objectweb.asm.tree.*;
 
 /**
  * Transformer that applies an InvokeDynamic obfuscation which
@@ -42,8 +40,12 @@ public class LightInvokeDynamic extends AbstractTransformer {
     /*
      * Magic numbers
      */
-    private int VIRTUAL_INVOCATION = 1;
-    private int STATIC_INVOCATION = 0;
+    public static final int VIRTUAL_INVOCATION = 1;
+    public static final int STATIC_INVOCATION = 0;
+    /**
+     * Length of names to generate.
+     */
+    protected int len = 10;
 
     /**
      * Applies obfuscation.
@@ -52,8 +54,8 @@ public class LightInvokeDynamic extends AbstractTransformer {
         AtomicInteger counter = new AtomicInteger();
         long current = System.currentTimeMillis();
         this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
-        this.logStrings.add(LoggerUtils.stdOut("Started light invokedynamic transformer"));
-        String[] bsmPath = new String[]{StringUtils.randomClass(classNames()), StringUtils.randomString(this.dictionary)};
+        this.logStrings.add(LoggerUtils.stdOut("Started invokedynamic transformer"));
+        String[] bsmPath = new String[]{StringUtils.randomClass(classNames()), StringUtils.randomString(this.dictionary, len)};
         Handle bsmHandle = new Handle(Opcodes.H_INVOKESTATIC,
                 bsmPath[0],
                 bsmPath[1],
@@ -61,7 +63,6 @@ public class LightInvokeDynamic extends AbstractTransformer {
                         "Ljava/lang/Object;Ljava/lang/Object;" +
                         "Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;",
                 false);
-
         this.classNodes().stream().filter(classNode -> !this.exempted(classNode.name, "InvokeDynamic")
                 && classNode.version >= 51).forEach(classNode -> {
             classNode.methods.stream().filter(methodNode ->
@@ -79,7 +80,7 @@ public class LightInvokeDynamic extends AbstractTransformer {
                         Type returnType = Type.getReturnType(methodInsnNode.desc);
                         int opcode = (isStatic) ? this.STATIC_INVOCATION : this.VIRTUAL_INVOCATION;
 
-                        InvokeDynamicInsnNode indy = new InvokeDynamicInsnNode(StringUtils.randomString(this.dictionary),
+                        InvokeDynamicInsnNode indy = new InvokeDynamicInsnNode(StringUtils.randomString(this.dictionary, len),
                                 newSig,
                                 bsmHandle,
                                 opcode,
@@ -95,13 +96,17 @@ public class LightInvokeDynamic extends AbstractTransformer {
                 }
             });
         });
-
-        this.classNodes().stream().filter(classNode -> classNode.name.equals(bsmPath[0])).forEach(classNode -> {
-            classNode.methods.add(InvokeDynamicBSM.lightBSM(bsmPath[1], classNode.name));
-            classNode.access = BytecodeUtils.makePublic(classNode.access);
-        });
+        // Add BSM method
+        ClassNode bsmHost = getClassMap().get(bsmPath[0]);
+        addBSM(bsmHost, bsmPath[1]);
+        // Do logging
         this.logStrings.add(LoggerUtils.stdOut("Replaced " + counter + " method invocations with invokedynamics."));
         this.logStrings.add(LoggerUtils.stdOut("Finished. [" + tookThisLong(current) + "ms]"));
+    }
+
+    protected void addBSM(ClassNode bsmHost, String methodName) {
+        bsmHost.methods.add(InvokeDynamicBSMGenerator.lightBSM(methodName, bsmHost.name));
+        bsmHost.access = BytecodeUtils.makePublic(bsmHost.access);
     }
 
     /**

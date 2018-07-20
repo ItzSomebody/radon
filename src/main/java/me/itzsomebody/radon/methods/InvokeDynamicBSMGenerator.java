@@ -33,7 +33,7 @@ import org.objectweb.asm.tree.MethodNode;
  * @author ItzSomebody
  * @author ASMifier by OW2
  */
-public class InvokeDynamicBSM implements Opcodes {
+public class InvokeDynamicBSMGenerator implements Opcodes {
     /**
      * Returns a {@link MethodNode} that returns a {@link ConstantCallSite}
      * statically linked to a method for {@link LightInvokeDynamic}.

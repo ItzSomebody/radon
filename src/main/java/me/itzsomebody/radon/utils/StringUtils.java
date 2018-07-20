@@ -28,7 +28,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 import me.itzsomebody.radon.transformers.stringencryption.LightStringEncryption;
 import me.itzsomebody.radon.transformers.stringencryption.NormalStringEncryption;
-import me.itzsomebody.radon.transformers.stringencryption.SuperLightStringEncryption;
+import me.itzsomebody.radon.transformers.stringencryption.VeryLightStringEncryption;
 
 /**
  * Utils for operating, and generating {@link String}s.
@@ -110,11 +110,11 @@ public class StringUtils {
     }
 
     /**
-     * Returns an encrypted string used by {@link SuperLightStringEncryption}.
+     * Returns an encrypted string used by {@link VeryLightStringEncryption}.
      *
      * @param msg string to encrypt.
      * @param key random integer
-     * @return an encrypted string used by {@link SuperLightStringEncryption}.
+     * @return an encrypted string used by {@link VeryLightStringEncryption}.
      */
     public static String superLightEncrypt(String msg, int key) {
         char[] encryptedArray = msg.toCharArray();

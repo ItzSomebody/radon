@@ -59,7 +59,7 @@ import me.itzsomebody.radon.transformers.sourcename.RemoveSourceName;
 import me.itzsomebody.radon.transformers.stringencryption.HeavyStringEncryption;
 import me.itzsomebody.radon.transformers.stringencryption.LightStringEncryption;
 import me.itzsomebody.radon.transformers.stringencryption.NormalStringEncryption;
-import me.itzsomebody.radon.transformers.stringencryption.SuperLightStringEncryption;
+import me.itzsomebody.radon.transformers.stringencryption.VeryLightStringEncryption;
 import me.itzsomebody.radon.utils.WatermarkUtils;
 
 
@@ -959,7 +959,7 @@ public class MainGUI {
         gbc_comboBox_04.fill = GridBagConstraints.HORIZONTAL;
         gbc_comboBox_04.gridx = 1;
         gbc_comboBox_04.gridy = 12;
-        String[] options = {"Class", "Method", "Field", "StringEncryption", "InvokeDynamic",
+        String[] options = {"Class", "Method", "Field", "StringEncryptionGenerator", "InvokeDynamic",
                 "Flow", "LocalVars", "SourceName", "SourceDebug", "LineNumbers", "StringPool",
                 "Crasher", "HideCode", "Numbers", "Shuffler", "InnerClasses", "Renamer",
                 "Expiry"};
@@ -1009,7 +1009,7 @@ public class MainGUI {
                     exemptList.addElement("Field: " + exemptField.getText());
                     exemptField.setText("");
                 } else if (comboBox_04.getSelectedIndex() == 3) {
-                    exemptList.addElement("StringEncryption: " + exemptField.getText());
+                    exemptList.addElement("StringEncryptionGenerator: " + exemptField.getText());
                     exemptField.setText("");
                 } else if (comboBox_04.getSelectedIndex() == 4) {
                     exemptList.addElement("InvokeDynamic: " + exemptField.getText());
@@ -1245,7 +1245,7 @@ public class MainGUI {
                         if (chckbxStringEncryption.isSelected()) {
                             switch (comboBox.getSelectedIndex()) {
                                 case 0:
-                                    transformers.add(new SuperLightStringEncryption(spigotMode));
+                                    transformers.add(new VeryLightStringEncryption(spigotMode));
                                     break;
                                 case 1:
                                     transformers.add(new LightStringEncryption(spigotMode));
@@ -1426,7 +1426,7 @@ public class MainGUI {
                         if (stringEncryptionMode == null) {
                             chckbxStringEncryption.setSelected(false);
                         } else if (stringEncryptionMode
-                                instanceof SuperLightStringEncryption) {
+                                instanceof VeryLightStringEncryption) {
                             chckbxStringEncryption.setSelected(true);
                             comboBox.setSelectedIndex(0);
                             comboBox.setEnabled(true);
