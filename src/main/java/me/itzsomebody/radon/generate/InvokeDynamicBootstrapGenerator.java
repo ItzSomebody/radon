@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package me.itzsomebody.radon.classes;
+package me.itzsomebody.radon.generate;
 
 import me.itzsomebody.radon.transformers.invokedynamic.HeavyInvokeDynamic;
 import org.objectweb.asm.Label;
@@ -24,7 +24,7 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.ClassNode;
 
-public class InvokeDynamicBootstrap implements Opcodes {
+public class InvokeDynamicBootstrapGenerator implements Opcodes {
     public static ClassNode heavyBootstrap(HeavyInvokeDynamic.MemberNames memberNames) {
         ClassNode cw = new ClassNode();
         MethodVisitor mv;

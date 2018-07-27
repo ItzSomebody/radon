@@ -23,30 +23,41 @@ package me.itzsomebody.radon.config;
  * @author ItzSomebody
  */
 public enum ConfigEnum {
-    INPUT,
-    OUTPUT,
-    LIBRARIES,
-    EXEMPTS,
-    STRING_ENCRYPTION,
-    FLOW_OBFUSCATION,
-    INVOKEDYNAMIC,
-    LOCAL_VARIABLES,
-    CRASHER,
-    HIDER,
-    STRING_POOL,
-    LINE_NUMBERS,
-    NUMBERS,
-    SOURCE_NAME,
-    SOURCE_DEBUG,
-    TRASH_CLASSES,
-    WATERMARK_MSG,
-    WATERMARK_KEY,
-    WATERMARK_TYPE,
-    SPIGOT_PLUGIN,
-    RENAMER,
-    EXPIRATION_TIME,
-    EXPIRATION_MESSAGE,
-    SHUFFLER,
-    DICTIONARY,
-    INNERCLASSES
+    INPUT("Input"),
+    OUTPUT("Output"),
+    LIBRARIES("Libraries"),
+    EXEMPTS("Exempts"),
+    STRING_ENCRYPTION("StringEncryption"),
+    FLOW_OBFUSCATION("FlowObfuscation"),
+    INVOKEDYNAMIC("InvokeDynamic"),
+    LOCAL_VARIABLES("LocalVariableObfuscation"),
+    CRASHER("Crasher"),
+    HIDER("HideCode"),
+    STRING_POOL("StringPool"),
+    LINE_NUMBERS("LineNumberObfuscation"),
+    NUMBERS("NumberObfuscation"),
+    SOURCE_NAME("SourceNameObfuscation"),
+    SOURCE_DEBUG("SourceDebugObfuscation"),
+    TRASH_CLASSES("TrashClasses"),
+    WATERMARK_MSG("WatermarkMessage"),
+    WATERMARK_KEY("WatermarkKey"),
+    WATERMARK_TYPE("WatermarkType"),
+    SPIGOT_PLUGIN("SpigotPlugin"), // TODO: Remove this, replace with custom rules that allow users to exclude conflicts
+    RENAMER("Renamer"),
+    EXPIRATION_TIME("ExpiryTime"),
+    EXPIRATION_MESSAGE("ExpiryMessage"),
+    SHUFFLER("Shuffler"),
+    DICTIONARY("Dictionary"),
+    INNERCLASSES("InnerClassRemover");
+
+    private final String text;
+
+    private ConfigEnum(String text) {
+        this.text = text;
+    }
+
+    @Override
+    public String toString() {
+        return text;
+    }
 }

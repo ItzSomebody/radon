@@ -18,25 +18,17 @@
 package me.itzsomebody.radon.transformers.stringencryption;
 
 import java.util.concurrent.atomic.AtomicInteger;
-import me.itzsomebody.radon.classes.StringDecryptor;
-import me.itzsomebody.radon.transformers.AbstractTransformer;
+
+import me.itzsomebody.radon.generate.StringDecryptorGenerator;
+import me.itzsomebody.radon.generate.StringEncryptionGenerator;
 import me.itzsomebody.radon.utils.BytecodeUtils;
 import me.itzsomebody.radon.utils.LoggerUtils;
 import me.itzsomebody.radon.utils.NumberUtils;
 import me.itzsomebody.radon.utils.StringUtils;
-import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.InsnNode;
-import org.objectweb.asm.tree.LdcInsnNode;
-import org.objectweb.asm.tree.MethodInsnNode;
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.tree.*;
 
-public class HeavyStringEncryption extends AbstractTransformer {
-    /**
-     * Indication to not encrypt strings containing Spigot placeholders
-     * (%%__USER__%%, %%__RESOURCE__%% and %%__NONCE__%%).
-     */
-    private boolean spigotMode;
-
+public class HeavyStringEncryption extends SuperLightStringEncryption {
     /**
      * Constructor used to create a {@link HeavyStringEncryption} object.
      *
@@ -45,18 +37,17 @@ public class HeavyStringEncryption extends AbstractTransformer {
      *                   %%__NONCE__%%).
      */
     public HeavyStringEncryption(boolean spigotMode) {
-        this.spigotMode = spigotMode;
+        super(spigotMode);
     }
 
     /**
      * Applies obfuscation.
      */
+    @Override
     public void obfuscate() {
         AtomicInteger counter = new AtomicInteger();
         long current = System.currentTimeMillis();
-
         MemberNames memberNames = new MemberNames(this);
-
         this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
         this.logStrings.add(LoggerUtils.stdOut("Started heavy string encryption transformer"));
         this.classNodes().parallelStream().filter(classNode -> !this.exempted(classNode.name, "StringEncryption")).forEach(classNode ->
@@ -66,37 +57,54 @@ public class HeavyStringEncryption extends AbstractTransformer {
                     for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
                         if (methodSize(methodNode) > 60000) break;
                         if (insn instanceof LdcInsnNode) {
-                            Object cst = ((LdcInsnNode) insn).cst;
-
-                            if (cst instanceof String) {
-                                if (this.spigotMode &&
-                                        ((String) cst).contains("%%__USER__%%")
-                                        || ((String) cst).contains("%%__RESOURCE__%%")
-                                        || ((String) cst).contains("%%__NONCE__%%"))
+                            LdcInsnNode ldc = (LdcInsnNode) insn;
+                            if (ldc.cst instanceof String) {
+                                String cst = (String) ldc.cst;
+                                if (spigotCheck(cst))
                                     continue;
-
                                 int extraKey = NumberUtils.getRandomInt();
                                 int callerClassHC = classNode.name.replace("/", ".").hashCode();
                                 int callerMethodHC = methodNode.name.hashCode();
                                 int decryptorClassHC = memberNames.className.replace("/", ".").hashCode();
                                 int decryptorMethodHC = memberNames.decryptorMethodName.hashCode();
-                                ((LdcInsnNode) insn).cst = encrypt((String) cst, callerClassHC, callerMethodHC, decryptorClassHC, decryptorMethodHC, extraKey);
+                                ldc.cst = encrypt(cst, callerClassHC, callerMethodHC, decryptorClassHC, decryptorMethodHC, extraKey);
                                 methodNode.instructions.insert(insn, new MethodInsnNode(INVOKESTATIC, memberNames.className, memberNames.decryptorMethodName, "(Ljava/lang/Object;I)Ljava/lang/String;", false));
                                 methodNode.instructions.insert(insn, new InsnNode(POP));
                                 methodNode.instructions.insert(insn, new InsnNode(DUP_X1));
-                                methodNode.instructions.insertBefore(insn, BytecodeUtils.getNumberInsn(extraKey));
-
+                                methodNode.instructions.insertBefore(insn, BytecodeUtils.createNumberInsn(extraKey));
                                 counter.incrementAndGet();
                             }
                         }
                     }
                 })
         );
-
-        ClassNode decryptor = StringDecryptor.heavyStringDecryptor(memberNames);
-        this.getClassMap().put(decryptor.name, decryptor);
+        // Add decrypt method
+        ClassNode decryptor = StringDecryptorGenerator.heavyStringDecryptor(memberNames);
+        getClassMap().put(decryptor.name, decryptor);
+        // Do logging
         logStrings.add(LoggerUtils.stdOut("Encrypted " + counter + " strings."));
         logStrings.add(LoggerUtils.stdOut("Finished. [" + tookThisLong(current) + "ms]"));
+    }
+
+    @Override
+    protected void addDecryptor(ClassNode decryptor, String methodName) {
+        decryptor.methods.add(StringEncryptionGenerator.lightMethod(methodName));
+        decryptor.access = BytecodeUtils.makePublic(decryptor.access);
+    }
+
+    @Override
+    protected void encrypt(MethodNode methodNode, String[] decryptorPath, LdcInsnNode ldc, String cst) {
+        int key = NumberUtils.getRandomInt();
+        ldc.cst = StringUtils.lightEncrypt(cst,
+                decryptorPath[0].replace("/", "."),
+                decryptorPath[1], key);
+        methodNode.instructions.insert(ldc,
+                new MethodInsnNode(Opcodes.INVOKESTATIC,
+                        decryptorPath[0], decryptorPath[1],
+                        "(Ljava/lang/Object;I)" +
+                                "Ljava/lang/String;",
+                        false));
+        methodNode.instructions.insert(ldc, BytecodeUtils.createNumberInsn(key));
     }
 
     private static String encrypt(String msg, int callerClassHC, int callerMethodHC, int decryptorClassHC, int decryptorMethodHC, int extraKey) {
@@ -105,19 +113,19 @@ public class HeavyStringEncryption extends AbstractTransformer {
         for (int i = 0; i < chars.length; i++) {
             switch (i % 4) {
                 case 0: {
-                    sb.append((char)(extraKey ^ callerClassHC ^ chars[i]));
+                    sb.append((char) (extraKey ^ callerClassHC ^ chars[i]));
                     break;
                 }
                 case 1: {
-                    sb.append((char)(extraKey ^ callerMethodHC ^ chars[i]));
+                    sb.append((char) (extraKey ^ callerMethodHC ^ chars[i]));
                     break;
                 }
                 case 2: {
-                    sb.append((char)(extraKey ^ decryptorClassHC ^ chars[i]));
+                    sb.append((char) (extraKey ^ decryptorClassHC ^ chars[i]));
                     break;
                 }
                 case 3: {
-                    sb.append((char)(extraKey ^ decryptorMethodHC ^ chars[i]));
+                    sb.append((char) (extraKey ^ decryptorMethodHC ^ chars[i]));
                     break;
                 }
             }
@@ -141,15 +149,15 @@ public class HeavyStringEncryption extends AbstractTransformer {
         public String decryptorMethodName;
 
         MemberNames(HeavyStringEncryption instance) {
-            this.className = StringUtils.randomClassName(instance.classNames(), instance.dictionary);
-            this.infoFieldName = StringUtils.randomString(instance.dictionary);
-            this.cacheFieldName = StringUtils.randomString(instance.dictionary);
-            this.populateMethodName = StringUtils.randomString(instance.dictionary);
-            this.createInfoMethodName = StringUtils.randomString(instance.dictionary);
-            this.setCacheMethodName = StringUtils.randomString(instance.dictionary);
-            this.getCacheMethodName = StringUtils.randomString(instance.dictionary);
-            this.cacheContainsMethodName = StringUtils.randomString(instance.dictionary);
-            this.decryptorMethodName = StringUtils.randomString(instance.dictionary);
+            this.className = StringUtils.randomClassName(instance.classNames(), instance.dictionary, len);
+            this.infoFieldName = StringUtils.randomString(instance.dictionary, len);
+            this.cacheFieldName = StringUtils.randomString(instance.dictionary, len);
+            this.populateMethodName = StringUtils.randomString(instance.dictionary, len);
+            this.createInfoMethodName = StringUtils.randomString(instance.dictionary, len);
+            this.setCacheMethodName = StringUtils.randomString(instance.dictionary, len);
+            this.getCacheMethodName = StringUtils.randomString(instance.dictionary, len);
+            this.cacheContainsMethodName = StringUtils.randomString(instance.dictionary, len);
+            this.decryptorMethodName = StringUtils.randomString(instance.dictionary, len);
         }
     }
 }

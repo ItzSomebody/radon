@@ -43,6 +43,10 @@ import org.objectweb.asm.tree.VarInsnNode;
  */
 public class TrashClasses {
     /**
+     * Length of names to generate.
+     */
+    private static int len = 10;
+    /**
      * Class name for the trash class.
      */
     private String trashClassName;
@@ -107,7 +111,7 @@ public class TrashClasses {
     private MethodNode methodGen() {
         String randDesc = descGen();
         MethodNode method = new MethodNode(Opcodes.ACC_STATIC +
-                Opcodes.ACC_PRIVATE, StringUtils.crazyString(), randDesc,
+                Opcodes.ACC_PRIVATE, StringUtils.crazyString(len), randDesc,
                 null, null);
         int instructions = NumberUtils.getRandomInt(30) + 30;
 
@@ -177,11 +181,11 @@ public class TrashClasses {
         switch (index) {
             case 0:
                 return new MethodInsnNode(Opcodes.INVOKESTATIC,
-                        StringUtils.crazyString(), StringUtils.crazyString(),
+                        StringUtils.crazyString(len), StringUtils.crazyString(len),
                         "(Ljava/lang/String;)V", false);
             case 1:
                 return new FieldInsnNode(Opcodes.GETFIELD,
-                        StringUtils.crazyString(), StringUtils.crazyString(),
+                        StringUtils.crazyString(len), StringUtils.crazyString(len),
                         "I");
             case 2:
                 return new InsnNode(NumberUtils.getRandomInt(16));
@@ -199,17 +203,17 @@ public class TrashClasses {
             case 8:
                 return new InsnNode(NumberUtils.getRandomInt(5));
             case 9:
-                return new LdcInsnNode(StringUtils.crazyString());
+                return new LdcInsnNode(StringUtils.crazyString(len));
             case 10:
                 return new IincInsnNode(NumberUtils.getRandomInt(16),
                         NumberUtils.getRandomInt(16));
             case 11:
                 return new MethodInsnNode(Opcodes.INVOKESPECIAL,
-                        StringUtils.crazyString(), StringUtils.crazyString(),
+                        StringUtils.crazyString(len), StringUtils.crazyString(len),
                         "()V", false);
             case 12:
                 return new MethodInsnNode(Opcodes.INVOKEVIRTUAL,
-                        StringUtils.crazyString(), StringUtils.crazyString(),
+                        StringUtils.crazyString(len), StringUtils.crazyString(len),
                         "(Ljava/lang/Object;)Ljava/lang/Object;", false);
             case 13:
                 return new VarInsnNode(Opcodes.ILOAD,
@@ -218,14 +222,14 @@ public class TrashClasses {
                 return new InsnNode(Opcodes.ATHROW);
             case 15:
                 return new MethodInsnNode(Opcodes.INVOKEINTERFACE,
-                        StringUtils.crazyString(), StringUtils.crazyString(),
+                        StringUtils.crazyString(len), StringUtils.crazyString(len),
                         "(I)I", false);
             case 16:
-                Handle handle = new Handle(6, StringUtils.crazyString(),
-                        StringUtils.crazyString(), StringUtils.crazyString(),
+                Handle handle = new Handle(6, StringUtils.crazyString(len),
+                        StringUtils.crazyString(len), StringUtils.crazyString(len),
                         false);
-                return new InvokeDynamicInsnNode(StringUtils.crazyString(),
-                        StringUtils.crazyString(), handle,
+                return new InvokeDynamicInsnNode(StringUtils.crazyString(len),
+                        StringUtils.crazyString(len), handle,
                         NumberUtils.getRandomInt(5),
                         NumberUtils.getRandomInt(5),
                         NumberUtils.getRandomInt(5),

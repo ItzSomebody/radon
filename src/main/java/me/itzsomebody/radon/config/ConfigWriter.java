@@ -54,145 +54,37 @@ public class ConfigWriter {
      * Parses all options into a virtual config.
      */
     public void parseOptions() {
-        Object result = this.keyValueMap.get(ConfigEnum.INPUT);
-        if (result != null) {
-            lines.add("Input: \"" + result.toString().replace("\\", "/") + "\"");
-        }
-
-        result = this.keyValueMap.get(ConfigEnum.OUTPUT);
-        if (result != null) {
-            lines.add("Output: \"" + result.toString().replace("\\", "/") + "\"");
-        }
-
-        result = this.keyValueMap.get(ConfigEnum.STRING_ENCRYPTION);
-        if (result != null) {
-            lines.add("StringEncryption: " + result);
-        }
-
-        result = this.keyValueMap.get(ConfigEnum.INVOKEDYNAMIC);
-        if (result != null) {
-            lines.add("InvokeDynamic: " + result);
-        }
-
-        result = this.keyValueMap.get(ConfigEnum.FLOW_OBFUSCATION);
-        if (result != null) {
-            lines.add("FlowObfuscation: " + result);
-        }
-
-        result = this.keyValueMap.get(ConfigEnum.LOCAL_VARIABLES);
-        if (result != null) {
-            lines.add("LocalVariableObfuscation: " + result);
-        }
-
-        result = this.keyValueMap.get(ConfigEnum.CRASHER);
-        if (result != null) {
-            lines.add("Crasher: " + result);
-        }
-
-        result = this.keyValueMap.get(ConfigEnum.HIDER);
-        if (result != null) {
-            lines.add("HideCode: " + result);
-        }
-
-        result = this.keyValueMap.get(ConfigEnum.STRING_POOL);
-        if (result != null) {
-            lines.add("StringPool: " + result);
-        }
-
-        result = this.keyValueMap.get(ConfigEnum.LINE_NUMBERS);
-        if (result != null) {
-            lines.add("LineNumberObfuscation: " + result);
-        }
-
-        result = this.keyValueMap.get(ConfigEnum.NUMBERS);
-        if (result != null) {
-            lines.add("NumberObfuscation: " + result);
-        }
-
-        result = this.keyValueMap.get(ConfigEnum.SOURCE_NAME);
-        if (result != null) {
-            lines.add("SourceNameObfuscation: " + result);
-        }
-
-        result = this.keyValueMap.get(ConfigEnum.SOURCE_DEBUG);
-        if (result != null) {
-            lines.add("SourceDebugObfuscation: " + result);
-        }
-
-        result = this.keyValueMap.get(ConfigEnum.TRASH_CLASSES);
-        if (result != null) {
-            lines.add("TrashClasses: " + result);
-        }
-
-        result = this.keyValueMap.get(ConfigEnum.WATERMARK_MSG);
-        if (result != null) {
-            lines.add("WatermarkMessage: " + result);
-        }
-
-        result = this.keyValueMap.get(ConfigEnum.WATERMARK_TYPE);
-        if (result != null) {
-            lines.add("WatermarkType: " + result);
-        }
-
-        result = this.keyValueMap.get(ConfigEnum.WATERMARK_KEY);
-        if (result != null) {
-            lines.add("WatermarkKey: " + result);
-        }
-
-        result = this.keyValueMap.get(ConfigEnum.SPIGOT_PLUGIN);
-        if (result != null) {
-            lines.add("SpigotPlugin: " + result);
-        }
-
-        result = this.keyValueMap.get(ConfigEnum.RENAMER);
-        if (result != null) {
-            lines.add("Renamer: " + result);
-        }
-
-        result = this.keyValueMap.get(ConfigEnum.EXPIRATION_TIME);
-        if (result != null) {
-            lines.add("ExpiryTime: " + result);
-        }
-
-        result = this.keyValueMap.get(ConfigEnum.EXPIRATION_MESSAGE);
-        if (result != null) {
-            lines.add("ExpiryMessage: " + result);
-        }
-
-        result = this.keyValueMap.get(ConfigEnum.SHUFFLER);
-        if (result != null) {
-            lines.add("Shuffler: " + result);
-        }
-
-        result = this.keyValueMap.get(ConfigEnum.DICTIONARY);
-        if (result != null) {
-            lines.add("Dictionary: " + result);
-        }
-
-        result = this.keyValueMap.get(ConfigEnum.INNERCLASSES);
-        if (result != null) {
-            lines.add("InnerClassRemover: " + result);
-        }
-
-        result = this.keyValueMap.get(ConfigEnum.LIBRARIES);
-        if (result != null) {
-            List<String> libs = (List) result;
-            if (!libs.isEmpty()) {
-                lines.add("Libraries: ");
-                for (String lib : libs) {
-                    lines.add("    - \"" + lib.replace("\\", "/") + "\"");
-                }
+        for (ConfigEnum conf : ConfigEnum.values()) {
+            // Get config for enum value, if it exists, add line
+            Object result = keyValueMap.get(conf);
+            if (result == null) {
+                continue;
             }
-        }
-
-        result = this.keyValueMap.get(ConfigEnum.EXEMPTS);
-        if (result != null) {
-            List<String> exempts = (List) result;
-            if (!exempts.isEmpty()) {
-                lines.add("Exempts: ");
-                for (String exempt : exempts) {
-                    lines.add("    - \"" + exempt + "\"");
-                }
+            switch (conf) {
+                case LIBRARIES:
+                    List<String> libs = (List) result;
+                    if (!libs.isEmpty()) {
+                        lines.add("Libraries: ");
+                        for (String lib : libs) {
+                            lines.add("    - \"" + lib.replace("\\", "/") + "\"");
+                        }
+                    }
+                    break;
+                case EXEMPTS:
+                    List<String> exempts = (List) result;
+                    if (!exempts.isEmpty()) {
+                        lines.add("Exempts: ");
+                        for (String exempt : exempts) {
+                            lines.add("    - \"" + exempt + "\"");
+                        }
+                    }
+                    break;
+                case INPUT:
+                case OUTPUT:
+                    lines.add(conf + ": \"" + result.toString().replace("\\", "/") + "\"");
+                    break;
+                default:
+                    lines.add(conf + ": " + result);
             }
         }
     }

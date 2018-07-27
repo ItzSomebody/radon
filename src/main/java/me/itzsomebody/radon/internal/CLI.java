@@ -23,7 +23,6 @@ import java.io.FileNotFoundException;
 import java.util.List;
 import me.itzsomebody.radon.Radon;
 import me.itzsomebody.radon.config.Config;
-import me.itzsomebody.radon.internal.climessages.CLIMessages;
 import me.itzsomebody.radon.utils.LoggerUtils;
 import me.itzsomebody.radon.utils.WatermarkUtils;
 
@@ -63,10 +62,10 @@ public class CLI {
                 case "-help":
                 case "help":
                 case "/help":
-                    CLIMessages.helpMsg();
+                    helpMsg();
                     break;
                 default:
-                    CLIMessages.usageMsg();
+                    usageMsg();
             }
         } else if (this.args.length == 2) {
             switch (this.args[0].toLowerCase()) {
@@ -90,7 +89,7 @@ public class CLI {
                     }
                     break;
                 default:
-                    CLIMessages.usageMsg();
+                    usageMsg();
                     break;
             }
         } else if (this.args.length == 3) {
@@ -116,11 +115,34 @@ public class CLI {
                     }
                     break;
                 default:
-                    CLIMessages.usageMsg();
+                    usageMsg();
                     break;
             }
         } else {
-            CLIMessages.usageMsg();
+            usageMsg();
         }
+    }
+
+    /**
+     * Prints usage message into console.
+     */
+    private static void usageMsg() {
+        LoggerUtils.stdOut("Usage: java -jar Radon.jar --config example" +
+                ".config");
+        LoggerUtils.stdOut("USage: java -jar Radon.jar --help");
+        LoggerUtils.stdOut("Usage: java -jar Radon.jar");
+    }
+
+    /**
+     * Prints help message into console.
+     */
+    private static void helpMsg() {
+        LoggerUtils.stdOut("CLI Usage:\t\tjava -jar Radon.jar --config " +
+                "example.config");
+        LoggerUtils.stdOut("Credits:\t\tjava -jar Radon.jar --version");
+        LoggerUtils.stdOut("Help Menu:\t\tjava -jar Radon.jar --help");
+        LoggerUtils.stdOut("Watermark Extraction:\tjava -jar Radon.jar " +
+                "--extract Input.jar exampleKey");
+        LoggerUtils.stdOut("MainGUI Usage:\t\tjava -jar Radon.jar");
     }
 }

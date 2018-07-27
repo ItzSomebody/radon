@@ -29,6 +29,10 @@ import me.itzsomebody.radon.utils.StringUtils;
  */
 public class ObfuscateLocalVariables extends AbstractTransformer {
     /**
+     * Length of names to generate.
+     */
+    private static int len = 10;
+    /**
      * Applies obfuscation.
      */
     public void obfuscate() {
@@ -41,7 +45,7 @@ public class ObfuscateLocalVariables extends AbstractTransformer {
                     !this.exempted(classNode.name + '.' + methodNode.name + methodNode.desc, "LocalVars")
                             && methodNode.localVariables != null).forEach(methodNode -> {
                 methodNode.localVariables.forEach(localVariableNode -> {
-                    localVariableNode.name = StringUtils.crazyString();
+                    localVariableNode.name = StringUtils.crazyString(len);
                     counter.incrementAndGet();
                 });
             });

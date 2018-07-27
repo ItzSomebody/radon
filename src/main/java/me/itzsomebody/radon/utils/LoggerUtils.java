@@ -35,7 +35,7 @@ public class LoggerUtils {
     /**
      * The {@link SimpleDateFormat} that will be used for logging.
      */
-    private static SimpleDateFormat FORMAT
+    private final static SimpleDateFormat FORMAT
             = new SimpleDateFormat("MM/dd/yyyy-HH:mm:ss");
 
     /**

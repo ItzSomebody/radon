@@ -45,7 +45,7 @@ public class BytecodeUtils {
      * @param access input access as {@link Integer}.
      * @return new {@link Integer} without restrictive flags.
      */
-    public static int accessFixer(int access) {
+    public static int makePublic(int access) {
         int a = access;
         if ((a & Opcodes.ACC_PRIVATE) != 0) {
             a ^= Opcodes.ACC_PRIVATE;
@@ -65,7 +65,7 @@ public class BytecodeUtils {
      * @param expiryTime a {@link Long} representation of the expiration date.
      * @return an {@link InsnList} with bytecode instructions for expiration.
      */
-    public static InsnList returnExpiry(long expiryTime, String expiredMsg) {
+    public static InsnList createExpiry(long expiryTime, String expiredMsg) {
         InsnList expiryCode = new InsnList();
         LabelNode injectedLabel = new LabelNode(new Label());
 
@@ -94,7 +94,7 @@ public class BytecodeUtils {
      * @param number the {@link Integer} for the obfuscator to contemplate.
      * @return a bytecode instruction representing an int.
      */
-    public static AbstractInsnNode getNumberInsn(int number) {
+    public static AbstractInsnNode createNumberInsn(int number) {
         if (number >= -1 && number <= 5) {
             return new InsnNode(number + 3);
         } else if (number >= -128 && number <= 127) {
@@ -112,7 +112,7 @@ public class BytecodeUtils {
      * @param number the {@link Long} for the obfuscator to contemplate.
      * @return a bytecode instruction representing a long.
      */
-    public static AbstractInsnNode getNumberInsn(long number) {
+    public static AbstractInsnNode createNumberInsn(long number) {
         if (number >= 0 && number <= 1) {
             return new InsnNode((int) (number + 9));
         } else {
@@ -179,7 +179,6 @@ public class BytecodeUtils {
      */
     public static int getIntNumber(AbstractInsnNode insn) {
         int opcode = insn.getOpcode();
-
         if (opcode >= Opcodes.ICONST_M1 && opcode <= Opcodes.ICONST_5) {
             return opcode - 3;
         } else if (insn instanceof IntInsnNode
@@ -189,7 +188,6 @@ public class BytecodeUtils {
                 && ((LdcInsnNode) insn).cst instanceof Integer) {
             return (Integer) ((LdcInsnNode) insn).cst;
         }
-
         throw new IllegalStateException("Unexpected instruction");
     }
 
@@ -203,14 +201,12 @@ public class BytecodeUtils {
      */
     public static long getLongNumber(AbstractInsnNode insn) {
         int opcode = insn.getOpcode();
-
         if (opcode >= Opcodes.LCONST_0 && opcode <= Opcodes.LCONST_1) {
             return opcode - 9;
         } else if (insn instanceof LdcInsnNode
                 && ((LdcInsnNode) insn).cst instanceof Long) {
             return (Long) ((LdcInsnNode) insn).cst;
         }
-
         throw new IllegalStateException("Unexpected instruction");
     }
 
@@ -227,7 +223,6 @@ public class BytecodeUtils {
                 return true;
             }
         }
-
         return false;
     }
 
@@ -238,7 +233,7 @@ public class BytecodeUtils {
      * @return true if provided {@link MethodNode} has any annotations. Otherwise, false.
      */
     public static boolean hasAnnotations(MethodNode methodNode) {
-        return (methodNode.visibleAnnotations != null && methodNode.visibleAnnotations.isEmpty());
+        return methodNode.visibleAnnotations != null && !methodNode.visibleAnnotations.isEmpty();
     }
 
     /**
@@ -248,7 +243,7 @@ public class BytecodeUtils {
      * @return true if provided {@link FieldNode} has any annotations. Otherwise, false.
      */
     public static boolean hasAnnotations(FieldNode fieldNode) {
-        return (fieldNode.visibleAnnotations != null && fieldNode.visibleAnnotations.isEmpty());
+        return fieldNode.visibleAnnotations != null && !fieldNode.visibleAnnotations.isEmpty();
     }
 
     /**
@@ -258,6 +253,6 @@ public class BytecodeUtils {
      * @return true if provided {@link ClassNode} has any annotations. Otherwise, false.
      */
     public static boolean hasAnnotations(ClassNode classNode) {
-        return (classNode.visibleAnnotations != null && classNode.visibleAnnotations.isEmpty());
+        return classNode.visibleAnnotations != null && !classNode.visibleAnnotations.isEmpty();
     }
 }

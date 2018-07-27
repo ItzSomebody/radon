@@ -22,18 +22,17 @@ package me.itzsomebody.radon.utils;
  *
  * @author ItzSomebody
  */
-public class CustomRegexUtils {
+public class MatchUtils {
     /**
      * Returns true/false based on if input is matched to this specific rule.
      *
-     * @param customregex a {@link String} which is used as a "custom regex"
-     *                    statement.
-     * @param string      a {@link String} to try to match.
+     * @param pattern a {@link String} which is used as a pattern matching statement.
+     *                This includes wildcard '*' support.
+     * @param string  a {@link String} to try to match.
      * @return true/false based on if input is matched to this specific rule.
      */
-    public static boolean isMatched(String customregex, String string) {
-        return (customregex.equals(string)
-                || (customregex.contains("*")
-                && string.contains(customregex.split("\\*")[0])));
+    public static boolean isMatched(String pattern, String string) {
+        return (pattern.equals(string) ||
+               (pattern.contains("*")  && string.contains(pattern.split("\\*")[0])));
     }
 }

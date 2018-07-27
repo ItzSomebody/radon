@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package me.itzsomebody.radon.methods;
+package me.itzsomebody.radon.generate;
 
 import me.itzsomebody.radon.transformers.stringencryption.LightStringEncryption;
 import me.itzsomebody.radon.transformers.stringencryption.NormalStringEncryption;
@@ -31,7 +31,7 @@ import org.objectweb.asm.tree.MethodNode;
  * @author ItzSomebody
  * @author ASMifier by OW2
  */
-public class StringEncryption implements Opcodes {
+public class StringEncryptionGenerator implements Opcodes {
     /**
      * Returns a {@link MethodNode} that returns a {@link String} needed to
      * decrypt strings encrypted by {@link SuperLightStringEncryption}.

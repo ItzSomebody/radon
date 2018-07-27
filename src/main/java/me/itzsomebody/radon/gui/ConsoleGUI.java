@@ -85,8 +85,8 @@ public class ConsoleGUI {
                 thisFrame.dispose();
             }
         });
-        this.thisFrame.setBounds(400, 400, 600, 400);
-
+        this.thisFrame.setSize(600, 400);
+        this.thisFrame.setLocationRelativeTo(null);
         this.consolePanel = new JPanel(new BorderLayout());
         this.consoleOutput = new JTextArea();
         this.consoleOutput.setFont(new Font("Arial", Font.PLAIN, 12));

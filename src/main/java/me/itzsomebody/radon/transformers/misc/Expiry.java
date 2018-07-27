@@ -66,7 +66,7 @@ public class Expiry extends AbstractTransformer {
                             && methodSize(methodNode) < 60000
                             && hasInstructions(methodNode)).forEach(methodNode -> {
                 methodNode.instructions.insertBefore(methodNode.instructions.getFirst(),
-                        BytecodeUtils.returnExpiry(this.expiryTime, this.expiryMsg));
+                        BytecodeUtils.createExpiry(this.expiryTime, this.expiryMsg));
                 counter.incrementAndGet();
             });
         });
