@@ -17,7 +17,6 @@
 
 package me.itzsomebody.radon.transformers.flow;
 
-import java.lang.reflect.Modifier;
 import java.util.Stack;
 import java.util.concurrent.atomic.AtomicInteger;
 import me.itzsomebody.radon.analyzer.StackAnalyzer;

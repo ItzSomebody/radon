@@ -50,7 +50,7 @@ import me.itzsomebody.radon.transformers.misc.InnerClassRemover;
 import me.itzsomebody.radon.transformers.misc.NumberObfuscation;
 import me.itzsomebody.radon.transformers.misc.Shuffler;
 import me.itzsomebody.radon.transformers.misc.StringPool;
-import me.itzsomebody.radon.transformers.renamer.Renamer;
+import me.itzsomebody.radon.transformers.misc.Renamer;
 import me.itzsomebody.radon.transformers.sourcedebug.ObfuscateSourceDebug;
 import me.itzsomebody.radon.transformers.sourcedebug.RemoveSourceDebug;
 import me.itzsomebody.radon.transformers.sourcename.ObfuscateSourceName;

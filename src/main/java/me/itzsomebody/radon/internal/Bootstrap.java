@@ -22,6 +22,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -49,7 +50,6 @@ import org.objectweb.asm.tree.ClassNode;
 
 /**
  * Bootstraps and runs the obfuscation process.
- * TODO: Create class hierarchy more efficiently.
  * FIXME: Renaming classes causes exempts on other classes to not work.
  *
  * @author ItzSomebody
@@ -205,12 +205,10 @@ public class Bootstrap { // Eyyy bootstrap bill
             this.logStrings = new ArrayList<>();
             if (doInit) {
                 this.init();
-                this.logStrings.add(LoggerUtils.stdOut("Successfully parsed " +
-                        "config"));
+                this.logStrings.add(LoggerUtils.stdOut("Successfully parsed config"));
             } else {
                 if (output.exists()) {
-                    logStrings.add(LoggerUtils.stdOut("Output already exists, renamed to "
-                            + FileUtils.renameExistingFile(output)));
+                    logStrings.add(LoggerUtils.stdOut("Output already exists, renamed to " + FileUtils.renameExistingFile(output)));
                 }
                 this.zos = new ZipOutputStream(new FileOutputStream(output));
             }
@@ -237,12 +235,8 @@ public class Bootstrap { // Eyyy bootstrap bill
                     ClassNode classNode = trashClass.returnTrashClass();
                     this.extraClasses.put(classNode.name, classNode);
                 }
-                this.logStrings.add(LoggerUtils.stdOut("Generated "
-                        + String.valueOf(this.trashClasses) + " trash classes"));
+                this.logStrings.add(LoggerUtils.stdOut("Generated " + String.valueOf(this.trashClasses) + " trash classes"));
             }
-
-            this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
-            this.createTrees();
 
             if (this.extraClasses.values().size() != 0) {
                 this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
@@ -266,45 +260,27 @@ public class Bootstrap { // Eyyy bootstrap bill
             this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
             this.logStrings.add(LoggerUtils.stdOut("Writing classes to output"));
             for (ClassNode classNode : this.classes.values()) {
-                ClassWriter cw;
-
-                if (classNode.version > Opcodes.V1_5) {
-                    cw = new CustomClassWriter(ClassWriter.COMPUTE_FRAMES);
-                } else {
-                    cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
-                }
+                ClassWriter cw = new CustomClassWriter(ClassWriter.COMPUTE_FRAMES);
 
                 try {
                     classNode.accept(cw);
                     if (this.watermarkMsg != null) {
-                        if (this.watermarkType == 0
-                                && NumberUtils.getRandomInt(10) >= 5) {
-                            cw.newUTF8("WMID: "
-                                    + StringUtils.aesEncrypt(this.watermarkMsg, this.watermarkKey));
-
-                            this.logStrings.add(LoggerUtils.stdOut("Watermarking "
-                                    + this.watermarkMsg + " into " + classNode.name));
-                        } else if (this.watermarkType == 1
-                                && NumberUtils.getRandomInt(10) >= 5) {
-                            classNode.signature =
-                                    StringUtils.aesEncrypt("WMID: " + this.watermarkMsg,
-                                            this.watermarkKey);
-
-                            this.logStrings.add(LoggerUtils.stdOut("Watermarking "
-                                    + this.watermarkMsg + " into " + classNode.name));
+                        if (this.watermarkType == 0 && NumberUtils.getRandomInt(10) >= 5) {
+                            cw.newUTF8("WMID: " + StringUtils.aesEncrypt(this.watermarkMsg, this.watermarkKey));
+                            this.logStrings.add(LoggerUtils.stdOut("Watermarking " + this.watermarkMsg + " into " + classNode.name));
+                        } else if (this.watermarkType == 1 && NumberUtils.getRandomInt(10) >= 5) {
+                            classNode.signature = StringUtils.aesEncrypt("WMID: " + this.watermarkMsg, this.watermarkKey);
+                            this.logStrings.add(LoggerUtils.stdOut("Watermarking " + this.watermarkMsg + " into " + classNode.name));
                         }
                     }
 
                     cw.newUTF8("RADON" + Radon.VERSION); // :D
                 } catch (Throwable t) {
-                    this.logStrings.add(LoggerUtils
-                            .stdOut("Error while writing "
-                                    + classNode.name + " -> " + t.getMessage()));
+                    this.logStrings.add(LoggerUtils.stdOut("Error while writing " + classNode.name + " -> " + t.getMessage()));
                     throw t;
                 }
 
-                ZipEntry newEntry = new ZipEntry(classNode.name
-                        + ".class");
+                ZipEntry newEntry = new ZipEntry(classNode.name + ".class");
                 newEntry.setTime(currentTime);
                 newEntry.setCompressedSize(-1);
                 this.zos.putNextEntry(newEntry);
@@ -437,8 +413,7 @@ public class Bootstrap { // Eyyy bootstrap bill
             this.zos = new ZipOutputStream(new FileOutputStream(this.output));
         } catch (Throwable t) {
             t.printStackTrace();
-            throw new RuntimeException("Error while loading config: "
-                    + t.getMessage());
+            throw new RuntimeException("Error while loading config: " + t.getMessage());
         }
     }
 
@@ -461,14 +436,14 @@ public class Bootstrap { // Eyyy bootstrap bill
                 while (entries.hasMoreElements()) {
                     zipEntry = entries.nextElement();
                     if (zipEntry.getName().endsWith(".class") && !zipEntry.isDirectory()) {
-                        ClassReader cr = new ClassReader(zipFile
-                                .getInputStream(zipEntry));
+                        ClassReader cr = new ClassReader(zipFile.getInputStream(zipEntry));
                         ClassNode classNode = new ClassNode();
                         classNode.libraryNode = true;
-
                         // We don't need code in methods for libs
-                        cr.accept(classNode, ClassReader.SKIP_DEBUG |
-                                ClassReader.SKIP_FRAMES | ClassReader.SKIP_CODE);
+                        cr.accept(classNode, ClassReader.SKIP_DEBUG | ClassReader.SKIP_FRAMES | ClassReader.SKIP_CODE);
+                        classNode.methods.forEach(methodNode -> methodNode.owner = classNode.name);
+                        classNode.fields.forEach(fieldNode -> fieldNode.owner = classNode.name);
+
 
 
                         this.classPath.put(classNode.name, classNode);
@@ -476,11 +451,9 @@ public class Bootstrap { // Eyyy bootstrap bill
                 }
                 zipFile.close();
             } catch (ZipException ze) {
-                throw new RuntimeException("There was an error opening "
-                        + lib.getAbsolutePath() + " as a zip!");
+                throw new RuntimeException("There was an error opening " + lib.getAbsolutePath() + " as a zip!");
             } catch (IOException ioe) {
-                throw new RuntimeException("Library " + lib.getAbsolutePath()
-                        + " does not exist!");
+                throw new RuntimeException("Library " + lib.getAbsolutePath() + " does not exist!");
             }
         }
     }
@@ -497,21 +470,20 @@ public class Bootstrap { // Eyyy bootstrap bill
         Enumeration<? extends ZipEntry> entries;
         ZipEntry zipEntry;
         try {
-            this.logStrings.add(LoggerUtils.stdOut("Loading classes of "
-                    + this.input.getAbsolutePath()));
+            this.logStrings.add(LoggerUtils.stdOut("Loading classes of " + this.input.getAbsolutePath()));
             zipFile = new ZipFile(this.input);
             entries = zipFile.entries();
             while (entries.hasMoreElements()) {
                 zipEntry = entries.nextElement();
                 if (!zipEntry.isDirectory()) {
                     if (zipEntry.getName().endsWith(".class")) {
-                        ClassReader cr = new ClassReader(zipFile
-                                .getInputStream(zipEntry));
+                        ClassReader cr = new ClassReader(zipFile.getInputStream(zipEntry));
                         ClassNode classNode = new ClassNode();
                         classNode.libraryNode = false;
-
                         // We will manually compute stack frames later
                         cr.accept(classNode, ClassReader.SKIP_FRAMES);
+                        classNode.methods.forEach(methodNode -> methodNode.owner = classNode.name);
+                        classNode.fields.forEach(fieldNode -> fieldNode.owner = classNode.name);
 
                         this.classes.put(classNode.name, classNode);
                     } else {
@@ -521,49 +493,90 @@ public class Bootstrap { // Eyyy bootstrap bill
             }
             zipFile.close();
         } catch (ZipException ze) {
-            throw new RuntimeException("There was an error opening "
-                    + this.input.getAbsolutePath() + " as a zip!");
+            throw new RuntimeException("There was an error opening " + this.input.getAbsolutePath() + " as a zip!");
         } catch (IOException ioe) {
-            throw new RuntimeException("Input "
-                    + this.input.getAbsolutePath() + " does not exist!");
+            throw new RuntimeException("Input " + this.input.getAbsolutePath() + " does not exist!");
         }
 
         this.classPath.putAll(this.classes);
     }
 
+    private void loadHierachyAll(ClassNode classNode) {
+        Set<String> processed = new HashSet<>();
+        LinkedList<ClassNode> toLoad = new LinkedList<>();
+        toLoad.add(classNode);
+        while (!toLoad.isEmpty()) {
+            for (ClassNode toProcess : loadHierachy(toLoad.poll())) {
+                if (processed.add(toProcess.name)) {
+                    toLoad.add(toProcess);
+                }
+            }
+        }
+    }
+
+    private ClassTree getOrCreateClassTree(String name) {
+        if (!this.hierarchy.containsKey(name)) {
+            this.hierarchy.put(name, new ClassTree(name, classPath.get(name).libraryNode));
+        }
+        return this.hierarchy.get(name);
+    }
+
+    private List<ClassNode> loadHierachy(ClassNode specificNode) {
+        if (specificNode.name.equals("java/lang/Object")) {
+            return Collections.emptyList();
+        }
+        if ((specificNode.access & Opcodes.ACC_INTERFACE) != 0) {
+            getOrCreateClassTree(specificNode.name).parentClasses.add("java/lang/Object");
+            return Collections.emptyList();
+        }
+        List<ClassNode> toProcess = new ArrayList<>();
+
+        ClassTree thisTree = getOrCreateClassTree(specificNode.name);
+        ClassNode superClass = returnClazz(specificNode.superName);
+        if (superClass == null) {
+            throw new IllegalArgumentException("Could not load " + specificNode.name);
+        }
+        ClassTree superTree = getOrCreateClassTree(superClass.name);
+        superTree.subClasses.add(specificNode.name);
+        thisTree.parentClasses.add(superClass.name);
+        toProcess.add(superClass);
+
+        for (String interfaceReference : specificNode.interfaces) {
+            ClassNode interfaceNode = returnClazz(interfaceReference);
+            if (interfaceNode == null) {
+                throw new IllegalArgumentException("Could not load " + interfaceReference);
+            }
+            ClassTree interfaceTree = getOrCreateClassTree(interfaceReference);
+            interfaceTree.subClasses.add(specificNode.name);
+            thisTree.parentClasses.add(interfaceReference);
+            toProcess.add(interfaceNode);
+        }
+        return toProcess;
+    }
+
+    public ClassTree getClassTree(String classNode) {
+        ClassTree tree = this.hierarchy.get(classNode);
+        if (tree == null) {
+            loadHierachyAll(returnClazz(classNode));
+            return getClassTree(classNode);
+        }
+        return tree;
+    }
+
     /**
-     * Creates {@link ClassTree}s needed for renaming.
+     * Returns the {@link ClassNode} object from {@link Bootstrap#classPath}
+     * if it exists.
+     *
+     * @param ref class name to fetch from {@link Bootstrap#classPath}.
+     * @return the {@link ClassNode} object from {@link Bootstrap#classPath}
+     * if it exists.
      */
-    private void createTrees() {
-        long executionTime = System.currentTimeMillis();
-        this.logStrings.add(LoggerUtils.stdOut("Creating class hierarchy."));
-        classPath.values().forEach(classNode -> {
-            classNode.methods.forEach(methodNode ->
-                methodNode.owner = classNode.name
-            );
-            classNode.fields.forEach(fieldNode ->
-                fieldNode.owner = classNode.name
-            );
-            ClassTree classTree = new ClassTree(classNode.name, classNode.libraryNode);
-            classTree.parentClasses.add(classNode.superName);
-            classTree.parentClasses.addAll(classNode.interfaces);
-            classes.values().forEach(anotherClass -> {
-                if (anotherClass.interfaces != null
-                        && anotherClass.interfaces.contains(classNode.name)) {
-                    classTree.subClasses.add(anotherClass.name);
-                }
-
-                if (anotherClass.superName != null
-                        && anotherClass.superName.equals(classNode.name)) {
-                    classTree.subClasses.add(anotherClass.name);
-                }
-            });
-
-            classTree.methods.addAll(classNode.methods);
-            classTree.fields.addAll(classNode.fields);
-            hierarchy.put(classNode.name, classTree);
-        });
-        this.logStrings.add(LoggerUtils.stdOut("Finished creating class hierarchy. [" + (System.currentTimeMillis() - executionTime) + "ms]"));
+    private ClassNode returnClazz(String ref) {
+        ClassNode clazz = classPath.get(ref);
+        if (clazz == null) {
+            throw new RuntimeException(ref + " does not exist in classpath!");
+        }
+        return clazz;
     }
 
     /**
@@ -659,23 +672,6 @@ public class Bootstrap { // Eyyy bootstrap bill
         }
 
         /**
-         * Returns the {@link ClassNode} object from {@link Bootstrap#classPath}
-         * if it exists.
-         *
-         * @param ref class name to fetch from {@link Bootstrap#classPath}.
-         * @return the {@link ClassNode} object from {@link Bootstrap#classPath}
-         * if it exists.
-         */
-        private ClassNode returnClazz(String ref) {
-            ClassNode clazz = classPath.get(ref);
-            if (clazz == null) {
-                throw new RuntimeException(ref
-                        + " does not exist in classpath!");
-            }
-            return clazz;
-        }
-
-        /**
          * Returns true/false based on if clazz1 is the superclass of clazz2.
          *
          * @param clazz1 possible superclass.
@@ -689,16 +685,16 @@ public class Bootstrap { // Eyyy bootstrap bill
             if (clazz1.name.equals(clazz2.name)) {
                 return true;
             }
-            ClassTree firstTree = hierarchy.get(clazz1.name);
-            if (firstTree == null) {
-                throw new RuntimeException("Could not find " + clazz1.name + " in the built class hiearchy");
-            }
+            ClassTree firstTree = getClassTree(clazz1.name);
+            //if (firstTree == null) {
+            //    throw new RuntimeException("Could not find " + clazz1.name + " in the built class hiearchy");
+            //}
             Set<String> children = new HashSet<>();
             LinkedList<String> searchThese = new LinkedList<>(firstTree.subClasses);
             while (!searchThese.isEmpty()) {
                 String s = searchThese.poll();
                 if (children.add(s)) {
-                    ClassTree tempTree = hierarchy.get(s);
+                    ClassTree tempTree = getClassTree(clazz2.name);
                     searchThese.addAll(tempTree.subClasses);
                 }
             }

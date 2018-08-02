@@ -38,7 +38,7 @@ public abstract class AbstractTransformer implements Opcodes {
     /**
      * Bootstrap instance.
      */
-    private Bootstrap bootstrap;
+    protected Bootstrap bootstrap;
 
     /**
      * Exempt information.
