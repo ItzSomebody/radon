@@ -42,7 +42,7 @@ import org.objectweb.asm.tree.VarInsnNode;
  *
  * @author ItzSomebody
  */
-public class NormalFlowObfuscation extends AbstractTransformer {
+public class NormalFlowObfuscation extends LightFlowObfuscation {
     /**
      * Applies obfuscation.
      */
@@ -53,7 +53,7 @@ public class NormalFlowObfuscation extends AbstractTransformer {
         this.logStrings.add(LoggerUtils.stdOut("Started normal flow obfuscation transformer"));
         classNodes().stream().filter(classNode -> !this.exempted(classNode.name, "Flow")).forEach(classNode -> {
             FieldNode field = new FieldNode(ACC_PUBLIC + ACC_STATIC +
-                    ACC_FINAL, StringUtils.randomString(this.dictionary), "Z", null, null);
+                    ACC_FINAL, StringUtils.randomString(this.dictionary, len), "Z", null, null);
             classNode.fields.add(field);
             classNode.methods.stream().filter(methodNode ->
                     !this.exempted(classNode.name + '.' + methodNode.name + methodNode.desc, "Flow")

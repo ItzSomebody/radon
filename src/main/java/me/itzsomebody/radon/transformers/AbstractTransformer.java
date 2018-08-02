@@ -23,7 +23,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import me.itzsomebody.radon.internal.Bootstrap;
-import me.itzsomebody.radon.utils.CustomRegexUtils;
+import me.itzsomebody.radon.utils.MatchUtils;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.commons.CodeSizeEvaluator;
 import org.objectweb.asm.tree.ClassNode;
@@ -146,19 +146,19 @@ public abstract class AbstractTransformer implements Opcodes {
         String exemptKey = exemptId + ": ";
         for (String exempt : this.exempts) {
             if (exempt.startsWith(exemptKey)) {
-                if (CustomRegexUtils.isMatched(exempt.replace(exemptKey, ""), checkThis)) {
+                if (MatchUtils.isMatched(exempt.replace(exemptKey, ""), checkThis)) {
                     return true;
                 }
             } else if (exempt.startsWith("Class: ")) {
-                if (CustomRegexUtils.isMatched(exempt.replace("Class: ", ""), checkThis)) {
+                if (MatchUtils.isMatched(exempt.replace("Class: ", ""), checkThis)) {
                     return true;
                 }
             } else if (exempt.startsWith("Method: ")) {
-                if (CustomRegexUtils.isMatched(exempt.replace("Method: ", ""), checkThis)) {
+                if (MatchUtils.isMatched(exempt.replace("Method: ", ""), checkThis)) {
                     return true;
                 }
             } else if (exempt.startsWith("Field: ")) {
-                if (CustomRegexUtils.isMatched(exempt.replace("Field: ", ""), checkThis)) {
+                if (MatchUtils.isMatched(exempt.replace("Field: ", ""), checkThis)) {
                     return true;
                 }
             }

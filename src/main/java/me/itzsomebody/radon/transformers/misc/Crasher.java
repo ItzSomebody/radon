@@ -35,6 +35,10 @@ import me.itzsomebody.radon.utils.StringUtils;
  */
 public class Crasher extends AbstractTransformer {
     /**
+     * Length of names to generate.
+     */
+    private int len = 10;
+    /**
      * Applies obfuscation.
      */
     public void obfuscate() {
@@ -44,7 +48,7 @@ public class Crasher extends AbstractTransformer {
         this.logStrings.add(LoggerUtils.stdOut("Started crasher transformer."));
         this.classNodes().stream().filter(classNode -> !this.exempted(classNode.name, "Crasher")).forEach(classNode -> {
             if (classNode.signature == null) {
-                classNode.signature = StringUtils.crazyString();
+                classNode.signature = StringUtils.crazyString(len);
                 counter.incrementAndGet();
             }
         });

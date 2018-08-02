@@ -27,6 +27,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import javax.swing.*;
+
 import me.itzsomebody.radon.Radon;
 import me.itzsomebody.radon.config.Config;
 import me.itzsomebody.radon.config.ConfigEnum;
@@ -100,7 +101,8 @@ public class MainGUI {
         }
         this.frmRadonObfuscator = new JFrame();
         this.frmRadonObfuscator.setTitle(Radon.PREFIX + " " + Radon.VERSION);
-        this.frmRadonObfuscator.setBounds(100, 100, 440, 570);
+        this.frmRadonObfuscator.setSize(440, 570);
+        this.frmRadonObfuscator.setLocationRelativeTo(null);
         this.frmRadonObfuscator.setResizable(true);
         this.frmRadonObfuscator
                 .setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);

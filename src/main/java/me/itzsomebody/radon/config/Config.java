@@ -64,41 +64,18 @@ public class Config {
     /**
      * Valid keys for element map loaded from config.
      */
-    private ArrayList<String> VALIDKEYS = new ArrayList<String>() {
+    private final static ArrayList<String> VALIDKEYS = new ArrayList<String>() {
         {
-            add("Input");
-            add("Output");
-            add("Libraries");
-            add("Exempts");
-            add("StringEncryption");
-            add("FlowObfuscation");
-            add("InvokeDynamic");
-            add("LocalVariableObfuscation");
-            add("Crasher");
-            add("HideCode");
-            add("StringPool");
-            add("LineNumberObfuscation");
-            add("NumberObfuscation");
-            add("SourceNameObfuscation");
-            add("SourceDebugObfuscation");
-            add("TrashClasses");
-            add("WatermarkMessage");
-            add("WatermarkType");
-            add("WatermarkKey");
-            add("SpigotPlugin");
-            add("Renamer");
-            add("ExpiryTime");
-            add("ExpiryMessage");
-            add("Shuffler");
-            add("InnerClassRemover");
-            add("Dictionary");
+            for (ConfigEnum conf : ConfigEnum.values()) {
+                add(conf.toString());
+            }
         }
     };
 
     /**
      * The config object as {@link InputStream}.
      */
-    private InputStream config;
+    private final InputStream config;
 
     /**
      * The element map object as {@link Map}.

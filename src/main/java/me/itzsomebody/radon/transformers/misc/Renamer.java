@@ -55,6 +55,11 @@ public class Renamer extends AbstractTransformer {
     private boolean spigotMode;
 
     /**
+     * Length of names to generate.
+     */
+    private int len = 10;
+
+    /**
      * Constructor used to create a {@link Renamer} object.
      */
     public Renamer(boolean spigotMode) {
@@ -77,14 +82,14 @@ public class Renamer extends AbstractTransformer {
                     && !methodNode.name.startsWith("<")
                     && !methodNode.name.contains("lambda")).forEach(methodNode -> {
                 if (this.weCanRenameMethod(methodNode)) {
-                    String newName = StringUtils.randomString(this.dictionary);
+                    String newName = StringUtils.randomString(this.dictionary, len);
                     this.renameMethodTree(new ArrayList<>(), methodNode, classNode.name, newName);
                 }
             });
 
             classNode.fields.forEach(fieldNode -> {
                 if (this.weCanRenameField(fieldNode)) {
-                    String newName = StringUtils.randomString(this.dictionary);
+                    String newName = StringUtils.randomString(this.dictionary, len);
                     this.renameFieldTree(new ArrayList<>(), fieldNode, classNode.name, newName);
                 }
             });
@@ -93,7 +98,7 @@ public class Renamer extends AbstractTransformer {
                 int packages = NumberUtils.getRandomInt(2) + 1;
                 StringBuilder newName = new StringBuilder();
                 for (int i = 0; i < packages; i++) {
-                    newName.append(StringUtils.randomString(this.dictionary)).append('/');
+                    newName.append(StringUtils.randomString(this.dictionary, len)).append('/');
                 }
 
                 this.mappings.put(classNode.name, newName.substring(0, newName.length() - 1));
@@ -108,14 +113,14 @@ public class Renamer extends AbstractTransformer {
         for (ClassNode classNode : new ArrayList<>(this.classNodes())) {
             ClassNode copy = new ClassNode();
             classNode.accept(new ClassRemapper(copy, simpleRemapper));
-            copy.access = BytecodeUtils.accessFixer(copy.access);
+            copy.access = BytecodeUtils.makePublic(copy.access);
             for (MethodNode methodNode : copy.methods) {
-                methodNode.access = BytecodeUtils.accessFixer(methodNode.access);
+                methodNode.access = BytecodeUtils.makePublic(methodNode.access);
             }
 
             if (copy.fields != null) {
                 for (FieldNode fieldNode : copy.fields) {
-                    fieldNode.access = BytecodeUtils.accessFixer(fieldNode.access);
+                    fieldNode.access = BytecodeUtils.makePublic(fieldNode.access);
                 }
             }
 
@@ -135,8 +140,11 @@ public class Renamer extends AbstractTransformer {
                     || (name.equals("plugin.yml") && spigotMode)) {
                 String stringVer = new String(byteArray);
                 for (String mapping : mappings.keySet()) {
-                    if (stringVer.contains(mapping.replace("/", "."))) {
-                        stringVer = stringVer.replace(mapping.replace("/", "."), mappings.get(mapping).replace("/", "."));
+                    String original =  mapping.replace("/", ".");
+                    if (stringVer.contains(original)) {
+                        // Regex that ensures that class names that match words in the manifest don't break the manifest
+                        // Example: name == Main
+                        stringVer = stringVer.replaceAll("(?<=[: ])" + original, mappings.get(mapping).replace("/", "."));
                     }
                 }
 
@@ -172,7 +180,7 @@ public class Renamer extends AbstractTransformer {
      * @return true if the method we input is inherited from a library class.
      */
     private boolean isLibInheritedMN(List<ClassTree> visited, MethodNode methodNode, String className) {
-        ClassTree ct = this.bootstrap.getClassTree(className);
+        ClassTree ct = this.bootstrap.getTree(className);
         if (ct == null)
             throw new RuntimeException(className + " doesn't exist in classpath.");
         if (!visited.contains(ct)) {
@@ -214,7 +222,7 @@ public class Renamer extends AbstractTransformer {
      * @param newName    the new name of the method.
      */
     private void renameMethodTree(List<ClassTree> visited, MethodNode methodNode, String className, String newName) {
-        ClassTree ct = this.bootstrap.getClassTree(className);
+        ClassTree ct = this.bootstrap.getTree(className);
         if (ct == null)
             throw new RuntimeException(className + " doesn't exist in classpath.");
         if (!ct.libraryNode && !visited.contains(ct)) {
@@ -247,7 +255,7 @@ public class Renamer extends AbstractTransformer {
      * @return true if the method we input is inherited from a library class.
      */
     private boolean isLibInheritedFN(List<ClassTree> visited, FieldNode fieldNode, String className) {
-        ClassTree ct = this.bootstrap.getClassTree(className);
+        ClassTree ct = this.bootstrap.getTree(className);
         if (ct == null)
             throw new RuntimeException(className + " doesn't exist in classpath.");
         if (!visited.contains(ct)) {
@@ -291,7 +299,7 @@ public class Renamer extends AbstractTransformer {
      */
     private void renameFieldTree(List<ClassTree> visited, FieldNode fieldNode,
                                  String className, String newName) {
-        ClassTree ct = this.bootstrap.getClassTree(className);
+        ClassTree ct = this.bootstrap.getTree(className);
         if (ct == null)
             throw new RuntimeException(className + " doesn't exist in classpath.");
         if (!ct.libraryNode && !visited.contains(ct)) {

@@ -18,15 +18,14 @@
 package me.itzsomebody.radon.transformers.stringencryption;
 
 import java.util.concurrent.atomic.AtomicInteger;
-import me.itzsomebody.radon.methods.StringEncryption;
+
+import me.itzsomebody.radon.generate.StringEncryptionGenerator;
 import me.itzsomebody.radon.transformers.AbstractTransformer;
 import me.itzsomebody.radon.utils.BytecodeUtils;
 import me.itzsomebody.radon.utils.LoggerUtils;
 import me.itzsomebody.radon.utils.NumberUtils;
 import me.itzsomebody.radon.utils.StringUtils;
-import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.LdcInsnNode;
-import org.objectweb.asm.tree.MethodInsnNode;
+import org.objectweb.asm.tree.*;
 
 /**
  * Transformer that encrypts strings using an extremely simple XOR algorithm.
@@ -35,11 +34,14 @@ import org.objectweb.asm.tree.MethodInsnNode;
  */
 public class SuperLightStringEncryption extends AbstractTransformer {
     /**
+     * Length of names to generate.
+     */
+    protected final int len = 64;
+    /**
      * Indication to not encrypt strings containing Spigot placeholders
      * (%%__USER__%%, %%__RESOURCE__%% and %%__NONCE__%%).
      */
-    private boolean spigotMode;
-
+    protected final boolean spigotMode;
     /**
      * Constructor used to create a {@link LightStringEncryption} object.
      *
@@ -58,8 +60,8 @@ public class SuperLightStringEncryption extends AbstractTransformer {
         AtomicInteger counter = new AtomicInteger();
         long current = System.currentTimeMillis();
         this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
-        this.logStrings.add(LoggerUtils.stdOut("Started super light string encryption transformer"));
-        String[] decryptorPath = new String[]{StringUtils.randomClass(classNames()), StringUtils.randomString(this.dictionary)};
+        this.logStrings.add(LoggerUtils.stdOut("Started string encryption transformer"));
+        String[] decryptorPath = new String[]{StringUtils.randomClass(classNames()), StringUtils.randomString(this.dictionary, len)};
         this.classNodes().stream().filter(classNode -> !this.exempted(classNode.name, "StringEncryption")).forEach(classNode -> {
             classNode.methods.stream().filter(methodNode ->
                     !this.exempted(classNode.name + '.' + methodNode.name + methodNode.desc, "StringEncryption")
@@ -67,38 +69,50 @@ public class SuperLightStringEncryption extends AbstractTransformer {
                 for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
                     if (methodSize(methodNode) > 60000) break;
                     if (insn instanceof LdcInsnNode) {
-                        Object cst = ((LdcInsnNode) insn).cst;
-
-                        if (cst instanceof String) {
-                            if (spigotMode &&
-                                    ((String) cst).contains("%%__USER__%%")
-                                    || ((String) cst).contains("%%__RESOURCE__%%")
-                                    || ((String) cst).contains("%%__NONCE__%%"))
+                        LdcInsnNode ldc = (LdcInsnNode) insn;
+                        if (ldc.cst instanceof String) {
+                            String cst = (String) ldc.cst;
+                            if (spigotCheck(cst))
                                 continue;
-
-                            int key = NumberUtils.getRandomInt();
-                            ((LdcInsnNode) insn).cst =
-                                    StringUtils.superLightEncrypt(((String) ((LdcInsnNode) insn).cst), key);
-                            methodNode.instructions.insert(insn,
-                                    new MethodInsnNode(INVOKESTATIC, decryptorPath[0],
-                                            decryptorPath[1],
-                                            "(Ljava/lang/String;I)" +
-                                                    "Ljava/lang/String;",
-                                            false));
-                            methodNode.instructions.insert(insn,
-                                    BytecodeUtils.getNumberInsn(key));
+                            encrypt(methodNode,decryptorPath, ldc, cst);
                             counter.incrementAndGet();
                         }
                     }
                 }
             });
         });
-
-        this.classNodes().stream().filter(classNode -> classNode.name.equals(decryptorPath[0])).forEach(classNode -> {
-            classNode.methods.add(StringEncryption.superLightMethod(decryptorPath[1]));
-            classNode.access = BytecodeUtils.accessFixer(classNode.access);
-        });
+        // Add decrypt method
+        ClassNode decryptor = getClassMap().get(decryptorPath[0]);
+        addDecryptor(decryptor, decryptorPath[1]);
+        // Do logging
         logStrings.add(LoggerUtils.stdOut("Encrypted " + counter + " strings."));
         logStrings.add(LoggerUtils.stdOut("Finished. [" + tookThisLong(current) + "ms]"));
     }
+
+    protected boolean spigotCheck(String cst) {
+        return spigotMode &&
+                (cst).contains("%%__USER__%%")
+                || (cst).contains("%%__RESOURCE__%%")
+                || (cst).contains("%%__NONCE__%%");
+    }
+
+    protected void addDecryptor(ClassNode decryptor, String methodName) {
+        decryptor.methods.add(StringEncryptionGenerator.superLightMethod(methodName));
+        decryptor.access = BytecodeUtils.makePublic(decryptor.access);
+    }
+
+    protected void encrypt(MethodNode methodNode, String[] decryptorPath,  LdcInsnNode ldc, String cst) {
+        int key = NumberUtils.getRandomInt();
+        ldc.cst = StringUtils.superLightEncrypt(cst, key);
+        methodNode.instructions.insert(ldc,
+                new MethodInsnNode(
+                        INVOKESTATIC,
+                        decryptorPath[0],
+                        decryptorPath[1],
+                        "(Ljava/lang/String;I)Ljava/lang/String;",
+                        false));
+        methodNode.instructions.insert(ldc, BytecodeUtils.createNumberInsn(key));
+    }
+
+
 }
