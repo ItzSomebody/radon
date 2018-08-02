@@ -21,7 +21,7 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import me.itzsomebody.radon.internal.ClassTree;
@@ -77,20 +77,20 @@ public class Renamer extends AbstractTransformer {
         AtomicInteger counter = new AtomicInteger();
         this.classNodes().forEach(classNode -> {
             classNode.methods.stream().filter(methodNode -> !Modifier.isNative(methodNode.access)
-                    && !methodNode.name.equals("main")
-                    && !methodNode.name.equals("premain")
-                    && !methodNode.name.startsWith("<")
-                    && !methodNode.name.contains("lambda")).forEach(methodNode -> {
+                && !methodNode.name.equals("main")
+                && !methodNode.name.equals("premain")
+                && !methodNode.name.startsWith("<")
+                && !methodNode.name.contains("lambda")).forEach(methodNode -> {
                 if (this.weCanRenameMethod(methodNode)) {
                     String newName = StringUtils.randomString(this.dictionary, len);
-                    this.renameMethodTree(new ArrayList<>(), methodNode, classNode.name, newName);
+                    this.renameMethodTree(new HashSet<>(), methodNode, classNode.name, newName);
                 }
             });
 
             classNode.fields.forEach(fieldNode -> {
                 if (this.weCanRenameField(fieldNode)) {
                     String newName = StringUtils.randomString(this.dictionary, len);
-                    this.renameFieldTree(new ArrayList<>(), fieldNode, classNode.name, newName);
+                    this.renameFieldTree(new HashSet<>(), fieldNode, classNode.name, newName);
                 }
             });
 
@@ -137,10 +137,10 @@ public class Renamer extends AbstractTransformer {
         AtomicInteger fixed = new AtomicInteger();
         getPassThru().forEach((name, byteArray) -> {
             if (name.equals("META-INF/MANIFEST.MF")
-                    || (name.equals("plugin.yml") && spigotMode)) {
+                || (name.equals("plugin.yml") && spigotMode)) {
                 String stringVer = new String(byteArray);
                 for (String mapping : mappings.keySet()) {
-                    String original =  mapping.replace("/", ".");
+                    String original = mapping.replace("/", ".");
                     if (stringVer.contains(original)) {
                         // Regex that ensures that class names that match words in the manifest don't break the manifest
                         // Example: name == Main
@@ -168,25 +168,25 @@ public class Renamer extends AbstractTransformer {
      * @return true if we can rename a method without running into errors.
      */
     private boolean weCanRenameMethod(MethodNode methodNode) {
-        return !this.isLibInheritedMN(new ArrayList<>(), methodNode, methodNode.owner);
+        return !this.isLibInheritedMN(new HashSet<>(), methodNode, methodNode.owner);
     }
 
     /**
      * Attempts to determine if the method we input is inherited from a library class or is exempted.
      *
-     * @param visited    a list of {@link ClassTree}s which contain the {@link MethodNode}s we already checked.
+     * @param visited    a set of {@link ClassTree}s which contain the {@link MethodNode}s we already checked.
      * @param methodNode {@link MethodNode} we want to check if we can rename without causing the JVM to spit lots of errors.
      * @param className  the name of the class we want to check
      * @return true if the method we input is inherited from a library class.
      */
-    private boolean isLibInheritedMN(List<ClassTree> visited, MethodNode methodNode, String className) {
+    private boolean isLibInheritedMN(HashSet<ClassTree> visited, MethodNode methodNode, String className) {
         ClassTree ct = this.bootstrap.getTree(className);
         if (ct == null)
             throw new RuntimeException(className + " doesn't exist in classpath.");
         if (!visited.contains(ct)) {
             visited.add(ct);
             if (!methodNode.owner.equals(className)) {
-                for (MethodNode mn : ct.methods) {
+                for (MethodNode mn : ct.classNode.methods) {
                     if (mn.name.equals(methodNode.name) && mn.desc.equals(methodNode.desc)) {
                         if (ct.libraryNode) {
                             return true;
@@ -216,12 +216,12 @@ public class Renamer extends AbstractTransformer {
     /**
      * Renames the methods in an inheritance tree to prevent inheritance errors.
      *
-     * @param visited    a list of {@link ClassTree}s which contain the {@link MethodNode}s we already renamed.
+     * @param visited    a set of {@link ClassTree}s which contain the {@link MethodNode}s we already renamed.
      * @param methodNode the method information.
      * @param className  the class we are currently browsing through.
      * @param newName    the new name of the method.
      */
-    private void renameMethodTree(List<ClassTree> visited, MethodNode methodNode, String className, String newName) {
+    private void renameMethodTree(HashSet<ClassTree> visited, MethodNode methodNode, String className, String newName) {
         ClassTree ct = this.bootstrap.getTree(className);
         if (ct == null)
             throw new RuntimeException(className + " doesn't exist in classpath.");
@@ -244,7 +244,7 @@ public class Renamer extends AbstractTransformer {
      * @return true if we can rename a field without running into errors.
      */
     private boolean weCanRenameField(FieldNode fieldNode) {
-        return this.isLibInheritedFN(new ArrayList<>(), fieldNode, fieldNode.owner);
+        return this.isLibInheritedFN(new HashSet<>(), fieldNode, fieldNode.owner);
     }
 
     /**
@@ -254,14 +254,14 @@ public class Renamer extends AbstractTransformer {
      * @param className the name of the class we want to check
      * @return true if the method we input is inherited from a library class.
      */
-    private boolean isLibInheritedFN(List<ClassTree> visited, FieldNode fieldNode, String className) {
+    private boolean isLibInheritedFN(HashSet<ClassTree> visited, FieldNode fieldNode, String className) {
         ClassTree ct = this.bootstrap.getTree(className);
         if (ct == null)
             throw new RuntimeException(className + " doesn't exist in classpath.");
         if (!visited.contains(ct)) {
             visited.add(ct);
             if (!fieldNode.owner.equals(className)) {
-                for (MethodNode mn : ct.methods) {
+                for (MethodNode mn : ct.classNode.methods) {
                     if (mn.name.equals(fieldNode.name) && mn.desc.equals(fieldNode.desc)) {
                         if (ct.libraryNode) {
                             return true;
@@ -297,7 +297,7 @@ public class Renamer extends AbstractTransformer {
      * @param className the class we are currently browsing through.
      * @param newName   the new name of the method.
      */
-    private void renameFieldTree(List<ClassTree> visited, FieldNode fieldNode,
+    private void renameFieldTree(HashSet<ClassTree> visited, FieldNode fieldNode,
                                  String className, String newName) {
         ClassTree ct = this.bootstrap.getTree(className);
         if (ct == null)

@@ -218,6 +218,7 @@ public class Bootstrap { // Eyyy bootstrap bill
             long currentTime = System.currentTimeMillis();
             this.loadClassPath();
             this.loadInput();
+            this.buildInheritance();
 
             for (AbstractTransformer transformer : this.transformers) {
                 transformer.init(this, this.exempts, this.dictionary);
@@ -230,8 +231,7 @@ public class Bootstrap { // Eyyy bootstrap bill
                 // TODO: make this variable a config option
                 int len = 4;
                 for (int i = 0; i < this.trashClasses; i++) {
-                    TrashClasses trashClass =
-                        new TrashClasses(StringUtils.randomClassName(this.classes.keySet(), this.dictionary, len));
+                    TrashClasses trashClass = new TrashClasses(StringUtils.randomClassName(this.classes.keySet(), this.dictionary, len));
                     ClassNode classNode = trashClass.returnTrashClass();
                     this.extraClasses.put(classNode.name, classNode);
                 }
@@ -442,7 +442,6 @@ public class Bootstrap { // Eyyy bootstrap bill
                         classNode.methods.forEach(methodNode -> methodNode.owner = classNode.name);
                         classNode.fields.forEach(fieldNode -> fieldNode.owner = classNode.name);
 
-
                         this.classPath.put(classNode.name, classNode);
                     }
                 }
@@ -500,7 +499,7 @@ public class Bootstrap { // Eyyy bootstrap bill
 
     public ClassTree getTree(String ref) {
         if (!hierarchy.containsKey(ref)) {
-            ClassNode wrapper = classPath.get(ref);
+            ClassNode wrapper = returnClazz(ref);
             buildHierarchy(wrapper, null);
         }
 
@@ -509,15 +508,16 @@ public class Bootstrap { // Eyyy bootstrap bill
 
     private void buildHierarchy(ClassNode classNode, ClassNode sub) {
         if (hierarchy.get(classNode.name) == null) {
-            ClassTree tree = new ClassTree();
+            ClassTree tree = new ClassTree(classNode.name, classNode.libraryNode);
+            tree.classNode = classNode;
             if (classNode.superName != null) {
                 tree.parentClasses.add(classNode.superName);
-                buildHierarchy(classPath.get(classNode.superName), );
+                buildHierarchy(returnClazz(classNode.superName), classNode);
             }
             if (classNode.interfaces != null && !classNode.interfaces.isEmpty()) {
                 for (String s : classNode.interfaces) {
                     tree.parentClasses.add(s);
-                    buildHierarchy(classPath.get(s), classNode);
+                    buildHierarchy(returnClazz(s), classNode);
                 }
             }
             hierarchy.put(classNode.name, tree);
