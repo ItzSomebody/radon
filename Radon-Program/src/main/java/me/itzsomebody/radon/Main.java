@@ -27,6 +27,7 @@ import me.itzsomebody.radon.utils.LoggerUtils;
  * TODO: Add JavaDocs.
  * TODO: Fix UnusedCodeRemover.
  * TODO: Make the UnusedMembersRemover transformer.
+ * TODO: Do the load config button in Radon-GUI.
  */
 public class Main {
     /**

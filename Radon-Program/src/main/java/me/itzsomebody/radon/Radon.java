@@ -39,6 +39,7 @@ import me.itzsomebody.radon.exceptions.InputNotFoundException;
 import me.itzsomebody.radon.exceptions.MissingClassException;
 import me.itzsomebody.radon.exceptions.NoTransformersException;
 import me.itzsomebody.radon.exceptions.OutputWriteException;
+import me.itzsomebody.radon.transformers.miscellaneous.TrashClasses;
 import me.itzsomebody.radon.utils.IOUtils;
 import me.itzsomebody.radon.utils.LoggerUtils;
 import org.objectweb.asm.ClassReader;
@@ -245,6 +246,9 @@ public class Radon {
     }
 
     private void executeTransformers() {
+        if (this.sessionInfo.getTrashClasses() > 0) {
+            this.sessionInfo.getTransformers().add(new TrashClasses());
+        }
         if (this.sessionInfo.getTransformers().isEmpty()) {
             throw new NoTransformersException();
         }
