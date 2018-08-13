@@ -224,7 +224,7 @@ The exclusions key takes only one argument: a **list of strings** containing exe
 
 Exclusions takes the following format: `<ExclusionType>: <ExclusionHere>` to dictate how Radon should treat exclusions. Exclusion statements are treated as **regular expressions**.
 
-To exclude methods, you must use the format: `<ExclusionType>: <ContainingClass>\.<MethodName><MethodDescription>`. Similarly, fields are excluded in the format `<ExclusionType>: <ContainingClass>\.<FieldName><FieldDescription>`.
+To exclude methods, you must use the format: `<ExclusionType>: <ContainingClass>\.<MethodName><MethodDescription>`. Fields are excluded in the format `<ExclusionType>: <ContainingClass>\.<FieldName>\.<FieldDescription>`.
 
 All classes, methods, and fields are checked against exclusion __***at their internal bytecode representations***__. This means that
 
