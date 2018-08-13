@@ -72,16 +72,16 @@ Exclusions:
     - "InvokeDynamic: me/itzsomebody/example/excludethisaswell.*"
 ```
 
-## Configuration Format
-**Input:**
+# Configuration Format
+## Input
 
 The input key only takes one argument, a **string** providing the input file to the obfuscator.
 
-**Output:**
+## Output
 
 The output key only takes one argument, a **string** providing the output file to the obfuscator to write the obfuscated result to.
 
-**StringEncryption:**
+## StringEncryption
 
 The string encryption key takes several arguments.
 
@@ -92,15 +92,15 @@ The string encryption key takes several arguments.
 | StringPool | Boolean | Determines if strings should also be pooled on top of the string encryption. |
 | Exclusions | List of Strings | Strings to prevent from being encrypted/pooled. Anything strings found in the input which contain these strings will be left untouched in the output. |
 
-**InvokeDynamic:**
+## InvokeDynamic
 
 The invokedynamic key only takes one argument: a **string** determining which kind of invokedynamic to apply to the output jar. Valid modes are **Light**, **Normal** and **Heavy**.
 
-**FlowObfuscation:**
+## FlowObfuscation
 
 The flow obfuscation key only takes one argument: a **string** determining which kind of flow obfuscation to apply to the output jar. Valid modes are **Light**, **Normal** and **Heavy**.
 
-**LocalVariableObfuscation:**
+## LocalVariableObfuscation
 
 The local variables obfuscation key takes two arguments.
 
@@ -109,7 +109,7 @@ The local variables obfuscation key takes two arguments.
 | Enabled | Boolean | Determines if local variable names should be obfuscated. |
 | Remove | Boolean | Determines if local variable names should be removed altogether. |
 
-**LineNumberObfuscation:**
+## LineNumberObfuscation
 
 The line number obfuscation key takes two arguments.
 
@@ -118,7 +118,7 @@ The line number obfuscation key takes two arguments.
 | Enabled | Boolean | Determines if line numbers should be obfuscated. |
 | Remove | Boolean | Determines if should be removed altogether. |
 
-**SourceNameObfuscation:**
+## SourceNameObfuscation
 
 The source name obfuscation key takes two arguments.
 
@@ -127,7 +127,7 @@ The source name obfuscation key takes two arguments.
 | Enabled | Boolean | Determines if source names should be obfuscated. |
 | Remove | Boolean | Determines if source names should be removed altogether. |
 
-**SourceDebugObfuscation:**
+## SourceDebugObfuscation
 
 The source debug obfuscation key takes two arguments.
 
@@ -136,19 +136,19 @@ The source debug obfuscation key takes two arguments.
 | Enabled | Boolean | Determines if source debug information should be obfuscated. |
 | Remove | Boolean | Determines if source debug information should be removed altogether. |
 
-**HideCode:**
+## HideCode
 
 The hide code key takes only one argument: a **boolean** determining if hide code obfuscation should be applied.
 
-**Shuffler:**
+## Shuffler
 
 The shuffler key takes only one argument: a **boolean** determining if member shuffling should be applied.
 
-**Crasher:**
+## Crasher
 
 The hide code key takes only one argument: a **boolean** determining if crashers should be applied.
 
-**Renamer:**
+## Renamer
 
 The renamer key takes several arguments.
 
@@ -158,7 +158,7 @@ The renamer key takes several arguments.
 | Repackage | String | Moves all classes into this package. |
 | AdaptResources | List of Strings | Regular expressions which tell the obfuscator which resources to attempt to adapt the updated class mappings to. |
 
-**Optimizer:**
+## Optimizer
 
 The optimizer key takes several arguments.
 
@@ -169,7 +169,7 @@ The optimizer key takes several arguments.
 | RemoveGotoReturn | Boolean | Determines if goto-return sequences should be optimized. |
 | RemoveNopInstructions | Boolean | Determines if nop instructions should be removed. |
 
-**Shrinker:**
+## Shrinker
 
 The shrinker key takes several arguments.
 
@@ -181,9 +181,9 @@ The shrinker key takes several arguments.
 | RemoveInvisibleAnnotations | Boolean | Determines if invisible annotations should be removed. |
 | RemoveVisibleAnnotations | Boolean | Determines if visible annotations should be removed. |
 | RemoveUnusedCode | Boolean | Determines if unused code should be removed. |
-| RemoveUnusedMembers | Boolean | Determines if unused members. |
+| RemoveUnusedMembers | Boolean | Determines if unused members should be removed. |
 
-**Watermarker:**
+## Watermarker
 
 The watermarker key takes several arguments.
 
@@ -193,7 +193,7 @@ The watermarker key takes several arguments.
 | Message | String | Message to embed. |
 | Key | String | Key to encrypt message with. |
 
-**Expiration:**
+## Expiration
 
 The expiration key takes several arguments.
 
@@ -204,23 +204,23 @@ The expiration key takes several arguments.
 | Message | String | Message to show when the expiration date passes. |
 | Expires | String | MM/dd/yyyy-formatted string of when the expiration date occurs. |
 
-**Dictionary:**
+## Dictionary
 
 The dictionary key takes only one argument: a **string** determining which dictionary to use when generating new names for classes and its members. Valid dictionaries are: **Spaces**, **Unrecognized**, **Alphabetical** and **Alphanumeric**.
 
-**TrashClasses:**
+## TrashClasses
 
 The trash classes key takes only one argument: a **integer** determining how many trash classes should be generated. Any integer less than or equal to zero will disable trash classes.
 
-**Libraries:**
+## Libraries
 
 The libraries key only takes one argument: a **list of strings** containing the paths of libraries the input jar is dependant on.
 
-**Exclusions:**
+## Exclusions
 
 The exclusions key takes only one argument: a **list of strings** containing exempts detailing how Radon should treat each class.
 
-## Exclusions
+# Exclusions
 
 Exclusions takes the following format: `<ExclusionType>: <ExclusionHere>` to dictate how Radon should treat exclusions. Exclusion statements are treated as **regular expressions**.
 
