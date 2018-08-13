@@ -1,4 +1,4 @@
-# Radon Java Obfuscator
+# Radon Java Obfuscator ![Build Status](https://travis-ci.org/ItzSomebody/Radon.svg?branch=master)
 
 Usage: `java -jar Radon-Program.jar ExampleConfig.yml`
 
