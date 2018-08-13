@@ -301,7 +301,7 @@ public class Bootstrap { // Eyyy bootstrap bill
 
             this.logStrings.add(LoggerUtils.stdOut("------------------------------------------------"));
             if (this.zos != null) {
-                this.zos.setComment("Obfuscation by Radon obfuscator developed by ItzSomebody"); // Cause why not xD
+                //this.zos.setComment("Obfuscation by Radon obfuscator developed by ItzSomebody"); // Cause why not xD
                 this.zos.close();
                 this.logStrings.add(LoggerUtils.stdOut("Finished processing file."));
             }
