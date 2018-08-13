@@ -1,3 +1,6 @@
+## 1.0.0
+* Rewrote everything.
+
 ## 0.9.0
 * Changed all anonymous inner classes in MainGUI class to lambdas.
 * Brand new heavy string encryption transformer.

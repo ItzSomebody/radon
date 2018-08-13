@@ -15,7 +15,7 @@ target/
 dependency-reduced-pom.xml
 
 # Eclipse
-.settings/
+.setup/
 bin/
 .classpath
 .project

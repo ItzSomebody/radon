@@ -1,136 +1,264 @@
-# Radon Java Obfuscator ![Build Status](https://travis-ci.org/ItzSomebody/Radon.svg?branch=master)
-Yet another Java obfuscator. If I forgot to credit you, just make a pull-request or open an issue.
+# Radon Java Obfuscator
 
-Licenses get to go with the manifest in src/META-INF (yay!)
+Usage: `java -jar Radon-Program.jar ExampleConfig.yml`
 
-Usage: ```java -jar Radon.jar --config exampleconfig.yml```
+Alternatively, you can also use `java -jar Radon-Program.jar --help` for help.
 
-Alternatively, you can also use ```java -jar Radon.jar --help``` for help.
-
-Example config:
+Example configuration:
 ```yaml
-Input: "C:/Users/Buddy/Desktop/RadonOBF/Counter.jar"
-Output: "C:/Users/Buddy/Desktop/Counter-OBF.jar"
-StringEncryption: Normal
+Input: "C:/Users/ItzSomebody/Desktop/Example.jar"
+Output: "C:/Users/ItzSomebody/Desktop/Example-OBF.jar"
+StringEncryption:
+    Enabled: true
+    Mode: Heavy
+    StringPool: false
+    Exclusions:
+        - "Example String #1"
+        - "Example String #2"
+        - "Example String #3"
 InvokeDynamic: Heavy
-FlowObfuscation: Normal
-LocalVariableObfuscation: Remove
-LineNumberObfuscation: Remove
-SourceNameObfuscation: Remove
-SourceDebugObfuscation: Remove
-HideCode: True
-Crasher: True
-Shuffler: True
-InnerClassRemover: True
-StringPool: True
-NumberObfuscation: True
-TrashClasses: 50
-Renamer: True
-WatermarkType: ConstantPool
-WatermarkMessage: ItzSomebody
-WatermarkKey: PASSWORD
-ExpiryTime: 5/25/2018
-ExpiryMessage: "YOUR SOFTWARE TRIAL HAS ENDED!!! YOU MUST NOW PAY $100000000 FOR THE FULL VERSION LULZ"
+NumberObfuscation: Heavy
+FlowObfuscation: Heavy
+LocalVariableObfuscation:
+    Enabled: true
+    Remove: true
+LineNumberObfuscation:
+    Enabled: true
+    Remove: true
+SourceNameObfuscation:
+    Enabled: true
+    Remove: true
+SourceDebugObfuscation:
+    Enabled: true
+    Remove: true
+HideCode: true
+Shuffler: true
+Crasher: true
+Renamer:
+    Enabled: true
+    Repackage: "NotTheDefaultPackage"
+    AdaptResources:
+        - "META-INF/MANIFEST.MF"
+        - "Example.resource"
+Optimizer:
+    Enabled: true
+    RemoveGotoGoto: true
+    RemoveGotoReturn: true
+    RemoveNopInstructions: true
+Shrinker:
+    Enabled: true
+    RemoveAttributes: true
+    RemoveDebug: true
+    RemoveInvisibleAnnotations: true
+    RemoveVisibleAnnotations: true
+    RemoveUnusedCode: true
+    RemoveUnusedMembers: true
+Watermarker:
+    Enabled: true
+    Message: "This copy belongs to ItzSomebody"
+    Key: "SuperSecureKey"
+Expiration:
+    Enabled: true
+    InjectJOptionPane: true
+    Message: "Sorry, but your software trial has passed the expiration date. Please pay the ItzSomebody Corporation 30 billion USD to the paypal address non-existant@troll.email to receive the full version."
+    Expires: "12/31/2018"
+Dictionary: Spaces
+TrashClasses: 30
 Libraries:
     - "C:/Program Files/Java/jre1.8.0_xxx/lib/rt.jar"
-Exempts:
-    - "Class: org/objectweb/asm/*"
-    - "StringPool: me/itzsomebody/counter/Counter$1"
-    - "InvokeDynamic: me/itzsomebody/counter/Counter"
-    - "Renamer: me/itzsomebody/counter/Counter$1"
-    - "Renamer: me/itzsomebody/counter/Counter.process(*"
+    - "C:/Program Files/Java/jre1.8.0_xxx/lib/jce.jar"
+Exclusions:
+    - "Global: me/itzsomebody/example/excludeallthis.*"
+    - "InvokeDynamic: me/itzsomebody/example/excludethisaswell.*"
 ```
 
-Valid config options you can use:
+## Configuration Format
+**Input:**
 
-| Option | Expected Value(s) | Desc |
+The input key only takes one argument, a **string** providing the input file to the obfuscator.
+
+**Output:**
+
+The output key only takes one argument, a **string** providing the output file to the obfuscator to write the obfuscated result to.
+
+**StringEncryption:**
+
+The string encryption key takes several arguments.
+
+| Key | Expected value(s) | Description |
 | --- | --- | --- |
-| Input | String | Input file to obfuscate |
-| Output | String | Output file to dump result of obfuscation |
-| Libraries | String List | Libraries used to compile the input |
-| Exempts | String List | Exempted classes, methods, or fields from obfuscation |
-| StringEncryption | String (SuperLight/Light/Normal/Heavy) | Type of string encryption to apply |
-| FlowObfuscation | String (Light/Normal) | Type of flow obfuscation to apply |
-| InvokeDynamic | String (Light/Normal/Heavy) | Type of invokedynamic obfuscation to apply |
-| LocalVariableObfuscation | String (Obfuscate/Remove) | Type of local variable obfuscation to apply |
-| Crasher | Boolean | Determines if the decompiler crasher should be applied |
-| HideCode | Boolean | Determines if synthetic modifiers should be applied |
-| StringPool | Boolean | Determines if strings should be pooled |
-| LineNumberObfuscation | String (Obfuscate/Remove) | Type of line number obfuscation to apply |
-| NumberObfuscation | Boolean | Determines if integers should be split into simple math expressions |
-| SourceNameObfuscation | String (Obfuscate/Remove) | Type of source name obfuscation to apply |
-| SourceDebugObfuscation | String (Obfuscate/Remove) | Type of source debug obfuscation to apply |
-| TrashClasses | Integer | Number of trash classes to generate |
-| WatermarkMessage | String | Message to watermark into the output |
-| WatermarkType | String (ConstantPool/Signature) | Type of watermark to apply |
-| WatermarkKey | String | Key used to encrypt watermarks |
-| SpigotPlugin | String | Determines if input should be treated as a spigot/bungee plugin |
-| Renamer | Boolean | Determines if obfuscator should rename classes and methods |
-| Shuffler | Boolean | Determines if obfuscator should re-arrange class members |
-| InnerClassRemover | Boolean | Determines if obfuscator should remove inner-class information |
-| ExpiryTime | String | Message to insert for expiry obfuscation (useful for trialware) |
-| ExpiryMessage | String | Message to show when set your trialware goes past expiration date (rip) |
-| Dictionary | Integer | Type of string generation to use in obfuscation. |
+| Enabled | Boolean | Determines if the string encryption transformer should be enabled. |
+| Mode | String | Determines which type of string encryption to apply. Valid modes are: **Light**, **Normal** and **Heavy**. |
+| StringPool | Boolean | Determines if strings should also be pooled on top of the string encryption. |
+| Exclusions | List of Strings | Strings to prevent from being encrypted/pooled. Anything strings found in the input which contain these strings will be left untouched in the output. |
 
-## Dictionary types
+**InvokeDynamic:**
 
-Valid dictionary types you can use:
+The invokedynamic key only takes one argument: a **string** determining which kind of invokedynamic to apply to the output jar. Valid modes are **Light**, **Normal** and **Heavy**.
 
-| Option | Description |
-| --- | --- |
-| 0 | (Default) Generates a string containing 10 characters composed entirely out of space-like characters. |
-| 1 | Generates a string containing 10 characters unrecognized by the JVM causing them to show as white-boxes. |
-| 2 | Generates an alpha-numeric string of length 4. |
+**FlowObfuscation:**
 
-## Exempting
+The flow obfuscation key only takes one argument: a **string** determining which kind of flow obfuscation to apply to the output jar. Valid modes are **Light**, **Normal** and **Heavy**.
 
-The character '\*' can be used as a wildcard for "anything which starts with before this". So "me/itzsomebody/\*" will match "me/itzsomebody/ExampleClass1", "me/itzsomebody/example/ExampleClass2". This also works on method matching, "me/itzsomebody/example/Example.exampleMethod(*" will match any method which has the name "exampleMethod" in "me/itzsomebody/example/Example".
+**LocalVariableObfuscation:**
 
-Valid exempt types you can use:
+The local variables obfuscation key takes two arguments.
 
-| Option | Expected Value(s) | Desc |
+| Key | Expected value(s) | Description |
 | --- | --- | --- |
-| Class | Fully qualified name of internal class name (i.e. me/itzsomebody/counter/Counter) | Exempts entire classes from obfuscation. |
-| Method | Fully qualified name of internal owner name + '.' + internal method name + internal method descriptor (i.e. me/itzsomebody/counter/Counter.exampleMethod()V) | Exempts entire method from obfuscation. |
-| Field | Fully qualified name of internal owner name + '.' + internal field name | Exempts field from obfuscation. |
-| StringEncryption | Fully qualified internal name (member name must be seperated from owner by a '.') (i.e. me/itzsomebody/counter/Counter.exampleMethod()V or me/itzsomebody/counter/Counter) | Exempts class or method from string encryption. |
-| InvokeDynamic | Fully qualified internal name (member name must be seperated from owner by a '.') (i.e. me/itzsomebody/counter/Counter.exampleMethod()V or me/itzsomebody/counter/Counter) | Exempts class or method from invokedynamic obfuscation. |
-| Flow | Fully qualified internal name (member name must be seperated from owner by a '.') (i.e. me/itzsomebody/counter/Counter.exampleMethod()V or me/itzsomebody/counter/Counter) | Exempts class or method from flow control obfuscation. |
-| LocalVars | Fully qualified internal name (member name must be seperated from owner by a '.') (i.e. me/itzsomebody/counter/Counter.exampleMethod()V or me/itzsomebody/counter/Counter) | Exempts class or method from local variable obfuscation. |
-| SourceName | Fully qualified internal name (i.e. me/itzsomebody/counter/Counter) | Exempts class source from name obfuscation. |
-| SourceDebug | Fully qualified internal name (i.e. me/itzsomebody/counter/Counter) | Exempts class source from debug obfuscation. |
-| LineNumbers | Fully qualified internal name (member name must be seperated from owner by a '.') (i.e. me/itzsomebody/counter/Counter.exampleMethod()V or me/itzsomebody/counter/Counter) | Exempts class or method from line number obfuscation. |
-| StringPool | Fully qualified internal name (member name must be seperated from owner by a '.') (i.e. me/itzsomebody/counter/Counter.exampleMethod()V or me/itzsomebody/counter/Counter) | Exempts class or method from string pooling. |
-| Crasher | Fully qualified internal name (i.e. me/itzsomebody/counter/Counter) | Exempts class from being added an invalid class signature. |
-| HideCode | Fully qualified internal name (member name must be seperated from owner by a '.') (i.e. me/itzsomebody/counter/Counter.exampleMethod()V or me/itzsomebody/counter/Counter.exampleField or ) | Exempts class, method or field from hide code obfuscation. |
-| Numbers | Fully qualified internal name (member name must be seperated from owner by a '.') (i.e. me/itzsomebody/counter/Counter.exampleMethod()V or me/itzsomebody/counter/Counter) | Exempts class or method number obfuscation. |
-| Shuffler | Fully qualified internal name (i.e. me/itzsomebody/counter/Counter) | Exempts class from member shuffling. |
-| InnerClasses | Fully qualified internal name (i.e. me/itzsomebody/counter/Counter) | Exempts class from inner-class information removal. |
-| Renamer | Fully qualified internal name (member name must be seperated from owner by a '.') (i.e. me/itzsomebody/counter/Counter.exampleMethod()V or me/itzsomebody/counter/Counter.exampleField or ) | Exempts class, method or field from renaming. |
-| Expiry | Fully qualified internal name (member name must be seperated from owner by a '.') (i.e. me/itzsomebody/counter/Counter.exampleMethod()V or me/itzsomebody/counter/Counter.exampleField or ) | Exempts class, method or field from expiration. |
+| Enabled | Boolean | Determines if local variable names should be obfuscated. |
+| Remove | Boolean | Determines if local variable names should be removed altogether. |
 
-## Obfuscation description
-This table describes the current obfuscation settings Radon has.
+**LineNumberObfuscation:**
 
-| Obfuscation Type | Description |
+The line number obfuscation key takes two arguments.
+
+| Key | Expected value(s) | Description |
+| --- | --- | --- |
+| Enabled | Boolean | Determines if line numbers should be obfuscated. |
+| Remove | Boolean | Determines if should be removed altogether. |
+
+**SourceNameObfuscation:**
+
+The source name obfuscation key takes two arguments.
+
+| Key | Expected value(s) | Description |
+| --- | --- | --- |
+| Enabled | Boolean | Determines if source names should be obfuscated. |
+| Remove | Boolean | Determines if source names should be removed altogether. |
+
+**SourceDebugObfuscation:**
+
+The source debug obfuscation key takes two arguments.
+
+| Key | Expected value(s) | Description |
+| --- | --- | --- |
+| Enabled | Boolean | Determines if source debug information should be obfuscated. |
+| Remove | Boolean | Determines if source debug information should be removed altogether. |
+
+**HideCode:**
+
+The hide code key takes only one argument: a **boolean** determining if hide code obfuscation should be applied.
+
+**Shuffler:**
+
+The shuffler key takes only one argument: a **boolean** determining if member shuffling should be applied.
+
+**Crasher:**
+
+The hide code key takes only one argument: a **boolean** determining if crashers should be applied.
+
+**Renamer:**
+
+The renamer key takes several arguments.
+
+| Key | Expected value(s) | Description |
+| --- | --- | --- |
+| Enabled | Boolean | Determines if identifier renaming should be enabled. |
+| Repackage | String | Moves all classes into this package. |
+| AdaptResources | List of Strings | Regular expressions which tell the obfuscator which resources to attempt to adapt the updated class mappings to. |
+
+**Optimizer:**
+
+The optimizer key takes several arguments.
+
+| Key | Expected value(s) | Description |
+| --- | --- | --- |
+| Enabled | Boolean | Determines if optimization should be enabled. |
+| RemoveGotoGoto | Boolean | Determines if goto-goto sequences should be optimized. |
+| RemoveGotoReturn | Boolean | Determines if goto-return sequences should be optimized. |
+| RemoveNopInstructions | Boolean | Determines if nop instructions should be removed. |
+
+**Shrinker:**
+
+The shrinker key takes several arguments.
+
+| Key | Expected value(s) | Description |
+| --- | --- | --- |
+| Enabled | Boolean | Determines if shrinking should be enabled. |
+| RemoveAttributes | Boolean | Determines if miscellaneous class attributes should be removed. |
+| RemoveDebug | Boolean | Determines if miscellaneous debugging info (inner classes, outer class, outer method, etc.) should be removed. |
+| RemoveInvisibleAnnotations | Boolean | Determines if invisible annotations should be removed. |
+| RemoveVisibleAnnotations | Boolean | Determines if visible annotations should be removed. |
+| RemoveUnusedCode | Boolean | Determines if unused code should be removed. |
+| RemoveUnusedMembers | Boolean | Determines if unused members. |
+
+**Watermarker:**
+
+The watermarker key takes several arguments.
+
+| Key | Expected value(s) | Description |
+| --- | --- | --- |
+| Enabled | Boolean | Determines if watermarking should be enabled. |
+| Message | String | Message to embed. |
+| Key | String | Key to encrypt message with. |
+
+**Expiration:**
+
+The expiration key takes several arguments.
+
+| Key | Expected value(s) | Description |
+| --- | --- | --- |
+| Enabled | Boolean | Determines if expiration should be enabled. |
+| InjectJOptionPane | Boolean | Determines if a JOptionPane should be injected into the code along with the Throwable. |
+| Message | String | Message to show when the expiration date passes. |
+| Expires | String | MM/dd/yyyy-formatted string of when the expiration date occurs. |
+
+**Dictionary:**
+
+The dictionary key takes only one argument: a **string** determining which dictionary to use when generating new names for classes and its members. Valid dictionaries are: **Spaces**, **Unrecognized**, **Alphabetical** and **Alphanumeric**.
+
+**TrashClasses:**
+
+The trash classes key takes only one argument: a **integer** determining how many trash classes should be generated. Any integer less than or equal to zero will disable trash classes.
+
+**Libraries:**
+
+The libraries key only takes one argument: a **list of strings** containing the paths of libraries the input jar is dependant on.
+
+**Exclusions:**
+
+The exclusions key takes only one argument: a **list of strings** containing exempts detailing how Radon should treat each class.
+
+## Exclusions
+
+Exclusions takes the following format: `<ExclusionType>: <ExclusionHere>` to dictate how Radon should treat exclusions. Exclusion statements are treated as **regular expressions**.
+
+To exclude methods, you must use the format: `<ExclusionType>: <ContainingClass>\.<MethodName><MethodDescription>`. Similarly, fields are excluded in the format `<ExclusionType>: <ContainingClass>\.<FieldName><FieldDescription>`.
+
+All classes, methods, and fields are checked against exclusion __***at their internal bytecode representations***__. This means that
+
+```java
+package me.itzsomebody;
+
+public class Test {
+    public static void main(String[] args) {
+        System.out.println("Test");
+    }
+}
+```
+
+will be seen as `me/itzsomebody/Test.main([Ljava/lang/String)V` to Radon. Valid exclusion types you can use are:
+
+| Exclusion Type | Description |
 | --- | --- |
-| StringEncryption | This takes the strings in your program and encrypts them. Each of the current settings are symmetrical and will NOT prevent reverse-engineers from figuring out what your program does. The super light setting uses an extremely simple xor algorithm and is not secure. The light setting uses a simple algorithm which encrypts the strings for speed. There is minimal flow obfuscation in the light setting so be aware this offers minimal protection. The normal string encryption setting is basically a flow-obfuscated version of the light string encryption, it is intended to make the decryption method more confusing. The heavy method is stacktrace-backed by both the caller and method name. |
-| FlowObfuscation | This attempts to confuse the program flow to make the decompiled code harder to understand. The light setting replaces all gotos in the program with conditionals which always evaluate to true. The light setting usually doesn't affect decompiler results by much unless you have methods with some certain flow control situations. The normal flow obfuscation attempts to find places in the bytecode where the stack is empty. It uses an injected predicate which is used to make false jumps and add some extra throw-nulls in random places. The heavy setting takes the normal flow one step further by inserting a conditional which is always true after all conditional statements found in the bytecode. |
-| InvokeDynamic | This abuses Java 7's new opcode, the invokedynamic. This replaces certain member access with dynamic invocations. The light invokedynamic transformer is very simple and replaces invokestatic, invokevirtual and invokeinterface with invokedynamics. This is easily reversed by experienced reverse-engineers so don't rely on this. The normal invokedynamic protection is a very slight improvement to the light settings, but still is easy to reverse. The heavy invokedynamic hides invokestatic, invokevirtual, getstatic, putstatic, getfield and putfield opcodes with invokedynamics. |
-| LocalVariableObfuscation | This attempts to prevent local variable analysis. The obfuscation setting changes the names of the local variables to hard-to-read UTF-8 characters. The remove setting removes the local variable information completely destroying the ability to recover the local variable names. Removal setting tends to shrink jar size since it removes information in the code. |
-| Crasher | This adds an invalid signature to classes. The intention of this transformer is to crash a majority of decompiles which attempt to take class signatures into account of the output. This crashes JD-GUI, Procyon, CFR and Javap. |
-| HideCode | This adds certain access flag modifiers to members of your code. Synthetic modifiers are added to classes, methods and fields and bridge modifiers are added to methods which aren't initializer methods (\<init> and \<clinit>). |
-| StringPool | This adds a method into the class which takes all the strings in the class and pools them into the added method. |
-| LineNumberObfuscation | This attempts to obscure stacktrace output by changing line number debug information. The obfuscation setting sets line numbers to random ones. The removal setting removes them from your code entirely. The removal setting also shrinks the size of the jar. |
-| NumberObfuscation | This splits integers into a xor expression making it difficult to determine what number is being used. This is defeated by Krakatau. |
-| SourceNameObfuscation | This attempts to obscure stacktrace output by removing sourcefile debug information. The obfuscation setting sets all the source file names to random ones. The removal setting removes them entirely from your code. The removal setting also shrinks the size of the jar. |
-| SourceDebugObfuscation | This attempts to obscure source debug information. The obfuscation setting sets all the source debug values to random ones. The removal setting removes them entirely from your code. The removal setting also shrinks the size of the jar. |
-| TrashClasses | This generates garbage classes which aren't used to attempt to hide the ones that are actually used. This also prevents JByteEdit usage which is a widely used tool by people who implement Minecraft plugin cracks. |
-| Watermark | This marks a message into the classes which is intended for customer-identification. The constant pool option marks the message into the constant pool of each class. The signature option marks the messages into the class signature. |
-| Renamer | This renames classes, methods and fields from their original names to random UTF-8 strings. |
-| Shuffler | This simply changes the order of class members (methods and fields). |
-| InnerClassRemover | This removes innerclass information. |
-| ExpirationObfuscation | This adds a block of expiration code into each class initializer to prevent usage of jar after the expiration date has passed. |
+| Global | Exempts a class/method/field from any kind of tampering (except for watermarking). |
+| StringEncryption | Exempts a class/method from having its string literals encrypted. |
+| InvokeDynamic | Exempts a class/method from having its method calls hidden with invokedynamic instructions. |
+| FlowObfuscation | Exempts a class/method from having its methods flow-obfuscated. |
+| LineNumbers | Exempts a class/method from having its line numbers tampered with. |
+| LocalVariables | Exempts a class/method from having its local variables tampered with. |
+| NumberObfuscation | Exempts a class/method from having its integer and long constants obfuscated. |
+| HideCode | Exempts a class/method/field from having access codes added into its flags. |
+| Crasher | Exempts a class from having an invalid type signature being added. |
+| Expiration | Exempts a class/method from having an expiration code block being inserted. |
+| Optimizer | Exempts a class/method from attempting to be optimized. |
+| Shrinker | Exempts a class/methods from attempting to strip information/code Radon deems unnecessary. |
+| Shuffler | Exempts a class from having its members (methods and fields) order randomized. |
+| SourceName | Exempts a class from having its source name debugging information being tampered with. |
+| SourceDebug | Exempts a class from having its source debug information being tampered with. |
+| StringPool | Exempts a class/method from having its string literals pooled. |
+| Renamer | Exempts a class/method/field from being renamed. |
 
 ## FAQ
 * **Q: Is this uncrackable/undeobfuscatable?**
@@ -142,15 +270,14 @@ This table describes the current obfuscation settings Radon has.
 * **Q: Why are concepts taken directly from other obfuscators/bytecode manipulation tools? (i.e. expiration transformer which is directly based on Allatori's expiration obfuscation)**
 * *A: I thought those would be interesting to include in an obfuscation tool. This is also one of the reasons Radon is open-sourced.*
 
-## Credits
+## Attribution
 
 * [OW2 ASM](http://asm.ow2.org) - Bytecode manipulation framework.
-* [SnakeYaml](http://www.snakeyaml.org) - Configuration parser.
+* [SnakeYaml](http://www.snakeyaml.org) - YAML parser.
 * [VincBreaker](https://github.com/Vinc0682) - Author of Smoke obfuscator which I took some ideas from. (i.e. Renaming classes as spaces and splitting numbers into bitwise xor operations)
 * [WindowBuilder by Eclipse](https://www.eclipse.org/windowbuilder/) - Used to make GUI (yes I know it's Java Swing, I didn't feel like remaking it in JavaFX)
 * [Licel](https://licelus.com) - Makers of IndyProtect which I used as a reference for my invokedynamic transformers.
 * [Allatori Dev Team](http://www.allatori.com) - Makers of Allatori Java Obfuscator which I took the concept of watermarking and expiration obfuscation from.
-* [Artel](https://gitlab.com/artel) - Beta tester.
 
 ## License
 
