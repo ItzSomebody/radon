@@ -41,8 +41,10 @@ import me.itzsomebody.radon.utils.StringUtils;
 import org.objectweb.asm.commons.ClassRemapper;
 import org.objectweb.asm.commons.Remapper;
 import org.objectweb.asm.commons.SimpleRemapper;
+import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldNode;
+import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 
 public class Renamer extends Transformer {
@@ -92,6 +94,14 @@ public class Renamer extends Transformer {
                 MethodNode methodNode = copy.methods.get(i);
                 methodNode.access = AccessUtils.makePublic(methodNode.access);
                 classWrapper.methods.get(i).methodNode = methodNode;
+
+                /*for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
+                    if (insn instanceof LdcInsnNode && ((LdcInsnNode) insn).cst instanceof String) {
+                        if (mappings.containsKey(((String) ((LdcInsnNode) insn).cst).replace(".", "/"))) {
+                            ((LdcInsnNode) insn).cst = mappings.get(((String) ((LdcInsnNode) insn).cst).replace(".", "/")).replace("/", ".");
+                        }
+                    }
+                }*/
             }
 
             if (copy.fields != null) {

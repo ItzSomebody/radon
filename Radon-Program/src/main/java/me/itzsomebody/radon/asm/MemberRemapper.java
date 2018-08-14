@@ -18,6 +18,8 @@
 package me.itzsomebody.radon.asm;
 
 import java.util.Map;
+import org.objectweb.asm.Handle;
+import org.objectweb.asm.Type;
 import org.objectweb.asm.commons.SimpleRemapper;
 
 public class MemberRemapper extends SimpleRemapper {
