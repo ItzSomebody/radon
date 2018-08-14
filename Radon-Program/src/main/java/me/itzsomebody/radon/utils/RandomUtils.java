@@ -27,7 +27,7 @@ public class RandomUtils {
     }
 
     public static int getRandomInt(int bounds) {
-        return random.nextInt(bounds);
+        return random.nextInt(1, bounds);
     }
 
     public static long getRandomLong() {
@@ -35,7 +35,7 @@ public class RandomUtils {
     }
 
     public static long getRandomLong(long bounds) {
-        return random.nextLong(bounds);
+        return random.nextLong(1, bounds);
     }
     
     public static float getRandomFloat() {
