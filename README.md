@@ -19,16 +19,16 @@ StringEncryption:
 InvokeDynamic: Heavy
 NumberObfuscation: Heavy
 FlowObfuscation: Heavy
-LocalVariableObfuscation:
+LocalVariables:
     Enabled: true
     Remove: true
-LineNumberObfuscation:
+LineNumbers:
     Enabled: true
     Remove: true
-SourceNameObfuscation:
+SourceName:
     Enabled: true
     Remove: true
-SourceDebugObfuscation:
+SourceDebug:
     Enabled: true
     Remove: true
 HideCode: true
