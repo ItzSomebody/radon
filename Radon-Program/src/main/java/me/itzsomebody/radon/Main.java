@@ -35,7 +35,7 @@ public class Main {
      */
     public static final String PREFIX = "[Radon]";
     public static final String VERSION = "1.0.0";
-    public static final String CONTRIBUTORS = "ItzSomebody, x0ark, Col-E and ArtelGG";
+    public static final String CONTRIBUTORS = "ItzSomebody, x0ark, Col-E, ArtelGG and kazigk";
     public static final String PROPAGANDA_GARBAGE = String.format("Radon is a free and open-source java obfuscator with contributions from %s.\nVersion: %s\nWebsite: https://github.com/ItzSomebody/Radon", Main.CONTRIBUTORS, Main.VERSION);
 
     /**
