@@ -111,10 +111,10 @@ public class ConfigurationWriter {
                 } else if (transformer instanceof FlowObfuscation) {
                     if (transformer instanceof LightFlowObfuscation) {
                         documentMap.put(ConfigurationSettings.FLOW_OBFUSCATION.getValue(), "Light");
-                    } else if (transformer instanceof NormalFlowObfuscation) {
-                        documentMap.put(ConfigurationSettings.FLOW_OBFUSCATION.getValue(), "Normal");
                     } else if (transformer instanceof HeavyFlowObfuscation) {
                         documentMap.put(ConfigurationSettings.FLOW_OBFUSCATION.getValue(), "Heavy");
+                    } else if (transformer instanceof NormalFlowObfuscation) {
+                        documentMap.put(ConfigurationSettings.FLOW_OBFUSCATION.getValue(), "Normal");
                     }
                 } else if (transformer instanceof LocalVariables) {
                     documentMap.putIfAbsent(ConfigurationSettings.LOCAL_VARIABLES.getValue(), new LinkedHashMap<String, Object>());

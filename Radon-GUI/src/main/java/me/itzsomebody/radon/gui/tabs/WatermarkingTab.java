@@ -24,6 +24,7 @@ import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
+import me.itzsomebody.radon.SessionInfo;
 import me.itzsomebody.radon.exceptions.WatermarkExtractionException;
 import me.itzsomebody.radon.transformers.miscellaneous.watermarker.Watermarker;
 import me.itzsomebody.radon.transformers.miscellaneous.watermarker.WatermarkerSetup;
@@ -219,5 +220,26 @@ public class WatermarkingTab extends JPanel {
 
     public Watermarker getWatermarker() {
         return (watermarkerEnabledCheckBox.isSelected()) ? new Watermarker(new WatermarkerSetup(watermarkMessageField.getText(), watermarkKeyField.getText())) : null;
+    }
+
+    public void setSettings(SessionInfo info) {
+        watermarkerEnabledCheckBox.setSelected(false);
+        watermarkMessageField.setText(null);
+        watermarkMessageField.setEditable(false);
+        watermarkKeyField.setText(null);
+        watermarkKeyField.setEditable(false);
+
+        if (info.getTransformers() != null) {
+            info.getTransformers().stream().filter(transformer -> transformer instanceof Watermarker).forEach(transformer -> {
+                watermarkerEnabledCheckBox.setSelected(true);
+                watermarkMessageField.setEditable(true);
+                watermarkKeyField.setEditable(true);
+
+                WatermarkerSetup setup = ((Watermarker) transformer).getSetup();
+
+                watermarkMessageField.setText(setup.getMessage());
+                watermarkKeyField.setText(setup.getKey());
+            });
+        }
     }
 }

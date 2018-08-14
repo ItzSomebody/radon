@@ -19,8 +19,11 @@ package me.itzsomebody.radon.gui.tabs;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Objects;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
+import me.itzsomebody.radon.SessionInfo;
 import me.itzsomebody.radon.gui.StringEncryptionExclusionGUI;
 import me.itzsomebody.radon.transformers.miscellaneous.Crasher;
 import me.itzsomebody.radon.transformers.obfuscators.flow.FlowObfuscation;
@@ -55,6 +58,7 @@ public class ObfuscationTab extends JPanel {
     private JComboBox<String> stringEncryptionTypeSelector;
     private JCheckBox stringPoolCheckBox;
     private JCheckBox stringEncryptionEnabledCheckBox;
+    private JButton stringEncryptionExclusionButtons;
 
     private JCheckBox renamingRepackageCheckBox;
     private JTextField renamingRepackageField;
@@ -131,7 +135,7 @@ public class ObfuscationTab extends JPanel {
         stringPoolCheckBox.setEnabled(false);
         stringEncryptionPanel.add(stringPoolCheckBox, gbc_stringPoolCheckBox);
 
-        JButton stringEncryptionExclusionButtons = new JButton("Exclusions");
+        stringEncryptionExclusionButtons = new JButton("Exclusions");
         GridBagConstraints gbc_stringEncryptionExclusionButtons = new GridBagConstraints();
         gbc_stringEncryptionExclusionButtons.anchor = GridBagConstraints.EAST;
         gbc_stringEncryptionExclusionButtons.insets = new Insets(0, 0, 5, 5);
@@ -532,5 +536,142 @@ public class ObfuscationTab extends JPanel {
 
     public Crasher getCrasher() {
         return (crasherCheckBox.isSelected()) ? new Crasher() : null;
+    }
+
+    public void setSettings(SessionInfo info) {
+        stringEncryptionEnabledCheckBox.setSelected(false);
+        stringEncryptionTypeSelector.setSelectedIndex(0);
+        stringEncryptionTypeSelector.setEnabled(false);
+        stringPoolCheckBox.setSelected(false);
+        stringPoolCheckBox.setEnabled(false);
+        stringEncryptionExclusionButtons.setEnabled(false);
+        stringExclusions.clear();
+
+        renamingEnabledCheckBox.setSelected(false);
+        renamingRepackageField.setText(null);
+        renamingRepackageField.setEditable(false);
+        renamingResourcesField.setText(null);
+        renamingResourcesField.setEditable(false);
+
+        invokeDynamicCheckBox.setSelected(false);
+        invokeDynamicComboBox.setSelectedIndex(0);
+        invokeDynamicComboBox.setEnabled(false);
+
+        flowCheckBox.setSelected(false);
+        flowComboBox.setSelectedIndex(0);
+        flowComboBox.setEnabled(false);
+
+        numberObfuscationCheckBox.setSelected(false);
+        numberObfuscationComboBox.setSelectedIndex(0);
+        numberObfuscationComboBox.setEnabled(false);
+
+        localVarCheckBox.setSelected(false);
+        localVarsRemove.setSelected(false);
+        localVarsRemove.setEnabled(false);
+
+        lineNumbersCheckBox.setSelected(false);
+        lineNumbersRemove.setSelected(false);
+        lineNumbersRemove.setEnabled(false);
+
+        sourceNameCheckBox.setSelected(false);
+        sourceNameRemove.setSelected(false);
+        sourceNameRemove.setEnabled(false);
+
+        sourceDebugCheckBox.setSelected(false);
+        sourceDebugRemove.setSelected(false);
+        sourceDebugRemove.setEnabled(false);
+
+        hideCodeCheckBox.setSelected(false);
+        shufflerCheckBox.setSelected(false);
+        crasherCheckBox.setSelected(false);
+
+        if (info.getTransformers() != null) {
+            info.getTransformers().stream().filter(Objects::nonNull).forEach(transformer -> {
+                if (transformer instanceof StringEncryption) {
+                    stringEncryptionEnabledCheckBox.setSelected(true);
+                    stringEncryptionTypeSelector.setEnabled(true);
+                    stringEncryptionExclusionButtons.setEnabled(true);
+                    stringPoolCheckBox.setEnabled(true);
+
+                    if (transformer instanceof LightStringEncryption) {
+                        stringEncryptionTypeSelector.setSelectedIndex(0);
+                    } else if (transformer instanceof NormalStringEncryption) {
+                        stringEncryptionTypeSelector.setSelectedIndex(1);
+                    } else if (transformer instanceof HeavyStringEncryption) {
+                        stringEncryptionTypeSelector.setSelectedIndex(2);
+                    } else if (transformer instanceof StringPool) {
+                        stringPoolCheckBox.setSelected(true);
+                    }
+                    if (stringExclusions.isEmpty()) {
+                        stringExclusions.addAll(((StringEncryption) transformer).getExcludedStrings());
+                    }
+                } else if (transformer instanceof Renamer) {
+                    RenamerSetup setup = ((Renamer) transformer).getSetup();
+
+                    renamingEnabledCheckBox.setSelected(true);
+                    renamingRepackageField.setText(setup.getRepackageName());
+                    renamingRepackageField.setEditable(true);
+                    if (setup.getAdaptTheseResources().length > 0) {
+                        renamingResourcesField.setText(Arrays.toString(setup.getAdaptTheseResources()).substring(1, setup.getAdaptTheseResources().length - 1));
+                    }
+                    renamingResourcesField.setEditable(true);
+                } else if (transformer instanceof InvokeDynamic) {
+                    invokeDynamicCheckBox.setSelected(true);
+                    invokeDynamicComboBox.setEnabled(true);
+
+                    if (transformer instanceof LightInvokeDynamic) {
+                        invokeDynamicComboBox.setSelectedIndex(0);
+                    } else if (transformer instanceof NormalInvokeDynamic) {
+                        invokeDynamicComboBox.setSelectedIndex(1);
+                    } else if (transformer instanceof HeavyInvokeDynamic) {
+                        invokeDynamicComboBox.setSelectedIndex(2);
+                    }
+                } else if (transformer instanceof FlowObfuscation) {
+                    flowCheckBox.setSelected(true);
+                    flowComboBox.setEnabled(true);
+
+                    if (transformer instanceof LightFlowObfuscation) {
+                        flowComboBox.setSelectedIndex(0);
+                    } else if (transformer instanceof HeavyFlowObfuscation) {
+                        flowComboBox.setSelectedIndex(2);
+                    } else if (transformer instanceof NormalFlowObfuscation) {
+                        flowComboBox.setSelectedIndex(1);
+                    }
+                } else if (transformer instanceof NumberObfuscation) {
+                    numberObfuscationCheckBox.setSelected(true);
+                    numberObfuscationComboBox.setEnabled(true);
+
+                    if (transformer instanceof LightNumberObfuscation) {
+                        numberObfuscationComboBox.setSelectedIndex(0);
+                    } else if (transformer instanceof NormalNumberObfuscation) {
+                        numberObfuscationComboBox.setSelectedIndex(1);
+                    } else if (transformer instanceof HeavyNumberObfuscation) {
+                        numberObfuscationComboBox.setSelectedIndex(2);
+                    }
+                } else if (transformer instanceof LocalVariables) {
+                    localVarCheckBox.setSelected(true);
+                    localVarsRemove.setSelected(((LocalVariables) transformer).isRemove());
+                    localVarsRemove.setEnabled(((LocalVariables) transformer).isRemove());
+                } else if (transformer instanceof LineNumbers) {
+                    lineNumbersCheckBox.setSelected(true);
+                    lineNumbersRemove.setSelected(((LineNumbers) transformer).isRemove());
+                    lineNumbersRemove.setEnabled(((LineNumbers) transformer).isRemove());
+                } else if (transformer instanceof SourceName) {
+                    sourceNameCheckBox.setSelected(true);
+                    sourceNameRemove.setSelected(((SourceName) transformer).isRemove());
+                    sourceNameRemove.setEnabled(((SourceName) transformer).isRemove());
+                } else if (transformer instanceof SourceDebug) {
+                    sourceDebugCheckBox.setSelected(true);
+                    sourceDebugRemove.setSelected(((SourceDebug) transformer).isRemove());
+                    sourceDebugRemove.setEnabled(((SourceDebug) transformer).isRemove());
+                } else if (transformer instanceof HideCode) {
+                    hideCodeCheckBox.setSelected(true);
+                } else if (transformer instanceof MemberShuffler) {
+                    shufflerCheckBox.setSelected(true);
+                } else if (transformer instanceof Crasher) {
+                    crasherCheckBox.setSelected(true);
+                }
+            });
+        }
     }
 }

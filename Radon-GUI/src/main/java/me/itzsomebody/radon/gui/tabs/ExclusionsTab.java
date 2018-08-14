@@ -20,6 +20,7 @@ package me.itzsomebody.radon.gui.tabs;
 import java.awt.*;
 import java.util.List;
 import javax.swing.*;
+import me.itzsomebody.radon.SessionInfo;
 import me.itzsomebody.radon.exclusions.Exclusion;
 import me.itzsomebody.radon.exclusions.ExclusionManager;
 import me.itzsomebody.radon.exclusions.ExclusionType;
@@ -119,5 +120,12 @@ public class ExclusionsTab extends JPanel {
         }
 
         return manager;
+    }
+
+    public void setSettings(SessionInfo info) {
+        exclusions.clear();
+
+        ExclusionManager manager = info.getExclusions();
+        manager.getExclusions().forEach(exclusion -> exclusions.addElement(exclusion.getExclusionType().getValue() + ": " + exclusion.getExclusion().pattern()));
     }
 }

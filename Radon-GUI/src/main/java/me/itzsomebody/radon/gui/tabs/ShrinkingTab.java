@@ -20,6 +20,7 @@ package me.itzsomebody.radon.gui.tabs;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
+import me.itzsomebody.radon.SessionInfo;
 import me.itzsomebody.radon.transformers.shrinkers.ShrinkerDelegator;
 import me.itzsomebody.radon.transformers.shrinkers.ShrinkerSetup;
 
@@ -130,5 +131,41 @@ public class ShrinkingTab extends JPanel {
     public ShrinkerDelegator getShrinker() {
         return (shrinkerEnabledCheckBox.isSelected()) ? new ShrinkerDelegator(new ShrinkerSetup(visibleAnnotationsCheckBox.isSelected(), invisibleAnnotationsCheckBox.isSelected(), attributesCheckBox.isSelected(),
             debugInfoCheckBox.isSelected(), unusedCodeCheckBox.isSelected(), unusedMembersCheckBox.isSelected())) : null;
+    }
+
+    public void setSettings(SessionInfo info) {
+        shrinkerEnabledCheckBox.setSelected(false);
+        attributesCheckBox.setSelected(false);
+        attributesCheckBox.setEnabled(false);
+        debugInfoCheckBox.setSelected(false);
+        debugInfoCheckBox.setEnabled(false);
+        invisibleAnnotationsCheckBox.setSelected(false);
+        invisibleAnnotationsCheckBox.setEnabled(false);
+        visibleAnnotationsCheckBox.setSelected(false);
+        visibleAnnotationsCheckBox.setEnabled(false);
+        unusedCodeCheckBox.setSelected(false);
+        unusedCodeCheckBox.setEnabled(false);
+        unusedMembersCheckBox.setSelected(false);
+        unusedMembersCheckBox.setEnabled(false);
+
+        if (info.getTransformers() != null) {
+            info.getTransformers().stream().filter(transformer -> transformer instanceof ShrinkerDelegator).forEach(transformer -> {
+                shrinkerEnabledCheckBox.setSelected(true);
+                attributesCheckBox.setEnabled(true);
+                debugInfoCheckBox.setEnabled(true);
+                invisibleAnnotationsCheckBox.setEnabled(true);
+                visibleAnnotationsCheckBox.setEnabled(true);
+                unusedCodeCheckBox.setEnabled(true);
+                unusedMembersCheckBox.setEnabled(true);
+
+                ShrinkerSetup setup = ((ShrinkerDelegator) transformer).getSetup();
+                attributesCheckBox.setSelected(setup.isRemoveAttributes());
+                debugInfoCheckBox.setSelected(setup.isRemoveDebug());
+                invisibleAnnotationsCheckBox.setSelected(setup.isRemoveInvisibleAnnotations());
+                visibleAnnotationsCheckBox.setSelected(setup.isRemoveVisibleAnnotations());
+                unusedCodeCheckBox.setSelected(setup.isRemoveUnusedCode());
+                unusedMembersCheckBox.setSelected(setup.isRemoveUnusedMembers());
+            });
+        }
     }
 }

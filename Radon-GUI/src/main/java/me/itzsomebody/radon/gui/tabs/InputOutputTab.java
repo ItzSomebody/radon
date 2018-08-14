@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
+import me.itzsomebody.radon.SessionInfo;
 
 public class InputOutputTab extends JPanel {
     private JTextField inputField;
@@ -264,5 +265,21 @@ public class InputOutputTab extends JPanel {
         }
 
         return libs;
+    }
+
+    public void setSettings(SessionInfo info) {
+        inputField.setText(null);
+        outputField.setText(null);
+        libraryList.clear();
+
+        if (info.getInput() != null) {
+            inputField.setText(info.getInput().getAbsolutePath());
+        }
+        if (info.getOutput() != null) {
+            outputField.setText(info.getOutput().getAbsolutePath());
+        }
+        if (info.getLibraries() != null) {
+            info.getLibraries().forEach(file -> libraryList.addElement(file.getAbsolutePath()));
+        }
     }
 }

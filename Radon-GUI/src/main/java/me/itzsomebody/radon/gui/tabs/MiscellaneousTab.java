@@ -20,10 +20,12 @@ package me.itzsomebody.radon.gui.tabs;
 import java.awt.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import me.itzsomebody.radon.Dictionaries;
 import me.itzsomebody.radon.Main;
+import me.itzsomebody.radon.SessionInfo;
 import me.itzsomebody.radon.transformers.miscellaneous.expiration.Expiration;
 import me.itzsomebody.radon.transformers.miscellaneous.expiration.ExpirationSetup;
 
@@ -239,5 +241,31 @@ public class MiscellaneousTab extends JPanel {
 
     public Dictionaries getDictionary() {
         return Dictionaries.intToDictionary(dictionaryComboBox.getSelectedIndex());
+    }
+
+    public void setSettings(SessionInfo info) {
+        expirationEnabledCheckBox.setSelected(false);
+        expirationSwingCheckBox.setSelected(false);
+        expirationSwingCheckBox.setEnabled(false);
+        expirationMessageField.setText(null);
+        expirationMessageField.setEditable(false);
+        expirationExpiresField.setText(null);
+        expirationExpiresField.setEditable(false);
+        dictionaryComboBox.setSelectedIndex(info.getDictionaryType().ordinal());
+        trashClassesField.setText(String.valueOf(info.getTrashClasses()));
+
+        if (info.getTransformers() != null) {
+            info.getTransformers().stream().filter(transformer -> transformer instanceof Expiration).forEach(transformer -> {
+                expirationEnabledCheckBox.setSelected(true);
+                expirationSwingCheckBox.setEnabled(true);
+                expirationMessageField.setEditable(true);
+                expirationExpiresField.setEditable(true);
+
+                ExpirationSetup setup = ((Expiration) transformer).getSetup();
+                expirationSwingCheckBox.setSelected(setup.isInjectJOptionPane());
+                expirationMessageField.setText(setup.getMessage());
+                expirationExpiresField.setText(new SimpleDateFormat("MM/dd/yyyy").format(new Date(setup.getExpires())));
+            });
+        }
     }
 }

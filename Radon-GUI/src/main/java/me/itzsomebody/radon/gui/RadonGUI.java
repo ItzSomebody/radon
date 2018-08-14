@@ -20,13 +20,18 @@ package me.itzsomebody.radon.gui;
 import java.awt.*;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
+import java.io.InputStream;
 import java.util.ArrayList;
 import javax.swing.*;
 import me.itzsomebody.radon.Main;
 import me.itzsomebody.radon.Radon;
 import me.itzsomebody.radon.SessionInfo;
+import me.itzsomebody.radon.config.ConfigurationParser;
 import me.itzsomebody.radon.config.ConfigurationWriter;
+import me.itzsomebody.radon.exceptions.ConfigurationParseException;
 import me.itzsomebody.radon.gui.tabs.ConsoleTab;
 import me.itzsomebody.radon.gui.tabs.ExclusionsTab;
 import me.itzsomebody.radon.gui.tabs.InputOutputTab;
@@ -85,7 +90,34 @@ class RadonGUI extends JFrame {
 
         JButton loadConfigButton = new JButton("Load Configuration");
         loadConfigButton.addActionListener((e) -> {
-            // TODO
+            JFileChooser chooser = new JFileChooser();
+            chooser.setMultiSelectionEnabled(false);
+            chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+            int result = chooser.showOpenDialog(this);
+            if (result == 0) {
+                SwingUtilities.invokeLater(() -> {
+                    try {
+                        InputStream inputStream;
+                        try {
+                            inputStream = new FileInputStream(chooser.getSelectedFile());
+                        } catch (FileNotFoundException exception) {
+                            exception.printStackTrace();
+                            throw new ConfigurationParseException("Could not find configuration file");
+                        }
+
+                        SessionInfo info = new ConfigurationParser(inputStream).createSessionFromConfig();
+                        inputOutputTab.setSettings(info);
+                        obfuscationPanel.setSettings(info);
+                        optimizationPanel.setSettings(info);
+                        shrinkingPanel.setSettings(info);
+                        watermarkingPanel.setSettings(info);
+                        miscPanel.setSettings(info);
+                        exclusionPanel.setSettings(info);
+                    } catch (Throwable t) {
+                        JOptionPane.showMessageDialog(null, "Error while creating config, check console for details.", "Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                });
+            }
         });
         toolBarPanel.add(loadConfigButton);
 
