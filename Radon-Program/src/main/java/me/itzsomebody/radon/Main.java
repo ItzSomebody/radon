@@ -22,7 +22,6 @@ import me.itzsomebody.radon.utils.LoggerUtils;
 /*
  * TODO: Allow toggling of dictionaries for all transformers.
  * TODO: Renamer transformer should correct strings used for reflection. (i.e. Class.forName("me.itzsomebody.Thing"))
- * TODO: Make the logger system non-static. (ew, static abuse)
  * TODO: Add JavaDocs.
  * TODO: Fix UnusedCodeRemover.
  * TODO: Make the UnusedMembersRemover transformer.

@@ -28,7 +28,6 @@ import me.itzsomebody.radon.Main;
 
 /**
  * Utils to print fancy stuff in the console and to write log file.
- * TODO: Kind of static abuse-ish. Maybe rewrite to use virtual instance instead of static?
  *
  * @author ItzSomebody
  */
