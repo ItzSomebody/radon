@@ -70,7 +70,6 @@ public class HeavyStringEncryption extends StringEncryption {
                             methodNode.instructions.insertBefore(insn, BytecodeUtils.getNumberInsn(extraKey));
                             leeway -= 10;
                             counter.incrementAndGet();
-
                         }
                     }
                 }
