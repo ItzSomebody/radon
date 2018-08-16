@@ -117,8 +117,6 @@ public class Radon {
                     t.printStackTrace();
                 }
             });
-
-            zos.setComment(Main.PROPAGANDA_GARBAGE);
             zos.close();
         } catch (Throwable t) {
             t.printStackTrace();
