@@ -52,7 +52,7 @@ public class UsedInstructionsFinder {
             usedInstructions.add(insn);
             if (insn.getOpcode() >= Opcodes.IRETURN && insn.getOpcode() <= Opcodes.RETURN) {
                 return;
-            } else if ((insn.getOpcode() >= Opcodes.IFEQ && insn.getOpcode() <= Opcodes.IF_ACMPNE) || insn.getOpcode() == Opcodes.IFNULL || insn.getOpcode() == Opcodes.IFNONNULL || insn.getOpcode() == Opcodes.GOTO) {
+            } else if (insn.getOpcode() >= Opcodes.IFEQ && insn.getOpcode() <= Opcodes.GOTO) {
                 execute(((JumpInsnNode) insn).label);
             } else if (insn.getOpcode() == Opcodes.JSR || insn.getOpcode() == Opcodes.RET) {
                 throw new RuntimeException("Did not expect JSR/RET instruction");
