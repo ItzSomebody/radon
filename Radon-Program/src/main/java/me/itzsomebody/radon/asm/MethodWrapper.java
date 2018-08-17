@@ -19,13 +19,41 @@ package me.itzsomebody.radon.asm;
 
 import org.objectweb.asm.tree.MethodNode;
 
+/**
+ * Wrapper for MethodNodes.
+ *
+ * @author ItzSomebody
+ */
 public class MethodWrapper {
+    /**
+     * Attached MethodNode.
+     */
     public MethodNode methodNode;
+
+    /**
+     * Owner of the method this MethodWrapper represents.
+     */
     public ClassWrapper owner;
+
+    /**
+     * Original method name;
+     */
     public String originalName;
+
+    /**
+     * Original method description.
+     */
     public String originalDescription;
 
-    public MethodWrapper(MethodNode methodNode, ClassWrapper owner, String originalName, String originalDescription) {
+    /**
+     * Creates a MethodWrapper object.
+     *
+     * @param methodNode the {@link MethodNode} this wrapper represents.
+     * @param owner the owner of this represented method.
+     * @param originalName the original method name.
+     * @param originalDescription the original method description.
+     */
+    MethodWrapper(MethodNode methodNode, ClassWrapper owner, String originalName, String originalDescription) {
         this.methodNode = methodNode;
         this.owner = owner;
         this.originalName = originalName;

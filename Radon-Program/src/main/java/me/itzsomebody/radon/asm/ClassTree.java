@@ -20,11 +20,32 @@ package me.itzsomebody.radon.asm;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Used to keep information on the hierarchy of all loaded classes.
+ *
+ * @author ItzSomebody
+ */
 public class ClassTree {
+    /**
+     * Attached ClassWrapper.
+     */
     public ClassWrapper classWrapper;
+
+    /**
+     * Names of classes this represented class inherits from.
+     */
     public Set<String> parentClasses = new HashSet<>();
+
+    /**
+     * Names of classes this represented class is inherited by.
+     */
     public Set<String> subClasses = new HashSet<>();
 
+    /**
+     * Creates a ClassTree object.
+     *
+     * @param classWrapper the ClassWraper attached to this ClassTree.
+     */
     public ClassTree(ClassWrapper classWrapper) {
         this.classWrapper = classWrapper;
     }

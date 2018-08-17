@@ -31,18 +31,40 @@ import org.objectweb.asm.tree.JumpInsnNode;
  * @author ItzSomebody
  */
 public class UsedInstructionsFinder {
+    /**
+     * Instruction list we are running through.
+     */
     private InsnList instructions;
+
+    /**
+     * Set of instructions this utility believes are used.
+     */
     private Set<AbstractInsnNode> usedInstructions = new HashSet<>();
 
+    /**
+     * Creates a UsedInstructionsFinder object.
+     *
+     * @param instructions the instructions to run through.
+     */
     public UsedInstructionsFinder(InsnList instructions) {
         this.instructions = instructions;
     }
 
+    /**
+     * Returns the results found.
+     *
+     * @return the results found.
+     */
     public Set<AbstractInsnNode> getUsedInstructions() {
         execute(instructions.getFirst());
         return usedInstructions;
     }
 
+    /**
+     * Adds this instruction to used instructions set.
+     *
+     * @param insn instruction.
+     */
     private void execute(AbstractInsnNode insn) {
         while (true) {
             if (insn == null || usedInstructions.contains(insn)) {

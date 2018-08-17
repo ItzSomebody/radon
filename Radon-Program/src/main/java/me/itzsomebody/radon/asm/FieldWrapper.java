@@ -19,13 +19,41 @@ package me.itzsomebody.radon.asm;
 
 import org.objectweb.asm.tree.FieldNode;
 
+/**
+ * Wrapper for FieldNodes.
+ *
+ * @author ItzSomebody.
+ */
 public class FieldWrapper {
+    /**
+     * Attached FieldNode.
+     */
     public FieldNode fieldNode;
+
+    /**
+     * Owner of this represented field.
+     */
     public ClassWrapper owner;
+
+    /**
+     * Original field name.
+     */
     public String originalName;
+
+    /**
+     * Original field description.
+     */
     public String originalDescription;
 
-    public FieldWrapper(FieldNode fieldNode, ClassWrapper owner, String originalName, String originalDescription) {
+    /**
+     * Creates a FieldWrapper object.
+     *
+     * @param fieldNode the {@link FieldNode} attached to this FieldWrapper.
+     * @param owner the owner of this represented field.
+     * @param originalName the original name of the field represented.
+     * @param originalDescription the original description of the field represented.
+     */
+    FieldWrapper(FieldNode fieldNode, ClassWrapper owner, String originalName, String originalDescription) {
         this.fieldNode = fieldNode;
         this.owner = owner;
         this.originalName = originalName;

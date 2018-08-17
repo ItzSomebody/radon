@@ -20,14 +20,43 @@ package me.itzsomebody.radon.asm;
 import java.util.ArrayList;
 import org.objectweb.asm.tree.ClassNode;
 
+/**
+ * Wrapper for ClassNodes.
+ *
+ * @author ItzSomebody
+ */
 public class ClassWrapper {
+    /**
+     * Attached class node.
+     */
     public ClassNode classNode;
+
+    /**
+     * Original name of ClassNode. Really useful when class got renamed.
+     */
     public String originalName;
+
+    /**
+     * Quick way of figuring out if this is represents library class or not.
+     */
     public boolean libraryNode;
 
+    /**
+     * Methods.
+     */
     public ArrayList<MethodWrapper> methods = new ArrayList<>();
+
+    /**
+     * Fields.
+     */
     public ArrayList<FieldWrapper> fields = new ArrayList<>();
 
+    /**
+     * Creates a ClassWrapper object.
+     *
+     * @param classNode the attached {@link ClassNode}.
+     * @param libraryNode is this a library class?
+     */
     public ClassWrapper(ClassNode classNode, boolean libraryNode) {
         this.classNode = classNode;
         this.originalName = classNode.name;

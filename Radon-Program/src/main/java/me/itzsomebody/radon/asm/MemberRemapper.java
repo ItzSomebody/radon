@@ -18,10 +18,13 @@
 package me.itzsomebody.radon.asm;
 
 import java.util.Map;
-import org.objectweb.asm.Handle;
-import org.objectweb.asm.Type;
 import org.objectweb.asm.commons.SimpleRemapper;
 
+/**
+ * Custom implementation of ASM's SimpleRemapper taking in account for field descriptions.
+ *
+ * @author ItzSomebody
+ */
 public class MemberRemapper extends SimpleRemapper {
     public MemberRemapper(final Map<String, String> mappings) {
         super(mappings);
