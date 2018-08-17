@@ -269,6 +269,8 @@ will be seen as `me/itzsomebody/Test.main([Ljava/lang/String;)V` to Radon. Valid
 * *A: Probably.*
 * **Q: Why are concepts taken directly from other obfuscators/bytecode manipulation tools? (i.e. expiration transformer which is directly based on Allatori's expiration obfuscation)**
 * *A: I thought those would be interesting to include in an obfuscation tool. This is also one of the reasons Radon is open-sourced.*
+* **Q: My Java 9+ installation doesn't have a rt.jar! What do I do?**
+* *A: Try [this](https://github.com/Storyyeller/jrt-extractor).
 
 ## Attribution
 
