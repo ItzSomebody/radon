@@ -238,7 +238,7 @@ public class Test {
 }
 ```
 
-will be seen as `me/itzsomebody/Test.main([Ljava/lang/String)V` to Radon. Valid exclusion types you can use are:
+will be seen as `me/itzsomebody/Test.main([Ljava/lang/String;)V` to Radon. Valid exclusion types you can use are:
 
 | Exclusion Type | Description |
 | --- | --- |
