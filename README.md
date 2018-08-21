@@ -100,7 +100,7 @@ The invokedynamic key only takes one argument: a **string** determining which ki
 
 The flow obfuscation key only takes one argument: a **string** determining which kind of flow obfuscation to apply to the output jar. Valid modes are **Light**, **Normal** and **Heavy**.
 
-## LocalVariableObfuscation
+## LocalVariables
 
 The local variables obfuscation key takes two arguments.
 
@@ -109,7 +109,7 @@ The local variables obfuscation key takes two arguments.
 | Enabled | Boolean | Determines if local variable names should be obfuscated. |
 | Remove | Boolean | Determines if local variable names should be removed altogether. |
 
-## LineNumberObfuscation
+## LineNumbers
 
 The line number obfuscation key takes two arguments.
 
@@ -118,7 +118,7 @@ The line number obfuscation key takes two arguments.
 | Enabled | Boolean | Determines if line numbers should be obfuscated. |
 | Remove | Boolean | Determines if should be removed altogether. |
 
-## SourceNameObfuscation
+## SourceName
 
 The source name obfuscation key takes two arguments.
 
@@ -127,7 +127,7 @@ The source name obfuscation key takes two arguments.
 | Enabled | Boolean | Determines if source names should be obfuscated. |
 | Remove | Boolean | Determines if source names should be removed altogether. |
 
-## SourceDebugObfuscation
+## SourceDebug
 
 The source debug obfuscation key takes two arguments.
 
