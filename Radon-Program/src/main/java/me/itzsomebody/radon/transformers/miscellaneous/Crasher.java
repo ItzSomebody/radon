@@ -30,7 +30,7 @@ public class Crasher extends Transformer {
     public void transform() {
         AtomicInteger counter = new AtomicInteger();
 
-        this.getClassWrappers().parallelStream().filter(classWrapper -> excluded(classWrapper) && classWrapper.classNode.signature == null).forEach(classWrapper -> {
+        this.getClassWrappers().parallelStream().filter(classWrapper -> !excluded(classWrapper) && classWrapper.classNode.signature == null).forEach(classWrapper -> {
             ClassNode classNode = classWrapper.classNode;
             classNode.signature = StringUtils.randomSpacesString(RandomUtils.getRandomInt(10));
             counter.incrementAndGet();
