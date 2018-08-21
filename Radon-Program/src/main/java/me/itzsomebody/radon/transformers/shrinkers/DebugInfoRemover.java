@@ -27,6 +27,9 @@ public class DebugInfoRemover extends Shrinker {
         AtomicInteger outerClasses = new AtomicInteger();
         AtomicInteger outerMethods = new AtomicInteger();
         AtomicInteger innerClasses = new AtomicInteger();
+        AtomicInteger classSignatures = new AtomicInteger();
+        AtomicInteger methodSignatures = new AtomicInteger();
+        AtomicInteger fieldSignatures = new AtomicInteger();
 
         getClassWrappers().parallelStream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper -> {
             ClassNode classNode = classWrapper.classNode;
@@ -46,9 +49,24 @@ public class DebugInfoRemover extends Shrinker {
                 innerClasses.addAndGet(classNode.innerClasses.size());
                 classNode.innerClasses.clear();
             }
+
+            if (classNode.signature != null) {
+                classSignatures.incrementAndGet();
+                classNode.signature = null;
+            }
+
+            classWrapper.methods.stream().filter(methodWrapper -> !excluded(methodWrapper) && methodWrapper.methodNode.signature != null).forEach(methodWrapper -> {
+                methodSignatures.incrementAndGet();
+                methodWrapper.methodNode.signature = null;
+            });
+
+            classWrapper.fields.stream().filter(fieldWrapper -> !excluded(fieldWrapper) && fieldWrapper.fieldNode.signature != null).forEach(fieldWrapper -> {
+                fieldSignatures.incrementAndGet();
+                fieldWrapper.fieldNode.signature = null;
+            });
         });
 
-        LoggerUtils.stdOut(String.format("Removed %d inner classes, %d outer classes and %d outer methods.", innerClasses.get(), outerClasses.get(), outerMethods.get()));
+        LoggerUtils.stdOut(String.format("Removed %d inner classes, %d outer classes, %d outer methods, %d class generic types, %d method generic types and %d field generic types.", innerClasses.get(), outerClasses.get(), outerMethods.get(), classSignatures.get(), methodSignatures.get(), fieldSignatures.get()));
     }
 
     @Override
