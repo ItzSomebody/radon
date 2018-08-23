@@ -29,8 +29,6 @@ public class ShrinkingTab extends JPanel {
     private JCheckBox debugInfoCheckBox;
     private JCheckBox invisibleAnnotationsCheckBox;
     private JCheckBox visibleAnnotationsCheckBox;
-    private JCheckBox unusedCodeCheckBox;
-    private JCheckBox unusedMembersCheckBox;
     private JCheckBox shrinkerEnabledCheckBox;
 
     public ShrinkingTab() {
@@ -92,24 +90,6 @@ public class ShrinkingTab extends JPanel {
         visibleAnnotationsCheckBox.setEnabled(false);
         shrinkerSetupPanel.add(visibleAnnotationsCheckBox, gbc_visibleAnnotationsCheckBox);
 
-        unusedCodeCheckBox = new JCheckBox("Remove Unused Code");
-        GridBagConstraints gbc_unusedCodeCheckBox = new GridBagConstraints();
-        gbc_unusedCodeCheckBox.anchor = GridBagConstraints.WEST;
-        gbc_unusedCodeCheckBox.insets = new Insets(0, 0, 5, 0);
-        gbc_unusedCodeCheckBox.gridx = 0;
-        gbc_unusedCodeCheckBox.gridy = 4;
-        unusedCodeCheckBox.setEnabled(false);
-        shrinkerSetupPanel.add(unusedCodeCheckBox, gbc_unusedCodeCheckBox);
-
-        unusedMembersCheckBox = new JCheckBox("Remove Unused Members");
-        GridBagConstraints gbc_unusedMembersCheckBox = new GridBagConstraints();
-        gbc_unusedMembersCheckBox.insets = new Insets(0, 0, 5, 0);
-        gbc_unusedMembersCheckBox.anchor = GridBagConstraints.WEST;
-        gbc_unusedMembersCheckBox.gridx = 0;
-        gbc_unusedMembersCheckBox.gridy = 5;
-        unusedMembersCheckBox.setEnabled(false);
-        shrinkerSetupPanel.add(unusedMembersCheckBox, gbc_unusedMembersCheckBox);
-
         shrinkerEnabledCheckBox = new JCheckBox("Enabled");
         GridBagConstraints gbc_shrinkerEnabledCheckBox = new GridBagConstraints();
         gbc_shrinkerEnabledCheckBox.insets = new Insets(0, 0, 5, 0);
@@ -122,15 +102,13 @@ public class ShrinkingTab extends JPanel {
             debugInfoCheckBox.setEnabled(enable);
             invisibleAnnotationsCheckBox.setEnabled(enable);
             visibleAnnotationsCheckBox.setEnabled(enable);
-            unusedCodeCheckBox.setEnabled(enable);
-            unusedMembersCheckBox.setEnabled(enable);
         });
         this.add(shrinkerEnabledCheckBox, gbc_shrinkerEnabledCheckBox);
     }
 
     public ShrinkerDelegator getShrinker() {
         return (shrinkerEnabledCheckBox.isSelected()) ? new ShrinkerDelegator(new ShrinkerSetup(visibleAnnotationsCheckBox.isSelected(), invisibleAnnotationsCheckBox.isSelected(), attributesCheckBox.isSelected(),
-            debugInfoCheckBox.isSelected(), unusedCodeCheckBox.isSelected(), unusedMembersCheckBox.isSelected())) : null;
+            debugInfoCheckBox.isSelected())) : null;
     }
 
     public void setSettings(SessionInfo info) {
@@ -143,10 +121,6 @@ public class ShrinkingTab extends JPanel {
         invisibleAnnotationsCheckBox.setEnabled(false);
         visibleAnnotationsCheckBox.setSelected(false);
         visibleAnnotationsCheckBox.setEnabled(false);
-        unusedCodeCheckBox.setSelected(false);
-        unusedCodeCheckBox.setEnabled(false);
-        unusedMembersCheckBox.setSelected(false);
-        unusedMembersCheckBox.setEnabled(false);
 
         if (info.getTransformers() != null) {
             info.getTransformers().stream().filter(transformer -> transformer instanceof ShrinkerDelegator).forEach(transformer -> {
@@ -155,16 +129,12 @@ public class ShrinkingTab extends JPanel {
                 debugInfoCheckBox.setEnabled(true);
                 invisibleAnnotationsCheckBox.setEnabled(true);
                 visibleAnnotationsCheckBox.setEnabled(true);
-                unusedCodeCheckBox.setEnabled(true);
-                unusedMembersCheckBox.setEnabled(true);
 
                 ShrinkerSetup setup = ((ShrinkerDelegator) transformer).getSetup();
                 attributesCheckBox.setSelected(setup.isRemoveAttributes());
                 debugInfoCheckBox.setSelected(setup.isRemoveDebug());
                 invisibleAnnotationsCheckBox.setSelected(setup.isRemoveInvisibleAnnotations());
                 visibleAnnotationsCheckBox.setSelected(setup.isRemoveVisibleAnnotations());
-                unusedCodeCheckBox.setSelected(setup.isRemoveUnusedCode());
-                unusedMembersCheckBox.setSelected(setup.isRemoveUnusedMembers());
             });
         }
     }

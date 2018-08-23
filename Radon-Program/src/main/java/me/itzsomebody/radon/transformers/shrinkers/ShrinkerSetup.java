@@ -22,16 +22,12 @@ public class ShrinkerSetup {
     private boolean removeInvisibleAnnotations;
     private boolean removeAttributes;
     private boolean removeDebug;
-    private boolean removeUnusedCode;
-    private boolean removeUnusedMembers;
 
-    public ShrinkerSetup(boolean removeVisibleAnnotations, boolean removeInvisibleAnnotations, boolean removeAttributes, boolean removeDebug, boolean removeUnusedCode, boolean removeUnusedMembers) {
+    public ShrinkerSetup(boolean removeVisibleAnnotations, boolean removeInvisibleAnnotations, boolean removeAttributes, boolean removeDebug) {
         this.removeVisibleAnnotations = removeVisibleAnnotations;
         this.removeInvisibleAnnotations = removeInvisibleAnnotations;
         this.removeAttributes = removeAttributes;
         this.removeDebug = removeDebug;
-        this.removeUnusedCode = removeUnusedCode;
-        this.removeUnusedMembers = removeUnusedMembers;
     }
 
     public boolean isRemoveVisibleAnnotations() {
@@ -48,13 +44,5 @@ public class ShrinkerSetup {
 
     public boolean isRemoveDebug() {
         return this.removeDebug;
-    }
-
-    public boolean isRemoveUnusedCode() {
-        return this.removeUnusedCode;
-    }
-
-    public boolean isRemoveUnusedMembers() {
-        return this.removeUnusedMembers;
     }
 }

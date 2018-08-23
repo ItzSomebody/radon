@@ -177,12 +177,6 @@ public class ConfigurationWriter {
                     if (shrinker.getSetup().isRemoveVisibleAnnotations()) {
                         ((LinkedHashMap) documentMap.get(ConfigurationSettings.SHRINKER.getValue())).put("RemoveVisibleAnnotations", true);
                     }
-                    if (shrinker.getSetup().isRemoveUnusedCode()) {
-                        ((LinkedHashMap) documentMap.get(ConfigurationSettings.SHRINKER.getValue())).put("RemoveUnusedCode", true);
-                    }
-                    if (shrinker.getSetup().isRemoveUnusedMembers()) {
-                        ((LinkedHashMap) documentMap.get(ConfigurationSettings.SHRINKER.getValue())).put("RemoveUnusedMembers", true);
-                    }
                 } else if (transformer instanceof Watermarker) {
                     Watermarker watermarker = (Watermarker) transformer;
                     documentMap.putIfAbsent(ConfigurationSettings.WATERMARK.getValue(), new LinkedHashMap<String, Object>());

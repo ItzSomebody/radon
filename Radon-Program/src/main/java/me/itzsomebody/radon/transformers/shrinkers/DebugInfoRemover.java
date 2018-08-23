@@ -55,12 +55,12 @@ public class DebugInfoRemover extends Shrinker {
                 classNode.signature = null;
             }
 
-            classWrapper.methods.stream().filter(methodWrapper -> !excluded(methodWrapper) && methodWrapper.methodNode.signature != null).forEach(methodWrapper -> {
+            classWrapper.methods.parallelStream().filter(methodWrapper -> !excluded(methodWrapper) && methodWrapper.methodNode.signature != null).forEach(methodWrapper -> {
                 methodSignatures.incrementAndGet();
                 methodWrapper.methodNode.signature = null;
             });
 
-            classWrapper.fields.stream().filter(fieldWrapper -> !excluded(fieldWrapper) && fieldWrapper.fieldNode.signature != null).forEach(fieldWrapper -> {
+            classWrapper.fields.parallelStream().filter(fieldWrapper -> !excluded(fieldWrapper) && fieldWrapper.fieldNode.signature != null).forEach(fieldWrapper -> {
                 fieldSignatures.incrementAndGet();
                 fieldWrapper.fieldNode.signature = null;
             });

@@ -46,16 +46,6 @@ public class ShrinkerDelegator extends Shrinker {
             debugInfoRemover.init(this.radon);
             debugInfoRemover.transform();
         }
-        if (this.setup.isRemoveUnusedCode()) {
-            UnusedCodeRemover unusedCodeRemover = new UnusedCodeRemover();
-            unusedCodeRemover.init(this.radon);
-            unusedCodeRemover.transform();
-        }
-        if (this.setup.isRemoveUnusedMembers()) {
-            UnusedMembersRemover unusedMembersRemover = new UnusedMembersRemover();
-            unusedMembersRemover.init(this.radon);
-            unusedMembersRemover.transform();
-        }
     }
 
     @Override

@@ -180,10 +180,8 @@ public class ConfigurationParser {
             boolean debug = shrinkerSettings.getOrDefault("RemoveDebug", false);
             boolean invisibleAnnotations = shrinkerSettings.getOrDefault("RemoveInvisibleAnnotations", false);
             boolean visibleAnnotations = shrinkerSettings.getOrDefault("RemoveVisibleAnnotations", false);
-            boolean unusedCode = shrinkerSettings.getOrDefault("RemoveUnusedCode", false);
-            boolean unusedMembers = shrinkerSettings.getOrDefault("RemoveUnusedMembers", false);
 
-            return new ShrinkerDelegator(new ShrinkerSetup(visibleAnnotations, invisibleAnnotations, attributes, debug, unusedCode, unusedMembers));
+            return new ShrinkerDelegator(new ShrinkerSetup(visibleAnnotations, invisibleAnnotations, attributes, debug));
         } catch (ClassCastException e) {
             throw new IllegalConfigurationValueException("Error while parsing shrinker setup: " + e.getMessage());
         }
