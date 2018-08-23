@@ -112,7 +112,6 @@ public class StackEmulator implements Opcodes {
                     case I2C:
                     case I2S:
                     case GOTO:
-                    case RET:
                     case RETURN:
                     case NEWARRAY:
                     case ANEWARRAY:
@@ -145,7 +144,6 @@ public class StackEmulator implements Opcodes {
                     case I2D:
                     case F2L:
                     case F2D:
-                    case JSR:
                     case NEW: {
                         // Pushes one-word constant to stack
                         stack.push(null);
@@ -378,6 +376,10 @@ public class StackEmulator implements Opcodes {
 
                         stack.push(null); // arrayref
                         break;
+                    }
+                    case JSR:
+                    case RET: {
+                        throw new RuntimeException("Did not expect JSR/RET instructions");
                     }
                 }
             } catch (EmptyStackException empty) {
