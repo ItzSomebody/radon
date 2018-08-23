@@ -18,9 +18,9 @@
 package me.itzsomebody.radon.transformers.obfuscators.invokedynamic;
 
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 import me.itzsomebody.radon.asm.ClassWrapper;
+import me.itzsomebody.radon.asm.FieldWrapper;
 import me.itzsomebody.radon.utils.LoggerUtils;
 import me.itzsomebody.radon.utils.StringUtils;
 import org.objectweb.asm.Handle;
@@ -40,12 +40,6 @@ public class HeavyInvokeDynamic extends InvokeDynamic {
     public void transform() {
         AtomicInteger counter = new AtomicInteger();
         MemberNames memberNames = new MemberNames();
-        ArrayList<String> finals = new ArrayList<>();
-        this.getClassPath().values().forEach(classWrapper -> {
-            ClassNode classNode = classWrapper.classNode;
-
-            classNode.fields.stream().filter(fieldNode -> Modifier.isFinal(fieldNode.access)).forEach(fieldNode -> finals.add(classNode.name + '.' + fieldNode.name));
-        });
         Handle bsmHandle = new Handle(H_INVOKESTATIC, memberNames.className, memberNames.bootstrapMethodName, "(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", false);
         this.getClassWrappers().parallelStream().filter(classWrapper -> !excluded(classWrapper) && classWrapper.classNode.version >= V1_7).forEach(classWrapper -> {
             ClassNode classNode = classWrapper.classNode;
@@ -103,12 +97,15 @@ public class HeavyInvokeDynamic extends InvokeDynamic {
                         if (!methodNode.name.equals("<init>")) {
                             FieldInsnNode fieldInsnNode = (FieldInsnNode) insn;
 
-                            if (finals.contains(fieldInsnNode.owner + '.' + fieldInsnNode.name)) {
-                                continue;
-                            }
-
                             boolean isStatic = (fieldInsnNode.getOpcode() == GETSTATIC || fieldInsnNode.getOpcode() == PUTSTATIC);
                             boolean isSetter = (fieldInsnNode.getOpcode() == PUTFIELD || fieldInsnNode.getOpcode() == PUTSTATIC);
+                            if (isSetter) {
+                                ClassWrapper cw = getClasses().get(fieldInsnNode.owner);
+                                FieldWrapper fw = cw.fields.stream().filter(fieldWrapper -> fieldWrapper.fieldNode.name.equals(fieldInsnNode.name) && fieldWrapper.fieldNode.desc.equals(fieldInsnNode.desc)).findFirst().orElse(null);
+                                if (fw != null && Modifier.isFinal(fw.fieldNode.access)) {
+                                    continue;
+                                }
+                            }
                             String newSig = (isSetter) ? "(" + fieldInsnNode.desc + ")V" : "()" + fieldInsnNode.desc;
                             if (!isStatic)
                                 newSig = newSig.replace("(", "(Ljava/lang/Object;");
