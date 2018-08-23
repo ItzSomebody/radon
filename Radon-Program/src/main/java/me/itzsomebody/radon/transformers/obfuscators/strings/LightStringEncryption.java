@@ -258,11 +258,11 @@ public class LightStringEncryption extends StringEncryption {
 
         private MemberNames() {
             className = StringUtils.randomClassName(getClasses().keySet());
-            cacheFieldName = StringUtils.randomSpacesString(RandomUtils.getRandomInt(10));
-            cacheStringMethodName = StringUtils.randomSpacesString(RandomUtils.getRandomInt(10));
-            returnCacheMethodName = StringUtils.randomSpacesString(RandomUtils.getRandomInt(10));
-            cacheContainsMethodName = StringUtils.randomSpacesString(RandomUtils.getRandomInt(10));
-            decryptMethodName = StringUtils.randomSpacesString(RandomUtils.getRandomInt(10));
+            cacheFieldName = randomString(4);
+            cacheStringMethodName = randomString(4);
+            returnCacheMethodName = randomString(4);
+            cacheContainsMethodName = randomString(4);
+            decryptMethodName = randomString(4);
         }
     }
 }

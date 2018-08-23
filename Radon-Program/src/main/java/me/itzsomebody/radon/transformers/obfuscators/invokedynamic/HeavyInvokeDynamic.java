@@ -662,9 +662,9 @@ public class HeavyInvokeDynamic extends InvokeDynamic {
 
         private MemberNames() {
             this.className = StringUtils.randomClassName(getClasses().keySet());
-            this.decryptorMethodName = StringUtils.randomAlphaString(4);
-            this.bootstrapMethodName = StringUtils.randomAlphaString(4);
-            this.searchMethodName = StringUtils.randomAlphaString(4);
+            this.decryptorMethodName = randomString(4);
+            this.bootstrapMethodName = randomString(4);
+            this.searchMethodName = randomString(4);
         }
     }
 }

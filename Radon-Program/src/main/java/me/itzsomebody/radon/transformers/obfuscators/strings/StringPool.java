@@ -43,8 +43,8 @@ public class StringPool extends StringEncryption {
 
         this.getClassWrappers().parallelStream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper -> {
             ArrayList<String> strList = new ArrayList<>();
-            String methodName = StringUtils.randomAlphaString(4);
-            String fieldName = StringUtils.randomAlphaString(4);
+            String methodName = randomString(4);
+            String fieldName = randomString(4);
 
             classWrapper.methods.parallelStream().filter(methodWrapper -> !excluded(methodWrapper) && hasInstructions(methodWrapper.methodNode)).forEach(methodWrapper -> {
                 MethodNode methodNode = methodWrapper.methodNode;

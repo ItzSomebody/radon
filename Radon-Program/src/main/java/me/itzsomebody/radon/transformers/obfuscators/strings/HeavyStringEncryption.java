@@ -595,14 +595,14 @@ public class HeavyStringEncryption extends StringEncryption {
 
         private MemberNames() {
             this.className = StringUtils.randomClassName(getClasses().keySet());
-            this.infoFieldName = StringUtils.randomAlphaString(4);
-            this.cacheFieldName = StringUtils.randomAlphaString(4);
-            this.populateMethodName = StringUtils.randomAlphaString(4);
-            this.createInfoMethodName = StringUtils.randomAlphaString(4);
-            this.setCacheMethodName = StringUtils.randomAlphaString(4);
-            this.getCacheMethodName = StringUtils.randomAlphaString(4);
-            this.cacheContainsMethodName = StringUtils.randomAlphaString(4);
-            this.decryptorMethodName = StringUtils.randomAlphaString(4);
+            this.infoFieldName = randomString(4);
+            this.cacheFieldName = randomString(4);
+            this.populateMethodName = randomString(4);
+            this.createInfoMethodName = randomString(4);
+            this.setCacheMethodName = randomString(4);
+            this.getCacheMethodName = randomString(4);
+            this.cacheContainsMethodName = randomString(4);
+            this.decryptorMethodName = randomString(4);
         }
     }
 }

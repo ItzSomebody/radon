@@ -34,7 +34,7 @@ public class StringUtils {
         return sb.toString();
     }
 
-    public static String unrecognizedCharsString(int length) {
+    public static String randomUnrecognizedString(int length) {
         StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < length; i++) {
@@ -44,55 +44,21 @@ public class StringUtils {
         return sb.toString();
     }
 
-    public static String alphaString(int i) {
-        char buf[] = new char[33];
-        boolean negative = (i < 0);
-        int charPos = 32;
-
-        if (!negative) {
-            i = -i;
-        }
-
-        while (i <= -ALPHA.length) {
-            buf[charPos--] = ALPHA[-(i % ALPHA.length)];
-            i = i / ALPHA.length;
-        }
-        buf[charPos] = ALPHA[-i];
-
-        if (negative) {
-            buf[--charPos] = '-';
-        }
-
-        return new String(buf, charPos, (33 - charPos));
-    }
-
-    public static String alphaNumericString(int i) {
-        char buf[] = new char[33];
-        boolean negative = (i < 0);
-        int charPos = 32;
-
-        if (!negative) {
-            i = -i;
-        }
-
-        while (i <= -ALPHA_NUM.length) {
-            buf[charPos--] = ALPHA_NUM[-(i % ALPHA_NUM.length)];
-            i = i / ALPHA_NUM.length;
-        }
-        buf[charPos] = ALPHA_NUM[-i];
-
-        if (negative) {
-            buf[--charPos] = '-';
-        }
-
-        return new String(buf, charPos, (33 - charPos));
-    }
-
     public static String randomAlphaString(int length) {
         StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < length; i++) {
             sb.append(ALPHA[RandomUtils.getRandomInt(ALPHA.length)]);
+        }
+
+        return sb.toString();
+    }
+
+    public static String randomAlphaNumericString(int length) {
+        StringBuilder sb = new StringBuilder();
+
+        for (int i = 0; i < length; i++) {
+            sb.append(ALPHA_NUM[RandomUtils.getRandomInt(ALPHA_NUM.length)]);
         }
 
         return sb.toString();

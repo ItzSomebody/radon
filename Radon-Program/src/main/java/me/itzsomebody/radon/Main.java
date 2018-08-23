@@ -20,7 +20,6 @@ package me.itzsomebody.radon;
 import me.itzsomebody.radon.utils.LoggerUtils;
 
 /*
- * TODO: Allow toggling of dictionaries for all transformers.
  * TODO: Renamer transformer should correct strings used for reflection. (i.e. Class.forName("me.itzsomebody.Thing"))
  */
 public class Main {

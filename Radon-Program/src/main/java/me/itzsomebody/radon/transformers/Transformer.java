@@ -17,19 +17,24 @@
 
 package me.itzsomebody.radon.transformers;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import me.itzsomebody.radon.Radon;
 import me.itzsomebody.radon.asm.ClassWrapper;
 import me.itzsomebody.radon.asm.FieldWrapper;
 import me.itzsomebody.radon.asm.MethodWrapper;
+import me.itzsomebody.radon.exceptions.IllegalDictionaryException;
 import me.itzsomebody.radon.exclusions.ExclusionType;
+import me.itzsomebody.radon.utils.StringUtils;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.commons.CodeSizeEvaluator;
 import org.objectweb.asm.tree.MethodNode;
 
 public abstract class Transformer implements Opcodes {
     protected Radon radon;
+    protected List<String> usedStrings = new ArrayList<>();
 
     public void init(Radon radon) {
         this.radon = radon;
@@ -64,6 +69,36 @@ public abstract class Transformer implements Opcodes {
 
     protected long tookThisLong(long from) {
         return System.currentTimeMillis() - from;
+    }
+
+    protected String randomString(int length) {
+        String str;
+        do {
+            str = getRandomString(length);
+        } while (usedStrings.contains(str));
+
+        usedStrings.add(str);
+        return str;
+    }
+
+    private String getRandomString(int length) {
+        switch (radon.sessionInfo.getDictionaryType()) {
+            case SPACES: {
+                return StringUtils.randomSpacesString(length);
+            }
+            case UNRECOGNIZED: {
+                return StringUtils.randomUnrecognizedString(length);
+            }
+            case ALPHABETICAL: {
+                return StringUtils.randomAlphaString(length);
+            }
+            case ALPHANUMERIC: {
+                return StringUtils.randomAlphaNumericString(length);
+            }
+            default: {
+                throw new IllegalDictionaryException();
+            }
+        }
     }
 
     protected Map<String, ClassWrapper> getClasses() {

@@ -47,7 +47,7 @@ public class LocalVariables extends Transformer {
                     methodNode.localVariables = null;
                 } else {
                     methodNode.localVariables.forEach(localVariableNode -> {
-                        localVariableNode.name = StringUtils.randomSpacesString(RandomUtils.getRandomInt(10));
+                        localVariableNode.name = randomString(4);
                         localVariableNode.desc = "L" + localVariableNode.name + ";";
                     });
                 }

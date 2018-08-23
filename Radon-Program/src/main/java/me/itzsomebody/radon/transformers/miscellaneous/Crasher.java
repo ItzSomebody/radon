@@ -32,7 +32,7 @@ public class Crasher extends Transformer {
 
         this.getClassWrappers().parallelStream().filter(classWrapper -> !excluded(classWrapper) && classWrapper.classNode.signature == null).forEach(classWrapper -> {
             ClassNode classNode = classWrapper.classNode;
-            classNode.signature = StringUtils.randomSpacesString(RandomUtils.getRandomInt(10));
+            classNode.signature = randomString(4);
             counter.incrementAndGet();
         });
 

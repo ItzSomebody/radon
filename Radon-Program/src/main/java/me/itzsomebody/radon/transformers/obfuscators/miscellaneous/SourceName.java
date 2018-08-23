@@ -39,7 +39,7 @@ public class SourceName extends Transformer {
     public void transform() {
         AtomicInteger counter = new AtomicInteger();
 
-        String newName = (remove) ? null : StringUtils.randomSpacesString(RandomUtils.getRandomInt(10)) + ".java";
+        String newName = (remove) ? null : randomString(4) + ".java";
         this.getClassWrappers().parallelStream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper -> {
             classWrapper.classNode.sourceFile = newName;
             counter.incrementAndGet();

@@ -606,13 +606,13 @@ public class NormalStringEncryption extends StringEncryption {
 
         private MemberNames() {
             this.className = StringUtils.randomClassName(getClasses().keySet());
-            this.cacheFieldName = StringUtils.randomSpacesString(RandomUtils.getRandomInt(10));
-            this.key1FieldName = StringUtils.randomSpacesString(RandomUtils.getRandomInt(10));
-            this.key2FieldName = StringUtils.randomSpacesString(RandomUtils.getRandomInt(10));
-            this.hashMethodName = StringUtils.randomSpacesString(RandomUtils.getRandomInt(10));
-            this.returnCacheMethodName = StringUtils.randomSpacesString(RandomUtils.getRandomInt(10));
-            this.cacheStringMethodName = StringUtils.randomSpacesString(RandomUtils.getRandomInt(10));
-            this.decryptMethodName = StringUtils.randomSpacesString(RandomUtils.getRandomInt(10));
+            this.cacheFieldName = randomString(4);
+            this.key1FieldName = randomString(4);
+            this.key2FieldName = randomString(4);
+            this.hashMethodName = randomString(4);
+            this.returnCacheMethodName = randomString(4);
+            this.cacheStringMethodName = randomString(4);
+            this.decryptMethodName = randomString(4);
         }
     }
 }

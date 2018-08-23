@@ -37,14 +37,10 @@ import me.itzsomebody.radon.transformers.Transformer;
 import me.itzsomebody.radon.utils.AccessUtils;
 import me.itzsomebody.radon.utils.IOUtils;
 import me.itzsomebody.radon.utils.LoggerUtils;
-import me.itzsomebody.radon.utils.StringUtils;
 import org.objectweb.asm.commons.ClassRemapper;
 import org.objectweb.asm.commons.Remapper;
-import org.objectweb.asm.commons.SimpleRemapper;
-import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldNode;
-import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 
 public class Renamer extends Transformer {
@@ -63,18 +59,18 @@ public class Renamer extends Transformer {
         this.getClassWrappers().forEach(classWrapper -> {
             classWrapper.methods.stream().filter(methodWrapper -> !AccessUtils.isNative(methodWrapper.methodNode.access) && !methodWrapper.methodNode.name.equals("main") && !methodWrapper.methodNode.name.equals("premain") && !methodWrapper.methodNode.name.startsWith("<")).forEach(methodWrapper -> {
                 if (canRenameMethodTree(new HashSet<>(), methodWrapper, classWrapper.originalName)) {
-                    this.renameMethodTree(new HashSet<>(), methodWrapper, classWrapper.originalName, StringUtils.randomAlphaString(5));
+                    this.renameMethodTree(new HashSet<>(), methodWrapper, classWrapper.originalName, randomString(4));
                 }
             });
 
             classWrapper.fields.forEach(fieldWrapper -> {
                 if (canRenameFieldTree(new HashSet<>(), fieldWrapper, classWrapper.originalName)) {
-                    this.renameFieldTree(new HashSet<>(), fieldWrapper, classWrapper.originalName, StringUtils.randomAlphaString(5));
+                    this.renameFieldTree(new HashSet<>(), fieldWrapper, classWrapper.originalName, randomString(4));
                 }
             });
 
             if (!this.excluded(classWrapper)) {
-                this.mappings.put(classWrapper.originalName, (setup.getRepackageName() != null) ? setup.getRepackageName() + '/' + StringUtils.alphaString(classCounter.get()) : StringUtils.alphaString(classCounter.get()));
+                this.mappings.put(classWrapper.originalName, (setup.getRepackageName() != null) ? setup.getRepackageName() + '/' + randomString(4) : randomString(4));
                 classCounter.incrementAndGet();
             }
         });
@@ -279,7 +275,6 @@ public class Renamer extends Transformer {
         } catch (Throwable t) {
             LoggerUtils.stdErr("Ran into an error trying to create the mappings file.");
             t.printStackTrace();
-            ;
         }
     }
 

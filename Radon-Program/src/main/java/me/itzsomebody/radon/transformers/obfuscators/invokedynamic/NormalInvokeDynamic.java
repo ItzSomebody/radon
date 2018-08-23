@@ -36,7 +36,7 @@ public class NormalInvokeDynamic extends InvokeDynamic {
     @Override
     public void transform() {
         AtomicInteger counter = new AtomicInteger();
-        String[] bsmPath = new String[]{StringUtils.randomClassName(getClasses().keySet()), StringUtils.randomAlphaString(4)};
+        String[] bsmPath = new String[]{StringUtils.randomClassName(getClasses().keySet()), randomString(4)};
         Handle bsmHandle = new Handle(Opcodes.H_INVOKESTATIC, bsmPath[0], bsmPath[1], "(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", false);
         this.getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper) && classWrapper.classNode.version >= V1_7).forEach(classWrapper ->
             classWrapper.methods.stream().filter(methodWrapper -> !excluded(methodWrapper) && hasInstructions(methodWrapper.methodNode)).forEach(methodWrapper -> {

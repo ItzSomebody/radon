@@ -84,13 +84,13 @@ public class TrashClasses extends Transformer {
 
     private MethodNode methodGen() {
         String randDesc = descGen();
-        MethodNode method = new MethodNode(ACC_STATIC + ACC_PRIVATE, StringUtils.randomSpacesString(8), randDesc, null, null);
+        MethodNode method = new MethodNode(ACC_STATIC + ACC_PRIVATE, randomString(7), randDesc, null, null);
         int instructions = RandomUtils.getRandomInt(30) + 30;
 
         InsnList insns = new InsnList();
 
         for (int i = 0; i < instructions; ++i) {
-            insns.add(junkInsns());
+            insns.add(junkInstructions());
         }
 
         if (randDesc.endsWith(")Ljava/lang/String;")
@@ -134,13 +134,13 @@ public class TrashClasses extends Transformer {
         }
     }
 
-    private static AbstractInsnNode junkInsns() {
+    private AbstractInsnNode junkInstructions() {
         int index = RandomUtils.getRandomInt(20);
         switch (index) {
             case 0:
-                return new MethodInsnNode(INVOKESTATIC, StringUtils.randomSpacesString(8), StringUtils.randomSpacesString(8), "(Ljava/lang/String;)V", false);
+                return new MethodInsnNode(INVOKESTATIC, randomString(7), randomString(7), "(Ljava/lang/String;)V", false);
             case 1:
-                return new FieldInsnNode(GETFIELD, StringUtils.randomSpacesString(8), StringUtils.randomSpacesString(8), "I");
+                return new FieldInsnNode(GETFIELD, randomString(7), randomString(7), "I");
             case 2:
                 return new InsnNode(RandomUtils.getRandomInt(16));
             case 3:
@@ -154,22 +154,22 @@ public class TrashClasses extends Transformer {
             case 8:
                 return new InsnNode(RandomUtils.getRandomInt(5));
             case 9:
-                return new LdcInsnNode(StringUtils.randomSpacesString(8));
+                return new LdcInsnNode(randomString(7));
             case 10:
                 return new IincInsnNode(RandomUtils.getRandomInt(16), RandomUtils.getRandomInt(16));
             case 11:
-                return new MethodInsnNode(INVOKESPECIAL, StringUtils.randomSpacesString(8), StringUtils.randomSpacesString(8), "()V", false);
+                return new MethodInsnNode(INVOKESPECIAL, randomString(7), randomString(7), "()V", false);
             case 12:
-                return new MethodInsnNode(INVOKEVIRTUAL, StringUtils.randomSpacesString(8), StringUtils.randomSpacesString(8), "(Ljava/lang/Object;)Ljava/lang/Object;", false);
+                return new MethodInsnNode(INVOKEVIRTUAL, randomString(7), randomString(7), "(Ljava/lang/Object;)Ljava/lang/Object;", false);
             case 13:
                 return new VarInsnNode(ILOAD, RandomUtils.getRandomInt(30));
             case 14:
                 return new InsnNode(ATHROW);
             case 15:
-                return new MethodInsnNode(INVOKEINTERFACE, StringUtils.randomSpacesString(8), StringUtils.randomSpacesString(8), "(I)I", false);
+                return new MethodInsnNode(INVOKEINTERFACE, randomString(7), randomString(7), "(I)I", false);
             case 16:
-                Handle handle = new Handle(6, StringUtils.randomSpacesString(8), StringUtils.randomSpacesString(8), StringUtils.randomSpacesString(8), false);
-                return new InvokeDynamicInsnNode(StringUtils.randomSpacesString(8), StringUtils.randomSpacesString(8), handle, RandomUtils.getRandomInt(5), RandomUtils.getRandomInt(5), RandomUtils.getRandomInt(5), RandomUtils.getRandomInt(5), RandomUtils.getRandomInt(5));
+                Handle handle = new Handle(6, randomString(7), randomString(7), randomString(7), false);
+                return new InvokeDynamicInsnNode(randomString(7), randomString(7), handle, RandomUtils.getRandomInt(5), RandomUtils.getRandomInt(5), RandomUtils.getRandomInt(5), RandomUtils.getRandomInt(5), RandomUtils.getRandomInt(5));
             case 17:
                 return new IntInsnNode(ANEWARRAY, RandomUtils.getRandomInt(30));
             case 18:
