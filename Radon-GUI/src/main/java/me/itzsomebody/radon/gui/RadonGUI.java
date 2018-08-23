@@ -114,7 +114,8 @@ class RadonGUI extends JFrame {
                         miscPanel.setSettings(info);
                         exclusionPanel.setSettings(info);
                     } catch (Throwable t) {
-                        JOptionPane.showMessageDialog(null, "Error while creating config, check console for details.", "Error", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(null, "Error while parsing config, check console for details.", "Error", JOptionPane.ERROR_MESSAGE);
+                        t.printStackTrace();
                     }
                 });
             }
