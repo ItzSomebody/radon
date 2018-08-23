@@ -51,8 +51,6 @@ Shrinker:
     RemoveDebug: true
     RemoveInvisibleAnnotations: true
     RemoveVisibleAnnotations: true
-    RemoveUnusedCode: true
-    RemoveUnusedMembers: true
 Watermarker:
     Enabled: true
     Message: "This copy belongs to ItzSomebody"
@@ -180,8 +178,6 @@ The shrinker key takes several arguments.
 | RemoveDebug | Boolean | Determines if miscellaneous debugging info (inner classes, outer class, outer method, etc.) should be removed. |
 | RemoveInvisibleAnnotations | Boolean | Determines if invisible annotations should be removed. |
 | RemoveVisibleAnnotations | Boolean | Determines if visible annotations should be removed. |
-| RemoveUnusedCode | Boolean | Determines if unused code should be removed. |
-| RemoveUnusedMembers | Boolean | Determines if unused members should be removed. |
 
 ## Watermarker
 
