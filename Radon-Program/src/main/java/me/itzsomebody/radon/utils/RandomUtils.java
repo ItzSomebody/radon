@@ -21,13 +21,17 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class RandomUtils {
     private static ThreadLocalRandom random = ThreadLocalRandom.current();
-    
+
     public static int getRandomInt() {
         return random.nextInt();
     }
 
     public static int getRandomInt(int bounds) {
         return random.nextInt(1, bounds);
+    }
+
+    public static int getRandomIntNoOrigin(int bounds) {
+        return random.nextInt(bounds);
     }
 
     public static long getRandomLong() {
@@ -37,7 +41,7 @@ public class RandomUtils {
     public static long getRandomLong(long bounds) {
         return random.nextLong(1, bounds);
     }
-    
+
     public static float getRandomFloat() {
         return random.nextFloat();
     }
