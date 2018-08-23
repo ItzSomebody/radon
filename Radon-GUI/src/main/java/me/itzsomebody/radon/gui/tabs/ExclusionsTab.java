@@ -125,7 +125,9 @@ public class ExclusionsTab extends JPanel {
     public void setSettings(SessionInfo info) {
         exclusions.clear();
 
-        ExclusionManager manager = info.getExclusions();
-        manager.getExclusions().forEach(exclusion -> exclusions.addElement(exclusion.getExclusionType().getValue() + ": " + exclusion.getExclusion().pattern()));
+        if (info.getExclusions() != null) {
+            ExclusionManager manager = info.getExclusions();
+            manager.getExclusions().forEach(exclusion -> exclusions.addElement(exclusion.getExclusionType().getValue() + ": " + exclusion.getExclusion().pattern()));
+        }
     }
 }
