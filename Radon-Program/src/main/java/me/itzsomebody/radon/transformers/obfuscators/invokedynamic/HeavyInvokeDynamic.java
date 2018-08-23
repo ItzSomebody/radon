@@ -21,6 +21,7 @@ import java.lang.reflect.Modifier;
 import java.util.concurrent.atomic.AtomicInteger;
 import me.itzsomebody.radon.asm.ClassWrapper;
 import me.itzsomebody.radon.asm.FieldWrapper;
+import me.itzsomebody.radon.exceptions.MissingClassException;
 import me.itzsomebody.radon.utils.LoggerUtils;
 import me.itzsomebody.radon.utils.StringUtils;
 import org.objectweb.asm.Handle;
@@ -97,15 +98,17 @@ public class HeavyInvokeDynamic extends InvokeDynamic {
                         if (!methodNode.name.equals("<init>")) {
                             FieldInsnNode fieldInsnNode = (FieldInsnNode) insn;
 
+                            ClassWrapper cw = getClassPath().get(fieldInsnNode.owner);
+                            if (cw == null) {
+                                throw new MissingClassException(fieldInsnNode.owner + " does not exist in classpath");
+                            }
+                            FieldWrapper fw = cw.fields.stream().filter(fieldWrapper -> fieldWrapper.fieldNode.name.equals(fieldInsnNode.name) && fieldWrapper.fieldNode.desc.equals(fieldInsnNode.desc)).findFirst().orElse(null);
+                            if (fw != null && Modifier.isFinal(fw.fieldNode.access)) {
+                                continue;
+                            }
+
                             boolean isStatic = (fieldInsnNode.getOpcode() == GETSTATIC || fieldInsnNode.getOpcode() == PUTSTATIC);
                             boolean isSetter = (fieldInsnNode.getOpcode() == PUTFIELD || fieldInsnNode.getOpcode() == PUTSTATIC);
-                            if (isSetter) {
-                                ClassWrapper cw = getClasses().get(fieldInsnNode.owner);
-                                FieldWrapper fw = cw.fields.stream().filter(fieldWrapper -> fieldWrapper.fieldNode.name.equals(fieldInsnNode.name) && fieldWrapper.fieldNode.desc.equals(fieldInsnNode.desc)).findFirst().orElse(null);
-                                if (fw != null && Modifier.isFinal(fw.fieldNode.access)) {
-                                    continue;
-                                }
-                            }
                             String newSig = (isSetter) ? "(" + fieldInsnNode.desc + ")V" : "()" + fieldInsnNode.desc;
                             if (!isStatic)
                                 newSig = newSig.replace("(", "(Ljava/lang/Object;");
