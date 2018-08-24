@@ -44,7 +44,8 @@ public class SourceDebug extends Transformer {
             classWrapper.classNode.sourceDebug = newName;
             counter.incrementAndGet();
         });
-        LoggerUtils.stdOut(String.format("Obfuscated %d source debug attributes.", counter.get()));
+
+        LoggerUtils.stdOut(String.format("%s %d source debug attributes.", (remove) ? "Removed" : "Obfuscated", counter.get()));
     }
 
     @Override

@@ -44,7 +44,8 @@ public class SourceName extends Transformer {
             classWrapper.classNode.sourceFile = newName;
             counter.incrementAndGet();
         });
-        LoggerUtils.stdOut(String.format("Obfuscated %d source name attributes.", counter.get()));
+
+        LoggerUtils.stdOut(String.format("%s %d source name attributes.", (remove) ? "Removed" : "Obfuscated", counter.get()));
     }
 
     @Override

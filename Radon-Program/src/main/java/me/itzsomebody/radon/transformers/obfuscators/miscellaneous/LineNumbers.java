@@ -20,6 +20,7 @@ package me.itzsomebody.radon.transformers.obfuscators.miscellaneous;
 import java.util.concurrent.atomic.AtomicInteger;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
+import me.itzsomebody.radon.utils.LoggerUtils;
 import me.itzsomebody.radon.utils.RandomUtils;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.LineNumberNode;
@@ -54,6 +55,8 @@ public class LineNumbers extends Transformer {
                 }
             });
         });
+
+        LoggerUtils.stdOut(String.format("%s %d line numbers.", (remove) ? "Removed" : "Obfuscated", counter.get()));
     }
 
     @Override

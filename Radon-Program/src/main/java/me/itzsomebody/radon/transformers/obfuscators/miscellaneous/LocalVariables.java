@@ -54,7 +54,7 @@ public class LocalVariables extends Transformer {
             })
         );
 
-        LoggerUtils.stdOut(String.format("Removed %d local variables.", counter.get()));
+        LoggerUtils.stdOut(String.format("%s %d local variables.", (remove) ? "Removed" : "Obfuscated", counter.get()));
     }
 
     @Override
