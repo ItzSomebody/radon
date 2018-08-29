@@ -18,6 +18,7 @@
 package me.itzsomebody.radon.transformers.obfuscators.invokedynamic;
 
 import java.util.concurrent.atomic.AtomicInteger;
+import me.itzsomebody.radon.asm.ClassWrapper;
 import me.itzsomebody.radon.utils.AccessUtils;
 import me.itzsomebody.radon.utils.LoggerUtils;
 import me.itzsomebody.radon.utils.StringUtils;
@@ -36,8 +37,9 @@ public class NormalInvokeDynamic extends InvokeDynamic {
     @Override
     public void transform() {
         AtomicInteger counter = new AtomicInteger();
-        String[] bsmPath = new String[]{StringUtils.randomClassName(getClasses().keySet()), randomString(4)};
-        Handle bsmHandle = new Handle(Opcodes.H_INVOKESTATIC, bsmPath[0], bsmPath[1], "(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", false);
+        String className = StringUtils.randomClassName(getClasses().keySet());
+        String bsmName = randomString(4);
+        Handle bsmHandle = new Handle(Opcodes.H_INVOKESTATIC, className, bsmName, "(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", false);
         this.getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper) && classWrapper.classNode.version >= V1_7).forEach(classWrapper ->
             classWrapper.methods.stream().filter(methodWrapper -> !excluded(methodWrapper) && hasInstructions(methodWrapper.methodNode)).forEach(methodWrapper -> {
                 MethodNode methodNode = methodWrapper.methodNode;
@@ -68,9 +70,13 @@ public class NormalInvokeDynamic extends InvokeDynamic {
             })
         );
 
-        ClassNode bsmHost = getClasses().get(bsmPath[0]).classNode;
-        bsmHost.methods.add(createBootstrap(bsmPath[1], bsmHost.name));
-        bsmHost.access = AccessUtils.makePublic(bsmHost.access);
+        ClassNode bsmHost = new ClassNode();
+        bsmHost.name = className;
+        bsmHost.version = V1_7;
+        bsmHost.methods.add(createBootstrap(bsmName, bsmHost.name));
+        bsmHost.superName = "java/lang/Object";
+        bsmHost.access = ACC_PUBLIC | ACC_SUPER;
+        getClasses().put(className, new ClassWrapper(bsmHost, false));
         LoggerUtils.stdOut(String.format("Replaced %d method invocations with invokedynamics.", counter.get()));
     }
 
