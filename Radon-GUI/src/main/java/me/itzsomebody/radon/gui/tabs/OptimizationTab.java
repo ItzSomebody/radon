@@ -110,7 +110,7 @@ public class OptimizationTab extends JPanel {
 
         if (info.getTransformers() != null) {
             info.getTransformers().stream().filter(transformer -> transformer instanceof OptimizerDelegator).forEach(transformer -> {
-                optimizationEnabledCheckBox.setEnabled(true);
+                optimizationEnabledCheckBox.setSelected(true);
                 nopCheckBox.setEnabled(true);
                 gotoReturnCheckBox.setEnabled(true);
                 gotoGotoCheckBox.setEnabled(true);

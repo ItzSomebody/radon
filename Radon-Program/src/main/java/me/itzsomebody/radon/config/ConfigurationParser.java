@@ -22,7 +22,6 @@ import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -226,8 +225,11 @@ public class ConfigurationParser {
             if (!(boolean) renamerSettings.get("Enabled")) {
                 return null;
             }
-            Object[] objects = ((List) renamerSettings.getOrDefault("AdaptResources", new ArrayList<String>())).toArray();
-            String[] adaptThese = Arrays.copyOf(objects, objects.length, String[].class);
+            List objects = (List) renamerSettings.getOrDefault("AdaptResources", new ArrayList<String>());
+            String[] adaptThese = new String[objects.size()];
+            for (int i = 0; i < objects.size(); i++) {
+                adaptThese[i] = (String) objects.get(i);
+            }
             String repackageName = (String) renamerSettings.get("Repackage");
 
             return new Renamer(new RenamerSetup(adaptThese, repackageName));

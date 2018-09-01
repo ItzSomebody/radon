@@ -438,7 +438,7 @@ public class ObfuscationTab extends JPanel {
 
     public Renamer getRenamer() {
         if (renamingEnabledCheckBox.isSelected()) {
-            String[] resources = (renamingAdaptResources.isSelected() && renamingResourcesField.getText() != null && !renamingResourcesField.getText().isEmpty()) ? renamingResourcesField.getText().split(",") : null;
+            String[] resources = (renamingAdaptResources.isSelected() && renamingResourcesField.getText() != null && !renamingResourcesField.getText().isEmpty()) ? renamingResourcesField.getText().split(", ") : null;
             String repackageName = (renamingRepackageCheckBox.isSelected() && renamingRepackageField.getText() != null && !renamingRepackageField.getText().isEmpty()) ? renamingRepackageField.getText() : null;
 
             return new Renamer(new RenamerSetup(resources, repackageName));
@@ -552,6 +552,10 @@ public class ObfuscationTab extends JPanel {
         renamingRepackageField.setEditable(false);
         renamingResourcesField.setText(null);
         renamingResourcesField.setEditable(false);
+        renamingAdaptResources.setSelected(false);
+        renamingAdaptResources.setEnabled(false);
+        renamingRepackageCheckBox.setSelected(false);
+        renamingRepackageCheckBox.setEnabled(false);
 
         invokeDynamicCheckBox.setSelected(false);
         invokeDynamicComboBox.setSelectedIndex(0);
@@ -611,8 +615,14 @@ public class ObfuscationTab extends JPanel {
                     renamingEnabledCheckBox.setSelected(true);
                     renamingRepackageField.setText(setup.getRepackageName());
                     renamingRepackageField.setEditable(true);
+                    renamingAdaptResources.setEnabled(true);
+                    renamingRepackageCheckBox.setEnabled(true);
                     if (setup.getAdaptTheseResources().length > 0) {
-                        renamingResourcesField.setText(Arrays.toString(setup.getAdaptTheseResources()).substring(1, setup.getAdaptTheseResources().length - 1));
+                        String str = Arrays.toString(setup.getAdaptTheseResources());
+                        if (str.length() > 1) {
+                            str = str.substring(1, str.length() - 1);
+                        }
+                        renamingResourcesField.setText(str);
                     }
                     renamingResourcesField.setEditable(true);
                 } else if (transformer instanceof InvokeDynamic) {
@@ -650,20 +660,20 @@ public class ObfuscationTab extends JPanel {
                     }
                 } else if (transformer instanceof LocalVariables) {
                     localVarCheckBox.setSelected(true);
+                    localVarsRemove.setEnabled(true);
                     localVarsRemove.setSelected(((LocalVariables) transformer).isRemove());
-                    localVarsRemove.setEnabled(((LocalVariables) transformer).isRemove());
                 } else if (transformer instanceof LineNumbers) {
                     lineNumbersCheckBox.setSelected(true);
+                    lineNumbersRemove.setEnabled(true);
                     lineNumbersRemove.setSelected(((LineNumbers) transformer).isRemove());
-                    lineNumbersRemove.setEnabled(((LineNumbers) transformer).isRemove());
                 } else if (transformer instanceof SourceName) {
                     sourceNameCheckBox.setSelected(true);
+                    sourceNameRemove.setEnabled(true);
                     sourceNameRemove.setSelected(((SourceName) transformer).isRemove());
-                    sourceNameRemove.setEnabled(((SourceName) transformer).isRemove());
                 } else if (transformer instanceof SourceDebug) {
                     sourceDebugCheckBox.setSelected(true);
+                    sourceDebugRemove.setEnabled(true);
                     sourceDebugRemove.setSelected(((SourceDebug) transformer).isRemove());
-                    sourceDebugRemove.setEnabled(((SourceDebug) transformer).isRemove());
                 } else if (transformer instanceof HideCode) {
                     hideCodeCheckBox.setSelected(true);
                 } else if (transformer instanceof MemberShuffler) {
