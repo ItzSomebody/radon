@@ -89,7 +89,7 @@ public class LightStringEncryption extends StringEncryption {
     }
 
     private ClassNode createDecryptor(MemberNames memberNames) {
-        ClassNode cw = new ClassNode(0);
+        ClassNode cw = new ClassNode();
         FieldVisitor fv;
         MethodVisitor mv;
 
