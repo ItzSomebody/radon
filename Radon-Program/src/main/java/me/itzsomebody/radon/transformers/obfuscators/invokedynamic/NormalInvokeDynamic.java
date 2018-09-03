@@ -19,7 +19,6 @@ package me.itzsomebody.radon.transformers.obfuscators.invokedynamic;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import me.itzsomebody.radon.asm.ClassWrapper;
-import me.itzsomebody.radon.utils.AccessUtils;
 import me.itzsomebody.radon.utils.LoggerUtils;
 import me.itzsomebody.radon.utils.StringUtils;
 import org.objectweb.asm.Handle;
@@ -40,7 +39,7 @@ public class NormalInvokeDynamic extends InvokeDynamic {
         String className = StringUtils.randomClassName(getClasses().keySet());
         String bsmName = randomString(4);
         Handle bsmHandle = new Handle(Opcodes.H_INVOKESTATIC, className, bsmName, "(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", false);
-        this.getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper) && classWrapper.classNode.version >= V1_7).forEach(classWrapper ->
+        this.getClassWrappers().stream().filter(classWrapper -> !classWrapper.classNode.superName.equals("java/lang/Enum") && !excluded(classWrapper) && classWrapper.classNode.version >= V1_7).forEach(classWrapper ->
             classWrapper.methods.stream().filter(methodWrapper -> !excluded(methodWrapper) && hasInstructions(methodWrapper.methodNode)).forEach(methodWrapper -> {
                 MethodNode methodNode = methodWrapper.methodNode;
 

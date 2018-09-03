@@ -42,7 +42,7 @@ public class HeavyInvokeDynamic extends InvokeDynamic {
         AtomicInteger counter = new AtomicInteger();
         MemberNames memberNames = new MemberNames();
         Handle bsmHandle = new Handle(H_INVOKESTATIC, memberNames.className, memberNames.bootstrapMethodName, "(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", false);
-        this.getClassWrappers().parallelStream().filter(classWrapper -> !excluded(classWrapper) && classWrapper.classNode.version >= V1_7).forEach(classWrapper -> {
+        this.getClassWrappers().parallelStream().filter(classWrapper -> !classWrapper.classNode.superName.equals("java/lang/Enum") && !excluded(classWrapper) && classWrapper.classNode.version >= V1_7).forEach(classWrapper -> {
             ClassNode classNode = classWrapper.classNode;
 
             classWrapper.methods.parallelStream().filter(methodWrapper -> !excluded(methodWrapper) && hasInstructions(methodWrapper.methodNode)).forEach(methodWrapper -> {
@@ -113,6 +113,7 @@ public class HeavyInvokeDynamic extends InvokeDynamic {
                             if (!isStatic)
                                 newSig = newSig.replace("(", "(Ljava/lang/Object;");
 
+                            Type type = Type.getType(fieldInsnNode.desc);
                             StringBuilder sb = new StringBuilder();
                             sb.append(fieldInsnNode.owner.replace("/", ".")).append("<>").append(fieldInsnNode.name).append("<>");
 
@@ -140,6 +141,9 @@ public class HeavyInvokeDynamic extends InvokeDynamic {
                                 newSig,
                                 bsmHandle
                             );
+                            if (type.getSort() == Type.ARRAY) {
+                                methodNode.instructions.insert(indy, new TypeInsnNode(CHECKCAST, type.getInternalName()));
+                            }
 
                             methodNode.instructions.set(insn, indy);
                             counter.incrementAndGet();
