@@ -5,7 +5,7 @@
     <parent>
         <artifactId>Radon</artifactId>
         <groupId>me.itzsomebody</groupId>
-        <version>1.0.1</version>
+        <version>1.0.2</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>Radon-GUI</artifactId>
@@ -50,7 +50,7 @@
         <dependency>
             <groupId>me.itzsomebody</groupId>
             <artifactId>Radon-Program</artifactId>
-            <version>1.0.1</version>
+            <version>1.0.2</version>
         </dependency>
     </dependencies>
 </project>
