@@ -30,6 +30,10 @@ public class RandomUtils {
         return random.nextInt(1, bounds);
     }
 
+    public static int getRandomInt(int origin, int bounds) {
+        return random.nextInt(origin, bounds);
+    }
+
     public static int getRandomIntNoOrigin(int bounds) {
         return random.nextInt(bounds);
     }

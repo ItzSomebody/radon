@@ -623,6 +623,7 @@ public class ObfuscationTab extends JPanel {
                             str = str.substring(1, str.length() - 1);
                         }
                         renamingResourcesField.setText(str);
+                        renamingAdaptResources.setSelected(true);
                     }
                     renamingResourcesField.setEditable(true);
                 } else if (transformer instanceof InvokeDynamic) {

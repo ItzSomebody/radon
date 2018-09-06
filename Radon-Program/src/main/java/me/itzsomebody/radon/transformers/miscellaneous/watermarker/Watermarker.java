@@ -43,9 +43,9 @@ public class Watermarker extends Transformer {
         for (int i = 0; i < 3; i++) { // Two extra injections helps with reliability of watermark to be extracted
             Stack<Character> watermark = cipheredWatermark();
             while (!watermark.isEmpty()) {
-                ClassWrapper classWrapper = classWrappers.get(RandomUtils.getRandomInt(classWrappers.size()));
+                ClassWrapper classWrapper = classWrappers.get(RandomUtils.getRandomInt(0, classWrappers.size()));
 
-                MethodNode methodNode = classWrapper.classNode.methods.get(RandomUtils.getRandomInt(classWrapper.classNode.methods.size()));
+                MethodNode methodNode = classWrapper.classNode.methods.get(RandomUtils.getRandomInt(0, classWrapper.classNode.methods.size()));
                 if (hasInstructions(methodNode)) {
                     methodNode.instructions.insertBefore(methodNode.instructions.getFirst(), createInstructions(watermark, methodNode));
                 }
@@ -56,6 +56,7 @@ public class Watermarker extends Transformer {
     }
 
     private static InsnList createInstructions(Stack<Character> watermark, MethodNode methodNode) {
+        int offset = (methodNode.localVariables == null) ? 0 : methodNode.localVariables.size();
         int xorKey = RandomUtils.getRandomInt();
         int watermarkChar = watermark.pop() ^ xorKey;
         int indexXorKey = RandomUtils.getRandomInt();
@@ -66,10 +67,10 @@ public class Watermarker extends Transformer {
         instructions.add(BytecodeUtils.getNumberInsn(watermarkChar));
         instructions.add(BytecodeUtils.getNumberInsn(indexXorKey));
         instructions.add(BytecodeUtils.getNumberInsn(watermarkIndex));
-        instructions.add(new VarInsnNode(ISTORE, methodNode.localVariables.size() + 1)); // Local variable x where x is the max locals allowed in method can be the top of a long or double
-        instructions.add(new VarInsnNode(ISTORE, methodNode.localVariables.size() + 2));
-        instructions.add(new VarInsnNode(ISTORE, methodNode.localVariables.size() + 3));
-        instructions.add(new VarInsnNode(ISTORE, methodNode.localVariables.size() + 4));
+        instructions.add(new VarInsnNode(ISTORE, offset + 1)); // Local variable x where x is the max locals allowed in method can be the top of a long or double
+        instructions.add(new VarInsnNode(ISTORE, offset + 2));
+        instructions.add(new VarInsnNode(ISTORE, offset + 3));
+        instructions.add(new VarInsnNode(ISTORE, offset + 4));
 
         return instructions;
     }

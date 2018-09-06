@@ -61,7 +61,7 @@ public class NormalStringEncryption extends StringEncryption {
                             int callerMethodHC = methodNode.name.hashCode();
                             int decryptorClassHC = memberNames.className.replace("/", ".").hashCode();
                             ldc.cst = encrypt(cst, callerClassHC, callerMethodHC, decryptorClassHC, extraKey);
-                            methodNode.instructions.insert(insn, new MethodInsnNode(INVOKESTATIC, memberNames.className, memberNames.decryptMethodName, "(Ljava/lang/String;I)Ljava/lang/String;", false));
+                            methodNode.instructions.insert(insn, new MethodInsnNode(INVOKESTATIC, memberNames.className, memberNames.decryptMethodName, "(Ljava/lang/Object;I)Ljava/lang/String;", false));
                             methodNode.instructions.insert(insn, BytecodeUtils.getNumberInsn(extraKey));
                             leeway -= 7;
                             counter.incrementAndGet();

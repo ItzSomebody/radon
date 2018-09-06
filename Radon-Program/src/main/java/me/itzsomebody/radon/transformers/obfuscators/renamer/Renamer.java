@@ -37,10 +37,13 @@ import me.itzsomebody.radon.transformers.Transformer;
 import me.itzsomebody.radon.utils.AccessUtils;
 import me.itzsomebody.radon.utils.IOUtils;
 import me.itzsomebody.radon.utils.LoggerUtils;
+import org.objectweb.asm.Handle;
 import org.objectweb.asm.commons.ClassRemapper;
 import org.objectweb.asm.commons.Remapper;
+import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldNode;
+import org.objectweb.asm.tree.InvokeDynamicInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 
 public class Renamer extends Transformer {
@@ -91,13 +94,20 @@ public class Renamer extends Transformer {
                 methodNode.access = AccessUtils.makePublic(methodNode.access);
                 classWrapper.methods.get(i).methodNode = methodNode;
 
-                /*for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
-                    if (insn instanceof LdcInsnNode && ((LdcInsnNode) insn).cst instanceof String) {
-                        if (mappings.containsKey(((String) ((LdcInsnNode) insn).cst).replace(".", "/"))) {
-                            ((LdcInsnNode) insn).cst = mappings.get(((String) ((LdcInsnNode) insn).cst).replace(".", "/")).replace("/", ".");
+                for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
+                    if (insn instanceof InvokeDynamicInsnNode) {
+                        InvokeDynamicInsnNode indy = (InvokeDynamicInsnNode) insn;
+                        if (indy.bsm.getOwner().equals("java/lang/invoke/LambdaMetafactory")) {
+                            Handle handle = (Handle) indy.bsmArgs[1];
+                            String newName = mappings.get(handle.getOwner() + '.' + handle.getName() + handle.getDesc());
+
+                            if (newName != null) {
+                                indy.name = newName;
+                                indy.bsm = new Handle(handle.getTag(), handle.getOwner(), newName, handle.getDesc(), false);
+                            }
                         }
                     }
-                }*/
+                }
             }
 
             if (copy.fields != null) {

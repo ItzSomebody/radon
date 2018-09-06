@@ -58,7 +58,7 @@ public class LightFlowObfuscation extends FlowObfuscation {
                 }
             });
 
-            classNode.fields.add(new FieldNode(ACC_PUBLIC + ACC_STATIC + ACC_FINAL, fieldName, "Z", null, true));
+            classNode.fields.add(new FieldNode(ACC_PUBLIC + ACC_STATIC + ACC_FINAL, fieldName, "Z", null, null));
         });
 
         LoggerUtils.stdOut(String.format("Added %d fake throw-null sequences", counter.get()));

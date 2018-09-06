@@ -141,9 +141,6 @@ public class HeavyInvokeDynamic extends InvokeDynamic {
                                 newSig,
                                 bsmHandle
                             );
-                            if (type.getSort() == Type.ARRAY) {
-                                methodNode.instructions.insert(indy, new TypeInsnNode(CHECKCAST, type.getInternalName()));
-                            }
 
                             methodNode.instructions.set(insn, indy);
                             counter.incrementAndGet();
