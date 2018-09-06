@@ -37,13 +37,10 @@ import me.itzsomebody.radon.transformers.Transformer;
 import me.itzsomebody.radon.utils.AccessUtils;
 import me.itzsomebody.radon.utils.IOUtils;
 import me.itzsomebody.radon.utils.LoggerUtils;
-import org.objectweb.asm.Handle;
 import org.objectweb.asm.commons.ClassRemapper;
 import org.objectweb.asm.commons.Remapper;
-import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldNode;
-import org.objectweb.asm.tree.InvokeDynamicInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 
 public class Renamer extends Transformer {
@@ -94,7 +91,7 @@ public class Renamer extends Transformer {
                 methodNode.access = AccessUtils.makePublic(methodNode.access);
                 classWrapper.methods.get(i).methodNode = methodNode;
 
-                for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
+                /*for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
                     if (insn instanceof InvokeDynamicInsnNode) {
                         InvokeDynamicInsnNode indy = (InvokeDynamicInsnNode) insn;
                         if (indy.bsm.getOwner().equals("java/lang/invoke/LambdaMetafactory")) {
@@ -107,7 +104,7 @@ public class Renamer extends Transformer {
                             }
                         }
                     }
-                }
+                }*/
             }
 
             if (copy.fields != null) {

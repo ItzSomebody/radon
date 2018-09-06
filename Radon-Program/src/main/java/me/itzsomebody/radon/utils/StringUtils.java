@@ -28,7 +28,7 @@ public class StringUtils {
         StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < length; i++) {
-            sb.append((char) (RandomUtils.getRandomInt(16) + '\u2000'));
+            sb.append((char) (RandomUtils.getRandomIntNoOrigin(16) + '\u2000'));
         }
 
         return sb.toString();
@@ -38,7 +38,7 @@ public class StringUtils {
         StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < length; i++) {
-            sb.append((char) (RandomUtils.getRandomInt(8) + '\ua6ac'));
+            sb.append((char) (RandomUtils.getRandomIntNoOrigin(8) + '\ua6ac'));
         }
 
         return sb.toString();
@@ -48,7 +48,7 @@ public class StringUtils {
         StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < length; i++) {
-            sb.append(ALPHA[RandomUtils.getRandomInt(ALPHA.length)]);
+            sb.append(ALPHA[RandomUtils.getRandomIntNoOrigin(ALPHA.length)]);
         }
 
         return sb.toString();
@@ -58,7 +58,7 @@ public class StringUtils {
         StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < length; i++) {
-            sb.append(ALPHA_NUM[RandomUtils.getRandomInt(ALPHA_NUM.length)]);
+            sb.append(ALPHA_NUM[RandomUtils.getRandomIntNoOrigin(ALPHA_NUM.length)]);
         }
 
         return sb.toString();
@@ -66,8 +66,8 @@ public class StringUtils {
 
     public static String randomClassName(Collection<String> classNames) {
         ArrayList<String> list = new ArrayList<>(classNames);
-        String first = list.get(RandomUtils.getRandomInt(classNames.size()));
-        String second = list.get(RandomUtils.getRandomInt(classNames.size()));
+        String first = list.get(RandomUtils.getRandomIntNoOrigin(classNames.size()));
+        String second = list.get(RandomUtils.getRandomIntNoOrigin(classNames.size()));
 
         return first + '$' + second.substring(second.lastIndexOf("/") + 1, second.length());
     }
