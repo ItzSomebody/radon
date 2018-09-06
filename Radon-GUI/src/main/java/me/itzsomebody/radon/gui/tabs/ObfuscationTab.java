@@ -203,7 +203,7 @@ public class ObfuscationTab extends JPanel {
         renamingAdaptResources.setEnabled(false);
         renamingPanel.add(renamingAdaptResources, gbc_renamingAdaptResources);
 
-        renamingResourcesField = new JTextField();
+        renamingResourcesField = new JTextField("META-INF/MANIFEST.MF");
         GridBagConstraints gbc_renamingResourcesField = new GridBagConstraints();
         gbc_renamingResourcesField.gridwidth = 2;
         gbc_renamingResourcesField.insets = new Insets(0, 0, 5, 5);
