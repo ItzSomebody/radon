@@ -101,7 +101,7 @@ public class NormalStringEncryption extends StringEncryption {
                     break;
                 }
                 case 3: {
-                    sb.append((char) (chars[i] ^ extraKey ^ callerClassNameHC));
+                    sb.append((char) (chars[i] ^ extraKey ^ "<clinit>".hashCode()));
                     break;
                 }
                 case 4: {
