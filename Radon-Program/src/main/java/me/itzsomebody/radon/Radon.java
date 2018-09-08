@@ -92,6 +92,7 @@ public class Radon {
                         LoggerUtils.stdErr(String.format("Error writing class %s.", classWrapper.classNode.name + ".class"));
                         t.printStackTrace();
                         cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
+                        cw.newUTF8("RADON" + Main.VERSION);
                         classWrapper.classNode.accept(cw);
                     }
 
@@ -226,12 +227,18 @@ public class Radon {
             ClassTree tree = new ClassTree(classWrapper);
             if (classWrapper.classNode.superName != null) {
                 tree.parentClasses.add(classWrapper.classNode.superName);
-                buildHierarchy(classPath.get(classWrapper.classNode.superName), classWrapper);
+                ClassWrapper superClass = classPath.get(classWrapper.classNode.superName);
+                if (superClass == null)
+                    throw new MissingClassException(classWrapper.classNode.superName + " is missing in the classpath.");
+                buildHierarchy(superClass, classWrapper);
             }
             if (classWrapper.classNode.interfaces != null && !classWrapper.classNode.interfaces.isEmpty()) {
                 for (String s : classWrapper.classNode.interfaces) {
                     tree.parentClasses.add(s);
-                    buildHierarchy(classPath.get(s), classWrapper);
+                    ClassWrapper interfaceClass = classPath.get(s);
+                    if (interfaceClass == null)
+                        throw new MissingClassException(classWrapper.classNode.superName + " is missing in the classpath.");
+                    buildHierarchy(interfaceClass, classWrapper);
                 }
             }
             hierarchy.put(classWrapper.classNode.name, tree);
