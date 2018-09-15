@@ -25,7 +25,7 @@ public enum Dictionaries {
     ALPHABETICAL("Alphabetical"),
     ALPHANUMERIC("Alphanumeric");
 
-    private String value;
+    private final String value;
 
     Dictionaries(String value) {
         this.value = value;
@@ -36,42 +36,24 @@ public enum Dictionaries {
     }
 
     public static Dictionaries intToDictionary(int type) {
-        switch (type) {
-            case 0: {
-                return SPACES;
-            }
-            case 1: {
-                return UNRECOGNIZED;
-            }
-            case 2: {
-                return ALPHABETICAL;
-            }
-            case 3: {
-                return ALPHANUMERIC;
-            }
-            default: {
-                throw new IllegalDictionaryException();
-            }
+        if (type >= values().length) {
+            throw new IllegalDictionaryException();
         }
+        return values()[type];
     }
 
     public static Dictionaries stringToDictionary(String s) {
         switch (s.toLowerCase()) {
-            case "spaces": {
+            case "spaces":
                 return SPACES;
-            }
-            case "unrecognized": {
+            case "unrecognized":
                 return UNRECOGNIZED;
-            }
-            case "alphabetical": {
+            case "alphabetical":
                 return ALPHABETICAL;
-            }
-            case "alphanumeric": {
+            case "alphanumeric":
                 return ALPHANUMERIC;
-            }
-            default: {
+            default:
                 throw new IllegalDictionaryException();
-            }
         }
     }
 }
