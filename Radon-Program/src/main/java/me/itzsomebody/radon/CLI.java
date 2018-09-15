@@ -35,7 +35,7 @@ class CLI {
     /**
      * Args passed down from {@link Main#main(String[])}.
      */
-    private String[] args;
+    private final String[] args;
 
     /**
      * Constructor to create a new {@link CLI} object.
@@ -51,45 +51,40 @@ class CLI {
      * Parses {@link CLI#args}.
      */
     private void startTheParty() {
-        if (this.args.length == 1) {
-            switch (this.args[0].toLowerCase()) {
-                case "--help":
-                case "-help":
-                case "help":
-                case "/help":
+        String firstArg = args.length > 0 ? this.args[0].toLowerCase() : null;
+
+        switch (this.args.length) {
+            case 1:
+                if (firstArg.contains("help")) {
                     helpMsg();
-                    break;
-                default:
+                } else {
                     usageMsg();
-            }
-        } else if (this.args.length == 2) {
-            switch (this.args[0].toLowerCase()) {
-                case "--config":
-                case "-config":
-                case "config":
-                case "/config":
+                }
+                break;
+
+            case 2:
+                if (firstArg.contains("config")) {
+
                     File file = new File(this.args[1]);
                     ConfigurationParser config;
                     try {
                         config = new ConfigurationParser(new FileInputStream(file));
                     } catch (FileNotFoundException exc) {
                         LoggerUtils.stdOut("Configuration file not found");
-                        return;
+                        break;
                     }
 
                     Radon radon = new Radon(config.createSessionFromConfig());
                     radon.partyTime();
-                    break;
-                default:
+
+                } else {
                     usageMsg();
-                    break;
-            }
-        } else if (this.args.length == 3) {
-            switch (this.args[0].toLowerCase()) {
-                case "--extract":
-                case "-extract":
-                case "extract":
-                case "/extract":
+                }
+                break;
+
+            case 3:
+                if (firstArg.contains("extract")) {
+
                     File leaked = new File(this.args[1]);
                     if (!leaked.exists()) {
                         LoggerUtils.stdOut("Input file not found");
@@ -97,20 +92,19 @@ class CLI {
 
                     try {
                         List<String> ids = WatermarkUtils.extractIds(new ZipFile(leaked), this.args[2]);
-                        for (String id : ids) {
-                            LoggerUtils.stdOut(id);
-                        }
+                        ids.forEach(LoggerUtils::stdOut);
                         return;
                     } catch (Throwable t) {
                         t.printStackTrace();
                     }
-                    break;
-                default:
+
+                } else {
                     usageMsg();
-                    break;
-            }
-        } else {
-            usageMsg();
+                }
+                break;
+
+            default:
+                usageMsg();
         }
     }
 
@@ -119,7 +113,7 @@ class CLI {
      */
     private static void usageMsg() {
         LoggerUtils.stdOut("Usage: java -jar Radon-Program.jar --config example.config");
-        LoggerUtils.stdOut("USage: java -jar Radon-Program.jar --help");
+        LoggerUtils.stdOut("Usage: java -jar Radon-Program.jar --help");
         LoggerUtils.stdOut("Usage: java -jar Radon-Program.jar");
     }
 
@@ -127,8 +121,8 @@ class CLI {
      * Prints help message into console.
      */
     private static void helpMsg() {
-        LoggerUtils.stdOut("CLI Usage:\t\tjava -jar Radon-Program.jar --config example.config");
-        LoggerUtils.stdOut("Help Menu:\t\tjava -jar Radon-Program.jar --help");
+        LoggerUtils.stdOut("CLI Usage:\t\t\t\tjava -jar Radon-Program.jar --config example.config");
+        LoggerUtils.stdOut("Help Menu:\t\t\t\tjava -jar Radon-Program.jar --help");
         LoggerUtils.stdOut("Watermark Extraction:\tjava -jar Radon-Program.jar --extract Input.jar exampleKey");
         LoggerUtils.stdOut("Radon GUI Usage:\t\tjava -jar Radon-GUI.jar");
     }
