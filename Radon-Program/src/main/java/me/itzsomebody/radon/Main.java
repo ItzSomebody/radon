@@ -30,6 +30,17 @@ public class Main {
     public static final String VERSION = "1.0.3";
     public static final String CONTRIBUTORS = "ItzSomebody, x0ark, Col-E, Artel and kazigk";
     public static final String PROPAGANDA_GARBAGE = String.format("Radon is a free and open-source java obfuscator with contributions from %s.\nVersion: %s\nWebsite: https://github.com/ItzSomebody/Radon", Main.CONTRIBUTORS, Main.VERSION);
+    public static final String RADON_ASCII_ART = "##############################################\n" +
+            "# +----------------------------------------+ #\n" +
+            "# |  _____            _____   ____  _   _  | #\n" +
+            "# | |  __ \\     /\\   |  __ \\ / __ \\| \\ | | | #\n" +
+            "# | | |__) |   /  \\  | |  | | |  | |  \\| | | #\n" +
+            "# | |  _  /   / /\\ \\ | |  | | |  | | . ` | | #\n" +
+            "# | | | \\ \\  / ____ \\| |__| | |__| | |\\  | | #\n" +
+            "# | |_|  \\_\\/_/    \\_\\_____/ \\____/|_| \\_| | #\n" +
+            "# |                                        | #\n" +
+            "# +----------------------------------------+ #\n" +
+            "##############################################\n";
 
     /**
      * Main method.
@@ -37,28 +48,10 @@ public class Main {
      * @param args arguments from command line.
      */
     public static void main(String[] args) {
-        coolThingInConsole();
-        new CLI(args);
-    }
-
-    /**
-     * Logo message for console.
-     */
-    private static void coolThingInConsole() {
-        System.out.println("##############################################");
-        System.out.println("# +----------------------------------------+ #");
-        System.out.println("# |  _____            _____   ____  _   _  | #");
-        System.out.println("# | |  __ \\     /\\   |  __ \\ / __ \\| \\ | | | #");
-        System.out.println("# | | |__) |   /  \\  | |  | | |  | |  \\| | | #");
-        System.out.println("# | |  _  /   / /\\ \\ | |  | | |  | | . ` | | #");
-        System.out.println("# | | | \\ \\  / ____ \\| |__| | |__| | |\\  | | #");
-        System.out.println("# | |_|  \\_\\/_/    \\_\\_____/ \\____/|_| \\_| | #");
-        System.out.println("# |                                        | #");
-        System.out.println("# +----------------------------------------+ #");
-        System.out.println("##############################################");
-        System.out.println();
-        System.out.println();
+        System.out.println(RADON_ASCII_ART);
         LoggerUtils.stdOut("Version: " + VERSION);
-        LoggerUtils.stdOut("Contributors: " + CONTRIBUTORS);
+        LoggerUtils.stdOut("Contributors: " + CONTRIBUTORS + "\n");
+
+        new CLI(args);
     }
 }
