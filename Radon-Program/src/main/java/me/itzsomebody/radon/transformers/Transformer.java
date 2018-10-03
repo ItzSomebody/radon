@@ -57,11 +57,13 @@ public abstract class Transformer implements Opcodes {
     }
 
     protected boolean excluded(MethodWrapper methodWrapper) {
-        return this.excluded(methodWrapper.owner.originalName + '.' + methodWrapper.originalName + methodWrapper.originalDescription);
+        return this.excluded(methodWrapper.owner.originalName + '.' + methodWrapper.originalName
+                + methodWrapper.originalDescription);
     }
 
     protected boolean excluded(FieldWrapper fieldWrapper) {
-        return this.excluded(fieldWrapper.owner.originalName + '.' + fieldWrapper.originalName + '.' + fieldWrapper.originalDescription);
+        return this.excluded(fieldWrapper.owner.originalName + '.' + fieldWrapper.originalName + '.'
+                + fieldWrapper.originalDescription);
     }
 
     /**
