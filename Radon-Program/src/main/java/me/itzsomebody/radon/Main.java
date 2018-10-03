@@ -26,13 +26,12 @@ import me.itzsomebody.radon.utils.LoggerUtils;
  * @author ItzSomebody
  */
 public class Main {
-    /**
-     * Static abuse variables xD
-     */
     public static final String PREFIX = "[Radon]";
-    public static final String VERSION = "1.0.3";
+    public static final String VERSION = "1.0.4";
     public static final String CONTRIBUTORS = "ItzSomebody, x0ark, Col-E, Artel, kazigk and Olexorus";
-    public static final String PROPAGANDA_GARBAGE = String.format("Radon is a free and open-source java obfuscator with contributions from %s.\nVersion: %s\nWebsite: https://github.com/ItzSomebody/Radon", Main.CONTRIBUTORS, Main.VERSION);
+    public static final String PROPAGANDA_GARBAGE = String.format("Radon is a free and open-source java obfuscator " +
+            "with contributions from %s.\nVersion: %s\nWebsite: https://github.com/ItzSomebody/Radon",
+            Main.CONTRIBUTORS, Main.VERSION);
     public static final String RADON_ASCII_ART = "##############################################\n" +
             "# +----------------------------------------+ #\n" +
             "# |  _____            _____   ____  _   _  | #\n" +
