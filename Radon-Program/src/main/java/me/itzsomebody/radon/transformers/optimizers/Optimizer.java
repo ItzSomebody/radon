@@ -20,6 +20,11 @@ package me.itzsomebody.radon.transformers.optimizers;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
 
+/**
+ * Abstract class for optimization transformers.
+ *
+ * @author ItzSomebody
+ */
 public abstract class Optimizer extends Transformer {
     @Override
     protected ExclusionType getExclusionType() {

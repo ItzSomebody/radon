@@ -35,17 +35,25 @@ import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
+/**
+ * Same as{@link NormalFlowObfuscation}, but also inserts a jump which never is made before all conditionals.
+ *
+ * @author ItzSomebody
+ */
 public class HeavyFlowObfuscation extends NormalFlowObfuscation {
     @Override
     public void transform() {
         AtomicInteger counter = new AtomicInteger();
 
-        this.getClassWrappers().parallelStream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper -> {
+        this.getClassWrappers().parallelStream().filter(classWrapper ->
+                !excluded(classWrapper)).forEach(classWrapper -> {
             ClassNode classNode = classWrapper.classNode;
-            FieldNode field = new FieldNode(ACC_PUBLIC + ACC_STATIC + ACC_FINAL, StringUtils.randomSpacesString(RandomUtils.getRandomInt(10)), "Z", null, null);
+            FieldNode field = new FieldNode(ACC_PUBLIC + ACC_STATIC + ACC_FINAL,
+                    StringUtils.randomSpacesString(RandomUtils.getRandomInt(10)), "Z", null, null);
 
             classNode.fields.add(field);
-            classWrapper.methods.parallelStream().filter(methodWrapper -> !excluded(methodWrapper) && hasInstructions(methodWrapper.methodNode)).forEach(methodWrapper -> {
+            classWrapper.methods.parallelStream().filter(methodWrapper -> !excluded(methodWrapper)
+                    && hasInstructions(methodWrapper.methodNode)).forEach(methodWrapper -> {
                 MethodNode methodNode = methodWrapper.methodNode;
                 int leeway = getSizeLeeway(methodNode);
                 int varIndex = methodNode.maxLocals;
@@ -53,14 +61,16 @@ public class HeavyFlowObfuscation extends NormalFlowObfuscation {
                 AbstractInsnNode[] untouchedList = methodNode.instructions.toArray();
                 LabelNode labelNode = exitLabel(methodNode);
                 boolean calledSuper = false;
-                Set<AbstractInsnNode> emptyAt = new StackEmulator(methodNode, methodNode.instructions.getLast()).getEmptyAt();
+                Set<AbstractInsnNode> emptyAt = new StackEmulator(methodNode,
+                        methodNode.instructions.getLast()).getEmptyAt();
                 for (AbstractInsnNode insn : untouchedList) {
                     if (leeway < 10000) {
                         break;
                     }
                     if (methodNode.name.equals("<init>")) {
                         if (insn instanceof MethodInsnNode) {
-                            if (insn.getOpcode() == INVOKESPECIAL && insn.getPrevious() instanceof VarInsnNode && ((VarInsnNode) insn.getPrevious()).var == 0) {
+                            if (insn.getOpcode() == INVOKESPECIAL && insn.getPrevious() instanceof VarInsnNode
+                                    && ((VarInsnNode) insn.getPrevious()).var == 0) {
                                 calledSuper = true;
                             }
                         }
@@ -89,8 +99,10 @@ public class HeavyFlowObfuscation extends NormalFlowObfuscation {
                         counter.incrementAndGet();
                     }
                 }
-                methodNode.instructions.insertBefore(methodNode.instructions.getFirst(), new VarInsnNode(ISTORE, varIndex));
-                methodNode.instructions.insertBefore(methodNode.instructions.getFirst(), new FieldInsnNode(GETSTATIC, classNode.name, field.name, "Z"));
+                methodNode.instructions.insertBefore(methodNode.instructions.getFirst(), new VarInsnNode(ISTORE,
+                        varIndex));
+                methodNode.instructions.insertBefore(methodNode.instructions.getFirst(), new FieldInsnNode(GETSTATIC,
+                        classNode.name, field.name, "Z"));
             });
         });
 

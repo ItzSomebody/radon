@@ -22,7 +22,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.utils.BytecodeUtils;
 import me.itzsomebody.radon.utils.LoggerUtils;
-import me.itzsomebody.radon.utils.StringUtils;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.FieldNode;
@@ -32,6 +31,12 @@ import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 
+/**
+ * Transformer that takes all the strings in a class and pools them into a field. When the string is needed, the string
+ * pool field is called with an index number.
+ *
+ * @author ItzSomebody
+ */
 public class StringPool extends StringEncryption {
     public StringPool(StringEncryptionSetup setup) {
         super(setup);
@@ -41,12 +46,13 @@ public class StringPool extends StringEncryption {
     public void transform() {
         AtomicInteger counter = new AtomicInteger();
 
-        this.getClassWrappers().parallelStream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper -> {
+        getClassWrappers().parallelStream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper -> {
             ArrayList<String> strList = new ArrayList<>();
             String methodName = randomString(4);
             String fieldName = randomString(4);
 
-            classWrapper.methods.parallelStream().filter(methodWrapper -> !excluded(methodWrapper) && hasInstructions(methodWrapper.methodNode)).forEach(methodWrapper -> {
+            classWrapper.methods.parallelStream().filter(methodWrapper -> !excluded(methodWrapper)
+                    && hasInstructions(methodWrapper.methodNode)).forEach(methodWrapper -> {
                 MethodNode methodNode = methodWrapper.methodNode;
 
                 for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
@@ -61,7 +67,8 @@ public class StringPool extends StringEncryption {
 
                                 int indexNumber = strList.size() - 1;
 
-                                methodNode.instructions.insertBefore(insn, new FieldInsnNode(GETSTATIC, classWrapper.classNode.name, fieldName, "[Ljava/lang/String;"));
+                                methodNode.instructions.insertBefore(insn, new FieldInsnNode(GETSTATIC,
+                                        classWrapper.classNode.name, fieldName, "[Ljava/lang/String;"));
                                 methodNode.instructions.insertBefore(insn, BytecodeUtils.getNumberInsn(indexNumber));
                                 methodNode.instructions.set(insn, new InsnNode(AALOAD));
                                 counter.incrementAndGet();
@@ -72,9 +79,11 @@ public class StringPool extends StringEncryption {
             });
 
             if (strList.size() != 0) {
-                classWrapper.classNode.methods.add(stringPool(classWrapper.classNode.name, methodName, fieldName, strList));
+                classWrapper.classNode.methods.add(stringPool(classWrapper.classNode.name, methodName, fieldName,
+                        strList));
 
-                MethodNode clinit = classWrapper.classNode.methods.stream().filter(methodNode -> methodNode.name.equals("<clinit>")).findFirst().orElse(null);
+                MethodNode clinit = classWrapper.classNode.methods.stream().filter(methodNode ->
+                        methodNode.name.equals("<clinit>")).findFirst().orElse(null);
                 if (clinit == null) {
                     clinit = new MethodNode(ACC_PRIVATE + ACC_STATIC + ACC_SYNTHETIC, "<clinit>", "()V", null, null);
                     InsnList insns = new InsnList();
@@ -83,9 +92,11 @@ public class StringPool extends StringEncryption {
                     clinit.instructions = insns;
                     classWrapper.classNode.methods.add(clinit);
                 } else {
-                    clinit.instructions.insertBefore(clinit.instructions.getFirst(), new MethodInsnNode(INVOKESTATIC, classWrapper.classNode.name, methodName, "()V", false));
+                    clinit.instructions.insertBefore(clinit.instructions.getFirst(), new MethodInsnNode(INVOKESTATIC,
+                            classWrapper.classNode.name, methodName, "()V", false));
                 }
-                FieldNode fieldNode = new FieldNode(ACC_PRIVATE + ACC_STATIC + ACC_SYNTHETIC, fieldName, "[Ljava/lang/String;", null, null);
+                FieldNode fieldNode = new FieldNode(ACC_PRIVATE + ACC_STATIC + ACC_SYNTHETIC, fieldName,
+                        "[Ljava/lang/String;", null, null);
                 if (classWrapper.classNode.fields == null)
                     classWrapper.classNode.fields = new ArrayList<>();
                 classWrapper.classNode.fields.add(fieldNode);
@@ -95,7 +106,8 @@ public class StringPool extends StringEncryption {
     }
 
     private MethodNode stringPool(String className, String methodName, String fieldName, ArrayList<String> strings) {
-        MethodNode method = new MethodNode(ACC_PRIVATE + ACC_STATIC + ACC_SYNTHETIC + ACC_BRIDGE, methodName, "()V", null, null);
+        MethodNode method = new MethodNode(ACC_PRIVATE + ACC_STATIC + ACC_SYNTHETIC + ACC_BRIDGE, methodName, "()V",
+                null, null);
 
         method.visitCode();
         int numberOfStrings = strings.size();

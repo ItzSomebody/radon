@@ -22,14 +22,21 @@ import me.itzsomebody.radon.utils.LoggerUtils;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 
+/**
+ * Removes all NOPs found. Do note that ASM's MethodWriter will replace unreachable instructions with NOPs so you might
+ * find NOPs in your program even after you ran this transformer on it.
+ *
+ * @author ItzSomebody
+ */
 public class NopRemover extends Optimizer {
     @Override
     public void transform() {
         AtomicInteger count = new AtomicInteger();
         long current = System.currentTimeMillis();
 
-        this.getClassWrappers().parallelStream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper ->
-            classWrapper.methods.parallelStream().filter(methodWrapper -> !excluded(methodWrapper) && hasInstructions(methodWrapper.methodNode)).forEach(methodWrapper -> {
+        getClassWrappers().parallelStream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper ->
+            classWrapper.methods.parallelStream().filter(methodWrapper -> !excluded(methodWrapper)
+                    && hasInstructions(methodWrapper.methodNode)).forEach(methodWrapper -> {
                 MethodNode methodNode = methodWrapper.methodNode;
 
                 for (AbstractInsnNode insn : methodNode.instructions.toArray()) {

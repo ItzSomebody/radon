@@ -19,6 +19,19 @@ package me.itzsomebody.radon;
 
 import me.itzsomebody.radon.exceptions.IllegalDictionaryException;
 
+/**
+ * The dictionaries used for string generation.
+ *
+ * {@link Dictionaries#SPACES} generates a string which is seen as spaces or related. The intent is to make the string
+ * "invisible".
+ * {@link Dictionaries#UNRECOGNIZED} generates a string full of unicode which the JVM is unable to parse. This leads to
+ * strings showing as white boxes.
+ * {@link Dictionaries#ALPHABETICAL} generates a string composed only of letters from the English alphabet.
+ * {@link Dictionaries#ALPHANUMERIC} generates a string composed only of letters from the English alphabet and integers
+ * 0 to 9.
+ *
+ * @author ItzSomebody
+ */
 public enum Dictionaries {
     SPACES("Spaces"),
     UNRECOGNIZED("Unrecognized"),

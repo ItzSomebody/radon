@@ -17,13 +17,19 @@
 
 package me.itzsomebody.radon.transformers.shrinkers;
 
+/**
+ * Used to hold the information needed for enabling the {@link ShrinkerDelegator} transformer.
+ *
+ * @author ItzSomebody
+ */
 public class ShrinkerSetup {
     private boolean removeVisibleAnnotations;
     private boolean removeInvisibleAnnotations;
     private boolean removeAttributes;
     private boolean removeDebug;
 
-    public ShrinkerSetup(boolean removeVisibleAnnotations, boolean removeInvisibleAnnotations, boolean removeAttributes, boolean removeDebug) {
+    public ShrinkerSetup(boolean removeVisibleAnnotations, boolean removeInvisibleAnnotations, boolean removeAttributes,
+                         boolean removeDebug) {
         this.removeVisibleAnnotations = removeVisibleAnnotations;
         this.removeInvisibleAnnotations = removeInvisibleAnnotations;
         this.removeAttributes = removeAttributes;

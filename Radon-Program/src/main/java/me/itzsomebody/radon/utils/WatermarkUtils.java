@@ -31,6 +31,11 @@ import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
 
+/**
+ * used to extract a watermark embedded by Radon. Prepare your eyes for cancer code.
+ *
+ * @author ItzSomebody
+ */
 public class WatermarkUtils {
     public static List<String> extractIds(ZipFile zipFile, String key) throws Throwable {
         ArrayList<String> ids = new ArrayList<>();
@@ -62,12 +67,20 @@ public class WatermarkUtils {
                         if (BytecodeUtils.isIntInsn(insn.getNext())) {
                             if (BytecodeUtils.isIntInsn(insn.getNext().getNext())) {
                                 if (BytecodeUtils.isIntInsn(insn.getNext().getNext().getNext())) {
-                                    if (insn.getNext().getNext().getNext().getNext() != null && insn.getNext().getNext().getNext().getNext().getOpcode() == Opcodes.ISTORE
-                                        && insn.getNext().getNext().getNext().getNext().getNext() != null && insn.getNext().getNext().getNext().getNext().getNext().getOpcode() == Opcodes.ISTORE
-                                        && insn.getNext().getNext().getNext().getNext().getNext().getNext() != null && insn.getNext().getNext().getNext().getNext().getNext().getNext().getOpcode() == Opcodes.ISTORE
-                                        && insn.getNext().getNext().getNext().getNext().getNext().getNext().getNext() != null && insn.getNext().getNext().getNext().getNext().getNext().getNext().getNext().getOpcode() == Opcodes.ISTORE) {
-                                        char character = (char) (BytecodeUtils.getIntNumber(insn) ^ BytecodeUtils.getIntNumber(insn.getNext()));
-                                        int index = BytecodeUtils.getIntNumber(insn.getNext().getNext()) ^ BytecodeUtils.getIntNumber(insn.getNext().getNext().getNext());
+                                    if (insn.getNext().getNext().getNext().getNext() != null && insn.getNext().getNext()
+                                            .getNext().getNext().getOpcode() == Opcodes.ISTORE
+                                            && insn.getNext().getNext().getNext().getNext().getNext() != null
+                                            && insn.getNext().getNext().getNext().getNext().getNext()
+                                            .getOpcode() == Opcodes.ISTORE && insn.getNext().getNext().getNext()
+                                            .getNext().getNext().getNext() != null && insn.getNext().getNext().getNext()
+                                            .getNext().getNext().getNext().getOpcode() == Opcodes.ISTORE
+                                            && insn.getNext().getNext().getNext().getNext().getNext().getNext()
+                                            .getNext() != null && insn.getNext().getNext().getNext().getNext().getNext()
+                                            .getNext().getNext().getOpcode() == Opcodes.ISTORE) {
+                                        char character = (char) (BytecodeUtils.getIntegerFromInsn(insn)
+                                                ^ BytecodeUtils.getIntegerFromInsn(insn.getNext()));
+                                        int index = BytecodeUtils.getIntegerFromInsn(insn.getNext().getNext())
+                                                ^ BytecodeUtils.getIntegerFromInsn(insn.getNext().getNext().getNext());
                                         embedMap.put(index, character);
                                     }
                                 }

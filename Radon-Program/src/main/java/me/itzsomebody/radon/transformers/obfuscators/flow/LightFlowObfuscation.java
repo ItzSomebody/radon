@@ -29,16 +29,23 @@ import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 
+/**
+ * This replaces all gotos with the equivalent: if (false) throw null;.
+ *
+ * @author ItzSomebody
+ */
 public class LightFlowObfuscation extends FlowObfuscation {
     @Override
     public void transform() {
         AtomicInteger counter = new AtomicInteger();
 
-        this.getClassWrappers().parallelStream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper -> {
+        this.getClassWrappers().parallelStream().filter(classWrapper ->
+                !excluded(classWrapper)).forEach(classWrapper -> {
             ClassNode classNode = classWrapper.classNode;
             String fieldName = StringUtils.randomSpacesString(RandomUtils.getRandomInt(10));
 
-            classWrapper.methods.parallelStream().filter(methodWrapper -> !excluded(methodWrapper) && hasInstructions(methodWrapper.methodNode)).forEach(methodWrapper -> {
+            classWrapper.methods.parallelStream().filter(methodWrapper -> !excluded(methodWrapper)
+                    && hasInstructions(methodWrapper.methodNode)).forEach(methodWrapper -> {
                 MethodNode methodNode = methodWrapper.methodNode;
                 int leeway = getSizeLeeway(methodNode);
 
@@ -48,7 +55,8 @@ public class LightFlowObfuscation extends FlowObfuscation {
                     }
 
                     if (insn.getOpcode() == GOTO) {
-                        methodNode.instructions.insertBefore(insn, new FieldInsnNode(GETSTATIC, classNode.name, fieldName, "Z"));
+                        methodNode.instructions.insertBefore(insn, new FieldInsnNode(GETSTATIC, classNode.name,
+                                fieldName, "Z"));
                         methodNode.instructions.insert(insn, new InsnNode(ATHROW));
                         methodNode.instructions.insert(insn, new InsnNode(ACONST_NULL));
                         methodNode.instructions.set(insn, new JumpInsnNode(IFEQ, ((JumpInsnNode) insn).label));

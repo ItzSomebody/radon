@@ -22,7 +22,6 @@ import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
 import me.itzsomebody.radon.utils.LoggerUtils;
 import org.objectweb.asm.Label;
-import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.InsnNode;
@@ -32,6 +31,12 @@ import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 
+
+/**
+ * Inserts an expiration block of instructions in each constructor method.
+ *
+ * @author ItzSomebody
+ */
 public class Expiration extends Transformer {
     private ExpirationSetup setup;
 
@@ -47,7 +52,7 @@ public class Expiration extends Transformer {
             ClassNode classNode = classWrapper.classNode;
 
             classNode.methods.stream().filter(methodNode -> methodNode.name.equals("<init>")).forEach(methodNode -> {
-                InsnList expirationCode = createExpiration();
+                InsnList expirationCode = createExpirationInstructions();
                 methodNode.instructions.insertBefore(methodNode.instructions.getFirst(), expirationCode);
                 counter.incrementAndGet();
             });
@@ -56,7 +61,7 @@ public class Expiration extends Transformer {
         LoggerUtils.stdOut(String.format("Added %d expiration code blocks.", counter.get()));
     }
 
-    private InsnList createExpiration() {
+    private InsnList createExpirationInstructions() {
         InsnList expiryCode = new InsnList();
         LabelNode injectedLabel = new LabelNode(new Label());
 
@@ -76,9 +81,11 @@ public class Expiration extends Transformer {
             expiryCode.add(new InsnNode(DUP));
             expiryCode.add(new InsnNode(ACONST_NULL));
             expiryCode.add(new InsnNode(SWAP));
-            expiryCode.add(new MethodInsnNode(INVOKESTATIC, "javax/swing/JOptionPane", "showMessageDialog", "(Ljava/awt/Component;Ljava/lang/Object;)V", false));
+            expiryCode.add(new MethodInsnNode(INVOKESTATIC, "javax/swing/JOptionPane", "showMessageDialog",
+                    "(Ljava/awt/Component;Ljava/lang/Object;)V", false));
         }
-        expiryCode.add(new MethodInsnNode(INVOKESPECIAL, "java/lang/Throwable", "<init>", "(Ljava/lang/String;)V", false));
+        expiryCode.add(new MethodInsnNode(INVOKESPECIAL, "java/lang/Throwable", "<init>", "(Ljava/lang/String;)V",
+                false));
         expiryCode.add(new InsnNode(ATHROW));
         expiryCode.add(injectedLabel);
 

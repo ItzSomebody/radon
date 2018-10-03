@@ -48,9 +48,9 @@ public class MethodWrapper {
     /**
      * Creates a MethodWrapper object.
      *
-     * @param methodNode the {@link MethodNode} this wrapper represents.
-     * @param owner the owner of this represented method.
-     * @param originalName the original method name.
+     * @param methodNode          the {@link MethodNode} this wrapper represents.
+     * @param owner               the owner of this represented method.
+     * @param originalName        the original method name.
      * @param originalDescription the original method description.
      */
     MethodWrapper(MethodNode methodNode, ClassWrapper owner, String originalName, String originalDescription) {

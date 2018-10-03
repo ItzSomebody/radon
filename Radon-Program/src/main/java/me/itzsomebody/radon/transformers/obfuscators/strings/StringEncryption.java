@@ -21,6 +21,11 @@ import java.util.List;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
 
+/**
+ * Abstract class for string encryption transformers.
+ *
+ * @author ItzSomebody
+ */
 public abstract class StringEncryption extends Transformer {
     protected StringEncryptionSetup setup;
 

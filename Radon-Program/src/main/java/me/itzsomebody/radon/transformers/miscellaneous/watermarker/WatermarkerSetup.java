@@ -17,6 +17,11 @@
 
 package me.itzsomebody.radon.transformers.miscellaneous.watermarker;
 
+/**
+ * Used to hold the information needed for enabling the {@link Watermarker} transformer.
+ *
+ * @author ItzSomebody
+ */
 public class WatermarkerSetup {
     private String message;
     private String key;

@@ -21,10 +21,14 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import me.itzsomebody.radon.SessionInfo;
-import me.itzsomebody.radon.transformers.optimizers.Optimizer;
 import me.itzsomebody.radon.transformers.optimizers.OptimizerDelegator;
 import me.itzsomebody.radon.transformers.optimizers.OptimizerSetup;
 
+/**
+ * A {@link JPanel} which controls all of the optimization settings in Radon.
+ *
+ * @author ItzSomebody
+ */
 public class OptimizationTab extends JPanel {
     private JCheckBox gotoGotoCheckBox;
     private JCheckBox gotoReturnCheckBox;
@@ -95,10 +99,22 @@ public class OptimizationTab extends JPanel {
         this.add(optimizationEnabledCheckBox, gbc_optimizationEnabledCheckBox);
     }
 
+    /**
+     * Returns an {@link OptimizerDelegator} setup accordingly to this {@link OptimizationTab}.
+     *
+     * @return an {@link OptimizerDelegator} setup accordingly to this {@link OptimizationTab}.
+     */
     public OptimizerDelegator getOptimizer() {
-        return (optimizationEnabledCheckBox.isSelected()) ? new OptimizerDelegator(new OptimizerSetup(nopCheckBox.isSelected(), gotoGotoCheckBox.isSelected(), gotoReturnCheckBox.isSelected())) : null;
+        return (optimizationEnabledCheckBox.isSelected()) ?
+                new OptimizerDelegator(new OptimizerSetup(nopCheckBox.isSelected(), gotoGotoCheckBox.isSelected(),
+                        gotoReturnCheckBox.isSelected())) : null;
     }
 
+    /**
+     * Sets the tab settings accordingly with the provided {@link SessionInfo}.
+     *
+     * @param info the {@link SessionInfo} used to determine the tab setup.
+     */
     public void setSettings(SessionInfo info) {
         optimizationEnabledCheckBox.setSelected(false);
         nopCheckBox.setSelected(false);
@@ -109,17 +125,18 @@ public class OptimizationTab extends JPanel {
         gotoGotoCheckBox.setEnabled(false);
 
         if (info.getTransformers() != null) {
-            info.getTransformers().stream().filter(transformer -> transformer instanceof OptimizerDelegator).forEach(transformer -> {
-                optimizationEnabledCheckBox.setSelected(true);
-                nopCheckBox.setEnabled(true);
-                gotoReturnCheckBox.setEnabled(true);
-                gotoGotoCheckBox.setEnabled(true);
+            info.getTransformers().stream().filter(transformer -> transformer instanceof OptimizerDelegator)
+                    .forEach(transformer -> {
+                        optimizationEnabledCheckBox.setSelected(true);
+                        nopCheckBox.setEnabled(true);
+                        gotoReturnCheckBox.setEnabled(true);
+                        gotoGotoCheckBox.setEnabled(true);
 
-                OptimizerSetup setup = ((OptimizerDelegator) transformer).getSetup();
-                nopCheckBox.setSelected(setup.isNopRemoverEnabled());
-                gotoReturnCheckBox.setSelected(setup.isGotoReturnEnabled());
-                gotoGotoCheckBox.setSelected(setup.isGotoGotoEnabled());
-            });
+                        OptimizerSetup setup = ((OptimizerDelegator) transformer).getSetup();
+                        nopCheckBox.setSelected(setup.isNopRemoverEnabled());
+                        gotoReturnCheckBox.setSelected(setup.isGotoReturnEnabled());
+                        gotoGotoCheckBox.setSelected(setup.isGotoGotoEnabled());
+                    });
         }
     }
 }

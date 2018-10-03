@@ -45,11 +45,6 @@ import me.itzsomebody.radon.transformers.Transformer;
 class RadonGUI extends JFrame {
     RadonGUI() {
         setTitle(Main.PREFIX + " - " + Main.VERSION);
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {
-            // Ignored
-        }
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setSize(700, 570);
         setLocationRelativeTo(null);

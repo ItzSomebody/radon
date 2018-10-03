@@ -25,19 +25,26 @@ import me.itzsomebody.radon.utils.BytecodeUtils;
 import me.itzsomebody.radon.utils.LoggerUtils;
 import org.objectweb.asm.tree.ClassNode;
 
+/**
+ * Adds a synthetic modifier and bridge modifier if possible to attempt to hide code against some lower-quality
+ * decompilers.
+ *
+ * @author ItzSomebody
+ */
 public class HideCode extends Transformer {
     @Override
     public void transform() {
         AtomicInteger counter = new AtomicInteger();
 
-        this.getClassWrappers().parallelStream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper -> {
+        getClassWrappers().parallelStream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper -> {
             ClassNode classNode = classWrapper.classNode;
             if (!AccessUtils.isSynthetic(classNode.access) && !BytecodeUtils.hasAnnotations(classNode)) {
                 classNode.access |= ACC_SYNTHETIC;
                 counter.incrementAndGet();
             }
 
-            classNode.methods.parallelStream().filter(methodNode -> !BytecodeUtils.hasAnnotations(methodNode)).forEach(methodNode -> {
+            classNode.methods.parallelStream().filter(methodNode ->
+                    !BytecodeUtils.hasAnnotations(methodNode)).forEach(methodNode -> {
                 boolean hidOnce = false;
                 if (!AccessUtils.isSynthetic(methodNode.access)) {
                     methodNode.access |= ACC_SYNTHETIC;

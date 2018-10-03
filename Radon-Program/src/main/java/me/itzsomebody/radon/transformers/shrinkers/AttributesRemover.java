@@ -21,12 +21,18 @@ import java.util.concurrent.atomic.AtomicInteger;
 import me.itzsomebody.radon.utils.LoggerUtils;
 import org.objectweb.asm.tree.ClassNode;
 
+/**
+ * Removes all attributes from the classes.
+ *
+ * @author ItzSomebody
+ */
 public class AttributesRemover extends Shrinker {
     @Override
     public void transform() {
         AtomicInteger counter = new AtomicInteger();
 
-        getClassWrappers().parallelStream().filter(classWrapper -> excluded(classWrapper) && classWrapper.classNode.attrs != null).forEach(classWrapper -> {
+        getClassWrappers().parallelStream().filter(classWrapper -> excluded(classWrapper)
+                && classWrapper.classNode.attrs != null).forEach(classWrapper -> {
             ClassNode classNode = classWrapper.classNode;
 
             counter.addAndGet(classNode.attrs.size());

@@ -17,6 +17,11 @@
 
 package me.itzsomebody.radon.config;
 
+/**
+ * An {@link Enum} containing all the allowed standalone configuration keys allowed.
+ *
+ * @author ItzSomebody
+ */
 public enum ConfigurationSettings {
     INPUT("Input"),
     OUTPUT("Output"),

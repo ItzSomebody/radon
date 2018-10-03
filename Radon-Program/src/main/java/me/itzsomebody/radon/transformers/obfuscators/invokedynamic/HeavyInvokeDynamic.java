@@ -36,16 +36,26 @@ import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 
+/**
+ * Replaces getstatic, getfield, putstatic, putfield, invokestatic, invokevirtual, invokeinterface and invokespecial
+ * with invokedynamics.
+ *
+ * @author ItzSomebody
+ */
 public class HeavyInvokeDynamic extends InvokeDynamic {
     @Override
     public void transform() {
         AtomicInteger counter = new AtomicInteger();
         MemberNames memberNames = new MemberNames();
-        Handle bsmHandle = new Handle(H_INVOKESTATIC, memberNames.className, memberNames.bootstrapMethodName, "(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", false);
-        this.getClassWrappers().parallelStream().filter(classWrapper -> !classWrapper.classNode.superName.equals("java/lang/Enum") && !excluded(classWrapper) && classWrapper.classNode.version >= V1_7).forEach(classWrapper -> {
+        Handle bsmHandle = new Handle(H_INVOKESTATIC, memberNames.className, memberNames.bootstrapMethodName,
+                "(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", false);
+        this.getClassWrappers().parallelStream().filter(classWrapper ->
+                !classWrapper.classNode.superName.equals("java/lang/Enum") && !excluded(classWrapper)
+                        && classWrapper.classNode.version >= V1_7).forEach(classWrapper -> {
             ClassNode classNode = classWrapper.classNode;
 
-            classWrapper.methods.parallelStream().filter(methodWrapper -> !excluded(methodWrapper) && hasInstructions(methodWrapper.methodNode)).forEach(methodWrapper -> {
+            classWrapper.methods.parallelStream().filter(methodWrapper -> !excluded(methodWrapper)
+                    && hasInstructions(methodWrapper.methodNode)).forEach(methodWrapper -> {
                 MethodNode methodNode = methodWrapper.methodNode;
 
                 for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
@@ -53,7 +63,8 @@ public class HeavyInvokeDynamic extends InvokeDynamic {
                         MethodInsnNode methodInsnNode = (MethodInsnNode) insn;
                         if (!methodInsnNode.name.equals("<init>")) {
                             boolean isStatic = (methodInsnNode.getOpcode() == INVOKESTATIC);
-                            String newSig = isStatic ? methodInsnNode.desc : methodInsnNode.desc.replace("(", "(Ljava/lang/Object;");
+                            String newSig = isStatic ? methodInsnNode.desc : methodInsnNode.desc.replace("(",
+                                    "(Ljava/lang/Object;");
                             Type returnType = Type.getReturnType(methodInsnNode.desc);
                             Type[] args = Type.getArgumentTypes(newSig);
                             for (int i = 0; i < args.length; i++) {
@@ -64,7 +75,8 @@ public class HeavyInvokeDynamic extends InvokeDynamic {
                             }
                             newSig = Type.getMethodDescriptor(returnType, args);
                             StringBuilder sb = new StringBuilder();
-                            sb.append(methodInsnNode.owner.replace("/", ".")).append("<>").append(methodInsnNode.name).append("<>");
+                            sb.append(methodInsnNode.owner.replace("/", ".")).append("<>").append(methodInsnNode.name)
+                                    .append("<>");
 
                             switch (insn.getOpcode()) {
                                 case INVOKEINTERFACE:
@@ -73,7 +85,8 @@ public class HeavyInvokeDynamic extends InvokeDynamic {
                                     break;
                                 }
                                 case INVOKESPECIAL: {
-                                    sb.append("2<>").append(methodInsnNode.desc).append("<>").append(classNode.name.replace("/", "."));
+                                    sb.append("2<>").append(methodInsnNode.desc).append("<>").append(classNode.name
+                                            .replace("/", "."));
                                     break;
                                 }
                                 case INVOKESTATIC: {
@@ -83,14 +96,15 @@ public class HeavyInvokeDynamic extends InvokeDynamic {
                             }
 
                             InvokeDynamicInsnNode indy = new InvokeDynamicInsnNode(
-                                encrypt(sb.toString(), memberNames),
-                                newSig,
-                                bsmHandle
+                                    encrypt(sb.toString(), memberNames),
+                                    newSig,
+                                    bsmHandle
                             );
 
                             methodNode.instructions.set(insn, indy);
                             if (returnType.getSort() == Type.ARRAY) {
-                                methodNode.instructions.insert(indy, new TypeInsnNode(CHECKCAST, returnType.getInternalName()));
+                                methodNode.instructions.insert(indy, new TypeInsnNode(CHECKCAST,
+                                        returnType.getInternalName()));
                             }
                             counter.incrementAndGet();
                         }
@@ -102,20 +116,26 @@ public class HeavyInvokeDynamic extends InvokeDynamic {
                             if (cw == null) {
                                 throw new MissingClassException(fieldInsnNode.owner + " does not exist in classpath");
                             }
-                            FieldWrapper fw = cw.fields.stream().filter(fieldWrapper -> fieldWrapper.fieldNode.name.equals(fieldInsnNode.name) && fieldWrapper.fieldNode.desc.equals(fieldInsnNode.desc)).findFirst().orElse(null);
+                            FieldWrapper fw = cw.fields.stream().filter(fieldWrapper ->
+                                    fieldWrapper.fieldNode.name.equals(fieldInsnNode.name)
+                                            && fieldWrapper.fieldNode.desc.equals(fieldInsnNode.desc)).findFirst()
+                                    .orElse(null);
                             if (fw != null && Modifier.isFinal(fw.fieldNode.access)) {
                                 continue;
                             }
 
-                            boolean isStatic = (fieldInsnNode.getOpcode() == GETSTATIC || fieldInsnNode.getOpcode() == PUTSTATIC);
-                            boolean isSetter = (fieldInsnNode.getOpcode() == PUTFIELD || fieldInsnNode.getOpcode() == PUTSTATIC);
+                            boolean isStatic = (fieldInsnNode.getOpcode() == GETSTATIC
+                                    || fieldInsnNode.getOpcode() == PUTSTATIC);
+                            boolean isSetter = (fieldInsnNode.getOpcode() == PUTFIELD
+                                    || fieldInsnNode.getOpcode() == PUTSTATIC);
                             String newSig = (isSetter) ? "(" + fieldInsnNode.desc + ")V" : "()" + fieldInsnNode.desc;
                             if (!isStatic)
                                 newSig = newSig.replace("(", "(Ljava/lang/Object;");
 
                             Type type = Type.getType(fieldInsnNode.desc);
                             StringBuilder sb = new StringBuilder();
-                            sb.append(fieldInsnNode.owner.replace("/", ".")).append("<>").append(fieldInsnNode.name).append("<>");
+                            sb.append(fieldInsnNode.owner.replace("/", ".")).append("<>").append(fieldInsnNode.name)
+                                    .append("<>");
 
                             switch (insn.getOpcode()) {
                                 case GETSTATIC: {
@@ -137,9 +157,9 @@ public class HeavyInvokeDynamic extends InvokeDynamic {
                             }
 
                             InvokeDynamicInsnNode indy = new InvokeDynamicInsnNode(
-                                encrypt(sb.toString(), memberNames),
-                                newSig,
-                                bsmHandle
+                                    encrypt(sb.toString(), memberNames),
+                                    newSig,
+                                    bsmHandle
                             );
 
                             methodNode.instructions.set(insn, indy);
@@ -193,7 +213,8 @@ public class HeavyInvokeDynamic extends InvokeDynamic {
 
         cw.visit(V1_5, ACC_PUBLIC + ACC_SUPER, memberNames.className, null, "java/lang/Object", null);
 
-        cw.visitInnerClass("java/lang/invoke/MethodHandles$Lookup", "java/lang/invoke/MethodHandles", "Lookup", ACC_PUBLIC + ACC_FINAL + ACC_STATIC);
+        cw.visitInnerClass("java/lang/invoke/MethodHandles$Lookup", "java/lang/invoke/MethodHandles", "Lookup",
+                ACC_PUBLIC + ACC_FINAL + ACC_STATIC);
 
         {
             mv = cw.visitMethod(ACC_PUBLIC, "<init>", "()V", null, null);
@@ -209,12 +230,14 @@ public class HeavyInvokeDynamic extends InvokeDynamic {
             mv.visitEnd();
         }
         {
-            mv = cw.visitMethod(ACC_PRIVATE + ACC_STATIC, memberNames.decryptorMethodName, "(Ljava/lang/String;)Ljava/lang/String;", null, null);
+            mv = cw.visitMethod(ACC_PRIVATE + ACC_STATIC, memberNames.decryptorMethodName,
+                    "(Ljava/lang/String;)Ljava/lang/String;", null, null);
             mv.visitCode();
             Label l0 = new Label();
             mv.visitLabel(l0);
             mv.visitMethodInsn(INVOKESTATIC, "java/lang/Thread", "currentThread", "()Ljava/lang/Thread;", false);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Thread", "getStackTrace", "()[Ljava/lang/StackTraceElement;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Thread", "getStackTrace", "()[Ljava/lang/StackTraceElement;",
+                    false);
             mv.visitVarInsn(ASTORE, 1);
             Label l1 = new Label();
             mv.visitLabel(l1);
@@ -254,11 +277,13 @@ public class HeavyInvokeDynamic extends InvokeDynamic {
             mv.visitVarInsn(ALOAD, 1);
             mv.visitInsn(ICONST_2);
             mv.visitInsn(AALOAD);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StackTraceElement", "getClassName", "()Ljava/lang/String;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StackTraceElement", "getClassName", "()Ljava/lang/String;",
+                    false);
             mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "hashCode", "()I", false);
             mv.visitInsn(IXOR);
             mv.visitInsn(I2C);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(C)Ljava/lang/StringBuilder;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(C)Ljava/lang/StringBuilder;",
+                    false);
             mv.visitInsn(POP);
             Label l12 = new Label();
             mv.visitLabel(l12);
@@ -271,11 +296,13 @@ public class HeavyInvokeDynamic extends InvokeDynamic {
             mv.visitVarInsn(ALOAD, 1);
             mv.visitInsn(ICONST_2);
             mv.visitInsn(AALOAD);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StackTraceElement", "getMethodName", "()Ljava/lang/String;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StackTraceElement", "getMethodName", "()Ljava/lang/String;",
+                    false);
             mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "hashCode", "()I", false);
             mv.visitInsn(IXOR);
             mv.visitInsn(I2C);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(C)Ljava/lang/StringBuilder;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(C)Ljava/lang/StringBuilder;",
+                    false);
             mv.visitInsn(POP);
             Label l13 = new Label();
             mv.visitLabel(l13);
@@ -288,11 +315,13 @@ public class HeavyInvokeDynamic extends InvokeDynamic {
             mv.visitVarInsn(ALOAD, 1);
             mv.visitInsn(ICONST_1);
             mv.visitInsn(AALOAD);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StackTraceElement", "getClassName", "()Ljava/lang/String;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StackTraceElement", "getClassName", "()Ljava/lang/String;",
+                    false);
             mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "hashCode", "()I", false);
             mv.visitInsn(IXOR);
             mv.visitInsn(I2C);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(C)Ljava/lang/StringBuilder;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(C)Ljava/lang/StringBuilder;",
+                    false);
             mv.visitInsn(POP);
             Label l14 = new Label();
             mv.visitLabel(l14);
@@ -305,11 +334,13 @@ public class HeavyInvokeDynamic extends InvokeDynamic {
             mv.visitVarInsn(ALOAD, 1);
             mv.visitInsn(ICONST_1);
             mv.visitInsn(AALOAD);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StackTraceElement", "getMethodName", "()Ljava/lang/String;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StackTraceElement", "getMethodName", "()Ljava/lang/String;",
+                    false);
             mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "hashCode", "()I", false);
             mv.visitInsn(IXOR);
             mv.visitInsn(I2C);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(C)Ljava/lang/StringBuilder;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(C)Ljava/lang/StringBuilder;",
+                    false);
             mv.visitInsn(POP);
             mv.visitLabel(l11);
             mv.visitIincInsn(4, 1);
@@ -329,7 +360,8 @@ public class HeavyInvokeDynamic extends InvokeDynamic {
             mv.visitEnd();
         }
         {
-            mv = cw.visitMethod(ACC_PUBLIC + ACC_STATIC, memberNames.bootstrapMethodName, "(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", null, null);
+            mv = cw.visitMethod(ACC_PUBLIC + ACC_STATIC, memberNames.bootstrapMethodName,
+                    "(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", null, null);
             mv.visitCode();
             Label l0 = new Label();
             Label l1 = new Label();
@@ -338,16 +370,19 @@ public class HeavyInvokeDynamic extends InvokeDynamic {
             mv.visitLabel(l0);
             mv.visitVarInsn(ALOAD, 1);
             mv.visitTypeInsn(CHECKCAST, "java/lang/String");
-            mv.visitMethodInsn(INVOKESTATIC, memberNames.className, memberNames.decryptorMethodName, "(Ljava/lang/String;)Ljava/lang/String;", false);
+            mv.visitMethodInsn(INVOKESTATIC, memberNames.className, memberNames.decryptorMethodName,
+                    "(Ljava/lang/String;)Ljava/lang/String;", false);
             mv.visitLdcInsn("<>");
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "split", "(Ljava/lang/String;)[Ljava/lang/String;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "split", "(Ljava/lang/String;)[Ljava/lang/String;",
+                    false);
             mv.visitVarInsn(ASTORE, 3);
             Label l3 = new Label();
             mv.visitLabel(l3);
             mv.visitVarInsn(ALOAD, 3);
             mv.visitInsn(ICONST_0);
             mv.visitInsn(AALOAD);
-            mv.visitMethodInsn(INVOKESTATIC, "java/lang/Class", "forName", "(Ljava/lang/String;)Ljava/lang/Class;", false);
+            mv.visitMethodInsn(INVOKESTATIC, "java/lang/Class", "forName", "(Ljava/lang/String;)Ljava/lang/Class;",
+                    false);
             mv.visitVarInsn(ASTORE, 4);
             Label l4 = new Label();
             mv.visitLabel(l4);
@@ -392,8 +427,11 @@ public class HeavyInvokeDynamic extends InvokeDynamic {
             mv.visitInsn(AALOAD);
             mv.visitLdcInsn(Type.getType("L" + memberNames.className + ";"));
             mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Class", "getClassLoader", "()Ljava/lang/ClassLoader;", false);
-            mv.visitMethodInsn(INVOKESTATIC, "java/lang/invoke/MethodType", "fromMethodDescriptorString", "(Ljava/lang/String;Ljava/lang/ClassLoader;)Ljava/lang/invoke/MethodType;", false);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/invoke/MethodHandles$Lookup", "findStatic", "(Ljava/lang/Class;Ljava/lang/String;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/MethodHandle;", false);
+            mv.visitMethodInsn(INVOKESTATIC, "java/lang/invoke/MethodType", "fromMethodDescriptorString",
+                    "(Ljava/lang/String;Ljava/lang/ClassLoader;)Ljava/lang/invoke/MethodType;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/invoke/MethodHandles$Lookup", "findStatic",
+                    "(Ljava/lang/Class;Ljava/lang/String;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/MethodHandle;",
+                    false);
             mv.visitVarInsn(ASTORE, 8);
             Label l17 = new Label();
             mv.visitLabel(l17);
@@ -407,8 +445,11 @@ public class HeavyInvokeDynamic extends InvokeDynamic {
             mv.visitInsn(AALOAD);
             mv.visitLdcInsn(Type.getType("L" + memberNames.className + ";"));
             mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Class", "getClassLoader", "()Ljava/lang/ClassLoader;", false);
-            mv.visitMethodInsn(INVOKESTATIC, "java/lang/invoke/MethodType", "fromMethodDescriptorString", "(Ljava/lang/String;Ljava/lang/ClassLoader;)Ljava/lang/invoke/MethodType;", false);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/invoke/MethodHandles$Lookup", "findVirtual", "(Ljava/lang/Class;Ljava/lang/String;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/MethodHandle;", false);
+            mv.visitMethodInsn(INVOKESTATIC, "java/lang/invoke/MethodType", "fromMethodDescriptorString",
+                    "(Ljava/lang/String;Ljava/lang/ClassLoader;)Ljava/lang/invoke/MethodType;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/invoke/MethodHandles$Lookup", "findVirtual",
+                    "(Ljava/lang/Class;Ljava/lang/String;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/MethodHandle;",
+                    false);
             mv.visitVarInsn(ASTORE, 8);
             Label l18 = new Label();
             mv.visitLabel(l18);
@@ -422,12 +463,16 @@ public class HeavyInvokeDynamic extends InvokeDynamic {
             mv.visitInsn(AALOAD);
             mv.visitLdcInsn(Type.getType("L" + memberNames.className + ";"));
             mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Class", "getClassLoader", "()Ljava/lang/ClassLoader;", false);
-            mv.visitMethodInsn(INVOKESTATIC, "java/lang/invoke/MethodType", "fromMethodDescriptorString", "(Ljava/lang/String;Ljava/lang/ClassLoader;)Ljava/lang/invoke/MethodType;", false);
+            mv.visitMethodInsn(INVOKESTATIC, "java/lang/invoke/MethodType", "fromMethodDescriptorString",
+                    "(Ljava/lang/String;Ljava/lang/ClassLoader;)Ljava/lang/invoke/MethodType;", false);
             mv.visitVarInsn(ALOAD, 3);
             mv.visitInsn(ICONST_4);
             mv.visitInsn(AALOAD);
-            mv.visitMethodInsn(INVOKESTATIC, "java/lang/Class", "forName", "(Ljava/lang/String;)Ljava/lang/Class;", false);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/invoke/MethodHandles$Lookup", "findSpecial", "(Ljava/lang/Class;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/Class;)Ljava/lang/invoke/MethodHandle;", false);
+            mv.visitMethodInsn(INVOKESTATIC, "java/lang/Class", "forName", "(Ljava/lang/String;)Ljava/lang/Class;",
+                    false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/invoke/MethodHandles$Lookup", "findSpecial",
+                    "(Ljava/lang/Class;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/Class;)" +
+                            "Ljava/lang/invoke/MethodHandle;", false);
             mv.visitVarInsn(ASTORE, 8);
             Label l19 = new Label();
             mv.visitLabel(l19);
@@ -435,7 +480,8 @@ public class HeavyInvokeDynamic extends InvokeDynamic {
             mv.visitLabel(l12);
             mv.visitVarInsn(ALOAD, 4);
             mv.visitVarInsn(ALOAD, 5);
-            mv.visitMethodInsn(INVOKESTATIC, memberNames.className, memberNames.searchMethodName, "(Ljava/lang/Class;Ljava/lang/String;)Ljava/lang/reflect/Field;", false);
+            mv.visitMethodInsn(INVOKESTATIC, memberNames.className, memberNames.searchMethodName, "(Ljava/lang/Class;" +
+                    "Ljava/lang/String;)Ljava/lang/reflect/Field;", false);
             mv.visitVarInsn(ASTORE, 9);
             Label l20 = new Label();
             mv.visitLabel(l20);
@@ -448,7 +494,8 @@ public class HeavyInvokeDynamic extends InvokeDynamic {
             mv.visitVarInsn(ALOAD, 5);
             mv.visitVarInsn(ALOAD, 9);
             mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/reflect/Field", "getType", "()Ljava/lang/Class;", false);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/invoke/MethodHandles$Lookup", "findStaticGetter", "(Ljava/lang/Class;Ljava/lang/String;Ljava/lang/Class;)Ljava/lang/invoke/MethodHandle;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/invoke/MethodHandles$Lookup", "findStaticGetter",
+                    "(Ljava/lang/Class;Ljava/lang/String;Ljava/lang/Class;)Ljava/lang/invoke/MethodHandle;", false);
             mv.visitVarInsn(ASTORE, 8);
             Label l22 = new Label();
             mv.visitLabel(l22);
@@ -456,7 +503,8 @@ public class HeavyInvokeDynamic extends InvokeDynamic {
             mv.visitLabel(l13);
             mv.visitVarInsn(ALOAD, 4);
             mv.visitVarInsn(ALOAD, 5);
-            mv.visitMethodInsn(INVOKESTATIC, memberNames.className, memberNames.searchMethodName, "(Ljava/lang/Class;Ljava/lang/String;)Ljava/lang/reflect/Field;", false);
+            mv.visitMethodInsn(INVOKESTATIC, memberNames.className, memberNames.searchMethodName,
+                    "(Ljava/lang/Class;Ljava/lang/String;)Ljava/lang/reflect/Field;", false);
             mv.visitVarInsn(ASTORE, 9);
             Label l23 = new Label();
             mv.visitLabel(l23);
@@ -469,7 +517,8 @@ public class HeavyInvokeDynamic extends InvokeDynamic {
             mv.visitVarInsn(ALOAD, 5);
             mv.visitVarInsn(ALOAD, 9);
             mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/reflect/Field", "getType", "()Ljava/lang/Class;", false);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/invoke/MethodHandles$Lookup", "findGetter", "(Ljava/lang/Class;Ljava/lang/String;Ljava/lang/Class;)Ljava/lang/invoke/MethodHandle;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/invoke/MethodHandles$Lookup", "findGetter",
+                    "(Ljava/lang/Class;Ljava/lang/String;Ljava/lang/Class;)Ljava/lang/invoke/MethodHandle;", false);
             mv.visitVarInsn(ASTORE, 8);
             Label l25 = new Label();
             mv.visitLabel(l25);
@@ -477,7 +526,8 @@ public class HeavyInvokeDynamic extends InvokeDynamic {
             mv.visitLabel(l14);
             mv.visitVarInsn(ALOAD, 4);
             mv.visitVarInsn(ALOAD, 5);
-            mv.visitMethodInsn(INVOKESTATIC, memberNames.className, memberNames.searchMethodName, "(Ljava/lang/Class;Ljava/lang/String;)Ljava/lang/reflect/Field;", false);
+            mv.visitMethodInsn(INVOKESTATIC, memberNames.className, memberNames.searchMethodName,
+                    "(Ljava/lang/Class;Ljava/lang/String;)Ljava/lang/reflect/Field;", false);
             mv.visitVarInsn(ASTORE, 9);
             Label l26 = new Label();
             mv.visitLabel(l26);
@@ -490,7 +540,8 @@ public class HeavyInvokeDynamic extends InvokeDynamic {
             mv.visitVarInsn(ALOAD, 5);
             mv.visitVarInsn(ALOAD, 9);
             mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/reflect/Field", "getType", "()Ljava/lang/Class;", false);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/invoke/MethodHandles$Lookup", "findStaticSetter", "(Ljava/lang/Class;Ljava/lang/String;Ljava/lang/Class;)Ljava/lang/invoke/MethodHandle;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/invoke/MethodHandles$Lookup", "findStaticSetter",
+                    "(Ljava/lang/Class;Ljava/lang/String;Ljava/lang/Class;)Ljava/lang/invoke/MethodHandle;", false);
             mv.visitVarInsn(ASTORE, 8);
             Label l28 = new Label();
             mv.visitLabel(l28);
@@ -498,7 +549,8 @@ public class HeavyInvokeDynamic extends InvokeDynamic {
             mv.visitLabel(l15);
             mv.visitVarInsn(ALOAD, 4);
             mv.visitVarInsn(ALOAD, 5);
-            mv.visitMethodInsn(INVOKESTATIC, memberNames.className, memberNames.searchMethodName, "(Ljava/lang/Class;Ljava/lang/String;)Ljava/lang/reflect/Field;", false);
+            mv.visitMethodInsn(INVOKESTATIC, memberNames.className, memberNames.searchMethodName,
+                    "(Ljava/lang/Class;Ljava/lang/String;)Ljava/lang/reflect/Field;", false);
             mv.visitVarInsn(ASTORE, 9);
             Label l29 = new Label();
             mv.visitLabel(l29);
@@ -511,7 +563,8 @@ public class HeavyInvokeDynamic extends InvokeDynamic {
             mv.visitVarInsn(ALOAD, 5);
             mv.visitVarInsn(ALOAD, 9);
             mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/reflect/Field", "getType", "()Ljava/lang/Class;", false);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/invoke/MethodHandles$Lookup", "findSetter", "(Ljava/lang/Class;Ljava/lang/String;Ljava/lang/Class;)Ljava/lang/invoke/MethodHandle;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/invoke/MethodHandles$Lookup", "findSetter",
+                    "(Ljava/lang/Class;Ljava/lang/String;Ljava/lang/Class;)Ljava/lang/invoke/MethodHandle;", false);
             mv.visitVarInsn(ASTORE, 8);
             mv.visitLabel(l16);
             mv.visitTypeInsn(NEW, "java/lang/invoke/ConstantCallSite");
@@ -519,8 +572,10 @@ public class HeavyInvokeDynamic extends InvokeDynamic {
             mv.visitVarInsn(ALOAD, 8);
             mv.visitVarInsn(ALOAD, 2);
             mv.visitTypeInsn(CHECKCAST, "java/lang/invoke/MethodType");
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/invoke/MethodHandle", "asType", "(Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/MethodHandle;", false);
-            mv.visitMethodInsn(INVOKESPECIAL, "java/lang/invoke/ConstantCallSite", "<init>", "(Ljava/lang/invoke/MethodHandle;)V", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/invoke/MethodHandle", "asType",
+                    "(Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/MethodHandle;", false);
+            mv.visitMethodInsn(INVOKESPECIAL, "java/lang/invoke/ConstantCallSite", "<init>",
+                    "(Ljava/lang/invoke/MethodHandle;)V", false);
             mv.visitLabel(l1);
             mv.visitInsn(ARETURN);
             mv.visitLabel(l2);
@@ -539,7 +594,9 @@ public class HeavyInvokeDynamic extends InvokeDynamic {
             mv.visitEnd();
         }
         {
-            mv = cw.visitMethod(ACC_PRIVATE + ACC_STATIC, memberNames.searchMethodName, "(Ljava/lang/Class;Ljava/lang/String;)Ljava/lang/reflect/Field;", "(Ljava/lang/Class<*>;Ljava/lang/String;)Ljava/lang/reflect/Field;", null);
+            mv = cw.visitMethod(ACC_PRIVATE + ACC_STATIC, memberNames.searchMethodName,
+                    "(Ljava/lang/Class;Ljava/lang/String;)Ljava/lang/reflect/Field;",
+                    "(Ljava/lang/Class<*>;Ljava/lang/String;)Ljava/lang/reflect/Field;", null);
             mv.visitCode();
             Label l0 = new Label();
             Label l1 = new Label();
@@ -552,7 +609,8 @@ public class HeavyInvokeDynamic extends InvokeDynamic {
             mv.visitLabel(l0);
             mv.visitVarInsn(ALOAD, 0);
             mv.visitVarInsn(ALOAD, 1);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Class", "getDeclaredField", "(Ljava/lang/String;)Ljava/lang/reflect/Field;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Class", "getDeclaredField",
+                    "(Ljava/lang/String;)Ljava/lang/reflect/Field;", false);
             mv.visitVarInsn(ASTORE, 2);
             Label l6 = new Label();
             mv.visitLabel(l6);
@@ -584,7 +642,8 @@ public class HeavyInvokeDynamic extends InvokeDynamic {
             mv.visitLabel(l9);
             mv.visitVarInsn(ALOAD, 3);
             mv.visitVarInsn(ALOAD, 1);
-            mv.visitMethodInsn(INVOKESTATIC, memberNames.className, memberNames.searchMethodName, "(Ljava/lang/Class;Ljava/lang/String;)Ljava/lang/reflect/Field;", false);
+            mv.visitMethodInsn(INVOKESTATIC, memberNames.className, memberNames.searchMethodName,
+                    "(Ljava/lang/Class;Ljava/lang/String;)Ljava/lang/reflect/Field;", false);
             mv.visitInsn(DUP);
             mv.visitVarInsn(ASTORE, 4);
             Label l11 = new Label();
@@ -627,7 +686,8 @@ public class HeavyInvokeDynamic extends InvokeDynamic {
             mv.visitVarInsn(ILOAD, 5);
             mv.visitInsn(AALOAD);
             mv.visitVarInsn(ALOAD, 1);
-            mv.visitMethodInsn(INVOKESTATIC, memberNames.className, memberNames.searchMethodName, "(Ljava/lang/Class;Ljava/lang/String;)Ljava/lang/reflect/Field;", false);
+            mv.visitMethodInsn(INVOKESTATIC, memberNames.className, memberNames.searchMethodName,
+                    "(Ljava/lang/Class;Ljava/lang/String;)Ljava/lang/reflect/Field;", false);
             mv.visitInsn(DUP);
             mv.visitVarInsn(ASTORE, 6);
             Label l21 = new Label();

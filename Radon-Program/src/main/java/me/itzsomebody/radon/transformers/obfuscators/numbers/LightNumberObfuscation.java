@@ -26,57 +26,63 @@ import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.MethodNode;
 
+/**
+ * Obfuscates integer and long constants using xor operations.
+ *
+ * @author ItzSomebody
+ */
 public class LightNumberObfuscation extends NumberObfuscation {
     @Override
     public void transform() {
         AtomicInteger counter = new AtomicInteger();
-        this.getClassWrappers().parallelStream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper ->
-            classWrapper.methods.parallelStream().filter(methodWrapper -> !excluded(methodWrapper) && hasInstructions(methodWrapper.methodNode)).forEach(methodWrapper -> {
-                MethodNode methodNode = methodWrapper.methodNode;
-                int leeway = getSizeLeeway(methodNode);
+        getClassWrappers().parallelStream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper ->
+                classWrapper.methods.parallelStream().filter(methodWrapper -> !excluded(methodWrapper)
+                        && hasInstructions(methodWrapper.methodNode)).forEach(methodWrapper -> {
+                    MethodNode methodNode = methodWrapper.methodNode;
+                    int leeway = getSizeLeeway(methodNode);
 
-                for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
-                    if (leeway < 10000)
-                        break;
-                    if (BytecodeUtils.isIntInsn(insn)) {
-                        int originalNum = BytecodeUtils.getIntNumber(insn);
-                        int value1 = RandomUtils.getRandomInt();
-                        int value2 = originalNum ^ value1;
+                    for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
+                        if (leeway < 10000)
+                            break;
+                        if (BytecodeUtils.isIntInsn(insn)) {
+                            int originalNum = BytecodeUtils.getIntegerFromInsn(insn);
+                            int value1 = RandomUtils.getRandomInt();
+                            int value2 = originalNum ^ value1;
 
-                        InsnList insnList = new InsnList();
-                        insnList.add(BytecodeUtils.getNumberInsn(value1));
-                        insnList.add(BytecodeUtils.getNumberInsn(RandomUtils.getRandomInt()));
-                        insnList.add(new InsnNode(SWAP));
-                        insnList.add(new InsnNode(DUP_X1));
-                        insnList.add(new InsnNode(POP2));
-                        insnList.add(BytecodeUtils.getNumberInsn(value2));
-                        insnList.add(new InsnNode(IXOR));
+                            InsnList insnList = new InsnList();
+                            insnList.add(BytecodeUtils.getNumberInsn(value1));
+                            insnList.add(BytecodeUtils.getNumberInsn(RandomUtils.getRandomInt()));
+                            insnList.add(new InsnNode(SWAP));
+                            insnList.add(new InsnNode(DUP_X1));
+                            insnList.add(new InsnNode(POP2));
+                            insnList.add(BytecodeUtils.getNumberInsn(value2));
+                            insnList.add(new InsnNode(IXOR));
 
-                        methodNode.instructions.insertBefore(insn, insnList);
-                        methodNode.instructions.remove(insn);
-                        leeway -= 10;
-                        counter.incrementAndGet();
-                    } else if (BytecodeUtils.isLongInsn(insn)) {
-                        long originalNum = BytecodeUtils.getLongNumber(insn);
-                        long value1 = RandomUtils.getRandomLong();
-                        long value2 = originalNum ^ value1;
+                            methodNode.instructions.insertBefore(insn, insnList);
+                            methodNode.instructions.remove(insn);
+                            leeway -= 10;
+                            counter.incrementAndGet();
+                        } else if (BytecodeUtils.isLongInsn(insn)) {
+                            long originalNum = BytecodeUtils.getLongFromInsn(insn);
+                            long value1 = RandomUtils.getRandomLong();
+                            long value2 = originalNum ^ value1;
 
-                        InsnList insnList = new InsnList();
-                        insnList.add(BytecodeUtils.getNumberInsn(RandomUtils.getRandomLong()));
-                        insnList.add(BytecodeUtils.getNumberInsn(value1));
-                        insnList.add(new InsnNode(DUP2_X2));
-                        insnList.add(new InsnNode(POP2));
-                        insnList.add(new InsnNode(POP2));
-                        insnList.add(BytecodeUtils.getNumberInsn(value2));
-                        insnList.add(new InsnNode(LXOR));
+                            InsnList insnList = new InsnList();
+                            insnList.add(BytecodeUtils.getNumberInsn(RandomUtils.getRandomLong()));
+                            insnList.add(BytecodeUtils.getNumberInsn(value1));
+                            insnList.add(new InsnNode(DUP2_X2));
+                            insnList.add(new InsnNode(POP2));
+                            insnList.add(new InsnNode(POP2));
+                            insnList.add(BytecodeUtils.getNumberInsn(value2));
+                            insnList.add(new InsnNode(LXOR));
 
-                        methodNode.instructions.insertBefore(insn, insnList);
-                        methodNode.instructions.remove(insn);
-                        leeway -= 15;
-                        counter.incrementAndGet();
+                            methodNode.instructions.insertBefore(insn, insnList);
+                            methodNode.instructions.remove(insn);
+                            leeway -= 15;
+                            counter.incrementAndGet();
+                        }
                     }
-                }
-            })
+                })
         );
         LoggerUtils.stdOut(String.format("Split %d numbers into bitwise xor instructions.", counter.get()));
     }

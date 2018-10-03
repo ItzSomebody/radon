@@ -21,9 +21,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
 import me.itzsomebody.radon.utils.LoggerUtils;
-import me.itzsomebody.radon.utils.RandomUtils;
-import me.itzsomebody.radon.utils.StringUtils;
 
+/**
+ * Obfuscate the source name attribute by either randomizing the data, or removing it altogether.
+ *
+ * @author ItzSomebody
+ */
 public class SourceName extends Transformer {
     private boolean remove;
 
@@ -40,12 +43,13 @@ public class SourceName extends Transformer {
         AtomicInteger counter = new AtomicInteger();
 
         String newName = (remove) ? null : randomString(4) + ".java";
-        this.getClassWrappers().parallelStream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper -> {
+        getClassWrappers().parallelStream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper -> {
             classWrapper.classNode.sourceFile = newName;
             counter.incrementAndGet();
         });
 
-        LoggerUtils.stdOut(String.format("%s %d source name attributes.", (remove) ? "Removed" : "Obfuscated", counter.get()));
+        LoggerUtils.stdOut(String.format("%s %d source name attributes.", (remove) ? "Removed" : "Obfuscated",
+                counter.get()));
     }
 
     @Override

@@ -25,7 +25,15 @@ import me.itzsomebody.radon.exclusions.Exclusion;
 import me.itzsomebody.radon.exclusions.ExclusionManager;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 
+/**
+ * A {@link JPanel} containing the functions needed to set general exclusions via GUI.
+ *
+ * @author ItzSomebody
+ */
 public class ExclusionsTab extends JPanel {
+    /**
+     * A {@link DefaultListModel<String>} containing all exclusions made in the exclusions tab of the GUI.
+     */
     private DefaultListModel<String> exclusions;
 
     public ExclusionsTab() {
@@ -55,23 +63,9 @@ public class ExclusionsTab extends JPanel {
         gbc_exclusionComboBox.fill = GridBagConstraints.HORIZONTAL;
         gbc_exclusionComboBox.gridx = 0;
         gbc_exclusionComboBox.gridy = 1;
-        exclusionComboBox.addItem(ExclusionType.GLOBAL.getValue());
-        exclusionComboBox.addItem(ExclusionType.STRING_ENCRYPTION.getValue());
-        exclusionComboBox.addItem(ExclusionType.INVOKEDYNAMIC.getValue());
-        exclusionComboBox.addItem(ExclusionType.FLOW_OBFUSCATION.getValue());
-        exclusionComboBox.addItem(ExclusionType.LINE_NUMBERS.getValue());
-        exclusionComboBox.addItem(ExclusionType.LOCAL_VARIABLES.getValue());
-        exclusionComboBox.addItem(ExclusionType.NUMBER_OBFUSCATION.getValue());
-        exclusionComboBox.addItem(ExclusionType.HIDE_CODE.getValue());
-        exclusionComboBox.addItem(ExclusionType.CRASHER.getValue());
-        exclusionComboBox.addItem(ExclusionType.EXPIRATION.getValue());
-        exclusionComboBox.addItem(ExclusionType.OPTIMIZER.getValue());
-        exclusionComboBox.addItem(ExclusionType.SHRINKER.getValue());
-        exclusionComboBox.addItem(ExclusionType.SHUFFLER.getValue());
-        exclusionComboBox.addItem(ExclusionType.SOURCE_NAME.getValue());
-        exclusionComboBox.addItem(ExclusionType.SOURCE_DEBUG.getValue());
-        exclusionComboBox.addItem(ExclusionType.STRING_POOL.getValue());
-        exclusionComboBox.addItem(ExclusionType.RENAMER.getValue());
+        for (ExclusionType exclusionType : ExclusionType.values()) {
+            exclusionComboBox.addItem(exclusionType.getValue());
+        }
         this.add(exclusionComboBox, gbc_exclusionComboBox);
 
         JTextField exclusionField = new JTextField();
@@ -90,7 +84,8 @@ public class ExclusionsTab extends JPanel {
         gbc_exclusionAddButton.gridy = 1;
         exclusionAddButton.addActionListener((e) -> {
             if (exclusionField.getText() != null && !exclusionField.getText().isEmpty()) {
-                exclusions.addElement(exclusionComboBox.getItemAt(exclusionComboBox.getSelectedIndex()) + ": " + exclusionField.getText());
+                exclusions.addElement(exclusionComboBox.getItemAt(exclusionComboBox.getSelectedIndex()) + ": "
+                        + exclusionField.getText());
                 exclusionField.setText(null);
             }
         });
@@ -113,6 +108,11 @@ public class ExclusionsTab extends JPanel {
         this.add(exclusionRemoveButton, gbc_exclusionRemoveButton);
     }
 
+    /**
+     * Creates and returns an {@link ExclusionManager} containing the exclusions made from this {@link ExclusionsTab}.
+     *
+     * @return an {@link ExclusionManager} containing the exclusions made from this {@link ExclusionsTab}.
+     */
     public ExclusionManager getExclusions() {
         ExclusionManager manager = new ExclusionManager();
         for (int i = 0; i < exclusions.size(); i++) {
@@ -122,12 +122,18 @@ public class ExclusionsTab extends JPanel {
         return manager;
     }
 
+    /**
+     * Sets the tab settings accordingly with the provided {@link SessionInfo}.
+     *
+     * @param info the {@link SessionInfo} used to determine the tab setup.
+     */
     public void setSettings(SessionInfo info) {
         exclusions.clear();
 
-        if (info.getExclusions() != null) {
-            ExclusionManager manager = info.getExclusions();
-            manager.getExclusions().forEach(exclusion -> exclusions.addElement(exclusion.getExclusionType().getValue() + ": " + exclusion.getExclusion().pattern()));
+        if (info.getExclusionManager() != null) {
+            ExclusionManager manager = info.getExclusionManager();
+            manager.getExclusions().forEach(exclusion -> exclusions.addElement(exclusion.getExclusionType().getValue()
+                    + ": " + exclusion.getPattern().pattern()));
         }
     }
 }

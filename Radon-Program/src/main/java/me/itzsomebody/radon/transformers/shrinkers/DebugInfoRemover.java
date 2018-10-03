@@ -21,6 +21,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 import me.itzsomebody.radon.utils.LoggerUtils;
 import org.objectweb.asm.tree.ClassNode;
 
+/**
+ * Removes various debug information that lies around in classes.
+ *
+ * @author ItzSomebody
+ */
 public class DebugInfoRemover extends Shrinker {
     @Override
     public void transform() {
@@ -55,18 +60,23 @@ public class DebugInfoRemover extends Shrinker {
                 classNode.signature = null;
             }
 
-            classWrapper.methods.parallelStream().filter(methodWrapper -> !excluded(methodWrapper) && methodWrapper.methodNode.signature != null).forEach(methodWrapper -> {
+            classWrapper.methods.parallelStream().filter(methodWrapper -> !excluded(methodWrapper)
+                    && methodWrapper.methodNode.signature != null).forEach(methodWrapper -> {
                 methodSignatures.incrementAndGet();
                 methodWrapper.methodNode.signature = null;
             });
 
-            classWrapper.fields.parallelStream().filter(fieldWrapper -> !excluded(fieldWrapper) && fieldWrapper.fieldNode.signature != null).forEach(fieldWrapper -> {
+            classWrapper.fields.parallelStream().filter(fieldWrapper -> !excluded(fieldWrapper)
+                    && fieldWrapper.fieldNode.signature != null).forEach(fieldWrapper -> {
                 fieldSignatures.incrementAndGet();
                 fieldWrapper.fieldNode.signature = null;
             });
         });
 
-        LoggerUtils.stdOut(String.format("Removed %d inner classes, %d outer classes, %d outer methods, %d class generic types, %d method generic types and %d field generic types.", innerClasses.get(), outerClasses.get(), outerMethods.get(), classSignatures.get(), methodSignatures.get(), fieldSignatures.get()));
+        LoggerUtils.stdOut(String.format("Removed %d inner classes, %d outer classes, %d outer methods, %d class " +
+                        "generic types, %d method generic types and %d field generic types.", innerClasses.get(),
+                outerClasses.get(), outerMethods.get(), classSignatures.get(), methodSignatures.get(),
+                fieldSignatures.get()));
     }
 
     @Override

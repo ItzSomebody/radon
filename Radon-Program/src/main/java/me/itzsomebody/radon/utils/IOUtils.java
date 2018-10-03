@@ -23,9 +23,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import me.itzsomebody.radon.exceptions.ByteArrayConversionException;
 
+/**
+ * IO utilities.
+ *
+ * @author ItzSomebody
+ */
 public class IOUtils {
     /**
-     * Renames an existing file to EXISTINGFILE.jar.BACKUP-X.
+     * Renames an existing file to EXISTING-FILE.jar.BACKUP-X.
      *
      * @param existing existing file to rename.
      * @return the new name of the existing name.

@@ -24,6 +24,11 @@ import me.itzsomebody.radon.utils.LoggerUtils;
 import me.itzsomebody.radon.utils.RandomUtils;
 import me.itzsomebody.radon.utils.StringUtils;
 
+/**
+ * Obfuscate the sourcedebugextension attribute by either randomizing the data, or removing it altogether.
+ *
+ * @author ItzSomebody
+ */
 public class SourceDebug extends Transformer {
     private boolean remove;
 
@@ -40,12 +45,13 @@ public class SourceDebug extends Transformer {
         AtomicInteger counter = new AtomicInteger();
 
         String newName = (remove) ? null : randomString(4) + ".java";
-        this.getClassWrappers().parallelStream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper -> {
+        getClassWrappers().parallelStream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper -> {
             classWrapper.classNode.sourceDebug = newName;
             counter.incrementAndGet();
         });
 
-        LoggerUtils.stdOut(String.format("%s %d source debug attributes.", (remove) ? "Removed" : "Obfuscated", counter.get()));
+        LoggerUtils.stdOut(String.format("%s %d source debug attributes.", (remove) ? "Removed" : "Obfuscated",
+                counter.get()));
     }
 
     @Override

@@ -23,12 +23,15 @@ import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
 import me.itzsomebody.radon.utils.LoggerUtils;
 
+/**
+ * Randomizes the order of methods and fields in a class.
+ */
 public class MemberShuffler extends Transformer {
     @Override
     public void transform() {
         AtomicInteger counter = new AtomicInteger();
 
-        this.getClassWrappers().parallelStream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper -> {
+        getClassWrappers().parallelStream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper -> {
             Collections.shuffle(classWrapper.classNode.methods);
             counter.addAndGet(classWrapper.classNode.methods.size());
             if (classWrapper.classNode.fields != null) {

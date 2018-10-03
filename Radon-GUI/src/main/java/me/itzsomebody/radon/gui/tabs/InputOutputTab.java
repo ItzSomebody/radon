@@ -25,6 +25,11 @@ import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import me.itzsomebody.radon.SessionInfo;
 
+/**
+ * A {@link JPanel} used to set the input, output and libraries.
+ *
+ * @author ItzSomebody
+ */
 public class InputOutputTab extends JPanel {
     private JTextField inputField;
     private JTextField outputField;
@@ -51,7 +56,8 @@ public class InputOutputTab extends JPanel {
         GridBagLayout gbl_inputOutputPanel = new GridBagLayout();
         gbl_inputOutputPanel.columnWidths = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
         gbl_inputOutputPanel.rowHeights = new int[]{0, 0, 0};
-        gbl_inputOutputPanel.columnWeights = new double[]{0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+        gbl_inputOutputPanel.columnWeights = new double[]{0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
         gbl_inputOutputPanel.rowWeights = new double[]{0.0, 0.0, Double.MIN_VALUE};
         inputOutputPanel.setLayout(gbl_inputOutputPanel);
 
@@ -250,14 +256,29 @@ public class InputOutputTab extends JPanel {
         librariesButtonPanel.add(librariesResetButton, gbc_librariesResetButton);
     }
 
+    /**
+     * Gets and returns the specified input file path as a {@link String}.
+     *
+     * @return the specified input file path as a {@link String}.
+     */
     public String getInputPath() {
         return this.inputField.getText();
     }
 
+    /**
+     * Gets and returns the specified output file path as a {@link String}.
+     *
+     * @return the specified output file path as a {@link String}.
+     */
     public String getOutputPath() {
         return this.outputField.getText();
     }
 
+    /**
+     * Gets and returns the specified libraries as a {@link List<File>}.
+     *
+     * @return the specified libraries as a {@link List<File>}.
+     */
     public List<File> getLibraries() {
         ArrayList<File> libs = new ArrayList<>();
         for (int i = 0; i < this.libraryList.size(); i++) {
@@ -267,6 +288,11 @@ public class InputOutputTab extends JPanel {
         return libs;
     }
 
+    /**
+     * Sets the tab settings accordingly with the provided {@link SessionInfo}.
+     *
+     * @param info the {@link SessionInfo} used to determine the tab setup.
+     */
     public void setSettings(SessionInfo info) {
         inputField.setText(null);
         outputField.setText(null);

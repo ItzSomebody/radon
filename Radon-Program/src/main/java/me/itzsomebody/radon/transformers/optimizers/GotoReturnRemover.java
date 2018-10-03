@@ -25,30 +25,36 @@ import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 
+/**
+ * Normalizes goto-return sequences by setting the goto to a return opcode.
+ *
+ * @author ItzSomebody.
+ */
 public class GotoReturnRemover extends Optimizer {
     @Override
     public void transform() {
         AtomicInteger count = new AtomicInteger();
         long current = System.currentTimeMillis();
 
-        this.getClassWrappers().parallelStream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper ->
-            classWrapper.methods.parallelStream().filter(methodWrapper -> !excluded(methodWrapper) && hasInstructions(methodWrapper.methodNode)).forEach(methodWrapper -> {
-                MethodNode methodNode = methodWrapper.methodNode;
+        getClassWrappers().parallelStream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper ->
+                classWrapper.methods.parallelStream().filter(methodWrapper -> !excluded(methodWrapper)
+                        && hasInstructions(methodWrapper.methodNode)).forEach(methodWrapper -> {
+                    MethodNode methodNode = methodWrapper.methodNode;
 
-                for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
-                    if (insn.getOpcode() == GOTO) {
-                        JumpInsnNode gotoJump = (JumpInsnNode) insn;
-                        AbstractInsnNode insnAfterTarget = gotoJump.label.getNext();
-                        if (insnAfterTarget != null && BytecodeUtils.isReturn(insnAfterTarget.getOpcode())) {
-                            methodNode.instructions.set(insn, new InsnNode(insnAfterTarget.getOpcode()));
-                            count.incrementAndGet();
+                    for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
+                        if (insn.getOpcode() == GOTO) {
+                            JumpInsnNode gotoJump = (JumpInsnNode) insn;
+                            AbstractInsnNode insnAfterTarget = gotoJump.label.getNext();
+                            if (insnAfterTarget != null && BytecodeUtils.isReturn(insnAfterTarget.getOpcode())) {
+                                methodNode.instructions.set(insn, new InsnNode(insnAfterTarget.getOpcode()));
+                                count.incrementAndGet();
+                            }
                         }
                     }
-                }
-            })
-        );
+                }));
 
-        LoggerUtils.stdOut(String.format("Normalized %d GOTO->RETURN sequences. [%dms]", count.get(), tookThisLong(current)));
+        LoggerUtils.stdOut(String.format("Normalized %d GOTO->RETURN sequences. [%dms]", count.get(),
+                tookThisLong(current)));
     }
 
     @Override

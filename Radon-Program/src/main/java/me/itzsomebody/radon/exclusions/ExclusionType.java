@@ -17,8 +17,15 @@
 
 package me.itzsomebody.radon.exclusions;
 
+/**
+ * All the valid exclusion types in an {@link Enum} representation.
+ *
+ * @author ItzSomebody
+ */
 public enum ExclusionType {
     GLOBAL("Global"),
+    EXTENDS("Extends"), // TODO
+    IMPLEMENTS("Implements"), // TODO
     STRING_ENCRYPTION("StringEncryption"),
     INVOKEDYNAMIC("InvokeDynamic"),
     FLOW_OBFUSCATION("FlowObfuscation"),

@@ -17,8 +17,20 @@
 
 package me.itzsomebody.radon.transformers.obfuscators.renamer;
 
+/**
+ * Used to hold the information needed for enabling the {@link Renamer} transformer.
+ *
+ * @author ItzSomebody
+ */
 public class RenamerSetup {
+    /**
+     * Resources Radon will attempt to update mappings in.
+     */
     private String[] adaptTheseResources;
+
+    /**
+     * Repackages all classes under this package.
+     */
     private String repackageName;
 
     public RenamerSetup(String[] adaptTheseResources, String repackageName) {

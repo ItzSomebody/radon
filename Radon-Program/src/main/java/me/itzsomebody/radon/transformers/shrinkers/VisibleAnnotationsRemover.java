@@ -21,6 +21,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 import me.itzsomebody.radon.utils.LoggerUtils;
 import org.objectweb.asm.tree.ClassNode;
 
+/**
+ * Removes annotations visible to the runtime from classes, methods and fields.
+ *
+ * @author ItzSomebody
+ */
 public class VisibleAnnotationsRemover extends Shrinker {
     @Override
     public void transform() {
@@ -36,18 +41,21 @@ public class VisibleAnnotationsRemover extends Shrinker {
                 classNode.visibleAnnotations.clear();
             }
 
-            classWrapper.fields.parallelStream().filter(fieldWrapper -> !excluded(fieldWrapper) && fieldWrapper.fieldNode.visibleAnnotations != null).forEach(fieldWrapper -> {
+            classWrapper.fields.parallelStream().filter(fieldWrapper -> !excluded(fieldWrapper)
+                    && fieldWrapper.fieldNode.visibleAnnotations != null).forEach(fieldWrapper -> {
                 fieldAnnotations.addAndGet(fieldWrapper.fieldNode.visibleAnnotations.size());
                 fieldWrapper.fieldNode.visibleAnnotations.clear();
             });
 
-            classWrapper.methods.parallelStream().filter(methodWrapper -> !excluded(methodWrapper) && methodWrapper.methodNode.visibleAnnotations != null).forEach(methodWrapper -> {
+            classWrapper.methods.parallelStream().filter(methodWrapper -> !excluded(methodWrapper)
+                    && methodWrapper.methodNode.visibleAnnotations != null).forEach(methodWrapper -> {
                 methodAnnotations.addAndGet(methodWrapper.methodNode.visibleAnnotations.size());
                 methodWrapper.methodNode.visibleAnnotations.clear();
             });
         });
 
-        LoggerUtils.stdOut(String.format("Removed %d class, %d method and %d field invisible annotations.", classAnnotations.get(), methodAnnotations.get(), fieldAnnotations.get()));
+        LoggerUtils.stdOut(String.format("Removed %d class, %d method and %d field invisible annotations.",
+                classAnnotations.get(), methodAnnotations.get(), fieldAnnotations.get()));
     }
 
     @Override

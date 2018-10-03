@@ -19,6 +19,11 @@ package me.itzsomebody.radon.utils;
 
 import java.util.concurrent.ThreadLocalRandom;
 
+/**
+ * Used to generate various randoms.
+ *
+ * @author ItzSomebody
+ */
 public class RandomUtils {
     private static ThreadLocalRandom random = ThreadLocalRandom.current();
 

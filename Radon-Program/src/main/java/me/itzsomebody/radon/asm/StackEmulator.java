@@ -76,7 +76,7 @@ public class StackEmulator implements Opcodes {
     }
 
     /**
-     *  Weakly emulates stack execution until no more instructions are left or the breakpoint is reached.
+     * Weakly emulates stack execution until no more instructions are left or the breakpoint is reached.
      */
     private void execute(boolean debug) {
         Stack<Object> stack = new Stack<>(); // Simulated stack
@@ -322,8 +322,7 @@ public class StackEmulator implements Opcodes {
                         Type[] args = Type.getArgumentTypes(((MethodInsnNode) insn).desc);
                         Type returnType = Type.getReturnType(((MethodInsnNode) insn).desc);
                         for (Type type : args) {
-                            if (type.getSort() == Type.LONG
-                                    || type.getSort() == Type.DOUBLE)
+                            if (type.getSort() == Type.LONG || type.getSort() == Type.DOUBLE)
                                 stack.pop();
 
                             stack.pop();
@@ -339,14 +338,12 @@ public class StackEmulator implements Opcodes {
                         Type[] args = Type.getArgumentTypes(((MethodInsnNode) insn).desc);
                         Type returnType = Type.getReturnType(((MethodInsnNode) insn).desc);
                         for (Type type : args) {
-                            if (type.getSort() == Type.LONG
-                                    || type.getSort() == Type.DOUBLE)
+                            if (type.getSort() == Type.LONG || type.getSort() == Type.DOUBLE)
                                 stack.pop();
 
                             stack.pop();
                         }
-                        if (returnType.getSort() == Type.LONG
-                                || returnType.getSort() == Type.DOUBLE)
+                        if (returnType.getSort() == Type.LONG || returnType.getSort() == Type.DOUBLE)
                             stack.push(null);
                         if (returnType.getSort() != Type.VOID)
                             stack.push(null);
@@ -356,14 +353,12 @@ public class StackEmulator implements Opcodes {
                         Type[] args = Type.getArgumentTypes(((InvokeDynamicInsnNode) insn).desc);
                         Type returnType = Type.getReturnType(((InvokeDynamicInsnNode) insn).desc);
                         for (Type type : args) {
-                            if (type.getSort() == Type.LONG
-                                    || type.getSort() == Type.DOUBLE)
+                            if (type.getSort() == Type.LONG || type.getSort() == Type.DOUBLE)
                                 stack.pop();
 
                             stack.pop();
                         }
-                        if (returnType.getSort() == Type.LONG
-                                || returnType.getSort() == Type.DOUBLE)
+                        if (returnType.getSort() == Type.LONG || returnType.getSort() == Type.DOUBLE)
                             stack.push(null);
                         if (returnType.getSort() != Type.VOID)
                             stack.push(null);

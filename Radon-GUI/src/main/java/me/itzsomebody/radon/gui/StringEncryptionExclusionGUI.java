@@ -25,14 +25,14 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import me.itzsomebody.radon.gui.tabs.ObfuscationTab;
 
+/**
+ * A {@link JFrame} which controls string-specific exclusion from encryption.
+ *
+ * @author ItzSomebody
+ */
 public class StringEncryptionExclusionGUI extends JFrame {
     public StringEncryptionExclusionGUI() {
         setTitle("String Exclusions");
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {
-            // Ignored
-        }
         setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         setSize(450, 300);
         setLocationRelativeTo(null);

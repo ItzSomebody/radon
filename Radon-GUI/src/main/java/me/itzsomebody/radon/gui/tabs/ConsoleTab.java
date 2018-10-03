@@ -23,7 +23,15 @@ import java.io.PrintStream;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 
+/**
+ * A {@link JPanel} containing a {@link JTextArea} which all System.out and System.err is redirected to.
+ *
+ * @author ItzSomebody
+ */
 public class ConsoleTab extends JPanel {
+    /**
+     * The {@link JTextArea} System.out and System.err is redirected to.
+     */
     private JTextArea consoleTextArea;
 
     public ConsoleTab() {
@@ -51,7 +59,13 @@ public class ConsoleTab extends JPanel {
         System.setErr(customPrintStream);
     }
 
+    /**
+     * Custom {@link OutputStream}.
+     */
     class OutputStreamRedirect extends OutputStream {
+        /**
+         * {@link JTextArea} System.out and System.err is redirected to.
+         */
         private JTextArea consoleOutput;
 
         private OutputStreamRedirect(JTextArea consoleOutput) {
@@ -65,6 +79,9 @@ public class ConsoleTab extends JPanel {
         }
     }
 
+    /**
+     * Clears the {@link JTextArea} System.out and System.err is redirected to.
+     */
     public void resetConsole() {
         consoleTextArea.setText(null);
     }

@@ -36,18 +36,26 @@ import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
+/**
+ * Same as{@link LightFlowObfuscation}, but also inserts fake jumps where the stack is empty.
+ *
+ * @author ItzSomebody
+ */
 public class NormalFlowObfuscation extends FlowObfuscation {
     @Override
     public void transform() {
         AtomicInteger counter = new AtomicInteger();
         long current = System.currentTimeMillis();
 
-        this.getClassWrappers().parallelStream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper -> {
+        this.getClassWrappers().parallelStream().filter(classWrapper ->
+                !excluded(classWrapper)).forEach(classWrapper -> {
             ClassNode classNode = classWrapper.classNode;
-            FieldNode field = new FieldNode(ACC_PUBLIC + ACC_STATIC + ACC_FINAL, StringUtils.randomSpacesString(RandomUtils.getRandomInt(10)), "Z", null, null);
+            FieldNode field = new FieldNode(ACC_PUBLIC + ACC_STATIC + ACC_FINAL,
+                    StringUtils.randomSpacesString(RandomUtils.getRandomInt(10)), "Z", null, null);
 
             classNode.fields.add(field);
-            classWrapper.methods.parallelStream().filter(methodWrapper -> !excluded(methodWrapper) && hasInstructions(methodWrapper.methodNode)).forEach(methodWrapper -> {
+            classWrapper.methods.parallelStream().filter(methodWrapper -> !excluded(methodWrapper)
+                    && hasInstructions(methodWrapper.methodNode)).forEach(methodWrapper -> {
                 MethodNode methodNode = methodWrapper.methodNode;
                 int leeway = getSizeLeeway(methodNode);
                 int varIndex = methodNode.maxLocals;
@@ -55,14 +63,16 @@ public class NormalFlowObfuscation extends FlowObfuscation {
                 AbstractInsnNode[] untouchedList = methodNode.instructions.toArray();
                 LabelNode labelNode = exitLabel(methodNode);
                 boolean calledSuper = false;
-                Set<AbstractInsnNode> emptyAt = new StackEmulator(methodNode, methodNode.instructions.getLast()).getEmptyAt();
+                Set<AbstractInsnNode> emptyAt = new StackEmulator(methodNode,
+                        methodNode.instructions.getLast()).getEmptyAt();
                 for (AbstractInsnNode insn : untouchedList) {
                     if (leeway < 10000) {
                         break;
                     }
                     if (methodNode.name.equals("<init>")) {
                         if (insn instanceof MethodInsnNode) {
-                            if (insn.getOpcode() == INVOKESPECIAL && insn.getPrevious() instanceof VarInsnNode && ((VarInsnNode) insn.getPrevious()).var == 0) {
+                            if (insn.getOpcode() == INVOKESPECIAL && insn.getPrevious() instanceof VarInsnNode
+                                    && ((VarInsnNode) insn.getPrevious()).var == 0) {
                                 calledSuper = true;
                             }
                         }
@@ -78,7 +88,8 @@ public class NormalFlowObfuscation extends FlowObfuscation {
                         }
                     }
                     if (insn.getOpcode() == GOTO) {
-                        methodNode.instructions.insertBefore(insn, new FieldInsnNode(GETSTATIC, classNode.name, field.name, "Z"));
+                        methodNode.instructions.insertBefore(insn, new FieldInsnNode(GETSTATIC, classNode.name,
+                                field.name, "Z"));
                         methodNode.instructions.insert(insn, new InsnNode(ATHROW));
                         methodNode.instructions.insert(insn, new InsnNode(ACONST_NULL));
                         methodNode.instructions.set(insn, new JumpInsnNode(IFEQ, ((JumpInsnNode) insn).label));
@@ -86,8 +97,10 @@ public class NormalFlowObfuscation extends FlowObfuscation {
                         counter.incrementAndGet();
                     }
                 }
-                methodNode.instructions.insertBefore(methodNode.instructions.getFirst(), new VarInsnNode(ISTORE, varIndex));
-                methodNode.instructions.insertBefore(methodNode.instructions.getFirst(), new FieldInsnNode(GETSTATIC, classNode.name, field.name, "Z"));
+                methodNode.instructions.insertBefore(methodNode.instructions.getFirst(),
+                        new VarInsnNode(ISTORE, varIndex));
+                methodNode.instructions.insertBefore(methodNode.instructions.getFirst(),
+                        new FieldInsnNode(GETSTATIC, classNode.name, field.name, "Z"));
             });
         });
     }
@@ -97,6 +110,12 @@ public class NormalFlowObfuscation extends FlowObfuscation {
         return "Normal flow obfuscation";
     }
 
+    /**
+     * Generates a generic "escape" pattern to avoid inserting multiple copies of the same bytecode instructions.
+     *
+     * @param methodNode the {@link MethodNode} we are inserting into.
+     * @return a {@link LabelNode} which "escapes" all other flow.
+     */
     LabelNode exitLabel(MethodNode methodNode) {
         LabelNode lb = new LabelNode();
         LabelNode escapeNode = new LabelNode();
@@ -112,13 +131,16 @@ public class NormalFlowObfuscation extends FlowObfuscation {
                 methodNode.instructions.insertBefore(target, BytecodeUtils.getNumberInsn(RandomUtils.getRandomInt(2)));
                 methodNode.instructions.insertBefore(target, new InsnNode(IRETURN));
             case Type.CHAR:
-                methodNode.instructions.insertBefore(target, BytecodeUtils.getNumberInsn(RandomUtils.getRandomInt(Character.MAX_VALUE + 1)));
+                methodNode.instructions.insertBefore(target, BytecodeUtils.getNumberInsn(RandomUtils
+                        .getRandomInt(Character.MAX_VALUE + 1)));
                 methodNode.instructions.insertBefore(target, new InsnNode(IRETURN));
             case Type.BYTE:
-                methodNode.instructions.insertBefore(target, BytecodeUtils.getNumberInsn(RandomUtils.getRandomInt(Byte.MAX_VALUE + 1)));
+                methodNode.instructions.insertBefore(target, BytecodeUtils.getNumberInsn(RandomUtils
+                        .getRandomInt(Byte.MAX_VALUE + 1)));
                 methodNode.instructions.insertBefore(target, new InsnNode(IRETURN));
             case Type.SHORT:
-                methodNode.instructions.insertBefore(target, BytecodeUtils.getNumberInsn(RandomUtils.getRandomInt(Short.MAX_VALUE + 1)));
+                methodNode.instructions.insertBefore(target, BytecodeUtils.getNumberInsn(RandomUtils
+                        .getRandomInt(Short.MAX_VALUE + 1)));
                 methodNode.instructions.insertBefore(target, new InsnNode(IRETURN));
             case Type.INT:
                 methodNode.instructions.insertBefore(target, BytecodeUtils.getNumberInsn(RandomUtils.getRandomInt()));

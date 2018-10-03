@@ -19,6 +19,11 @@ package me.itzsomebody.radon.utils;
 
 import org.objectweb.asm.Opcodes;
 
+/**
+ * Access utilities for access flags.
+ *
+ * @author ItzSomebody
+ */
 public class AccessUtils {
     public static boolean isAbstract(int access) {
         return (Opcodes.ACC_ABSTRACT & access) != 0;

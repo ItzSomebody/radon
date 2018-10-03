@@ -67,7 +67,7 @@ public class SessionInfo {
         this.exclusions = exclusions;
     }
 
-    public ExclusionManager getExclusions() {
+    public ExclusionManager getExclusionManager() {
         return this.exclusions;
     }
 

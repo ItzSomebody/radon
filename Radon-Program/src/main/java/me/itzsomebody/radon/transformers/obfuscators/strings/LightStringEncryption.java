@@ -32,6 +32,11 @@ import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 
+/**
+ * Encrypts string literals with a simple XOR algorithm.
+ *
+ * @author ItzSomebody
+ */
 public class LightStringEncryption extends StringEncryption {
     public LightStringEncryption(StringEncryptionSetup setup) {
         super(setup);
@@ -42,31 +47,36 @@ public class LightStringEncryption extends StringEncryption {
         AtomicInteger counter = new AtomicInteger();
         MemberNames memberNames = new MemberNames();
 
-        this.getClassWrappers().parallelStream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper -> classWrapper.methods.parallelStream().filter(methodWrapper -> !excluded(methodWrapper) && hasInstructions(methodWrapper.methodNode)).forEach(methodWrapper -> {
-            MethodNode methodNode = methodWrapper.methodNode;
-            int leeway = getSizeLeeway(methodNode);
+        this.getClassWrappers().parallelStream().filter(classWrapper ->
+                !excluded(classWrapper)).forEach(classWrapper ->
+                classWrapper.methods.parallelStream().filter(methodWrapper -> !excluded(methodWrapper)
+                        && hasInstructions(methodWrapper.methodNode)).forEach(methodWrapper -> {
+                    MethodNode methodNode = methodWrapper.methodNode;
+                    int leeway = getSizeLeeway(methodNode);
 
-            for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
-                if (leeway < 10000) {
-                    break;
-                }
-                if (insn instanceof LdcInsnNode) {
-                    LdcInsnNode ldc = (LdcInsnNode) insn;
-                    if (ldc.cst instanceof String) {
-                        String cst = (String) ldc.cst;
+                    for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
+                        if (leeway < 10000) {
+                            break;
+                        }
+                        if (insn instanceof LdcInsnNode) {
+                            LdcInsnNode ldc = (LdcInsnNode) insn;
+                            if (ldc.cst instanceof String) {
+                                String cst = (String) ldc.cst;
 
-                        if (!excludedString(cst)) {
-                            int extraKey = RandomUtils.getRandomInt();
-                            ldc.cst = encrypt(cst, extraKey);
-                            methodNode.instructions.insert(insn, new MethodInsnNode(INVOKESTATIC, memberNames.className, memberNames.decryptMethodName, "(Ljava/lang/String;I)Ljava/lang/String;", false));
-                            methodNode.instructions.insert(insn, BytecodeUtils.getNumberInsn(extraKey));
-                            leeway -= 7;
-                            counter.incrementAndGet();
+                                if (!excludedString(cst)) {
+                                    int extraKey = RandomUtils.getRandomInt();
+                                    ldc.cst = encrypt(cst, extraKey);
+                                    methodNode.instructions.insert(insn, new MethodInsnNode(INVOKESTATIC,
+                                            memberNames.className, memberNames.decryptMethodName,
+                                            "(Ljava/lang/String;I)Ljava/lang/String;", false));
+                                    methodNode.instructions.insert(insn, BytecodeUtils.getNumberInsn(extraKey));
+                                    leeway -= 7;
+                                    counter.incrementAndGet();
+                                }
+                            }
                         }
                     }
-                }
-            }
-        }));
+                }));
         // Add decrypt method
         ClassNode decryptor = createDecryptor(memberNames);
         getClasses().put(decryptor.name, new ClassWrapper(decryptor, false));
@@ -96,7 +106,8 @@ public class LightStringEncryption extends StringEncryption {
         cw.visit(V1_5, ACC_PUBLIC + ACC_SUPER, memberNames.className, null, "java/lang/Object", null);
 
         {
-            fv = cw.visitField(ACC_PRIVATE + ACC_STATIC, memberNames.cacheFieldName, "Ljava/util/HashMap;", "Ljava/util/HashMap<Ljava/lang/String;Ljava/lang/String;>;", null);
+            fv = cw.visitField(ACC_PRIVATE + ACC_STATIC, memberNames.cacheFieldName, "Ljava/util/HashMap;",
+                    "Ljava/util/HashMap<Ljava/lang/String;Ljava/lang/String;>;", null);
             fv.visitEnd();
         }
         {
@@ -126,14 +137,16 @@ public class LightStringEncryption extends StringEncryption {
             mv.visitEnd();
         }
         {
-            mv = cw.visitMethod(ACC_PRIVATE + ACC_STATIC, memberNames.cacheStringMethodName, "(Ljava/lang/String;Ljava/lang/String;)V", null, null);
+            mv = cw.visitMethod(ACC_PRIVATE + ACC_STATIC, memberNames.cacheStringMethodName,
+                    "(Ljava/lang/String;Ljava/lang/String;)V", null, null);
             mv.visitCode();
             Label l0 = new Label();
             mv.visitLabel(l0);
             mv.visitFieldInsn(GETSTATIC, memberNames.className, memberNames.cacheFieldName, "Ljava/util/HashMap;");
             mv.visitVarInsn(ALOAD, 0);
             mv.visitVarInsn(ALOAD, 1);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/util/HashMap", "put", "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/util/HashMap", "put",
+                    "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", false);
             mv.visitInsn(POP);
             Label l1 = new Label();
             mv.visitLabel(l1);
@@ -144,13 +157,15 @@ public class LightStringEncryption extends StringEncryption {
             mv.visitEnd();
         }
         {
-            mv = cw.visitMethod(ACC_PRIVATE + ACC_STATIC, memberNames.returnCacheMethodName, "(Ljava/lang/String;)Ljava/lang/String;", null, null);
+            mv = cw.visitMethod(ACC_PRIVATE + ACC_STATIC, memberNames.returnCacheMethodName,
+                    "(Ljava/lang/String;)Ljava/lang/String;", null, null);
             mv.visitCode();
             Label l0 = new Label();
             mv.visitLabel(l0);
             mv.visitFieldInsn(GETSTATIC, memberNames.className, memberNames.cacheFieldName, "Ljava/util/HashMap;");
             mv.visitVarInsn(ALOAD, 0);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/util/HashMap", "get", "(Ljava/lang/Object;)Ljava/lang/Object;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/util/HashMap", "get", "(Ljava/lang/Object;)Ljava/lang/Object;",
+                    false);
             mv.visitTypeInsn(CHECKCAST, "java/lang/String");
             mv.visitInsn(ARETURN);
             Label l1 = new Label();
@@ -159,7 +174,8 @@ public class LightStringEncryption extends StringEncryption {
             mv.visitEnd();
         }
         {
-            mv = cw.visitMethod(ACC_PRIVATE + ACC_STATIC, memberNames.cacheContainsMethodName, "(Ljava/lang/String;)Z", null, null);
+            mv = cw.visitMethod(ACC_PRIVATE + ACC_STATIC, memberNames.cacheContainsMethodName, "(Ljava/lang/String;)Z",
+                    null, null);
             mv.visitCode();
             Label l0 = new Label();
             mv.visitLabel(l0);
@@ -173,18 +189,21 @@ public class LightStringEncryption extends StringEncryption {
             mv.visitEnd();
         }
         {
-            mv = cw.visitMethod(ACC_PUBLIC + ACC_STATIC, memberNames.decryptMethodName, "(Ljava/lang/String;I)Ljava/lang/String;", null, null);
+            mv = cw.visitMethod(ACC_PUBLIC + ACC_STATIC, memberNames.decryptMethodName,
+                    "(Ljava/lang/String;I)Ljava/lang/String;", null, null);
             mv.visitCode();
             Label l0 = new Label();
             mv.visitLabel(l0);
             mv.visitVarInsn(ALOAD, 0);
-            mv.visitMethodInsn(INVOKESTATIC, memberNames.className, memberNames.cacheContainsMethodName, "(Ljava/lang/String;)Z", false);
+            mv.visitMethodInsn(INVOKESTATIC, memberNames.className, memberNames.cacheContainsMethodName,
+                    "(Ljava/lang/String;)Z", false);
             Label l1 = new Label();
             mv.visitJumpInsn(IFEQ, l1);
             Label l2 = new Label();
             mv.visitLabel(l2);
             mv.visitVarInsn(ALOAD, 0);
-            mv.visitMethodInsn(INVOKESTATIC, memberNames.className, memberNames.returnCacheMethodName, "(Ljava/lang/String;)Ljava/lang/String;", false);
+            mv.visitMethodInsn(INVOKESTATIC, memberNames.className, memberNames.returnCacheMethodName,
+                    "(Ljava/lang/String;)Ljava/lang/String;", false);
             mv.visitInsn(ARETURN);
             mv.visitLabel(l1);
             mv.visitVarInsn(ALOAD, 0);
@@ -213,7 +232,8 @@ public class LightStringEncryption extends StringEncryption {
             mv.visitVarInsn(ILOAD, 1);
             mv.visitInsn(IXOR);
             mv.visitInsn(I2C);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(C)Ljava/lang/StringBuilder;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(C)Ljava/lang/StringBuilder;",
+                    false);
             mv.visitInsn(POP);
             Label l8 = new Label();
             mv.visitLabel(l8);
@@ -232,7 +252,8 @@ public class LightStringEncryption extends StringEncryption {
             mv.visitLabel(l10);
             mv.visitVarInsn(ALOAD, 0);
             mv.visitVarInsn(ALOAD, 4);
-            mv.visitMethodInsn(INVOKESTATIC, memberNames.className, memberNames.cacheStringMethodName, "(Ljava/lang/String;Ljava/lang/String;)V", false);
+            mv.visitMethodInsn(INVOKESTATIC, memberNames.className, memberNames.cacheStringMethodName,
+                    "(Ljava/lang/String;Ljava/lang/String;)V", false);
             Label l11 = new Label();
             mv.visitLabel(l11);
             mv.visitVarInsn(ALOAD, 3);

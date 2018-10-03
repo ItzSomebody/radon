@@ -20,6 +20,11 @@ package me.itzsomebody.radon.transformers.shrinkers;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
 
+/**
+ * Abstract class for shrinking transformers.
+ *
+ * @author ItzSomebody
+ */
 public abstract class Shrinker extends Transformer {
     @Override
     protected ExclusionType getExclusionType() {

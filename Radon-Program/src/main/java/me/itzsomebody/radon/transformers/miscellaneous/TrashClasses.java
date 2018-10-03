@@ -42,8 +42,14 @@ import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
+/**
+ * Not really a transformer. This "transformer" generates unused classes full
+ * of random bytecode.
+ *
+ * @author ItzSomebody
+ */
 public class TrashClasses extends Transformer {
-    private ArrayList<String> DESCRIPTORS = new ArrayList<String>() {
+    private static ArrayList<String> DESCRIPTORS = new ArrayList<String>() {
         {
             add("Z");
             add("C");

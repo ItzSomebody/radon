@@ -19,6 +19,11 @@ package me.itzsomebody.radon.transformers.obfuscators.strings;
 
 import java.util.List;
 
+/**
+ * Used to hold the information needed for enabling the string encryption transformers.
+ *
+ * @author ItzSomebody
+ */
 public class StringEncryptionSetup {
     private final List<String> exemptedStrings;
 

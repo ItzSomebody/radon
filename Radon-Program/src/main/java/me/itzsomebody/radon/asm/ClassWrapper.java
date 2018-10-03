@@ -54,7 +54,7 @@ public class ClassWrapper {
     /**
      * Creates a ClassWrapper object.
      *
-     * @param classNode the attached {@link ClassNode}.
+     * @param classNode   the attached {@link ClassNode}.
      * @param libraryNode is this a library class?
      */
     public ClassWrapper(ClassNode classNode, boolean libraryNode) {
@@ -63,9 +63,11 @@ public class ClassWrapper {
         this.libraryNode = libraryNode;
 
         ClassWrapper instance = this;
-        classNode.methods.forEach(methodNode -> methods.add(new MethodWrapper(methodNode, instance, methodNode.name, methodNode.desc)));
+        classNode.methods.forEach(methodNode -> methods.add(new MethodWrapper(methodNode, instance, methodNode.name,
+                methodNode.desc)));
         if (classNode.fields != null) {
-            classNode.fields.forEach(fieldNode -> fields.add(new FieldWrapper(fieldNode, instance, fieldNode.name, fieldNode.desc)));
+            classNode.fields.forEach(fieldNode -> fields.add(new FieldWrapper(fieldNode, instance, fieldNode.name,
+                    fieldNode.desc)));
         }
     }
 }

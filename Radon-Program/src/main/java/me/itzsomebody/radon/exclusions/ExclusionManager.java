@@ -17,13 +17,17 @@
 
 package me.itzsomebody.radon.exclusions;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.LinkedList;
 
+/**
+ * Class containing a {@link LinkedList<Exclusion>} of all the created exclusions.
+ *
+ * @author ItzSomebody
+ */
 public class ExclusionManager {
-    private List<Exclusion> exclusions = new ArrayList<>();
+    private LinkedList<Exclusion> exclusions = new LinkedList<>();
 
-    public List<Exclusion> getExclusions() {
+    public LinkedList<Exclusion> getExclusions() {
         return this.exclusions;
     }
 
@@ -33,7 +37,8 @@ public class ExclusionManager {
 
     public boolean isExcluded(String pattern, ExclusionType type) {
         for (Exclusion exclusion : this.exclusions) {
-            if ((exclusion.getExclusionType() == type || exclusion.getExclusionType() == ExclusionType.GLOBAL) && exclusion.matches(pattern)) {
+            if ((exclusion.getExclusionType() == type || exclusion.getExclusionType() == ExclusionType.GLOBAL)
+                    && exclusion.matches(pattern)) {
                 return true;
             }
         }

@@ -53,6 +53,11 @@ import me.itzsomebody.radon.transformers.obfuscators.strings.StringEncryption;
 import me.itzsomebody.radon.transformers.obfuscators.strings.StringEncryptionSetup;
 import me.itzsomebody.radon.transformers.obfuscators.strings.StringPool;
 
+/**
+ * A {@link JPanel} which controls all of the obfuscation settings in Radon.
+ *
+ * @author ItzSomebody
+ */
 public class ObfuscationTab extends JPanel {
     public static ArrayList<String> stringExclusions = new ArrayList<>();
     private JComboBox<String> stringEncryptionTypeSelector;
@@ -109,7 +114,8 @@ public class ObfuscationTab extends JPanel {
         GridBagLayout gbl_stringEncryptionPanel = new GridBagLayout();
         gbl_stringEncryptionPanel.columnWidths = new int[]{0, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
         gbl_stringEncryptionPanel.rowHeights = new int[]{0, 0, 0};
-        gbl_stringEncryptionPanel.columnWeights = new double[]{1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+        gbl_stringEncryptionPanel.columnWeights = new double[]{1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
         gbl_stringEncryptionPanel.rowWeights = new double[]{0.0, 0.0, Double.MIN_VALUE};
         stringEncryptionPanel.setBorder(new TitledBorder("String Encryption"));
         stringEncryptionPanel.setLayout(gbl_stringEncryptionPanel);
@@ -170,7 +176,8 @@ public class ObfuscationTab extends JPanel {
         GridBagLayout gbl_renamingPanel = new GridBagLayout();
         gbl_renamingPanel.columnWidths = new int[]{0, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
         gbl_renamingPanel.rowHeights = new int[]{0, 0, 0, 0};
-        gbl_renamingPanel.columnWeights = new double[]{1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE};
+        gbl_renamingPanel.columnWeights = new double[]{1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                0.0, 1.0, 0.0, Double.MIN_VALUE};
         gbl_renamingPanel.rowWeights = new double[]{0.0, 0.0, 0.0, Double.MIN_VALUE};
         renamingPanel.setLayout(gbl_renamingPanel);
 
@@ -239,7 +246,8 @@ public class ObfuscationTab extends JPanel {
         GridBagLayout gbl_otherPanel = new GridBagLayout();
         gbl_otherPanel.columnWidths = new int[]{74, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
         gbl_otherPanel.rowHeights = new int[]{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-        gbl_otherPanel.columnWeights = new double[]{1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
+        gbl_otherPanel.columnWeights = new double[]{1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                0.0, 0.0, 0.0, Double.MIN_VALUE};
         gbl_otherPanel.rowWeights = new double[]{0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, Double.MIN_VALUE};
         otherPanel.setLayout(gbl_otherPanel);
 
@@ -261,7 +269,8 @@ public class ObfuscationTab extends JPanel {
         gbc_invokeDynamicCheckBox.insets = new Insets(0, 0, 5, 5);
         gbc_invokeDynamicCheckBox.gridx = 0;
         gbc_invokeDynamicCheckBox.gridy = 0;
-        invokeDynamicCheckBox.addActionListener((e) -> invokeDynamicComboBox.setEnabled(invokeDynamicCheckBox.isSelected()));
+        invokeDynamicCheckBox.addActionListener((e) ->
+                invokeDynamicComboBox.setEnabled(invokeDynamicCheckBox.isSelected()));
         otherPanel.add(invokeDynamicCheckBox, gbc_invokeDynamicCheckBox);
 
         flowComboBox = new JComboBox<>();
@@ -303,7 +312,8 @@ public class ObfuscationTab extends JPanel {
         gbc_numberObfuscationCheckBox.insets = new Insets(0, 0, 5, 5);
         gbc_numberObfuscationCheckBox.gridx = 0;
         gbc_numberObfuscationCheckBox.gridy = 2;
-        numberObfuscationCheckBox.addActionListener((e) -> numberObfuscationComboBox.setEnabled(numberObfuscationCheckBox.isSelected()));
+        numberObfuscationCheckBox.addActionListener((e) ->
+                numberObfuscationComboBox.setEnabled(numberObfuscationCheckBox.isSelected()));
         otherPanel.add(numberObfuscationCheckBox, gbc_numberObfuscationCheckBox);
 
         localVarsRemove = new JCheckBox("Remove");
@@ -422,7 +432,8 @@ public class ObfuscationTab extends JPanel {
                     break;
                 }
                 default: {
-                    throw new IllegalStateException(String.format("Bad string encryption type %d.", stringEncryptionTypeSelector.getSelectedIndex()));
+                    throw new IllegalStateException(String.format("Bad string encryption type %d.",
+                            stringEncryptionTypeSelector.getSelectedIndex()));
                 }
             }
 
@@ -433,13 +444,17 @@ public class ObfuscationTab extends JPanel {
     }
 
     public StringPool getStringPool() {
-        return (stringEncryptionEnabledCheckBox.isSelected() && stringPoolCheckBox.isSelected()) ? new StringPool(new StringEncryptionSetup(stringExclusions)) : null;
+        return (stringEncryptionEnabledCheckBox.isSelected() && stringPoolCheckBox.isSelected())
+                ? new StringPool(new StringEncryptionSetup(stringExclusions)) : null;
     }
 
     public Renamer getRenamer() {
         if (renamingEnabledCheckBox.isSelected()) {
-            String[] resources = (renamingAdaptResources.isSelected() && renamingResourcesField.getText() != null && !renamingResourcesField.getText().isEmpty()) ? renamingResourcesField.getText().split(", ") : null;
-            String repackageName = (renamingRepackageCheckBox.isSelected() && renamingRepackageField.getText() != null && !renamingRepackageField.getText().isEmpty()) ? renamingRepackageField.getText() : null;
+            String[] resources = (renamingAdaptResources.isSelected() && renamingResourcesField.getText() != null
+                    && !renamingResourcesField.getText().isEmpty())
+                    ? renamingResourcesField.getText().split(", ") : null;
+            String repackageName = (renamingRepackageCheckBox.isSelected() && renamingRepackageField.getText() != null
+                    && !renamingRepackageField.getText().isEmpty()) ? renamingRepackageField.getText() : null;
 
             return new Renamer(new RenamerSetup(resources, repackageName));
         } else {
@@ -460,7 +475,8 @@ public class ObfuscationTab extends JPanel {
                     return new HeavyInvokeDynamic();
                 }
                 default: {
-                    throw new IllegalStateException(String.format("Bad invokedynamic type %d.", invokeDynamicComboBox.getSelectedIndex()));
+                    throw new IllegalStateException(String.format("Bad invokedynamic type %d.",
+                            invokeDynamicComboBox.getSelectedIndex()));
                 }
             }
         } else {
@@ -481,7 +497,8 @@ public class ObfuscationTab extends JPanel {
                     return new HeavyFlowObfuscation();
                 }
                 default: {
-                    throw new IllegalStateException(String.format("Bad flow obfuscation type %d.", flowComboBox.getSelectedIndex()));
+                    throw new IllegalStateException(String.format("Bad flow obfuscation type %d.",
+                            flowComboBox.getSelectedIndex()));
                 }
             }
         } else {
@@ -502,7 +519,8 @@ public class ObfuscationTab extends JPanel {
                     return new HeavyNumberObfuscation();
                 }
                 default: {
-                    throw new IllegalStateException(String.format("Bad number obfuscation type %d.", flowComboBox.getSelectedIndex()));
+                    throw new IllegalStateException(String.format("Bad number obfuscation type %d.",
+                            flowComboBox.getSelectedIndex()));
                 }
             }
         } else {
@@ -538,6 +556,11 @@ public class ObfuscationTab extends JPanel {
         return (crasherCheckBox.isSelected()) ? new Crasher() : null;
     }
 
+    /**
+     * Sets the tab settings accordingly with the provided {@link SessionInfo}.
+     *
+     * @param info the {@link SessionInfo} used to determine the tab setup.
+     */
     public void setSettings(SessionInfo info) {
         stringEncryptionEnabledCheckBox.setSelected(false);
         stringEncryptionTypeSelector.setSelectedIndex(0);

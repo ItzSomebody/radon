@@ -42,7 +42,7 @@ public class LoggerUtils {
     /**
      * Writes strings to log.
      */
-    public static void logWriter() {
+    public static void dumpLog() {
         BufferedWriter bw;
         try {
             File log = new File("Radon.log");

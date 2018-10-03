@@ -30,6 +30,11 @@ import me.itzsomebody.radon.transformers.miscellaneous.watermarker.Watermarker;
 import me.itzsomebody.radon.transformers.miscellaneous.watermarker.WatermarkerSetup;
 import me.itzsomebody.radon.utils.WatermarkUtils;
 
+/**
+ * A {@link JPanel} which controls all of the watermarking settings in Radon.
+ *
+ * @author ItzSomebody
+ */
 public class WatermarkingTab extends JPanel {
     private JTextField watermarkMessageField;
     private JTextField watermarkKeyField;
@@ -138,7 +143,8 @@ public class WatermarkingTab extends JPanel {
             chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
             int result = chooser.showOpenDialog(this);
             if (result == 0) {
-                SwingUtilities.invokeLater(() -> watermarkExtractorInputField.setText(chooser.getSelectedFile().getAbsolutePath()));
+                SwingUtilities.invokeLater(() ->
+                        watermarkExtractorInputField.setText(chooser.getSelectedFile().getAbsolutePath()));
             }
         });
         watermarkerExtractor.add(watermarkExtractorInputButton, gbc_watermarkExtractorInputButton);
@@ -183,7 +189,8 @@ public class WatermarkingTab extends JPanel {
             extractionList.clear();
             File file = new File(watermarkExtractorInputField.getText());
             if (!file.exists()) {
-                throw new WatermarkExtractionException(String.format("Could not find input file %s.", watermarkExtractorInputField.getText()));
+                throw new WatermarkExtractionException(String.format("Could not find input file %s.",
+                        watermarkExtractorInputField.getText()));
             }
 
             try {
@@ -218,10 +225,24 @@ public class WatermarkingTab extends JPanel {
         this.add(watermarkerEnabledCheckBox, gbc_watermarkerEnabledCheckBox);
     }
 
+    /**
+     * Creates an {@link Watermarker} transformer setup accordingly to the information provided in this
+     * {@link WatermarkingTab}.
+     *
+     * @return an {@link Watermarker} transformer setup accordingly to the information provided in this
+     * {@link WatermarkingTab}.
+     */
     public Watermarker getWatermarker() {
-        return (watermarkerEnabledCheckBox.isSelected()) ? new Watermarker(new WatermarkerSetup(watermarkMessageField.getText(), watermarkKeyField.getText())) : null;
+        return (watermarkerEnabledCheckBox.isSelected())
+                ? new Watermarker(new WatermarkerSetup(watermarkMessageField.getText(),
+                watermarkKeyField.getText())) : null;
     }
 
+    /**
+     * Sets the tab settings accordingly with the provided {@link SessionInfo}.
+     *
+     * @param info the {@link SessionInfo} used to determine the tab setup.
+     */
     public void setSettings(SessionInfo info) {
         watermarkerEnabledCheckBox.setSelected(false);
         watermarkMessageField.setText(null);
@@ -230,7 +251,8 @@ public class WatermarkingTab extends JPanel {
         watermarkKeyField.setEditable(false);
 
         if (info.getTransformers() != null) {
-            info.getTransformers().stream().filter(transformer -> transformer instanceof Watermarker).forEach(transformer -> {
+            info.getTransformers().stream().filter(transformer ->
+                    transformer instanceof Watermarker).forEach(transformer -> {
                 watermarkerEnabledCheckBox.setSelected(true);
                 watermarkMessageField.setEditable(true);
                 watermarkKeyField.setEditable(true);

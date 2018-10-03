@@ -49,6 +49,11 @@ import org.objectweb.asm.commons.JSRInlinerAdapter;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
 
+/**
+ * This class is how Radon processes the provided {@link SessionInfo} to produce an obfuscated jar.
+ *
+ * @author ItzSomebody
+ */
 public class Radon {
     public SessionInfo sessionInfo;
     private Map<String, ClassTree> hierarchy = new HashMap<>();
@@ -60,13 +65,16 @@ public class Radon {
         this.sessionInfo = sessionInfo;
     }
 
+    /**
+     * Execution order. Feel free to modifiy.
+     */
     public void partyTime() {
         loadClassPath();
         loadInput();
         buildInheritance();
         executeTransformers();
         writeOutput();
-        LoggerUtils.logWriter();
+        LoggerUtils.dumpLog();
     }
 
     private void writeOutput() {
@@ -332,8 +340,7 @@ public class Radon {
                 throw new RuntimeException("Could not find " + type1 + " in the built class hierarchy");
             }
             Set<String> allChildren = new HashSet<>();
-            LinkedList<String> toProcess = new LinkedList<>();
-            toProcess.addAll(firstTree.subClasses);
+            LinkedList<String> toProcess = new LinkedList<>(firstTree.subClasses);
             while (!toProcess.isEmpty()) {
                 String s = toProcess.poll();
                 if (allChildren.add(s)) {

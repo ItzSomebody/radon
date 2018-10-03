@@ -48,9 +48,9 @@ public class FieldWrapper {
     /**
      * Creates a FieldWrapper object.
      *
-     * @param fieldNode the {@link FieldNode} attached to this FieldWrapper.
-     * @param owner the owner of this represented field.
-     * @param originalName the original name of the field represented.
+     * @param fieldNode           the {@link FieldNode} attached to this FieldWrapper.
+     * @param owner               the owner of this represented field.
+     * @param originalName        the original name of the field represented.
      * @param originalDescription the original description of the field represented.
      */
     FieldWrapper(FieldNode fieldNode, ClassWrapper owner, String originalName, String originalDescription) {

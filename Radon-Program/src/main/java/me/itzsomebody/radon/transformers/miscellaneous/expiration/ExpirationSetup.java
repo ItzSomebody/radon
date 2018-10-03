@@ -17,6 +17,11 @@
 
 package me.itzsomebody.radon.transformers.miscellaneous.expiration;
 
+/**
+ * Used to hold the information needed for enabling the {@link Expiration} transformer.
+ *
+ * @author ItzSomebody
+ */
 public class ExpirationSetup {
     private String message;
     private long expires;

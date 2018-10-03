@@ -20,23 +20,38 @@ package me.itzsomebody.radon.gui;
 import java.io.File;
 import javax.swing.*;
 
+/**
+ * Main class. \o/
+ *
+ * @author ItzSomebody
+ */
 public class Main {
     public static void main(String[] args) {
         runChecks();
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {
+            // Ignored
+        }
         new RadonGUI();
     }
 
+    /**
+     * Makes sure the obfuscator jar actually exists before we start to screw around with the GUI.
+     */
     private static void runChecks() {
         File file = new File("Radon-Program.jar");
         if (!file.exists()) {
-            JOptionPane.showMessageDialog(null, "Radon-Program.jar was not found in directory.", "Radon not found.", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Radon-Program.jar was not found in directory.", "Radon not found.",
+                    JOptionPane.ERROR_MESSAGE);
             throw new RuntimeException();
         }
 
         try {
             Class.forName("me.itzsomebody.radon.Radon");
         } catch (ClassNotFoundException e) {
-            JOptionPane.showMessageDialog(null, "me.itzsomebody.radon.Radon class was not found.", "Radon instance class not found.", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "me.itzsomebody.radon.Radon class was not found.",
+                    "Radon instance class not found.", JOptionPane.ERROR_MESSAGE);
             throw new RuntimeException();
         }
     }

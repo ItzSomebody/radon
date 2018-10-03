@@ -29,6 +29,11 @@ import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
+/**
+ * Embeds a watermark into random classes.
+ *
+ * @author ItzSomebody.
+ */
 public class Watermarker extends Transformer {
     private WatermarkerSetup setup;
 
@@ -45,9 +50,11 @@ public class Watermarker extends Transformer {
             while (!watermark.isEmpty()) {
                 ClassWrapper classWrapper = classWrappers.get(RandomUtils.getRandomInt(0, classWrappers.size()));
 
-                MethodNode methodNode = classWrapper.classNode.methods.get(RandomUtils.getRandomInt(0, classWrapper.classNode.methods.size()));
+                MethodNode methodNode = classWrapper.classNode.methods.get(RandomUtils.getRandomInt(0,
+                        classWrapper.classNode.methods.size()));
                 if (hasInstructions(methodNode)) {
-                    methodNode.instructions.insertBefore(methodNode.instructions.getFirst(), createInstructions(watermark, methodNode));
+                    methodNode.instructions.insertBefore(methodNode.instructions.getFirst(),
+                            createInstructions(watermark, methodNode));
                 }
             }
         }
@@ -67,7 +74,9 @@ public class Watermarker extends Transformer {
         instructions.add(BytecodeUtils.getNumberInsn(watermarkChar));
         instructions.add(BytecodeUtils.getNumberInsn(indexXorKey));
         instructions.add(BytecodeUtils.getNumberInsn(watermarkIndex));
-        instructions.add(new VarInsnNode(ISTORE, offset + 1)); // Local variable x where x is the max locals allowed in method can be the top of a long or double
+
+        // Local variable x where x is the max locals allowed in method can be the top of a long or double so we add 1
+        instructions.add(new VarInsnNode(ISTORE, offset + 1));
         instructions.add(new VarInsnNode(ISTORE, offset + 2));
         instructions.add(new VarInsnNode(ISTORE, offset + 3));
         instructions.add(new VarInsnNode(ISTORE, offset + 4));

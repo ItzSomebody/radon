@@ -17,6 +17,11 @@
 
 package me.itzsomebody.radon.transformers.optimizers;
 
+/**
+ * Used to hold the information needed for enabling the {@link OptimizerDelegator} transformer.
+ *
+ * @author ItzSomebody
+ */
 public class OptimizerSetup {
     private boolean nopRemoverEnabled;
     private boolean gotoGotoEnabled;

@@ -29,6 +29,12 @@ import me.itzsomebody.radon.SessionInfo;
 import me.itzsomebody.radon.transformers.miscellaneous.expiration.Expiration;
 import me.itzsomebody.radon.transformers.miscellaneous.expiration.ExpirationSetup;
 
+/**
+ * A {@link JPanel} used control other parts of Radon such as: expiration, trash classes, dictionary, and the garbage
+ * collector.
+ *
+ * @author ItzSomebody
+ */
 public class MiscellaneousTab extends JPanel {
     private JCheckBox expirationSwingCheckBox;
     private JTextField expirationMessageField;
@@ -156,7 +162,8 @@ public class MiscellaneousTab extends JPanel {
         gbc_garbagCollectorButton.gridx = 0;
         gbc_garbagCollectorButton.gridy = 0;
         garbagCollectorButton.addActionListener((e) -> SwingUtilities.invokeLater(() -> {
-            JOptionPane.showMessageDialog(null, ((Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory()) / 1000000) + "mb in use before garbage collection.");
+            JOptionPane.showMessageDialog(null, ((Runtime.getRuntime().totalMemory()
+                    - Runtime.getRuntime().freeMemory()) / 1000000) + "mb in use before garbage collection.");
             System.gc();
         }));
         miscOtherPanel.add(garbagCollectorButton, gbc_garbagCollectorButton);
@@ -225,24 +232,47 @@ public class MiscellaneousTab extends JPanel {
         miscOtherPanel.add(aboutButton, gbc_aboutButton);
     }
 
+    /**
+     * Creates an {@link Expiration} transformer setup accordingly to the information provided in this
+     * {@link MiscellaneousTab}.
+     *
+     * @return an {@link Expiration} transformer setup accordingly to the information provided in this
+     * {@link MiscellaneousTab}.
+     */
     public Expiration getExpiration() {
         try {
-            return (expirationEnabledCheckBox.isSelected()) ? new Expiration(new ExpirationSetup(expirationMessageField.getText(),
-                new SimpleDateFormat("MM/dd/yyyy").parse(expirationExpiresField.getText()).getTime(), expirationSwingCheckBox.isSelected())) : null;
+            return (expirationEnabledCheckBox.isSelected()) ?
+                    new Expiration(new ExpirationSetup(expirationMessageField.getText(), new SimpleDateFormat("MM/dd/yyyy")
+                            .parse(expirationExpiresField.getText()).getTime(), expirationSwingCheckBox.isSelected())) : null;
         } catch (ParseException e) {
             e.printStackTrace();
             throw new RuntimeException();
         }
     }
 
+    /**
+     * Returns an integer representation of how many trash classes should be generated.
+     *
+     * @return an integer representation of how many trash classes should be generated.
+     */
     public int getTrashClasses() {
         return Integer.valueOf(trashClassesField.getText());
     }
 
+    /**
+     * Returns the desired {@link Dictionaries} instance as specified in the GUI.
+     *
+     * @return the desired {@link Dictionaries} instance as specified in the GUI.
+     */
     public Dictionaries getDictionary() {
         return Dictionaries.intToDictionary(dictionaryComboBox.getSelectedIndex());
     }
 
+    /**
+     * Sets the tab settings accordingly with the provided {@link SessionInfo}.
+     *
+     * @param info the {@link SessionInfo} used to determine the tab setup.
+     */
     public void setSettings(SessionInfo info) {
         expirationEnabledCheckBox.setSelected(false);
         expirationSwingCheckBox.setSelected(false);
@@ -255,7 +285,8 @@ public class MiscellaneousTab extends JPanel {
         trashClassesField.setText(String.valueOf(info.getTrashClasses()));
 
         if (info.getTransformers() != null) {
-            info.getTransformers().stream().filter(transformer -> transformer instanceof Expiration).forEach(transformer -> {
+            info.getTransformers().stream().filter(transformer ->
+                    transformer instanceof Expiration).forEach(transformer -> {
                 expirationEnabledCheckBox.setSelected(true);
                 expirationSwingCheckBox.setEnabled(true);
                 expirationMessageField.setEditable(true);

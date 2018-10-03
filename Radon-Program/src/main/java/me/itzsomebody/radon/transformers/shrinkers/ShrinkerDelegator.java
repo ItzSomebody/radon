@@ -17,6 +17,11 @@
 
 package me.itzsomebody.radon.transformers.shrinkers;
 
+/**
+ * Enables and runs the shrinking transformers.
+ *
+ * @author ItzSomebody
+ */
 public class ShrinkerDelegator extends Shrinker {
     private ShrinkerSetup setup;
 

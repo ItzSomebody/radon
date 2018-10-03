@@ -20,6 +20,11 @@ package me.itzsomebody.radon.transformers.obfuscators.invokedynamic;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
 
+/**
+ * Abstract class for invokedynamic transformers.
+ *
+ * @author ItzSomebody
+ */
 public abstract class InvokeDynamic extends Transformer {
     @Override
     protected ExclusionType getExclusionType() {

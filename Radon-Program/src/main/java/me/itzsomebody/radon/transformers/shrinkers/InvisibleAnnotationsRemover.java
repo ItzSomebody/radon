@@ -21,6 +21,11 @@ import java.util.concurrent.atomic.AtomicInteger;
 import me.itzsomebody.radon.utils.LoggerUtils;
 import org.objectweb.asm.tree.ClassNode;
 
+/**
+ * Removes annotations invisible to the runtime from classes, methods and fields.
+ *
+ * @author ItzSomebody
+ */
 public class InvisibleAnnotationsRemover extends Shrinker {
     @Override
     public void transform() {
@@ -36,18 +41,21 @@ public class InvisibleAnnotationsRemover extends Shrinker {
                 classNode.invisibleAnnotations.clear();
             }
 
-            classWrapper.fields.parallelStream().filter(fieldWrapper -> !excluded(fieldWrapper) && fieldWrapper.fieldNode.invisibleAnnotations != null).forEach(fieldWrapper -> {
+            classWrapper.fields.parallelStream().filter(fieldWrapper -> !excluded(fieldWrapper)
+                    && fieldWrapper.fieldNode.invisibleAnnotations != null).forEach(fieldWrapper -> {
                 fieldAnnotations.addAndGet(fieldWrapper.fieldNode.invisibleAnnotations.size());
                 fieldWrapper.fieldNode.invisibleAnnotations.clear();
             });
 
-            classWrapper.methods.parallelStream().filter(methodWrapper -> !excluded(methodWrapper) && methodWrapper.methodNode.invisibleAnnotations != null).forEach(methodWrapper -> {
+            classWrapper.methods.parallelStream().filter(methodWrapper -> !excluded(methodWrapper)
+                    && methodWrapper.methodNode.invisibleAnnotations != null).forEach(methodWrapper -> {
                 methodAnnotations.addAndGet(methodWrapper.methodNode.invisibleAnnotations.size());
                 methodWrapper.methodNode.invisibleAnnotations.clear();
             });
         });
 
-        LoggerUtils.stdOut(String.format("Removed %d class, %d method and %d field invisible annotations.", classAnnotations.get(), methodAnnotations.get(), fieldAnnotations.get()));
+        LoggerUtils.stdOut(String.format("Removed %d class, %d method and %d field invisible annotations.",
+                classAnnotations.get(), methodAnnotations.get(), fieldAnnotations.get()));
     }
 
     @Override

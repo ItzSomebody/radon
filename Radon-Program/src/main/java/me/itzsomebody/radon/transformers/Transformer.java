@@ -17,9 +17,8 @@
 
 package me.itzsomebody.radon.transformers;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
 import me.itzsomebody.radon.Radon;
 import me.itzsomebody.radon.asm.ClassWrapper;
@@ -32,16 +31,25 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.commons.CodeSizeEvaluator;
 import org.objectweb.asm.tree.MethodNode;
 
+/**
+ * Abstract transformer for all the transformers. \o/
+ *
+ * @author ItzSomebody
+ */
 public abstract class Transformer implements Opcodes {
     protected Radon radon;
-    protected List<String> usedStrings = new ArrayList<>();
+
+    /**
+     * Strings which have already been generated and used.
+     */
+    private HashSet<String> usedStrings = new HashSet<>();
 
     public void init(Radon radon) {
         this.radon = radon;
     }
 
     protected boolean excluded(String str) {
-        return this.radon.sessionInfo.getExclusions().isExcluded(str, getExclusionType());
+        return this.radon.sessionInfo.getExclusionManager().isExcluded(str, getExclusionType());
     }
 
     protected boolean excluded(ClassWrapper classWrapper) {
@@ -56,6 +64,12 @@ public abstract class Transformer implements Opcodes {
         return this.excluded(fieldWrapper.owner.originalName + '.' + fieldWrapper.originalName + '.' + fieldWrapper.originalDescription);
     }
 
+    /**
+     * Returns the remaining leeway of a method's allowed size.
+     *
+     * @param methodNode the {@link MethodNode} to check.
+     * @return the remaining leeway of a method's allowed size.
+     */
     protected int getSizeLeeway(MethodNode methodNode) {
         CodeSizeEvaluator cse = new CodeSizeEvaluator(null);
         methodNode.accept(cse);

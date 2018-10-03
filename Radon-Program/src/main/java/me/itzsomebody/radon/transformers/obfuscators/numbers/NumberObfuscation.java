@@ -20,6 +20,11 @@ package me.itzsomebody.radon.transformers.obfuscators.numbers;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
 
+/**
+ * Abstract class for number obfuscation transformers.
+ *
+ * @author ItzSomebody
+ */
 public abstract class NumberObfuscation extends Transformer {
     @Override
     protected ExclusionType getExclusionType() {

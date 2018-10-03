@@ -29,6 +29,11 @@ import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.LineNumberNode;
 import org.objectweb.asm.tree.MethodNode;
 
+/**
+ * Bytecode utilities for bytecode instructions.
+ *
+ * @author ItzSomebody.
+ */
 public class BytecodeUtils {
     public static boolean isInstruction(AbstractInsnNode insn) {
         return !(insn instanceof FrameNode) && !(insn instanceof LineNumberNode) && !(insn instanceof LabelNode);
@@ -117,7 +122,7 @@ public class BytecodeUtils {
         }
     }
 
-    public static int getIntNumber(AbstractInsnNode insn) {
+    public static int getIntegerFromInsn(AbstractInsnNode insn) {
         int opcode = insn.getOpcode();
 
         if (opcode >= org.objectweb.asm.Opcodes.ICONST_M1 && opcode <= org.objectweb.asm.Opcodes.ICONST_5) {
@@ -133,7 +138,7 @@ public class BytecodeUtils {
         throw new IllegalArgumentException("Unexpected instruction");
     }
 
-    public static long getLongNumber(AbstractInsnNode insn) {
+    public static long getLongFromInsn(AbstractInsnNode insn) {
         int opcode = insn.getOpcode();
 
         if (opcode >= org.objectweb.asm.Opcodes.LCONST_0 && opcode <= org.objectweb.asm.Opcodes.LCONST_1) {

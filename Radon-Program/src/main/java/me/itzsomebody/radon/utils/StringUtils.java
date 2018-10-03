@@ -20,6 +20,11 @@ package me.itzsomebody.radon.utils;
 import java.util.ArrayList;
 import java.util.Collection;
 
+/**
+ * Utilities for strings. Primarily used for string generation.
+ *
+ * @author ItzSomebody
+ */
 public class StringUtils {
     private static char ALPHA_NUM[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".toCharArray();
     private static char ALPHA[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".toCharArray();

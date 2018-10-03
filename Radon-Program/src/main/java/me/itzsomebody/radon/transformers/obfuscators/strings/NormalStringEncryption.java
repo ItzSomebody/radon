@@ -32,6 +32,11 @@ import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 
+/**
+ * Encrypts string literals using a key and caller context. Caching is done via a custom hashing algorithm.
+ *
+ * @author ItzSomebody
+ */
 public class NormalStringEncryption extends StringEncryption {
     public NormalStringEncryption(StringEncryptionSetup setup) {
         super(setup);
@@ -42,7 +47,10 @@ public class NormalStringEncryption extends StringEncryption {
         AtomicInteger counter = new AtomicInteger();
         MemberNames memberNames = new MemberNames();
 
-        this.getClassWrappers().parallelStream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper -> classWrapper.methods.parallelStream().filter(methodWrapper -> !excluded(methodWrapper) && hasInstructions(methodWrapper.methodNode)).forEach(methodWrapper -> {
+        this.getClassWrappers().parallelStream().filter(classWrapper ->
+                !excluded(classWrapper)).forEach(classWrapper ->
+                classWrapper.methods.parallelStream().filter(methodWrapper -> !excluded(methodWrapper)
+                        && hasInstructions(methodWrapper.methodNode)).forEach(methodWrapper -> {
             MethodNode methodNode = methodWrapper.methodNode;
             int leeway = getSizeLeeway(methodNode);
 
@@ -61,7 +69,8 @@ public class NormalStringEncryption extends StringEncryption {
                             int callerMethodHC = methodNode.name.hashCode();
                             int decryptorClassHC = memberNames.className.replace("/", ".").hashCode();
                             ldc.cst = encrypt(cst, decryptorClassHC, callerClassHC, callerMethodHC, extraKey);
-                            methodNode.instructions.insert(insn, new MethodInsnNode(INVOKESTATIC, memberNames.className, memberNames.decryptMethodName, "(Ljava/lang/Object;I)Ljava/lang/String;", false));
+                            methodNode.instructions.insert(insn, new MethodInsnNode(INVOKESTATIC, memberNames.className,
+                                    memberNames.decryptMethodName, "(Ljava/lang/Object;I)Ljava/lang/String;", false));
                             methodNode.instructions.insert(insn, BytecodeUtils.getNumberInsn(extraKey));
                             leeway -= 7;
                             counter.incrementAndGet();
@@ -82,7 +91,8 @@ public class NormalStringEncryption extends StringEncryption {
         return "Normal string encryption";
     }
 
-    private static String encrypt(String msg, int decryptorClassHC, int callerClassNameHC, int callerMethodNameHC, int extraKey) {
+    private static String encrypt(String msg, int decryptorClassHC, int callerClassNameHC, int callerMethodNameHC,
+                                  int extraKey) {
         char[] chars = msg.toCharArray();
         StringBuilder sb = new StringBuilder();
 
@@ -157,20 +167,23 @@ public class NormalStringEncryption extends StringEncryption {
             Label l1 = new Label();
             mv.visitLabel(l1);
             mv.visitMethodInsn(INVOKESTATIC, "java/lang/Thread", "currentThread", "()Ljava/lang/Thread;", false);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Thread", "getStackTrace", "()[Ljava/lang/StackTraceElement;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Thread", "getStackTrace", "()[Ljava/lang/StackTraceElement;",
+                    false);
             mv.visitInsn(ICONST_1);
             mv.visitInsn(AALOAD);
             mv.visitVarInsn(ASTORE, 0);
             Label l2 = new Label();
             mv.visitLabel(l2);
             mv.visitVarInsn(ALOAD, 0);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StackTraceElement", "getClassName", "()Ljava/lang/String;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StackTraceElement", "getClassName", "()Ljava/lang/String;",
+                    false);
             mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "hashCode", "()I", false);
             mv.visitFieldInsn(PUTSTATIC, memberNames.className, memberNames.key1FieldName, "I");
             Label l3 = new Label();
             mv.visitLabel(l3);
             mv.visitVarInsn(ALOAD, 0);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StackTraceElement", "getMethodName", "()Ljava/lang/String;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StackTraceElement", "getMethodName", "()Ljava/lang/String;",
+                    false);
             mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "hashCode", "()I", false);
             mv.visitFieldInsn(PUTSTATIC, memberNames.className, memberNames.key2FieldName, "I");
             Label l4 = new Label();
@@ -335,14 +348,16 @@ public class NormalStringEncryption extends StringEncryption {
             mv.visitEnd();
         }
         {
-            mv = cw.visitMethod(ACC_PRIVATE + ACC_STATIC, memberNames.returnCacheMethodName, "(I)Ljava/lang/String;", null, null);
+            mv = cw.visitMethod(ACC_PRIVATE + ACC_STATIC, memberNames.returnCacheMethodName, "(I)Ljava/lang/String;",
+                    null, null);
             mv.visitCode();
             Label l0 = new Label();
             mv.visitLabel(l0);
             mv.visitFieldInsn(GETSTATIC, memberNames.className, memberNames.cacheFieldName, "Ljava/util/HashMap;");
             mv.visitVarInsn(ILOAD, 0);
             mv.visitMethodInsn(INVOKESTATIC, "java/lang/Integer", "valueOf", "(I)Ljava/lang/Integer;", false);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/util/HashMap", "get", "(Ljava/lang/Object;)Ljava/lang/Object;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/util/HashMap", "get", "(Ljava/lang/Object;)Ljava/lang/Object;",
+                    false);
             mv.visitTypeInsn(CHECKCAST, "java/lang/String");
             mv.visitInsn(ARETURN);
             Label l1 = new Label();
@@ -351,7 +366,8 @@ public class NormalStringEncryption extends StringEncryption {
             mv.visitEnd();
         }
         {
-            mv = cw.visitMethod(ACC_PRIVATE + ACC_STATIC, memberNames.cacheStringMethodName, "(Ljava/lang/String;I)V", null, null);
+            mv = cw.visitMethod(ACC_PRIVATE + ACC_STATIC, memberNames.cacheStringMethodName, "(Ljava/lang/String;I)V",
+                    null, null);
             mv.visitCode();
             Label l0 = new Label();
             mv.visitLabel(l0);
@@ -359,7 +375,8 @@ public class NormalStringEncryption extends StringEncryption {
             mv.visitVarInsn(ILOAD, 1);
             mv.visitMethodInsn(INVOKESTATIC, "java/lang/Integer", "valueOf", "(I)Ljava/lang/Integer;", false);
             mv.visitVarInsn(ALOAD, 0);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/util/HashMap", "put", "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/util/HashMap", "put",
+                    "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", false);
             mv.visitInsn(POP);
             Label l1 = new Label();
             mv.visitLabel(l1);
@@ -370,7 +387,8 @@ public class NormalStringEncryption extends StringEncryption {
             mv.visitEnd();
         }
         {
-            mv = cw.visitMethod(ACC_PUBLIC + ACC_STATIC, memberNames.decryptMethodName, "(Ljava/lang/Object;I)Ljava/lang/String;", null, null);
+            mv = cw.visitMethod(ACC_PUBLIC + ACC_STATIC, memberNames.decryptMethodName,
+                    "(Ljava/lang/Object;I)Ljava/lang/String;", null, null);
             mv.visitCode();
             Label l0 = new Label();
             mv.visitLabel(l0);
@@ -386,7 +404,8 @@ public class NormalStringEncryption extends StringEncryption {
             Label l2 = new Label();
             mv.visitLabel(l2);
             mv.visitVarInsn(ILOAD, 3);
-            mv.visitMethodInsn(INVOKESTATIC, memberNames.className, memberNames.returnCacheMethodName, "(I)Ljava/lang/String;", false);
+            mv.visitMethodInsn(INVOKESTATIC, memberNames.className, memberNames.returnCacheMethodName,
+                    "(I)Ljava/lang/String;", false);
             mv.visitVarInsn(ASTORE, 4);
             Label l3 = new Label();
             mv.visitLabel(l3);
@@ -399,14 +418,16 @@ public class NormalStringEncryption extends StringEncryption {
             mv.visitInsn(ARETURN);
             mv.visitLabel(l4);
             mv.visitMethodInsn(INVOKESTATIC, "java/lang/Thread", "currentThread", "()Ljava/lang/Thread;", false);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Thread", "getStackTrace", "()[Ljava/lang/StackTraceElement;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Thread", "getStackTrace", "()[Ljava/lang/StackTraceElement;",
+                    false);
             mv.visitVarInsn(ASTORE, 5);
             Label l6 = new Label();
             mv.visitLabel(l6);
             mv.visitVarInsn(ALOAD, 5);
             mv.visitInsn(ICONST_2);
             mv.visitInsn(AALOAD);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StackTraceElement", "getClassName", "()Ljava/lang/String;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StackTraceElement", "getClassName", "()Ljava/lang/String;",
+                    false);
             mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "hashCode", "()I", false);
             mv.visitVarInsn(ISTORE, 6);
             Label l7 = new Label();
@@ -414,7 +435,8 @@ public class NormalStringEncryption extends StringEncryption {
             mv.visitVarInsn(ALOAD, 5);
             mv.visitInsn(ICONST_2);
             mv.visitInsn(AALOAD);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StackTraceElement", "getMethodName", "()Ljava/lang/String;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StackTraceElement", "getMethodName", "()Ljava/lang/String;",
+                    false);
             mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "hashCode", "()I", false);
             mv.visitVarInsn(ISTORE, 7);
             Label l8 = new Label();
@@ -456,7 +478,8 @@ public class NormalStringEncryption extends StringEncryption {
             mv.visitInsn(CALOAD);
             mv.visitInsn(IXOR);
             mv.visitInsn(I2C);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(C)Ljava/lang/StringBuilder;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(C)Ljava/lang/StringBuilder;",
+                    false);
             mv.visitInsn(POP);
             Label l22 = new Label();
             mv.visitLabel(l22);
@@ -471,7 +494,8 @@ public class NormalStringEncryption extends StringEncryption {
             mv.visitInsn(CALOAD);
             mv.visitInsn(IXOR);
             mv.visitInsn(I2C);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(C)Ljava/lang/StringBuilder;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(C)Ljava/lang/StringBuilder;",
+                    false);
             mv.visitInsn(POP);
             Label l23 = new Label();
             mv.visitLabel(l23);
@@ -486,7 +510,8 @@ public class NormalStringEncryption extends StringEncryption {
             mv.visitInsn(CALOAD);
             mv.visitInsn(IXOR);
             mv.visitInsn(I2C);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(C)Ljava/lang/StringBuilder;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(C)Ljava/lang/StringBuilder;",
+                    false);
             mv.visitInsn(POP);
             Label l24 = new Label();
             mv.visitLabel(l24);
@@ -501,7 +526,8 @@ public class NormalStringEncryption extends StringEncryption {
             mv.visitInsn(CALOAD);
             mv.visitInsn(IXOR);
             mv.visitInsn(I2C);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(C)Ljava/lang/StringBuilder;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(C)Ljava/lang/StringBuilder;",
+                    false);
             mv.visitInsn(POP);
             Label l25 = new Label();
             mv.visitLabel(l25);
@@ -516,7 +542,8 @@ public class NormalStringEncryption extends StringEncryption {
             mv.visitInsn(CALOAD);
             mv.visitInsn(IXOR);
             mv.visitInsn(I2C);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(C)Ljava/lang/StringBuilder;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(C)Ljava/lang/StringBuilder;",
+                    false);
             mv.visitInsn(POP);
             Label l26 = new Label();
             mv.visitLabel(l26);
@@ -531,7 +558,8 @@ public class NormalStringEncryption extends StringEncryption {
             mv.visitInsn(CALOAD);
             mv.visitInsn(IXOR);
             mv.visitInsn(I2C);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(C)Ljava/lang/StringBuilder;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(C)Ljava/lang/StringBuilder;",
+                    false);
             mv.visitInsn(POP);
             Label l27 = new Label();
             mv.visitLabel(l27);
@@ -546,7 +574,8 @@ public class NormalStringEncryption extends StringEncryption {
             mv.visitInsn(CALOAD);
             mv.visitInsn(IXOR);
             mv.visitInsn(I2C);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(C)Ljava/lang/StringBuilder;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(C)Ljava/lang/StringBuilder;",
+                    false);
             mv.visitInsn(POP);
             Label l28 = new Label();
             mv.visitLabel(l28);
@@ -561,7 +590,8 @@ public class NormalStringEncryption extends StringEncryption {
             mv.visitInsn(CALOAD);
             mv.visitInsn(IXOR);
             mv.visitInsn(I2C);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(C)Ljava/lang/StringBuilder;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(C)Ljava/lang/StringBuilder;",
+                    false);
             mv.visitInsn(POP);
             mv.visitLabel(l21);
             mv.visitIincInsn(9, 1);
@@ -579,7 +609,8 @@ public class NormalStringEncryption extends StringEncryption {
             mv.visitLabel(l30);
             mv.visitVarInsn(ALOAD, 9);
             mv.visitVarInsn(ILOAD, 3);
-            mv.visitMethodInsn(INVOKESTATIC, memberNames.className, memberNames.cacheStringMethodName, "(Ljava/lang/String;I)V", false);
+            mv.visitMethodInsn(INVOKESTATIC, memberNames.className, memberNames.cacheStringMethodName,
+                    "(Ljava/lang/String;I)V", false);
             Label l31 = new Label();
             mv.visitLabel(l31);
             mv.visitVarInsn(ALOAD, 9);

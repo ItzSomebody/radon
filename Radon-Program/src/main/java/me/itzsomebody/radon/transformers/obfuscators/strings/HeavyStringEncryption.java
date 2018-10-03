@@ -34,6 +34,11 @@ import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 
+/**
+ * Encrypts string literals using very basic multi-threading, a key, caller and name context.
+ *
+ * @author ItzSomebody
+ */
 public class HeavyStringEncryption extends StringEncryption {
     public HeavyStringEncryption(StringEncryptionSetup setup) {
         super(setup);
@@ -44,37 +49,43 @@ public class HeavyStringEncryption extends StringEncryption {
         AtomicInteger counter = new AtomicInteger();
         MemberNames memberNames = new MemberNames();
 
-        this.getClassWrappers().parallelStream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper -> classWrapper.methods.parallelStream().filter(methodWrapper -> !excluded(methodWrapper) && hasInstructions(methodWrapper.methodNode)).forEach(methodWrapper -> {
-            MethodNode methodNode = methodWrapper.methodNode;
-            int leeway = getSizeLeeway(methodNode);
+        getClassWrappers().parallelStream().filter(classWrapper ->
+                !excluded(classWrapper)).forEach(classWrapper ->
+                classWrapper.methods.parallelStream().filter(methodWrapper -> !excluded(methodWrapper)
+                        && hasInstructions(methodWrapper.methodNode)).forEach(methodWrapper -> {
+                    MethodNode methodNode = methodWrapper.methodNode;
+                    int leeway = getSizeLeeway(methodNode);
 
-            for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
-                if (leeway < 10000) {
-                    break;
-                }
-                if (insn instanceof LdcInsnNode) {
-                    LdcInsnNode ldc = (LdcInsnNode) insn;
-                    if (ldc.cst instanceof String) {
-                        String cst = (String) ldc.cst;
+                    for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
+                        if (leeway < 10000) {
+                            break;
+                        }
+                        if (insn instanceof LdcInsnNode) {
+                            LdcInsnNode ldc = (LdcInsnNode) insn;
+                            if (ldc.cst instanceof String) {
+                                String cst = (String) ldc.cst;
 
-                        if (!excludedString(cst)) {
-                            int extraKey = RandomUtils.getRandomInt();
-                            int callerClassHC = classWrapper.classNode.name.replace("/", ".").hashCode();
-                            int callerMethodHC = methodNode.name.hashCode();
-                            int decryptorClassHC = memberNames.className.replace("/", ".").hashCode();
-                            int decryptorMethodHC = memberNames.decryptorMethodName.hashCode();
-                            ldc.cst = encrypt(cst, callerClassHC, callerMethodHC, decryptorClassHC, decryptorMethodHC, extraKey);
-                            methodNode.instructions.insert(insn, new MethodInsnNode(INVOKESTATIC, memberNames.className, memberNames.decryptorMethodName, "(Ljava/lang/Object;I)Ljava/lang/String;", false));
-                            methodNode.instructions.insert(insn, new InsnNode(POP));
-                            methodNode.instructions.insert(insn, new InsnNode(DUP_X1));
-                            methodNode.instructions.insertBefore(insn, BytecodeUtils.getNumberInsn(extraKey));
-                            leeway -= 10;
-                            counter.incrementAndGet();
+                                if (!excludedString(cst)) {
+                                    int extraKey = RandomUtils.getRandomInt();
+                                    int callerClassHC = classWrapper.classNode.name.replace("/", ".").hashCode();
+                                    int callerMethodHC = methodNode.name.hashCode();
+                                    int decryptorClassHC = memberNames.className.replace("/", ".").hashCode();
+                                    int decryptorMethodHC = memberNames.decryptorMethodName.hashCode();
+                                    ldc.cst = encrypt(cst, callerClassHC, callerMethodHC, decryptorClassHC,
+                                            decryptorMethodHC, extraKey);
+                                    methodNode.instructions.insert(insn, new MethodInsnNode(INVOKESTATIC,
+                                            memberNames.className, memberNames.decryptorMethodName,
+                                            "(Ljava/lang/Object;I)Ljava/lang/String;", false));
+                                    methodNode.instructions.insert(insn, new InsnNode(POP));
+                                    methodNode.instructions.insert(insn, new InsnNode(DUP_X1));
+                                    methodNode.instructions.insertBefore(insn, BytecodeUtils.getNumberInsn(extraKey));
+                                    leeway -= 10;
+                                    counter.incrementAndGet();
+                                }
+                            }
                         }
                     }
-                }
-            }
-        }));
+                }));
         // Add decrypt method
         ClassNode decryptor = createDecryptor(memberNames);
         getClasses().put(decryptor.name, new ClassWrapper(decryptor, false));
@@ -87,7 +98,8 @@ public class HeavyStringEncryption extends StringEncryption {
         return "Heavy string encryption";
     }
 
-    private static String encrypt(String msg, int callerClassHC, int callerMethodHC, int decryptorClassHC, int decryptorMethodHC, int extraKey) {
+    private static String encrypt(String msg, int callerClassHC, int callerMethodHC, int decryptorClassHC,
+                                  int decryptorMethodHC, int extraKey) {
         StringBuilder sb = new StringBuilder();
         char[] chars = msg.toCharArray();
         for (int i = 0; i < chars.length; i++) {
@@ -122,11 +134,13 @@ public class HeavyStringEncryption extends StringEncryption {
         cw.visit(V1_5, ACC_PUBLIC + ACC_SUPER, memberNames.className, null, "java/lang/Thread", null);
 
         {
-            fv = cw.visitField(ACC_PRIVATE + ACC_STATIC + ACC_VOLATILE, memberNames.infoFieldName, "[Ljava/lang/Object;", null, null);
+            fv = cw.visitField(ACC_PRIVATE + ACC_STATIC + ACC_VOLATILE, memberNames.infoFieldName,
+                    "[Ljava/lang/Object;", null, null);
             fv.visitEnd();
         }
         {
-            fv = cw.visitField(ACC_PRIVATE + ACC_STATIC, memberNames.cacheFieldName, "Ljava/util/HashMap;", "Ljava/util/HashMap<Ljava/lang/String;Ljava/lang/String;>;", null);
+            fv = cw.visitField(ACC_PRIVATE + ACC_STATIC, memberNames.cacheFieldName, "Ljava/util/HashMap;",
+                    "Ljava/util/HashMap<Ljava/lang/String;Ljava/lang/String;>;", null);
             fv.visitEnd();
         }
         {
@@ -181,12 +195,14 @@ public class HeavyStringEncryption extends StringEncryption {
             Label l1 = new Label();
             mv.visitLabel(l1);
             mv.visitVarInsn(ALOAD, 0);
-            mv.visitMethodInsn(INVOKEVIRTUAL, memberNames.className, "getStackTrace", "()[Ljava/lang/StackTraceElement;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, memberNames.className, "getStackTrace",
+                    "()[Ljava/lang/StackTraceElement;", false);
             mv.visitVarInsn(ASTORE, 1);
             Label l2 = new Label();
             mv.visitLabel(l2);
             mv.visitLdcInsn(Type.getType("L" + memberNames.className + ";"));
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Class", "getDeclaredMethods", "()[Ljava/lang/reflect/Method;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Class", "getDeclaredMethods", "()[Ljava/lang/reflect/Method;",
+                    false);
             mv.visitVarInsn(ASTORE, 2);
             Label l3 = new Label();
             mv.visitLabel(l3);
@@ -209,12 +225,14 @@ public class HeavyStringEncryption extends StringEncryption {
             Label l8 = new Label();
             mv.visitLabel(l8);
             mv.visitVarInsn(ALOAD, 5);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/reflect/Method", "getReturnType", "()Ljava/lang/Class;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/reflect/Method", "getReturnType", "()Ljava/lang/Class;",
+                    false);
             mv.visitLdcInsn(Type.getType("Ljava/lang/String;"));
             Label l9 = new Label();
             mv.visitJumpInsn(IF_ACMPNE, l9);
             mv.visitVarInsn(ALOAD, 5);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/reflect/Method", "getParameterTypes", "()[Ljava/lang/Class;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/reflect/Method", "getParameterTypes", "()[Ljava/lang/Class;",
+                    false);
             mv.visitInsn(ICONST_2);
             mv.visitTypeInsn(ANEWARRAY, "java/lang/Class");
             mv.visitInsn(DUP);
@@ -225,7 +243,8 @@ public class HeavyStringEncryption extends StringEncryption {
             mv.visitInsn(ICONST_1);
             mv.visitFieldInsn(GETSTATIC, "java/lang/Integer", "TYPE", "Ljava/lang/Class;");
             mv.visitInsn(AASTORE);
-            mv.visitMethodInsn(INVOKESTATIC, "java/util/Arrays", "equals", "([Ljava/lang/Object;[Ljava/lang/Object;)Z", false);
+            mv.visitMethodInsn(INVOKESTATIC, "java/util/Arrays", "equals", "([Ljava/lang/Object;[Ljava/lang/Object;)Z",
+                    false);
             mv.visitJumpInsn(IFEQ, l9);
             Label l10 = new Label();
             mv.visitLabel(l10);
@@ -273,7 +292,8 @@ public class HeavyStringEncryption extends StringEncryption {
             mv.visitTypeInsn(CHECKCAST, "java/lang/Integer");
             mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Integer", "intValue", "()I", false);
             mv.visitInsn(AALOAD);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StackTraceElement", "getClassName", "()Ljava/lang/String;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StackTraceElement", "getClassName", "()Ljava/lang/String;",
+                    false);
             mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "hashCode", "()I", false);
             mv.visitMethodInsn(INVOKESTATIC, "java/lang/Integer", "valueOf", "(I)Ljava/lang/Integer;", false);
             mv.visitInsn(AASTORE);
@@ -288,7 +308,8 @@ public class HeavyStringEncryption extends StringEncryption {
             mv.visitTypeInsn(CHECKCAST, "java/lang/Integer");
             mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Integer", "intValue", "()I", false);
             mv.visitInsn(AALOAD);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StackTraceElement", "getMethodName", "()Ljava/lang/String;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StackTraceElement", "getMethodName", "()Ljava/lang/String;",
+                    false);
             mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "hashCode", "()I", false);
             mv.visitMethodInsn(INVOKESTATIC, "java/lang/Integer", "valueOf", "(I)Ljava/lang/Integer;", false);
             mv.visitInsn(AASTORE);
@@ -314,7 +335,8 @@ public class HeavyStringEncryption extends StringEncryption {
             mv.visitEnd();
         }
         {
-            mv = cw.visitMethod(ACC_PRIVATE + ACC_STATIC, memberNames.createInfoMethodName, "()V", null, new String[]{"java/lang/InterruptedException"});
+            mv = cw.visitMethod(ACC_PRIVATE + ACC_STATIC, memberNames.createInfoMethodName, "()V", null,
+                    new String[]{"java/lang/InterruptedException"});
             mv.visitCode();
             Label l0 = new Label();
             mv.visitLabel(l0);
@@ -339,14 +361,16 @@ public class HeavyStringEncryption extends StringEncryption {
             mv.visitEnd();
         }
         {
-            mv = cw.visitMethod(ACC_PRIVATE + ACC_STATIC, memberNames.setCacheMethodName, "(Ljava/lang/String;Ljava/lang/String;)V", null, null);
+            mv = cw.visitMethod(ACC_PRIVATE + ACC_STATIC, memberNames.setCacheMethodName,
+                    "(Ljava/lang/String;Ljava/lang/String;)V", null, null);
             mv.visitCode();
             Label l0 = new Label();
             mv.visitLabel(l0);
             mv.visitFieldInsn(GETSTATIC, memberNames.className, memberNames.cacheFieldName, "Ljava/util/HashMap;");
             mv.visitVarInsn(ALOAD, 0);
             mv.visitVarInsn(ALOAD, 1);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/util/HashMap", "put", "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/util/HashMap", "put",
+                    "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", false);
             mv.visitInsn(POP);
             Label l1 = new Label();
             mv.visitLabel(l1);
@@ -357,13 +381,15 @@ public class HeavyStringEncryption extends StringEncryption {
             mv.visitEnd();
         }
         {
-            mv = cw.visitMethod(ACC_PRIVATE + ACC_STATIC, memberNames.getCacheMethodName, "(Ljava/lang/String;)Ljava/lang/String;", null, null);
+            mv = cw.visitMethod(ACC_PRIVATE + ACC_STATIC, memberNames.getCacheMethodName,
+                    "(Ljava/lang/String;)Ljava/lang/String;", null, null);
             mv.visitCode();
             Label l0 = new Label();
             mv.visitLabel(l0);
             mv.visitFieldInsn(GETSTATIC, memberNames.className, memberNames.cacheFieldName, "Ljava/util/HashMap;");
             mv.visitVarInsn(ALOAD, 0);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/util/HashMap", "get", "(Ljava/lang/Object;)Ljava/lang/Object;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/util/HashMap", "get",
+                    "(Ljava/lang/Object;)Ljava/lang/Object;", false);
             mv.visitTypeInsn(CHECKCAST, "java/lang/String");
             mv.visitInsn(ARETURN);
             Label l1 = new Label();
@@ -372,7 +398,8 @@ public class HeavyStringEncryption extends StringEncryption {
             mv.visitEnd();
         }
         {
-            mv = cw.visitMethod(ACC_PRIVATE + ACC_STATIC, memberNames.cacheContainsMethodName, "(Ljava/lang/String;)Z", null, null);
+            mv = cw.visitMethod(ACC_PRIVATE + ACC_STATIC, memberNames.cacheContainsMethodName, "(Ljava/lang/String;)Z",
+                    null, null);
             mv.visitCode();
             Label l0 = new Label();
             mv.visitLabel(l0);
@@ -386,7 +413,8 @@ public class HeavyStringEncryption extends StringEncryption {
             mv.visitEnd();
         }
         {
-            mv = cw.visitMethod(ACC_PUBLIC + ACC_STATIC, memberNames.decryptorMethodName, "(Ljava/lang/Object;I)Ljava/lang/String;", null, null);
+            mv = cw.visitMethod(ACC_PUBLIC + ACC_STATIC, memberNames.decryptorMethodName,
+                    "(Ljava/lang/Object;I)Ljava/lang/String;", null, null);
             mv.visitCode();
             Label l0 = new Label();
             Label l1 = new Label();
@@ -406,12 +434,14 @@ public class HeavyStringEncryption extends StringEncryption {
             Label l8 = new Label();
             mv.visitLabel(l8);
             mv.visitVarInsn(ALOAD, 2);
-            mv.visitMethodInsn(INVOKESTATIC, memberNames.className, memberNames.cacheContainsMethodName, "(Ljava/lang/String;)Z", false);
+            mv.visitMethodInsn(INVOKESTATIC, memberNames.className, memberNames.cacheContainsMethodName,
+                    "(Ljava/lang/String;)Z", false);
             mv.visitJumpInsn(IFEQ, l6);
             Label l9 = new Label();
             mv.visitLabel(l9);
             mv.visitVarInsn(ALOAD, 2);
-            mv.visitMethodInsn(INVOKESTATIC, memberNames.className, memberNames.getCacheMethodName, "(Ljava/lang/String;)Ljava/lang/String;", false);
+            mv.visitMethodInsn(INVOKESTATIC, memberNames.className, memberNames.getCacheMethodName,
+                    "(Ljava/lang/String;)Ljava/lang/String;", false);
             mv.visitLabel(l4);
             mv.visitInsn(ARETURN);
             mv.visitLabel(l6);
@@ -423,7 +453,8 @@ public class HeavyStringEncryption extends StringEncryption {
             mv.visitMethodInsn(INVOKESTATIC, memberNames.className, memberNames.createInfoMethodName, "()V", false);
             mv.visitLabel(l10);
             mv.visitMethodInsn(INVOKESTATIC, "java/lang/Thread", "currentThread", "()Ljava/lang/Thread;", false);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Thread", "getStackTrace", "()[Ljava/lang/StackTraceElement;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Thread", "getStackTrace", "()[Ljava/lang/StackTraceElement;",
+                    false);
             mv.visitVarInsn(ASTORE, 3);
             Label l12 = new Label();
             mv.visitLabel(l12);
@@ -463,13 +494,15 @@ public class HeavyStringEncryption extends StringEncryption {
             mv.visitIntInsn(SIPUSH, 255);
             mv.visitInsn(IAND);
             mv.visitInsn(AALOAD);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StackTraceElement", "getClassName", "()Ljava/lang/String;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StackTraceElement", "getClassName", "()Ljava/lang/String;",
+                    false);
             mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "hashCode", "()I", false);
             mv.visitInsn(IXOR);
             mv.visitVarInsn(ILOAD, 1);
             mv.visitInsn(IXOR);
             mv.visitInsn(I2C);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(C)Ljava/lang/StringBuilder;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(C)Ljava/lang/StringBuilder;",
+                    false);
             mv.visitInsn(POP);
             Label l19 = new Label();
             mv.visitLabel(l19);
@@ -489,13 +522,15 @@ public class HeavyStringEncryption extends StringEncryption {
             mv.visitIntInsn(SIPUSH, 255);
             mv.visitInsn(IAND);
             mv.visitInsn(AALOAD);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StackTraceElement", "getMethodName", "()Ljava/lang/String;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StackTraceElement", "getMethodName", "()Ljava/lang/String;",
+                    false);
             mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "hashCode", "()I", false);
             mv.visitInsn(IXOR);
             mv.visitVarInsn(ILOAD, 1);
             mv.visitInsn(IXOR);
             mv.visitInsn(I2C);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(C)Ljava/lang/StringBuilder;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(C)Ljava/lang/StringBuilder;",
+                    false);
             mv.visitInsn(POP);
             Label l21 = new Label();
             mv.visitLabel(l21);
@@ -514,7 +549,8 @@ public class HeavyStringEncryption extends StringEncryption {
             mv.visitVarInsn(ILOAD, 1);
             mv.visitInsn(IXOR);
             mv.visitInsn(I2C);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(C)Ljava/lang/StringBuilder;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(C)Ljava/lang/StringBuilder;",
+                    false);
             mv.visitInsn(POP);
             Label l22 = new Label();
             mv.visitLabel(l22);
@@ -533,7 +569,8 @@ public class HeavyStringEncryption extends StringEncryption {
             mv.visitVarInsn(ILOAD, 1);
             mv.visitInsn(IXOR);
             mv.visitInsn(I2C);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(C)Ljava/lang/StringBuilder;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(C)Ljava/lang/StringBuilder;",
+                    false);
             mv.visitInsn(POP);
             mv.visitLabel(l1);
             mv.visitJumpInsn(GOTO, l20);
@@ -556,7 +593,8 @@ public class HeavyStringEncryption extends StringEncryption {
             mv.visitLabel(l26);
             mv.visitVarInsn(ALOAD, 2);
             mv.visitVarInsn(ALOAD, 7);
-            mv.visitMethodInsn(INVOKESTATIC, memberNames.className, memberNames.setCacheMethodName, "(Ljava/lang/String;Ljava/lang/String;)V", false);
+            mv.visitMethodInsn(INVOKESTATIC, memberNames.className, memberNames.setCacheMethodName,
+                    "(Ljava/lang/String;Ljava/lang/String;)V", false);
             Label l27 = new Label();
             mv.visitLabel(l27);
             mv.visitVarInsn(ALOAD, 7);

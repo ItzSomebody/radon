@@ -17,6 +17,11 @@
 
 package me.itzsomebody.radon.transformers.optimizers;
 
+/**
+ * Enables and runs the optimization transformers.
+ *
+ * @author ItzSomebody
+ */
 public class OptimizerDelegator extends Optimizer {
     private OptimizerSetup setup;
 

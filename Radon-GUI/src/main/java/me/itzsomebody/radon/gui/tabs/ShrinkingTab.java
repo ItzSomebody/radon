@@ -24,6 +24,11 @@ import me.itzsomebody.radon.SessionInfo;
 import me.itzsomebody.radon.transformers.shrinkers.ShrinkerDelegator;
 import me.itzsomebody.radon.transformers.shrinkers.ShrinkerSetup;
 
+/**
+ * A {@link JPanel} which controls all of the shrinking settings in Radon.
+ *
+ * @author ItzSomebody
+ */
 public class ShrinkingTab extends JPanel {
     private JCheckBox attributesCheckBox;
     private JCheckBox debugInfoCheckBox;
@@ -106,11 +111,23 @@ public class ShrinkingTab extends JPanel {
         this.add(shrinkerEnabledCheckBox, gbc_shrinkerEnabledCheckBox);
     }
 
+    /**
+     * Returns an {@link ShrinkerDelegator} setup accordingly to this {@link ShrinkingTab}.
+     *
+     * @return an {@link ShrinkerDelegator} setup accordingly to this {@link ShrinkingTab}.
+     */
     public ShrinkerDelegator getShrinker() {
-        return (shrinkerEnabledCheckBox.isSelected()) ? new ShrinkerDelegator(new ShrinkerSetup(visibleAnnotationsCheckBox.isSelected(), invisibleAnnotationsCheckBox.isSelected(), attributesCheckBox.isSelected(),
-            debugInfoCheckBox.isSelected())) : null;
+        return (shrinkerEnabledCheckBox.isSelected()) ?
+                new ShrinkerDelegator(new ShrinkerSetup(visibleAnnotationsCheckBox.isSelected(),
+                        invisibleAnnotationsCheckBox.isSelected(), attributesCheckBox.isSelected(),
+                        debugInfoCheckBox.isSelected())) : null;
     }
 
+    /**
+     * Sets the tab settings accordingly with the provided {@link SessionInfo}.
+     *
+     * @param info the {@link SessionInfo} used to determine the tab setup.
+     */
     public void setSettings(SessionInfo info) {
         shrinkerEnabledCheckBox.setSelected(false);
         attributesCheckBox.setSelected(false);
@@ -123,19 +140,20 @@ public class ShrinkingTab extends JPanel {
         visibleAnnotationsCheckBox.setEnabled(false);
 
         if (info.getTransformers() != null) {
-            info.getTransformers().stream().filter(transformer -> transformer instanceof ShrinkerDelegator).forEach(transformer -> {
-                shrinkerEnabledCheckBox.setSelected(true);
-                attributesCheckBox.setEnabled(true);
-                debugInfoCheckBox.setEnabled(true);
-                invisibleAnnotationsCheckBox.setEnabled(true);
-                visibleAnnotationsCheckBox.setEnabled(true);
+            info.getTransformers().stream().filter(transformer -> transformer instanceof ShrinkerDelegator)
+                    .forEach(transformer -> {
+                        shrinkerEnabledCheckBox.setSelected(true);
+                        attributesCheckBox.setEnabled(true);
+                        debugInfoCheckBox.setEnabled(true);
+                        invisibleAnnotationsCheckBox.setEnabled(true);
+                        visibleAnnotationsCheckBox.setEnabled(true);
 
-                ShrinkerSetup setup = ((ShrinkerDelegator) transformer).getSetup();
-                attributesCheckBox.setSelected(setup.isRemoveAttributes());
-                debugInfoCheckBox.setSelected(setup.isRemoveDebug());
-                invisibleAnnotationsCheckBox.setSelected(setup.isRemoveInvisibleAnnotations());
-                visibleAnnotationsCheckBox.setSelected(setup.isRemoveVisibleAnnotations());
-            });
+                        ShrinkerSetup setup = ((ShrinkerDelegator) transformer).getSetup();
+                        attributesCheckBox.setSelected(setup.isRemoveAttributes());
+                        debugInfoCheckBox.setSelected(setup.isRemoveDebug());
+                        invisibleAnnotationsCheckBox.setSelected(setup.isRemoveInvisibleAnnotations());
+                        visibleAnnotationsCheckBox.setSelected(setup.isRemoveVisibleAnnotations());
+                    });
         }
     }
 }

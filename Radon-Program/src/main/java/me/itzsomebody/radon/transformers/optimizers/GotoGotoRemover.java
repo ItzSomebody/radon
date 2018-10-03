@@ -20,35 +20,40 @@ package me.itzsomebody.radon.transformers.optimizers;
 import java.util.concurrent.atomic.AtomicInteger;
 import me.itzsomebody.radon.utils.LoggerUtils;
 import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 
+/**
+ * Normalizes goto-goto sequences by directing the first goto's target to the second goto's target.
+ *
+ * @author ItzSomebody.
+ */
 public class GotoGotoRemover extends Optimizer {
     @Override
     public void transform() {
         AtomicInteger count = new AtomicInteger();
         long current = System.currentTimeMillis();
 
-        this.getClassWrappers().parallelStream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper ->
-            classWrapper.methods.parallelStream().filter(methodWrapper -> !excluded(methodWrapper) && hasInstructions(methodWrapper.methodNode)).forEach(methodWrapper -> {
-                MethodNode methodNode = methodWrapper.methodNode;
+        getClassWrappers().parallelStream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper ->
+                classWrapper.methods.parallelStream().filter(methodWrapper -> !excluded(methodWrapper)
+                        && hasInstructions(methodWrapper.methodNode)).forEach(methodWrapper -> {
+                    MethodNode methodNode = methodWrapper.methodNode;
 
-                for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
-                    if (insn.getOpcode() == GOTO) {
-                        JumpInsnNode gotoJump = (JumpInsnNode) insn;
-                        AbstractInsnNode insnAfterTarget = gotoJump.label.getNext();
-                        if (insnAfterTarget != null && insnAfterTarget.getOpcode() == GOTO) {
-                            JumpInsnNode secGoto = (JumpInsnNode) insnAfterTarget;
-                            gotoJump.label = secGoto.label;
-                            count.incrementAndGet();
+                    for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
+                        if (insn.getOpcode() == GOTO) {
+                            JumpInsnNode gotoJump = (JumpInsnNode) insn;
+                            AbstractInsnNode insnAfterTarget = gotoJump.label.getNext();
+                            if (insnAfterTarget != null && insnAfterTarget.getOpcode() == GOTO) {
+                                JumpInsnNode secGoto = (JumpInsnNode) insnAfterTarget;
+                                gotoJump.label = secGoto.label;
+                                count.incrementAndGet();
+                            }
                         }
                     }
-                }
-            })
-        );
+                }));
 
-        LoggerUtils.stdOut(String.format("Normalized %d GOTO->GOTO sequences. [%dms]", count.get(), tookThisLong(current)));
+        LoggerUtils.stdOut(String.format("Normalized %d GOTO->GOTO sequences. [%dms]", count.get(),
+                tookThisLong(current)));
     }
 
     @Override

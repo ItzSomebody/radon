@@ -24,6 +24,11 @@ import me.itzsomebody.radon.utils.LoggerUtils;
 import me.itzsomebody.radon.utils.RandomUtils;
 import me.itzsomebody.radon.utils.StringUtils;
 
+/**
+ * Obfuscates local variable names by changing their names and descriptions, or removing them entirely.
+ *
+ * @author ItzSomebody
+ */
 public class LocalVariables extends Transformer {
     private boolean remove;
 
@@ -39,8 +44,9 @@ public class LocalVariables extends Transformer {
     public void transform() {
         AtomicInteger counter = new AtomicInteger();
 
-        this.getClassWrappers().parallelStream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper ->
-            classWrapper.classNode.methods.parallelStream().filter(methodNode -> methodNode.localVariables != null).forEach(methodNode -> {
+        getClassWrappers().parallelStream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper ->
+            classWrapper.classNode.methods.parallelStream().filter(methodNode ->
+                    methodNode.localVariables != null).forEach(methodNode -> {
                 counter.addAndGet(methodNode.localVariables.size());
 
                 if (remove) {
