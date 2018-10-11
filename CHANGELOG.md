@@ -1,3 +1,20 @@
+## 1.0.4
+* Changes a few internals.
+* Changes ASM version to 7.0-beta.
+* Relocates license.txt to root path of Radon jars.
+
+## 1.0.3
+* Sort of fixes the random integer error.
+* Fixes normal string encryption transformer incorrectly encrypting strings.
+* Set default resource adaptation value as META-INF/MANIFEST.MF.
+
+## 1.0.2
+* Fixes invokedynamic and Enum incompatibilities.
+* Fixes light string encryption error.
+
+## 1.0.1
+* Fixes multiple GUI bugs.
+
 ## 1.0.0
 * Rewrote everything.
 
