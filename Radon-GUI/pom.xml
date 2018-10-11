@@ -27,7 +27,7 @@
                             <mainClass>me.itzsomebody.radon.gui.Main</mainClass>
                             <addClasspath>true</addClasspath>
                             <classpathLayoutType>custom</classpathLayoutType>
-                            <customClasspathLayout>radon-program.jar</customClasspathLayout>
+                            <customClasspathLayout>Radon-Program.jar</customClasspathLayout>
                         </manifest>
                     </archive>
                 </configuration>
