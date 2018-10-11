@@ -5,15 +5,15 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>me.itzsomebody</groupId>
-    <artifactId>Radon</artifactId>
+    <artifactId>radon</artifactId>
     <packaging>pom</packaging>
     <version>1.0.4</version>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <modules>
-        <module>Radon-Program</module>
-        <module>Radon-GUI</module>
+        <module>radon-program</module>
+        <module>radon-gui</module>
     </modules>
     <repositories>
         <repository>

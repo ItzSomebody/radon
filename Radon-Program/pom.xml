@@ -3,12 +3,12 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>Radon</artifactId>
+        <artifactId>radon</artifactId>
         <groupId>me.itzsomebody</groupId>
         <version>1.0.4</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>Radon-Program</artifactId>
+    <artifactId>radon-program</artifactId>
     <build>
         <plugins>
             <plugin>
@@ -61,27 +61,27 @@
         <dependency>
             <groupId>org.ow2.asm</groupId>
             <artifactId>asm</artifactId>
-            <version>6.1</version>
+            <version>7.0-beta</version>
         </dependency>
         <dependency>
             <groupId>org.ow2.asm</groupId>
             <artifactId>asm-tree</artifactId>
-            <version>6.1</version>
+            <version>7.0-beta</version>
         </dependency>
         <dependency>
             <groupId>org.ow2.asm</groupId>
             <artifactId>asm-commons</artifactId>
-            <version>6.1</version>
+            <version>7.0-beta</version>
         </dependency>
         <dependency>
             <groupId>org.ow2.asm</groupId>
             <artifactId>asm-analysis</artifactId>
-            <version>6.1</version>
+            <version>7.0-beta</version>
         </dependency>
         <dependency>
             <groupId>org.ow2.asm</groupId>
             <artifactId>asm-util</artifactId>
-            <version>6.1</version>
+            <version>7.0-beta</version>
         </dependency>
     </dependencies>
 </project>

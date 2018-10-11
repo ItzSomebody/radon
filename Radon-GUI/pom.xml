@@ -3,12 +3,12 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>Radon</artifactId>
+        <artifactId>radon</artifactId>
         <groupId>me.itzsomebody</groupId>
         <version>1.0.4</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>Radon-GUI</artifactId>
+    <artifactId>radon-gui</artifactId>
     <build>
         <sourceDirectory>src/main/java</sourceDirectory>
         <resources>
@@ -27,7 +27,7 @@
                             <mainClass>me.itzsomebody.radon.gui.Main</mainClass>
                             <addClasspath>true</addClasspath>
                             <classpathLayoutType>custom</classpathLayoutType>
-                            <customClasspathLayout>Radon-Program.jar</customClasspathLayout>
+                            <customClasspathLayout>radon-program.jar</customClasspathLayout>
                         </manifest>
                     </archive>
                 </configuration>
@@ -49,7 +49,7 @@
     <dependencies>
         <dependency>
             <groupId>me.itzsomebody</groupId>
-            <artifactId>Radon-Program</artifactId>
+            <artifactId>radon-program</artifactId>
             <version>1.0.4</version>
         </dependency>
     </dependencies>
