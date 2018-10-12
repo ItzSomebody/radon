@@ -245,7 +245,7 @@ public class Radon {
                     tree.parentClasses.add(s);
                     ClassWrapper interfaceClass = classPath.get(s);
                     if (interfaceClass == null)
-                        throw new MissingClassException(classWrapper.classNode.superName + " is missing in the classpath.");
+                        throw new MissingClassException(s + " is missing in the classpath.");
                     buildHierarchy(interfaceClass, classWrapper);
                 }
             }
