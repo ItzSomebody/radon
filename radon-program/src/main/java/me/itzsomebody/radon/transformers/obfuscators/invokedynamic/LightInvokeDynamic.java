@@ -67,7 +67,7 @@ public class LightInvokeDynamic extends InvokeDynamic {
                                     newSig,
                                     bsmHandle,
                                     opcode,
-                                    encrypt(methodInsnNode.owner.replaceAll("/", "."), 1029),
+                                    encrypt(methodInsnNode.owner.replace("/", "."), 1029),
                                     encrypt(methodInsnNode.name, 2038),
                                     encrypt(methodInsnNode.desc, 1928));
                             methodNode.instructions.set(insn, indy);

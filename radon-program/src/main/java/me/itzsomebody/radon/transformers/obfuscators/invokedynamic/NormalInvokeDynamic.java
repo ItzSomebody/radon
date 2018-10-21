@@ -68,7 +68,7 @@ public class NormalInvokeDynamic extends InvokeDynamic {
                                     newSig,
                                     bsmHandle,
                                     opcode,
-                                    encrypt(methodInsnNode.owner.replaceAll("/", "."), 2893),
+                                    encrypt(methodInsnNode.owner.replace("/", "."), 2893),
                                     encrypt(methodInsnNode.name, 2993),
                                     encrypt(methodInsnNode.desc, 8372));
                             methodNode.instructions.set(insn, indy);
