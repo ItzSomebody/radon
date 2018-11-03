@@ -40,18 +40,4 @@ public class AccessUtils {
     public static boolean isBridge(int access) {
         return (Opcodes.ACC_BRIDGE & access) != 0;
     }
-
-    public static int makePublic(int access) {
-        int a = access;
-        if ((a & Opcodes.ACC_PRIVATE) != 0) {
-            a ^= Opcodes.ACC_PRIVATE;
-        }
-        if ((a & Opcodes.ACC_PROTECTED) != 0) {
-            a ^= Opcodes.ACC_PROTECTED;
-        }
-        if ((a & Opcodes.ACC_PUBLIC) == 0) {
-            a |= Opcodes.ACC_PUBLIC;
-        }
-        return a;
-    }
 }

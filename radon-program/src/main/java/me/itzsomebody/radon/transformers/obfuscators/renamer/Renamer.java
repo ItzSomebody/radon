@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -94,13 +95,10 @@ public class Renamer extends Transformer {
 
             ClassNode copy = new ClassNode();
             classNode.accept(new ClassRemapper(copy, simpleRemapper));
-            copy.access = AccessUtils.makePublic(copy.access);
             for (int i = 0; i < copy.methods.size(); i++) {
-                MethodNode methodNode = copy.methods.get(i);
-                methodNode.access = AccessUtils.makePublic(methodNode.access);
-                classWrapper.methods.get(i).methodNode = methodNode;
+                classWrapper.methods.get(i).methodNode = copy.methods.get(i);
 
-                /*for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
+                /*for (AbstractInsnNode insn : methodNode.instructions.toArray()) { // TODO: Fix lambdas + interface
                     if (insn instanceof InvokeDynamicInsnNode) {
                         InvokeDynamicInsnNode indy = (InvokeDynamicInsnNode) insn;
                         if (indy.bsm.getOwner().equals("java/lang/invoke/LambdaMetafactory")) {
@@ -118,9 +116,7 @@ public class Renamer extends Transformer {
 
             if (copy.fields != null) {
                 for (int i = 0; i < copy.fields.size(); i++) {
-                    FieldNode fieldNode = copy.fields.get(i);
-                    fieldNode.access = AccessUtils.makePublic(fieldNode.access);
-                    classWrapper.fields.get(i).fieldNode = fieldNode;
+                    classWrapper.fields.get(i).fieldNode = copy.fields.get(i);
                 }
             }
 
@@ -159,13 +155,8 @@ public class Renamer extends Transformer {
                             }
                         }
 
-                        try {
-                            getResources().put(name, stringVer.getBytes("UTF-8"));
-                            fixed.incrementAndGet();
-                        } catch (UnsupportedEncodingException e) {
-                            e.printStackTrace();
-                            throw new RuntimeException(e.getMessage());
-                        }
+                        getResources().put(name, stringVer.getBytes(StandardCharsets.UTF_8));
+                        fixed.incrementAndGet();
                     }
                 }
             }
