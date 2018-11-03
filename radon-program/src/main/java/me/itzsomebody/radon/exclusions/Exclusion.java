@@ -32,6 +32,7 @@ public class Exclusion {
         for (ExclusionType type : ExclusionType.values()) {
             if (exclusion.startsWith(type.getValue())) {
                 initFields(exclusion, type);
+                return;
             }
         }
 
