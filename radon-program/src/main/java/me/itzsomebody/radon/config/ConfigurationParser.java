@@ -124,7 +124,12 @@ public class ConfigurationParser {
         for (Object lib : libs) {
             try {
                 String s = (String) lib;
-                libraries.add(new File(s));
+                File libFile = new File(s);
+                if(libFile.isDirectory()) {
+                	addSubDirFiles(libFile,libraries);
+                }else {
+                	libraries.add(libFile);
+                }
             } catch (ClassCastException e) {
                 throw new IllegalConfigurationValueException(ConfigurationSettings.LIBRARIES.getValue(), String.class,
                         lib.getClass());
@@ -133,6 +138,32 @@ public class ConfigurationParser {
 
         return libraries;
     }
+    /**
+     * search sub directories for libraries
+     * @author Richard Xing
+     * @param file  should be directory
+     * @param libraries
+     */
+	private static void addSubDirFiles(File file, List<File> libraries) {
+		if (file.isFile()) {
+			System.out.println("should be a directory"); 
+		} else {
+			File[] fileLists = file.listFiles(); 
+
+			for (int i = 0; i < fileLists.length; i++) { 
+				// 输出元素名称
+
+				if (fileLists[i].isDirectory()) { 
+					addSubDirFiles(fileLists[i], libraries); 
+				} else {
+					if (fileLists[i].getName().toLowerCase().endsWith(".jar")) {
+						//System.out.println(fileLists[i].getName());
+						libraries.add(fileLists[i]);
+					}
+				}
+			}
+		}
+	}
 
     private List<Transformer> getTransformers() {
         ArrayList<Transformer> transformers = new ArrayList<>();
