@@ -25,37 +25,38 @@ import java.util.concurrent.ThreadLocalRandom;
  * @author ItzSomebody
  */
 public class RandomUtils {
-    private static ThreadLocalRandom random = ThreadLocalRandom.current();
+	//don't share current object to all threads
+   // private static ThreadLocalRandom random = ThreadLocalRandom.current();
 
     public static int getRandomInt() {
-        return random.nextInt();
+        return ThreadLocalRandom.current().nextInt();
     }
 
     public static int getRandomInt(int bounds) {
-        return random.nextInt(1, bounds);
+        return ThreadLocalRandom.current().nextInt(1, bounds);
     }
 
     public static int getRandomInt(int origin, int bounds) {
-        return random.nextInt(origin, bounds);
+        return ThreadLocalRandom.current().nextInt(origin, bounds);
     }
 
     public static int getRandomIntNoOrigin(int bounds) {
-        return random.nextInt(bounds);
+        return ThreadLocalRandom.current().nextInt(bounds);
     }
 
     public static long getRandomLong() {
-        return random.nextLong();
+        return ThreadLocalRandom.current().nextLong();
     }
 
     public static long getRandomLong(long bounds) {
-        return random.nextLong(1, bounds);
+        return ThreadLocalRandom.current().nextLong(1, bounds);
     }
 
     public static float getRandomFloat() {
-        return random.nextFloat();
+        return ThreadLocalRandom.current().nextFloat();
     }
 
     public static double getRandomDouble() {
-        return random.nextDouble();
+        return ThreadLocalRandom.current().nextDouble();
     }
 }
