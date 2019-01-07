@@ -48,7 +48,16 @@ public class Watermarker extends Transformer {
         for (int i = 0; i < 3; i++) { // Two extra injections helps with reliability of watermark to be extracted
             Stack<Character> watermark = cipheredWatermark();
             while (!watermark.isEmpty()) {
-                ClassWrapper classWrapper = classWrappers.get(RandomUtils.getRandomInt(0, classWrappers.size()));
+                ClassWrapper classWrapper;
+                int counter = 0;
+
+                do {
+                    classWrapper = classWrappers.get(RandomUtils.getRandomInt(0, classWrappers.size()));
+                    counter++;
+
+                    if (counter > 20)
+                        throw new RuntimeException("Radon couldn't find any methods to embed a watermark in after " + counter + "tries.");
+                } while (classWrapper.classNode.methods.size() != 0);
 
                 MethodNode methodNode = classWrapper.classNode.methods.get(RandomUtils.getRandomInt(0,
                         classWrapper.classNode.methods.size()));
@@ -63,7 +72,7 @@ public class Watermarker extends Transformer {
     }
 
     private static InsnList createInstructions(Stack<Character> watermark, MethodNode methodNode) {
-        int offset = (methodNode.localVariables == null) ? 0 : methodNode.localVariables.size();
+        int offset = methodNode.maxLocals;
         int xorKey = RandomUtils.getRandomInt();
         int watermarkChar = watermark.pop() ^ xorKey;
         int indexXorKey = RandomUtils.getRandomInt();
