@@ -107,7 +107,7 @@ public class LightStringEncryption extends StringEncryption {
 
         {
             fv = cw.visitField(ACC_PRIVATE + ACC_STATIC, memberNames.cacheFieldName, "Ljava/util/HashMap;",
-                    "Ljava/util/HashMap<Ljava/lang/String;Ljava/lang/String;>;", null);
+                    null, null);
             fv.visitEnd();
         }
         {
@@ -194,14 +194,25 @@ public class LightStringEncryption extends StringEncryption {
             mv.visitCode();
             Label l0 = new Label();
             mv.visitLabel(l0);
+            mv.visitTypeInsn(NEW, "java/lang/StringBuilder");
+            mv.visitInsn(DUP);
+            mv.visitMethodInsn(INVOKESPECIAL, "java/lang/StringBuilder", "<init>", "()V", false);
             mv.visitVarInsn(ALOAD, 0);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append",
+                    "(Ljava/lang/String;)Ljava/lang/StringBuilder;", false);
+            mv.visitVarInsn(ILOAD, 1);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(I)Ljava/lang/StringBuilder;",
+                    false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;", false);
+            mv.visitVarInsn(ASTORE, 5);
+            mv.visitVarInsn(ALOAD, 5);
             mv.visitMethodInsn(INVOKESTATIC, memberNames.className, memberNames.cacheContainsMethodName,
                     "(Ljava/lang/String;)Z", false);
             Label l1 = new Label();
             mv.visitJumpInsn(IFEQ, l1);
             Label l2 = new Label();
             mv.visitLabel(l2);
-            mv.visitVarInsn(ALOAD, 0);
+            mv.visitVarInsn(ALOAD, 5);
             mv.visitMethodInsn(INVOKESTATIC, memberNames.className, memberNames.returnCacheMethodName,
                     "(Ljava/lang/String;)Ljava/lang/String;", false);
             mv.visitInsn(ARETURN);
@@ -250,18 +261,17 @@ public class LightStringEncryption extends StringEncryption {
             mv.visitVarInsn(ASTORE, 4);
             Label l10 = new Label();
             mv.visitLabel(l10);
-            mv.visitVarInsn(ALOAD, 0);
+            mv.visitVarInsn(ALOAD, 5);
             mv.visitVarInsn(ALOAD, 4);
             mv.visitMethodInsn(INVOKESTATIC, memberNames.className, memberNames.cacheStringMethodName,
                     "(Ljava/lang/String;Ljava/lang/String;)V", false);
             Label l11 = new Label();
             mv.visitLabel(l11);
-            mv.visitVarInsn(ALOAD, 3);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;", false);
+            mv.visitVarInsn(ALOAD, 4);
             mv.visitInsn(ARETURN);
             Label l12 = new Label();
             mv.visitLabel(l12);
-            mv.visitMaxs(3, 5);
+            mv.visitMaxs(3, 6);
             mv.visitEnd();
         }
         cw.visitEnd();

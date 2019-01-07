@@ -140,7 +140,7 @@ public class HeavyStringEncryption extends StringEncryption {
         }
         {
             fv = cw.visitField(ACC_PRIVATE + ACC_STATIC, memberNames.cacheFieldName, "Ljava/util/HashMap;",
-                    "Ljava/util/HashMap<Ljava/lang/String;Ljava/lang/String;>;", null);
+                    null, null);
             fv.visitEnd();
         }
         {
