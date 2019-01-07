@@ -1,3 +1,12 @@
+## 1.0.5
+* Fixes bug that caused all exclusions to not work.
+* Fixes a flaw in the light string encryption decryption code which
+could lead to collision issues (Thanks [visleaf](https://github.com/visleaf)).
+* Radon now searches sub-directories for libraries (Thanks [freeasbird](https://github.com/freeasbird)).
+* Radon no longer uses the same shared object for randoms (Thanks [freeasbird](https://github.com/freeasbird)).
+* Fixes an issue in the Watermarker transformer that could break applications.
+* Adds MissingClassException when library classes are missing.
+
 ## 1.0.4
 * Changes a few internals.
 * Changes ASM version to 7.0-beta.
