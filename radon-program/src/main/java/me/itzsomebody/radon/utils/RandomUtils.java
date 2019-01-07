@@ -23,12 +23,9 @@ import java.util.concurrent.ThreadLocalRandom;
  * Used to generate various randoms.
  *
  * @author ItzSomebody
+ * @author freeasbird
  */
-public class RandomUtils {
-	//don't share current object to all threads
-   // private static ThreadLocalRandom random = ThreadLocalRandom.current();
-
-    public static int getRandomInt() {
+public class RandomUtils {public static int getRandomInt() {
         return ThreadLocalRandom.current().nextInt();
     }
 

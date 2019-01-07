@@ -125,10 +125,10 @@ public class ConfigurationParser {
             try {
                 String s = (String) lib;
                 File libFile = new File(s);
-                if(libFile.isDirectory()) {
-                	addSubDirFiles(libFile,libraries);
-                }else {
-                	libraries.add(libFile);
+                if (libFile.isDirectory()) {
+                    addSubDirFiles(libFile, libraries);
+                } else {
+                    libraries.add(libFile);
                 }
             } catch (ClassCastException e) {
                 throw new IllegalConfigurationValueException(ConfigurationSettings.LIBRARIES.getValue(), String.class,
@@ -138,32 +138,34 @@ public class ConfigurationParser {
 
         return libraries;
     }
+
     /**
-     * search sub directories for libraries
-     * @author Richard Xing
-     * @param file  should be directory
+     * Searches sub directories for libraries
+     *
+     * @param file      should be directory
      * @param libraries
+     * @author Richard Xing
      */
-	private static void addSubDirFiles(File file, List<File> libraries) {
-		if (file.isFile()) {
-			System.out.println("should be a directory"); 
-		} else {
-			File[] fileLists = file.listFiles(); 
+    private static void addSubDirFiles(File file, List<File> libraries) {
+        if (file.isFile()) {
+            System.out.println("should be a directory");
+        } else {
+            File[] fileLists = file.listFiles();
 
-			for (int i = 0; i < fileLists.length; i++) { 
-				// 输出元素名称
+            for (int i = 0; i < fileLists.length; i++) {
+                // 输出元素名称
 
-				if (fileLists[i].isDirectory()) { 
-					addSubDirFiles(fileLists[i], libraries); 
-				} else {
-					if (fileLists[i].getName().toLowerCase().endsWith(".jar")) {
-						//System.out.println(fileLists[i].getName());
-						libraries.add(fileLists[i]);
-					}
-				}
-			}
-		}
-	}
+                if (fileLists[i].isDirectory()) {
+                    addSubDirFiles(fileLists[i], libraries);
+                } else {
+                    if (fileLists[i].getName().toLowerCase().endsWith(".jar")) {
+                        //System.out.println(fileLists[i].getName());
+                        libraries.add(fileLists[i]);
+                    }
+                }
+            }
+        }
+    }
 
     private List<Transformer> getTransformers() {
         ArrayList<Transformer> transformers = new ArrayList<>();
