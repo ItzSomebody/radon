@@ -5,7 +5,7 @@
     <parent>
         <artifactId>radon</artifactId>
         <groupId>me.itzsomebody</groupId>
-        <version>1.0.4</version>
+        <version>1.0.5</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>radon-program</artifactId>
@@ -61,27 +61,27 @@
         <dependency>
             <groupId>org.ow2.asm</groupId>
             <artifactId>asm</artifactId>
-            <version>7.0-beta</version>
+            <version>7.0</version>
         </dependency>
         <dependency>
             <groupId>org.ow2.asm</groupId>
             <artifactId>asm-tree</artifactId>
-            <version>7.0-beta</version>
+            <version>7.0</version>
         </dependency>
         <dependency>
             <groupId>org.ow2.asm</groupId>
             <artifactId>asm-commons</artifactId>
-            <version>7.0-beta</version>
+            <version>7.0</version>
         </dependency>
         <dependency>
             <groupId>org.ow2.asm</groupId>
             <artifactId>asm-analysis</artifactId>
-            <version>7.0-beta</version>
+            <version>7.0</version>
         </dependency>
         <dependency>
             <groupId>org.ow2.asm</groupId>
             <artifactId>asm-util</artifactId>
-            <version>7.0-beta</version>
+            <version>7.0</version>
         </dependency>
     </dependencies>
 </project>
