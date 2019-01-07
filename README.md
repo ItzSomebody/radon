@@ -94,6 +94,10 @@ The string encryption key takes several arguments.
 
 The invokedynamic key only takes one argument: a **string** determining which kind of invokedynamic to apply to the output jar. Valid modes are **Light**, **Normal** and **Heavy**.
 
+## NumberObfuscation
+
+The number obfuscation key only takes one argument: a **string** determining which kind of number obfuscation to apply to the output jar. Valid modes are **Light**, **Normal** and **Heavy**.
+
 ## FlowObfuscation
 
 The flow obfuscation key only takes one argument: a **string** determining which kind of flow obfuscation to apply to the output jar. Valid modes are **Light**, **Normal** and **Heavy**.
@@ -258,7 +262,7 @@ will be seen as `me/itzsomebody/Test.main([Ljava/lang/String;)V` to Radon. Valid
 
 ## FAQ
 * **Q: Is this uncrackable/undeobfuscatable?**
-* *A: No. Nothing is impossible to deobfuscate or reverse-engineer. Furthermore, Radon is far from being hard to deobfuscate.*
+* *A: No. Nothing is impossible to deobfuscate or reverse-engineer. Furthermore, Radon is far from being hard to deobfuscate. On a scale of 1 to 10 on how hard Radon is to deobfuscate, I'd say 3 at best.*
 * **Q: Why is this open-sourced?**
 * *A: I made Radon as a way to experiment with obfuscation and to become familar with the JVM bytecode instruction set and as a codebase if anyone wants to mess around.*
 * **Q: Doesn't that make it easier to deobfuscate?**

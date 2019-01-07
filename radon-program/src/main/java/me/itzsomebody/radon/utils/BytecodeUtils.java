@@ -17,7 +17,7 @@
 
 package me.itzsomebody.radon.utils;
 
-import jdk.internal.org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldNode;
@@ -53,17 +53,17 @@ public class BytecodeUtils {
 
     public static boolean hasAnnotations(ClassNode classNode) {
         return (classNode.visibleAnnotations != null && !classNode.visibleAnnotations.isEmpty())
-            || (classNode.invisibleAnnotations != null && !classNode.invisibleAnnotations.isEmpty());
+                || (classNode.invisibleAnnotations != null && !classNode.invisibleAnnotations.isEmpty());
     }
 
     public static boolean hasAnnotations(MethodNode methodNode) {
         return (methodNode.visibleAnnotations != null && !methodNode.visibleAnnotations.isEmpty())
-            || (methodNode.invisibleAnnotations != null && !methodNode.invisibleAnnotations.isEmpty());
+                || (methodNode.invisibleAnnotations != null && !methodNode.invisibleAnnotations.isEmpty());
     }
 
     public static boolean hasAnnotations(FieldNode fieldNode) {
         return (fieldNode.visibleAnnotations != null && !fieldNode.visibleAnnotations.isEmpty())
-            || (fieldNode.invisibleAnnotations != null && !fieldNode.invisibleAnnotations.isEmpty());
+                || (fieldNode.invisibleAnnotations != null && !fieldNode.invisibleAnnotations.isEmpty());
     }
 
     public static boolean isIntInsn(AbstractInsnNode insn) {
@@ -71,19 +71,31 @@ public class BytecodeUtils {
             return false;
         }
         int opcode = insn.getOpcode();
-        return ((opcode >= org.objectweb.asm.Opcodes.ICONST_M1 && opcode <= org.objectweb.asm.Opcodes.ICONST_5)
-            || opcode == org.objectweb.asm.Opcodes.BIPUSH
-            || opcode == org.objectweb.asm.Opcodes.SIPUSH
-            || (insn instanceof LdcInsnNode
-            && ((LdcInsnNode) insn).cst instanceof Integer));
+        return ((opcode >= Opcodes.ICONST_M1 && opcode <= Opcodes.ICONST_5)
+                || opcode == Opcodes.BIPUSH
+                || opcode == Opcodes.SIPUSH
+                || (insn instanceof LdcInsnNode
+                && ((LdcInsnNode) insn).cst instanceof Integer));
     }
 
     public static boolean isLongInsn(AbstractInsnNode insn) {
         int opcode = insn.getOpcode();
-        return (opcode == org.objectweb.asm.Opcodes.LCONST_0
-            || opcode == org.objectweb.asm.Opcodes.LCONST_1
-            || (insn instanceof LdcInsnNode
-            && ((LdcInsnNode) insn).cst instanceof Long));
+        return (opcode == Opcodes.LCONST_0
+                || opcode == Opcodes.LCONST_1
+                || (insn instanceof LdcInsnNode
+                && ((LdcInsnNode) insn).cst instanceof Long));
+    }
+
+    public static boolean isFloatInsn(AbstractInsnNode insn) {
+        int opcode = insn.getOpcode();
+        return (opcode >= Opcodes.FCONST_0 && opcode <= Opcodes.FCONST_2)
+                || (insn instanceof LdcInsnNode && ((LdcInsnNode) insn).cst instanceof Float);
+    }
+
+    public static boolean isDoubleInsn(AbstractInsnNode insn) {
+        int opcode = insn.getOpcode();
+        return (opcode >= Opcodes.DCONST_0 && opcode <= Opcodes.DCONST_1)
+                || (insn instanceof LdcInsnNode && ((LdcInsnNode) insn).cst instanceof Double);
     }
 
     public static AbstractInsnNode getNumberInsn(int number) {
@@ -125,13 +137,13 @@ public class BytecodeUtils {
     public static int getIntegerFromInsn(AbstractInsnNode insn) {
         int opcode = insn.getOpcode();
 
-        if (opcode >= org.objectweb.asm.Opcodes.ICONST_M1 && opcode <= org.objectweb.asm.Opcodes.ICONST_5) {
+        if (opcode >= Opcodes.ICONST_M1 && opcode <= Opcodes.ICONST_5) {
             return opcode - 3;
         } else if (insn instanceof IntInsnNode
-            && insn.getOpcode() != org.objectweb.asm.Opcodes.NEWARRAY) {
+                && insn.getOpcode() != Opcodes.NEWARRAY) {
             return ((IntInsnNode) insn).operand;
         } else if (insn instanceof LdcInsnNode
-            && ((LdcInsnNode) insn).cst instanceof Integer) {
+                && ((LdcInsnNode) insn).cst instanceof Integer) {
             return (Integer) ((LdcInsnNode) insn).cst;
         }
 
@@ -141,11 +153,37 @@ public class BytecodeUtils {
     public static long getLongFromInsn(AbstractInsnNode insn) {
         int opcode = insn.getOpcode();
 
-        if (opcode >= org.objectweb.asm.Opcodes.LCONST_0 && opcode <= org.objectweb.asm.Opcodes.LCONST_1) {
+        if (opcode >= Opcodes.LCONST_0 && opcode <= Opcodes.LCONST_1) {
             return opcode - 9;
         } else if (insn instanceof LdcInsnNode
-            && ((LdcInsnNode) insn).cst instanceof Long) {
+                && ((LdcInsnNode) insn).cst instanceof Long) {
             return (Long) ((LdcInsnNode) insn).cst;
+        }
+
+        throw new IllegalArgumentException("Unexpected instruction");
+    }
+
+    public static float getFloatFromInsn(AbstractInsnNode insn) {
+        int opcode = insn.getOpcode();
+
+        if (opcode >= Opcodes.FCONST_0 && opcode <= Opcodes.FCONST_2) {
+            return opcode - 11;
+        } else if (insn instanceof LdcInsnNode
+                && ((LdcInsnNode) insn).cst instanceof Float) {
+            return (Float) ((LdcInsnNode) insn).cst;
+        }
+
+        throw new IllegalArgumentException("Unexpected instruction");
+    }
+
+    public static double getDoubleFromInsn(AbstractInsnNode insn) {
+        int opcode = insn.getOpcode();
+
+        if (opcode >= Opcodes.DCONST_0 && opcode <= Opcodes.DCONST_1) {
+            return opcode - 14;
+        } else if (insn instanceof LdcInsnNode
+                && ((LdcInsnNode) insn).cst instanceof Double) {
+            return (Double) ((LdcInsnNode) insn).cst;
         }
 
         throw new IllegalArgumentException("Unexpected instruction");
