@@ -1,6 +1,4 @@
-# Radon Java Obfuscator ![Build Status](https://travis-ci.org/ItzSomebody/Radon.svg?branch=master)
-
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/330fee5bb8ee4fab89ac5607f7db653e)](https://app.codacy.com/app/ItzSomebody/Radon?utm_source=github.com&utm_medium=referral&utm_content=ItzSomebody/Radon&utm_campaign=Badge_Grade_Dashboard)
+# Radon Java Obfuscator ![Build Status](https://travis-ci.org/ItzSomebody/Radon.svg?branch=master)[![Codacy Badge](https://api.codacy.com/project/badge/Grade/330fee5bb8ee4fab89ac5607f7db653e)] (https://app.codacy.com/app/ItzSomebody/Radon?utm_source=github.com&utm_medium=referral&utm_content=ItzSomebody/Radon&utm_campaign=Badge_Grade_Dashboard)
 
 Usage: `java -jar Radon-Program.jar ExampleConfig.yml`
 
