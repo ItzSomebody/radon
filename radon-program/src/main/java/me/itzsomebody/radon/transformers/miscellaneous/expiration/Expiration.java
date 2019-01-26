@@ -51,7 +51,7 @@ public class Expiration extends Transformer {
         getClassWrappers().parallelStream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper -> {
             ClassNode classNode = classWrapper.classNode;
 
-            classNode.methods.stream().filter(methodNode -> methodNode.name.equals("<init>")).forEach(methodNode -> {
+            classNode.methods.stream().filter(methodNode -> "<init>".equals(methodNode.name)).forEach(methodNode -> {
                 InsnList expirationCode = createExpirationInstructions();
                 methodNode.instructions.insertBefore(methodNode.instructions.getFirst(), expirationCode);
                 counter.incrementAndGet();

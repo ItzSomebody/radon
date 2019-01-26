@@ -20,12 +20,7 @@ package me.itzsomebody.radon.transformers.miscellaneous;
 import java.util.concurrent.atomic.AtomicInteger;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
-import me.itzsomebody.radon.utils.LoggerUtils;
-import me.itzsomebody.radon.utils.StringUtils;
 import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.InsnList;
-import org.objectweb.asm.tree.MethodNode;
-import org.objectweb.asm.tree.VarInsnNode;
 
 /**
  * Sets the class signature to a random string. A known trick to work on JD, CFR, Procyon and Javap.

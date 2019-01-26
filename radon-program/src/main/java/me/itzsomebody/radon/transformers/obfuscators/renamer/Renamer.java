@@ -21,7 +21,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -145,8 +144,8 @@ public class Renamer extends Transformer {
                                 // Regex that ensures that class names that match words in the manifest don't break the
                                 // manifest.
                                 // Example: name == Main
-                                if (name.equals("META-INF/MANIFEST.MF") || name.equals("plugin.yml")
-                                        || name.equals("bungee.yml")) {
+                                if ("META-INF/MANIFEST.MF".equals(name) || "plugin.yml".equals(name)
+                                        || "bungee.yml".equals(name)) {
                                     stringVer = stringVer.replaceAll("(?<=[: ])"
                                             + original, mappings.get(mapping).replace("/", "."));
                                 } else {

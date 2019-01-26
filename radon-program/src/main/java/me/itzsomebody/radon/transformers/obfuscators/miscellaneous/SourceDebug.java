@@ -21,8 +21,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
 import me.itzsomebody.radon.utils.LoggerUtils;
-import me.itzsomebody.radon.utils.RandomUtils;
-import me.itzsomebody.radon.utils.StringUtils;
 
 /**
  * Obfuscate the sourcedebugextension attribute by either randomizing the data, or removing it altogether.

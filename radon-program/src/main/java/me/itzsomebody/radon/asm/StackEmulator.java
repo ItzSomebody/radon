@@ -21,6 +21,7 @@ import java.util.EmptyStackException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Stack;
+import me.itzsomebody.radon.exceptions.StackEmulationException;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
@@ -374,8 +375,10 @@ public class StackEmulator implements Opcodes {
                     }
                     case JSR:
                     case RET: {
-                        throw new RuntimeException("Did not expect JSR/RET instructions");
+                        throw new StackEmulationException("Did not expect JSR/RET instructions");
                     }
+                    default:
+                        break;
                 }
             } catch (EmptyStackException empty) {
                 if (debug) empty.printStackTrace();

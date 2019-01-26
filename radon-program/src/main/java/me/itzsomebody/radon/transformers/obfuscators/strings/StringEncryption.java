@@ -18,6 +18,7 @@
 package me.itzsomebody.radon.transformers.obfuscators.strings;
 
 import java.util.List;
+import me.itzsomebody.radon.exceptions.IllegalConfigurationValueException;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
 
@@ -64,7 +65,7 @@ public abstract class StringEncryption extends Transformer {
                 return new HeavyStringEncryption(setup);
             }
             default: {
-                throw new RuntimeException("Did not expect " + s + " as a string obfuscation mode");
+                throw new IllegalConfigurationValueException("Did not expect " + s + " as a string obfuscation mode");
             }
         }
     }

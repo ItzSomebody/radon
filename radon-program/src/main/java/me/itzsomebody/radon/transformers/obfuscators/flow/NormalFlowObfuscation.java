@@ -45,7 +45,6 @@ public class NormalFlowObfuscation extends FlowObfuscation {
     @Override
     public void transform() {
         AtomicInteger counter = new AtomicInteger();
-        long current = System.currentTimeMillis();
 
         this.getClassWrappers().parallelStream().filter(classWrapper ->
                 !excluded(classWrapper)).forEach(classWrapper -> {
@@ -69,16 +68,12 @@ public class NormalFlowObfuscation extends FlowObfuscation {
                     if (leeway < 10000) {
                         break;
                     }
-                    if (methodNode.name.equals("<init>")) {
-                        if (insn instanceof MethodInsnNode) {
-                            if (insn.getOpcode() == INVOKESPECIAL && insn.getPrevious() instanceof VarInsnNode
-                                    && ((VarInsnNode) insn.getPrevious()).var == 0) {
-                                calledSuper = true;
-                            }
-                        }
+                    if ("<init>".equals(methodNode.name)) {
+                        calledSuper = (insn instanceof MethodInsnNode && insn.getOpcode() == INVOKESPECIAL
+                                && insn.getPrevious() instanceof VarInsnNode && ((VarInsnNode) insn.getPrevious()).var == 0);
                     }
                     if (insn != methodNode.instructions.getFirst() && !(insn instanceof LineNumberNode)) {
-                        if (methodNode.name.equals("<init>") && !calledSuper)
+                        if ("<init>".equals(methodNode.name) && !calledSuper)
                             continue;
                         if (emptyAt.contains(insn)) { // We need to make sure stack is empty before making jumps
                             methodNode.instructions.insertBefore(insn, new VarInsnNode(ILOAD, varIndex));
@@ -116,7 +111,7 @@ public class NormalFlowObfuscation extends FlowObfuscation {
      * @param methodNode the {@link MethodNode} we are inserting into.
      * @return a {@link LabelNode} which "escapes" all other flow.
      */
-    LabelNode exitLabel(MethodNode methodNode) {
+    public static LabelNode exitLabel(MethodNode methodNode) {
         LabelNode lb = new LabelNode();
         LabelNode escapeNode = new LabelNode();
         AbstractInsnNode target = methodNode.instructions.getFirst();
@@ -130,18 +125,22 @@ public class NormalFlowObfuscation extends FlowObfuscation {
             case Type.BOOLEAN:
                 methodNode.instructions.insertBefore(target, BytecodeUtils.getNumberInsn(RandomUtils.getRandomInt(2)));
                 methodNode.instructions.insertBefore(target, new InsnNode(IRETURN));
+                break;
             case Type.CHAR:
                 methodNode.instructions.insertBefore(target, BytecodeUtils.getNumberInsn(RandomUtils
                         .getRandomInt(Character.MAX_VALUE + 1)));
                 methodNode.instructions.insertBefore(target, new InsnNode(IRETURN));
+                break;
             case Type.BYTE:
                 methodNode.instructions.insertBefore(target, BytecodeUtils.getNumberInsn(RandomUtils
                         .getRandomInt(Byte.MAX_VALUE + 1)));
                 methodNode.instructions.insertBefore(target, new InsnNode(IRETURN));
+                break;
             case Type.SHORT:
                 methodNode.instructions.insertBefore(target, BytecodeUtils.getNumberInsn(RandomUtils
                         .getRandomInt(Short.MAX_VALUE + 1)));
                 methodNode.instructions.insertBefore(target, new InsnNode(IRETURN));
+                break;
             case Type.INT:
                 methodNode.instructions.insertBefore(target, BytecodeUtils.getNumberInsn(RandomUtils.getRandomInt()));
                 methodNode.instructions.insertBefore(target, new InsnNode(IRETURN));

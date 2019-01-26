@@ -50,7 +50,7 @@ public class HeavyInvokeDynamic extends InvokeDynamic {
         Handle bsmHandle = new Handle(H_INVOKESTATIC, memberNames.className, memberNames.bootstrapMethodName,
                 "(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", false);
         this.getClassWrappers().parallelStream().filter(classWrapper ->
-                !classWrapper.classNode.superName.equals("java/lang/Enum") && !excluded(classWrapper)
+                !"java/lang/Enum".equals(classWrapper.classNode.superName) && !excluded(classWrapper)
                         && classWrapper.classNode.version >= V1_7).forEach(classWrapper -> {
             ClassNode classNode = classWrapper.classNode;
 
@@ -61,7 +61,7 @@ public class HeavyInvokeDynamic extends InvokeDynamic {
                 for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
                     if (insn instanceof MethodInsnNode) {
                         MethodInsnNode methodInsnNode = (MethodInsnNode) insn;
-                        if (!methodInsnNode.name.equals("<init>")) {
+                        if (!"<init>".equals(methodInsnNode.name)) {
                             boolean isStatic = (methodInsnNode.getOpcode() == INVOKESTATIC);
                             String newSig = isStatic ? methodInsnNode.desc : methodInsnNode.desc.replace("(",
                                     "(Ljava/lang/Object;");
@@ -93,6 +93,9 @@ public class HeavyInvokeDynamic extends InvokeDynamic {
                                     sb.append("0<>").append(methodInsnNode.desc);
                                     break;
                                 }
+                                default: {
+                                    break;
+                                }
                             }
 
                             InvokeDynamicInsnNode indy = new InvokeDynamicInsnNode(
@@ -108,63 +111,63 @@ public class HeavyInvokeDynamic extends InvokeDynamic {
                             }
                             counter.incrementAndGet();
                         }
-                    } else if (insn instanceof FieldInsnNode) {
-                        if (!methodNode.name.equals("<init>")) {
-                            FieldInsnNode fieldInsnNode = (FieldInsnNode) insn;
+                    } else if (insn instanceof FieldInsnNode && !"<init>".equals(methodNode.name)) {
+                        FieldInsnNode fieldInsnNode = (FieldInsnNode) insn;
 
-                            ClassWrapper cw = getClassPath().get(fieldInsnNode.owner);
-                            if (cw == null) {
-                                throw new MissingClassException(fieldInsnNode.owner + " does not exist in classpath");
-                            }
-                            FieldWrapper fw = cw.fields.stream().filter(fieldWrapper ->
-                                    fieldWrapper.fieldNode.name.equals(fieldInsnNode.name)
-                                            && fieldWrapper.fieldNode.desc.equals(fieldInsnNode.desc)).findFirst()
-                                    .orElse(null);
-                            if (fw != null && Modifier.isFinal(fw.fieldNode.access)) {
-                                continue;
-                            }
-
-                            boolean isStatic = (fieldInsnNode.getOpcode() == GETSTATIC
-                                    || fieldInsnNode.getOpcode() == PUTSTATIC);
-                            boolean isSetter = (fieldInsnNode.getOpcode() == PUTFIELD
-                                    || fieldInsnNode.getOpcode() == PUTSTATIC);
-                            String newSig = (isSetter) ? "(" + fieldInsnNode.desc + ")V" : "()" + fieldInsnNode.desc;
-                            if (!isStatic)
-                                newSig = newSig.replace("(", "(Ljava/lang/Object;");
-
-                            Type type = Type.getType(fieldInsnNode.desc);
-                            StringBuilder sb = new StringBuilder();
-                            sb.append(fieldInsnNode.owner.replace("/", ".")).append("<>").append(fieldInsnNode.name)
-                                    .append("<>");
-
-                            switch (insn.getOpcode()) {
-                                case GETSTATIC: {
-                                    sb.append("3");
-                                    break;
-                                }
-                                case GETFIELD: {
-                                    sb.append("4");
-                                    break;
-                                }
-                                case PUTSTATIC: {
-                                    sb.append("5");
-                                    break;
-                                }
-                                case PUTFIELD: {
-                                    sb.append("6");
-                                    break;
-                                }
-                            }
-
-                            InvokeDynamicInsnNode indy = new InvokeDynamicInsnNode(
-                                    encrypt(sb.toString(), memberNames),
-                                    newSig,
-                                    bsmHandle
-                            );
-
-                            methodNode.instructions.set(insn, indy);
-                            counter.incrementAndGet();
+                        ClassWrapper cw = getClassPath().get(fieldInsnNode.owner);
+                        if (cw == null) {
+                            throw new MissingClassException(fieldInsnNode.owner + " does not exist in classpath");
                         }
+                        FieldWrapper fw = cw.fields.stream().filter(fieldWrapper ->
+                                fieldWrapper.fieldNode.name.equals(fieldInsnNode.name)
+                                        && fieldWrapper.fieldNode.desc.equals(fieldInsnNode.desc)).findFirst()
+                                .orElse(null);
+                        if (fw != null && Modifier.isFinal(fw.fieldNode.access)) {
+                            continue;
+                        }
+
+                        boolean isStatic = (fieldInsnNode.getOpcode() == GETSTATIC
+                                || fieldInsnNode.getOpcode() == PUTSTATIC);
+                        boolean isSetter = (fieldInsnNode.getOpcode() == PUTFIELD
+                                || fieldInsnNode.getOpcode() == PUTSTATIC);
+                        String newSig = (isSetter) ? "(" + fieldInsnNode.desc + ")V" : "()" + fieldInsnNode.desc;
+                        if (!isStatic)
+                            newSig = newSig.replace("(", "(Ljava/lang/Object;");
+
+                        StringBuilder sb = new StringBuilder();
+                        sb.append(fieldInsnNode.owner.replace("/", ".")).append("<>").append(fieldInsnNode.name)
+                                .append("<>");
+
+                        switch (insn.getOpcode()) {
+                            case GETSTATIC: {
+                                sb.append("3");
+                                break;
+                            }
+                            case GETFIELD: {
+                                sb.append("4");
+                                break;
+                            }
+                            case PUTSTATIC: {
+                                sb.append("5");
+                                break;
+                            }
+                            case PUTFIELD: {
+                                sb.append("6");
+                                break;
+                            }
+                            default: {
+                                break;
+                            }
+                        }
+
+                        InvokeDynamicInsnNode indy = new InvokeDynamicInsnNode(
+                                encrypt(sb.toString(), memberNames),
+                                newSig,
+                                bsmHandle
+                        );
+
+                        methodNode.instructions.set(insn, indy);
+                        counter.incrementAndGet();
                     }
                 }
             });

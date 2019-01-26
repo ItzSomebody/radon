@@ -67,16 +67,12 @@ public class HeavyFlowObfuscation extends NormalFlowObfuscation {
                     if (leeway < 10000) {
                         break;
                     }
-                    if (methodNode.name.equals("<init>")) {
-                        if (insn instanceof MethodInsnNode) {
-                            if (insn.getOpcode() == INVOKESPECIAL && insn.getPrevious() instanceof VarInsnNode
-                                    && ((VarInsnNode) insn.getPrevious()).var == 0) {
-                                calledSuper = true;
-                            }
-                        }
+                    if ("<init>".equals(methodNode.name)) {
+                        calledSuper = (insn instanceof MethodInsnNode && insn.getOpcode() == INVOKESPECIAL
+                                && insn.getPrevious() instanceof VarInsnNode && ((VarInsnNode) insn.getPrevious()).var == 0);
                     }
                     if (insn != methodNode.instructions.getFirst() && !(insn instanceof LineNumberNode)) {
-                        if (methodNode.name.equals("<init>") && !calledSuper)
+                        if ("<init>".equals(methodNode.name) && !calledSuper)
                             continue;
                         if (emptyAt.contains(insn)) { // We need to make sure stack is empty before making jumps
                             methodNode.instructions.insertBefore(insn, new VarInsnNode(ILOAD, varIndex));

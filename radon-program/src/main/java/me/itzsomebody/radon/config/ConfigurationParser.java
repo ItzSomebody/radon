@@ -67,12 +67,12 @@ import org.yaml.snakeyaml.Yaml;
  */
 public class ConfigurationParser {
     private Map<String, Object> map;
-    private final static Set<String> VALID_KEYS = new HashSet<String>() {
-        {
-            for (ConfigurationSettings setting : ConfigurationSettings.values())
-                add(setting.getValue());
-        }
-    };
+    private final static Set<String> VALID_KEYS = new HashSet<String>();
+
+    static {
+        for (ConfigurationSettings setting : ConfigurationSettings.values())
+            VALID_KEYS.add(setting.getValue());
+    }
 
     public ConfigurationParser(InputStream in) {
         this.map = new Yaml().load(in);
@@ -277,7 +277,7 @@ public class ConfigurationParser {
                     String.class, o.getClass());
 
         String s = (String) o;
-        if (!s.equals("Light") && !s.equals("Normal") && !s.equals("Heavy"))
+        if (!"Light".equals(s) && !"Normal".equals(s) && !"Heavy".equals(s))
             throw new IllegalConfigurationValueException("Expected Light, Normal or Heavy as mode for number " +
                     "obfuscation. Got " + s + " instead.");
 
@@ -292,7 +292,7 @@ public class ConfigurationParser {
             throw new IllegalConfigurationValueException(ConfigurationSettings.INVOKEDYNAMIC.getValue(), String.class,
                     o.getClass());
         String s = (String) o;
-        if (!s.equals("Light") && !s.equals("Normal") && !s.equals("Heavy"))
+        if (!"Light".equals(s) && !"Normal".equals(s) && !"Heavy".equals(s))
             throw new IllegalConfigurationValueException("Expected Light, Normal or Heavy as mode for invokedynamic " +
                     "obfuscation. Got " + s + " instead.");
 
@@ -313,7 +313,7 @@ public class ConfigurationParser {
             return null;
 
         String s = (String) settings.get("Mode");
-        if (!s.equals("Light") && !s.equals("Normal") && !s.equals("Heavy"))
+        if (!"Light".equals(s) && !"Normal".equals(s) && !"Heavy".equals(s))
             throw new IllegalConfigurationValueException("Expected Light, Normal or Heavy as mode for string " +
                     "encryption. Got " + s + " instead.");
 
@@ -337,7 +337,7 @@ public class ConfigurationParser {
                     String.class, o.getClass());
 
         String s = (String) o;
-        if (!s.equals("Light") && !s.equals("Normal") && !s.equals("Heavy"))
+        if (!"Light".equals(s) && !"Normal".equals(s) && !"Heavy".equals(s))
             throw new IllegalConfigurationValueException("Expected Light, Normal or Heavy as mode for flow " +
                     "obfuscation. Got " + s + " instead.");
 

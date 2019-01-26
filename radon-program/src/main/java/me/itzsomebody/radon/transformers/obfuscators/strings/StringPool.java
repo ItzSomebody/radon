@@ -83,7 +83,7 @@ public class StringPool extends StringEncryption {
                         strList));
 
                 MethodNode clinit = classWrapper.classNode.methods.stream().filter(methodNode ->
-                        methodNode.name.equals("<clinit>")).findFirst().orElse(null);
+                        "<clinit>".equals(methodNode.name)).findFirst().orElse(null);
                 if (clinit == null) {
                     clinit = new MethodNode(ACC_PRIVATE + ACC_STATIC + ACC_SYNTHETIC, "<clinit>", "()V", null, null);
                     InsnList insns = new InsnList();

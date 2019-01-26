@@ -245,7 +245,6 @@ public class HeavyNumberObfuscation extends NumberObfuscation {
             mv.visitCode();
             Label l0 = new Label();
             Label l1 = new Label();
-            Label l2 = new Label();
             Label l3 = new Label();
             mv.visitLabel(l3);
             mv.visitTypeInsn(NEW, memberNames.className);

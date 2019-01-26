@@ -49,18 +49,18 @@ import org.objectweb.asm.tree.VarInsnNode;
  * @author ItzSomebody
  */
 public class TrashClasses extends Transformer {
-    private static ArrayList<String> DESCRIPTORS = new ArrayList<String>() {
-        {
-            add("Z");
-            add("C");
-            add("B");
-            add("S");
-            add("I");
-            add("F");
-            add("J");
-            add("D");
-        }
-    };
+    private static ArrayList<String> DESCRIPTORS = new ArrayList<String>();
+
+    static {
+        DESCRIPTORS.add("Z");
+        DESCRIPTORS.add("C");
+        DESCRIPTORS.add("B");
+        DESCRIPTORS.add("S");
+        DESCRIPTORS.add("I");
+        DESCRIPTORS.add("F");
+        DESCRIPTORS.add("J");
+        DESCRIPTORS.add("D");
+    }
 
     @Override
     public void transform() {
@@ -158,6 +158,7 @@ public class TrashClasses extends Transformer {
             default: {
                 insns.add(new VarInsnNode(ALOAD, RandomUtils.getRandomInt(30)));
                 insns.add(new InsnNode(ARETURN));
+                break;
             }
         }
 
@@ -212,6 +213,7 @@ public class TrashClasses extends Transformer {
             }
             default: {
                 sb.append(DESCRIPTORS.get(RandomUtils.getRandomIntNoOrigin(DESCRIPTORS.size())));
+                break;
             }
         }
 

@@ -63,29 +63,22 @@ public class WatermarkUtils {
         for (ClassNode classNode : classes.values()) {
             for (MethodNode methodNode : classNode.methods) {
                 for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
-                    if (BytecodeUtils.isIntInsn(insn)) {
-                        if (BytecodeUtils.isIntInsn(insn.getNext())) {
-                            if (BytecodeUtils.isIntInsn(insn.getNext().getNext())) {
-                                if (BytecodeUtils.isIntInsn(insn.getNext().getNext().getNext())) {
-                                    if (insn.getNext().getNext().getNext().getNext() != null && insn.getNext().getNext()
-                                            .getNext().getNext().getOpcode() == Opcodes.ISTORE
-                                            && insn.getNext().getNext().getNext().getNext().getNext() != null
-                                            && insn.getNext().getNext().getNext().getNext().getNext()
-                                            .getOpcode() == Opcodes.ISTORE && insn.getNext().getNext().getNext()
-                                            .getNext().getNext().getNext() != null && insn.getNext().getNext().getNext()
-                                            .getNext().getNext().getNext().getOpcode() == Opcodes.ISTORE
-                                            && insn.getNext().getNext().getNext().getNext().getNext().getNext()
-                                            .getNext() != null && insn.getNext().getNext().getNext().getNext().getNext()
-                                            .getNext().getNext().getOpcode() == Opcodes.ISTORE) {
-                                        char character = (char) (BytecodeUtils.getIntegerFromInsn(insn)
-                                                ^ BytecodeUtils.getIntegerFromInsn(insn.getNext()));
-                                        int index = BytecodeUtils.getIntegerFromInsn(insn.getNext().getNext())
-                                                ^ BytecodeUtils.getIntegerFromInsn(insn.getNext().getNext().getNext());
-                                        embedMap.put(index, character);
-                                    }
-                                }
-                            }
-                        }
+                    if (BytecodeUtils.isIntInsn(insn) && BytecodeUtils.isIntInsn(insn.getNext())
+                            && BytecodeUtils.isIntInsn(insn.getNext().getNext())
+                            && BytecodeUtils.isIntInsn(insn.getNext().getNext().getNext())
+                            && insn.getNext().getNext().getNext().getNext() != null
+                            && insn.getNext().getNext().getNext().getNext().getOpcode() == Opcodes.ISTORE
+                            && insn.getNext().getNext().getNext().getNext().getNext() != null
+                            && insn.getNext().getNext().getNext().getNext().getNext().getOpcode() == Opcodes.ISTORE
+                            && insn.getNext().getNext().getNext().getNext().getNext().getNext() != null
+                            && insn.getNext().getNext().getNext().getNext().getNext().getNext().getOpcode() == Opcodes.ISTORE
+                            && insn.getNext().getNext().getNext().getNext().getNext().getNext().getNext() != null
+                            && insn.getNext().getNext().getNext().getNext().getNext().getNext().getNext().getOpcode() == Opcodes.ISTORE) {
+                        char character = (char) (BytecodeUtils.getIntegerFromInsn(insn)
+                                ^ BytecodeUtils.getIntegerFromInsn(insn.getNext()));
+                        int index = BytecodeUtils.getIntegerFromInsn(insn.getNext().getNext())
+                                ^ BytecodeUtils.getIntegerFromInsn(insn.getNext().getNext().getNext());
+                        embedMap.put(index, character);
                     }
                 }
             }

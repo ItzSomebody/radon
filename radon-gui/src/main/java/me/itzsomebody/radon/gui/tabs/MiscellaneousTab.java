@@ -239,15 +239,10 @@ public class MiscellaneousTab extends JPanel {
      * @return an {@link Expiration} transformer setup accordingly to the information provided in this
      * {@link MiscellaneousTab}.
      */
-    public Expiration getExpiration() {
-        try {
-            return (expirationEnabledCheckBox.isSelected()) ?
-                    new Expiration(new ExpirationSetup(expirationMessageField.getText(), new SimpleDateFormat("MM/dd/yyyy")
-                            .parse(expirationExpiresField.getText()).getTime(), expirationSwingCheckBox.isSelected())) : null;
-        } catch (ParseException e) {
-            e.printStackTrace();
-            throw new RuntimeException();
-        }
+    public Expiration getExpiration() throws ParseException {
+        return (expirationEnabledCheckBox.isSelected()) ?
+                new Expiration(new ExpirationSetup(expirationMessageField.getText(), new SimpleDateFormat("MM/dd/yyyy")
+                        .parse(expirationExpiresField.getText()).getTime(), expirationSwingCheckBox.isSelected())) : null;
     }
 
     /**

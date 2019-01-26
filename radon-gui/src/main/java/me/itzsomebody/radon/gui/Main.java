@@ -19,6 +19,7 @@ package me.itzsomebody.radon.gui;
 
 import java.io.File;
 import javax.swing.*;
+import me.itzsomebody.radon.gui.exceptions.RadonInstanceNotFound;
 
 /**
  * Main class. \o/
@@ -52,7 +53,7 @@ public class Main {
         } catch (ClassNotFoundException e) {
             JOptionPane.showMessageDialog(null, "me.itzsomebody.radon.Radon class was not found.",
                     "Radon instance class not found.", JOptionPane.ERROR_MESSAGE);
-            throw new RuntimeException();
+            throw new RadonInstanceNotFound();
         }
     }
 }

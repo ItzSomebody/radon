@@ -285,16 +285,16 @@ public class Radon {
 
         @Override
         protected String getCommonSuperClass(final String type1, final String type2) {
-            if (type1.equals("java/lang/Object") || type2.equals("java/lang/Object")) {
+            if ("java/lang/Object".equals(type1) || "java/lang/Object".equals(type2)) {
                 return "java/lang/Object";
             }
 
             String first = deriveCommonSuperName(type1, type2);
             String second = deriveCommonSuperName(type2, type1);
-            if (!first.equals("java/lang/Object")) {
+            if (!"java/lang/Object".equals(first)) {
                 return first;
             }
-            if (!second.equals("java/lang/Object")) {
+            if (!"java/lang/Object".equals(second)) {
                 return second;
             }
 
@@ -328,7 +328,7 @@ public class Radon {
         }
 
         private boolean isAssignableFrom(String type1, String type2) {
-            if (type1.equals("java/lang/Object"))
+            if ("java/lang/Object".equals(type1))
                 return true;
             if (type1.equals(type2)) {
                 return true;
@@ -337,7 +337,7 @@ public class Radon {
             returnClazz(type2);
             ClassTree firstTree = getTree(type1);
             if (firstTree == null) {
-                throw new RuntimeException("Could not find " + type1 + " in the built class hierarchy");
+                throw new MissingClassException("Could not find " + type1 + " in the built class hierarchy");
             }
             Set<String> allChildren = new HashSet<>();
             LinkedList<String> toProcess = new LinkedList<>(firstTree.subClasses);

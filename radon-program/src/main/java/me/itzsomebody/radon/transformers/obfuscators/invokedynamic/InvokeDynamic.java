@@ -17,6 +17,7 @@
 
 package me.itzsomebody.radon.transformers.obfuscators.invokedynamic;
 
+import me.itzsomebody.radon.exceptions.IllegalConfigurationValueException;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
 
@@ -43,7 +44,7 @@ public abstract class InvokeDynamic extends Transformer {
                 return new HeavyInvokeDynamic();
             }
             default: {
-                throw new RuntimeException("Did not expect " + s + " as a invokedynamic obfuscation mode");
+                throw new IllegalConfigurationValueException("Did not expect " + s + " as a invokedynamic obfuscation mode");
             }
         }
     }
