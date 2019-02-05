@@ -25,11 +25,6 @@ import me.itzsomebody.radon.exceptions.CLIException;
 
 public class CommandArgumentsParser {
     private static final List<CommandSwitchStatement> commandSwitches = new LinkedList<>();
-
-    public static void registerCommandSwitch(String name, int nArgs) {
-        commandSwitches.add(new CommandSwitchStatement(name, nArgs));
-    }
-
     private final Map<String, String[]> argMap;
 
     public CommandArgumentsParser(String[] args) {
@@ -78,5 +73,9 @@ public class CommandArgumentsParser {
 
     public String[] getSwitchArgs(String name) {
         return argMap.get(name);
+    }
+
+    public static void registerCommandSwitch(String name, int nArgs) {
+        commandSwitches.add(new CommandSwitchStatement(name, nArgs));
     }
 }
