@@ -41,6 +41,7 @@ import me.itzsomebody.radon.gui.tabs.OptimizationTab;
 import me.itzsomebody.radon.gui.tabs.ShrinkingTab;
 import me.itzsomebody.radon.gui.tabs.WatermarkingTab;
 import me.itzsomebody.radon.transformers.Transformer;
+import me.itzsomebody.radon.utils.LoggerUtils;
 
 class RadonGUI extends JFrame {
     RadonGUI() {
@@ -212,7 +213,9 @@ class RadonGUI extends JFrame {
                         sessionInfo.setDictionaryType(miscPanel.getDictionary());
 
                         Radon radon = new Radon(sessionInfo);
-                        radon.partyTime();
+                        radon.run();
+
+                        LoggerUtils.dumpLog();
 
                         JOptionPane.showMessageDialog(null, "Processed successfully.", "Done", JOptionPane.INFORMATION_MESSAGE);
                     } catch (Throwable t) {

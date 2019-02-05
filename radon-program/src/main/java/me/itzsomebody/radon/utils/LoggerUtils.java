@@ -43,37 +43,39 @@ public class LoggerUtils {
      * Writes strings to log.
      */
     public static void dumpLog() {
-        BufferedWriter bw;
-        try {
-            File log = new File("Radon.log");
-            if (!log.exists()) {
-                log.createNewFile();
+        if (!strings.isEmpty()) {
+            BufferedWriter bw;
+            try {
+                File log = new File("Radon.log");
+                if (!log.exists()) {
+                    log.createNewFile();
+                }
+                bw = new BufferedWriter(new FileWriter(log));
+                bw.append("##############################################\n");
+                bw.append("# +----------------------------------------+ #\n");
+                bw.append("# |  _____            _____   ____  _   _  | #\n");
+                bw.append("# | |  __ \\     /\\   |  __ \\ / __ \\| \\ | | | #\n");
+                bw.append("# | | |__) |   /  \\  | |  | | |  | |  \\| | | #\n");
+                bw.append("# | |  _  /   / /\\ \\ | |  | | |  | | . ` | | #\n");
+                bw.append("# | | | \\ \\  / ____ \\| |__| | |__| | |\\  | | #\n");
+                bw.append("# | |_|  \\_\\/_/    \\_\\_____/ \\____/|_| \\_| | #\n");
+                bw.append("# |                                        | #\n");
+                bw.append("# +----------------------------------------+ #\n");
+                bw.append("##############################################\n");
+                bw.append("\n");
+                bw.append("\n");
+                bw.append("Version: ").append(Main.VERSION).append('\n');
+                bw.append("Contributors: ").append(Main.CONTRIBUTORS).append('\n');
+                for (String msg : strings) {
+                    bw.append(msg);
+                    bw.newLine();
+                }
+                strings.clear();
+                bw.close();
+            } catch (Throwable t) {
+                stdErr("Error occurred while writing log.");
+                t.printStackTrace();
             }
-            bw = new BufferedWriter(new FileWriter(log));
-            bw.append("##############################################\n");
-            bw.append("# +----------------------------------------+ #\n");
-            bw.append("# |  _____            _____   ____  _   _  | #\n");
-            bw.append("# | |  __ \\     /\\   |  __ \\ / __ \\| \\ | | | #\n");
-            bw.append("# | | |__) |   /  \\  | |  | | |  | |  \\| | | #\n");
-            bw.append("# | |  _  /   / /\\ \\ | |  | | |  | | . ` | | #\n");
-            bw.append("# | | | \\ \\  / ____ \\| |__| | |__| | |\\  | | #\n");
-            bw.append("# | |_|  \\_\\/_/    \\_\\_____/ \\____/|_| \\_| | #\n");
-            bw.append("# |                                        | #\n");
-            bw.append("# +----------------------------------------+ #\n");
-            bw.append("##############################################\n");
-            bw.append("\n");
-            bw.append("\n");
-            bw.append("Version: ").append(Main.VERSION).append('\n');
-            bw.append("Contributors: ").append(Main.CONTRIBUTORS).append('\n');
-            for (String msg : strings) {
-                bw.append(msg);
-                bw.newLine();
-            }
-            strings.clear();
-            bw.close();
-        } catch (Throwable t) {
-            stdErr("Error occurred while writing log.");
-            t.printStackTrace();
         }
     }
 

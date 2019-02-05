@@ -68,13 +68,28 @@ public class Radon {
     /**
      * Execution order. Feel free to modifiy.
      */
-    public void partyTime() {
+    public void run() {
         loadClassPath();
         loadInput();
         buildInheritance();
-        executeTransformers();
+
+        if (this.sessionInfo.getTrashClasses() > 0) {
+            this.sessionInfo.getTransformers().add(new TrashClasses());
+        }
+        if (this.sessionInfo.getTransformers().isEmpty()) {
+            throw new NoTransformersException();
+        }
+        LoggerUtils.stdOut("------------------------------------------------");
+        this.sessionInfo.getTransformers().stream().filter(Objects::nonNull).forEach(transformer -> {
+            long current = System.currentTimeMillis();
+            LoggerUtils.stdOut(String.format("Running %s transformer.", transformer.getName()));
+            transformer.init(this);
+            transformer.transform();
+            LoggerUtils.stdOut(String.format("Finished running %s transformer. [%dms]", transformer.getName(), (System.currentTimeMillis() - current)));
+            LoggerUtils.stdOut("------------------------------------------------");
+        });
+
         writeOutput();
-        LoggerUtils.dumpLog();
     }
 
     private void writeOutput() {
@@ -258,24 +273,6 @@ public class Radon {
 
     private void buildInheritance() {
         classes.values().forEach(classWrapper -> buildHierarchy(classWrapper, null));
-    }
-
-    private void executeTransformers() {
-        if (this.sessionInfo.getTrashClasses() > 0) {
-            this.sessionInfo.getTransformers().add(new TrashClasses());
-        }
-        if (this.sessionInfo.getTransformers().isEmpty()) {
-            throw new NoTransformersException();
-        }
-        LoggerUtils.stdOut("------------------------------------------------");
-        this.sessionInfo.getTransformers().stream().filter(Objects::nonNull).forEach(transformer -> {
-            long current = System.currentTimeMillis();
-            LoggerUtils.stdOut(String.format("Running %s transformer.", transformer.getName()));
-            transformer.init(this);
-            transformer.transform();
-            LoggerUtils.stdOut(String.format("Finished running %s transformer. [%dms]", transformer.getName(), (System.currentTimeMillis() - current)));
-            LoggerUtils.stdOut("------------------------------------------------");
-        });
     }
 
     class CustomClassWriter extends ClassWriter {

@@ -509,7 +509,7 @@ public class ConfigurationParser {
         ExclusionManager exclusions = new ExclusionManager();
         Object o = map.get(ConfigurationSettings.EXCLUSIONS.getValue());
         if (o == null)
-            return null;
+            return exclusions;
         if (!(o instanceof List))
             throw new IllegalConfigurationValueException(ConfigurationSettings.EXCLUSIONS.getValue(), List.class,
                     o.getClass());
