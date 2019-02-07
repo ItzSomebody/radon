@@ -56,7 +56,7 @@ public class Watermarker extends Transformer {
                     counter++;
 
                     if (counter > 20)
-                        throw new RuntimeException("Radon couldn't find any methods to embed a watermark in after " + counter + "tries.");
+                        throw new RuntimeException("Radon couldn't find any methods to embed a watermark in after " + counter + " tries.");
                 } while (classWrapper.classNode.methods.size() != 0);
 
                 MethodNode methodNode = classWrapper.classNode.methods.get(RandomUtils.getRandomInt(0,

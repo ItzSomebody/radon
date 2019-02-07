@@ -45,7 +45,7 @@ public class Main {
         if (!file.exists()) {
             JOptionPane.showMessageDialog(null, "Radon-Program.jar was not found in directory.", "Radon not found.",
                     JOptionPane.ERROR_MESSAGE);
-            throw new RuntimeException();
+            throw new RadonInstanceNotFound();
         }
 
         try {

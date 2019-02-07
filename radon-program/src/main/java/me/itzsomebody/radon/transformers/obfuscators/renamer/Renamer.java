@@ -64,7 +64,7 @@ public class Renamer extends Transformer {
         AtomicInteger classCounter = new AtomicInteger();
         this.getClassWrappers().forEach(classWrapper -> {
             classWrapper.methods.stream().filter(methodWrapper -> !AccessUtils.isNative(methodWrapper.methodNode.access)
-                    && !methodWrapper.methodNode.name.equals("main") && !methodWrapper.methodNode.name.equals("premain")
+                    && !"main".equals(methodWrapper.methodNode.name) && !"premain".equals(methodWrapper.methodNode.name)
                     && !methodWrapper.methodNode.name.startsWith("<")).forEach(methodWrapper -> {
                 if (canRenameMethodTree(new HashSet<>(), methodWrapper, classWrapper.originalName)) {
                     this.renameMethodTree(new HashSet<>(), methodWrapper, classWrapper.originalName, randomString(4));

@@ -47,7 +47,7 @@ public class LightInvokeDynamic extends InvokeDynamic {
                 "(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;" +
                         "Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", false);
         this.getClassWrappers().stream().filter(classWrapper ->
-                !classWrapper.classNode.superName.equals("java/lang/Enum") && !excluded(classWrapper)
+                !"java/lang/Enum".equals(classWrapper.classNode.superName) && !excluded(classWrapper)
                         && classWrapper.classNode.version >= V1_7).forEach(classWrapper ->
                 classWrapper.methods.stream().filter(methodWrapper -> !excluded(methodWrapper)
                         && hasInstructions(methodWrapper.methodNode)).forEach(methodWrapper -> {
