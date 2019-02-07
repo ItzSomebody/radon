@@ -18,17 +18,19 @@
 package me.itzsomebody.radon.transformers.optimizers;
 
 import java.util.concurrent.atomic.AtomicInteger;
+import me.itzsomebody.radon.utils.BytecodeUtils;
 import me.itzsomebody.radon.utils.LoggerUtils;
 import org.objectweb.asm.tree.AbstractInsnNode;
+import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 
 /**
- * Normalizes goto-goto sequences by directing the first goto's target to the second goto's target.
+ * Inlines goto-return sequences by setting the goto to a return opcode.
  *
  * @author ItzSomebody.
  */
-public class GotoGotoRemover extends Optimizer {
+public class GotoReturnInliner extends Optimizer {
     @Override
     public void transform() {
         AtomicInteger count = new AtomicInteger();
@@ -43,21 +45,20 @@ public class GotoGotoRemover extends Optimizer {
                         if (insn.getOpcode() == GOTO) {
                             JumpInsnNode gotoJump = (JumpInsnNode) insn;
                             AbstractInsnNode insnAfterTarget = gotoJump.label.getNext();
-                            if (insnAfterTarget != null && insnAfterTarget.getOpcode() == GOTO) {
-                                JumpInsnNode secGoto = (JumpInsnNode) insnAfterTarget;
-                                gotoJump.label = secGoto.label;
+                            if (insnAfterTarget != null && BytecodeUtils.isReturn(insnAfterTarget.getOpcode())) {
+                                methodNode.instructions.set(insn, new InsnNode(insnAfterTarget.getOpcode()));
                                 count.incrementAndGet();
                             }
                         }
                     }
                 }));
 
-        LoggerUtils.stdOut(String.format("Normalized %d GOTO->GOTO sequences. [%dms]", count.get(),
+        LoggerUtils.stdOut(String.format("Inlined %d GOTO->RETURN sequences. [%dms]", count.get(),
                 tookThisLong(current)));
     }
 
     @Override
     public String getName() {
-        return "GOTO->GOTO Remover";
+        return "GOTO->Return Remover";
     }
 }

@@ -230,8 +230,8 @@ public class ConfigurationParser {
             if (!optimizerSettings.get("Enabled"))
                 return null;
 
-            boolean gotoGoto = optimizerSettings.getOrDefault("RemoveGotoGoto", false);
-            boolean gotoReturn = optimizerSettings.getOrDefault("RemoveGotoReturn", false);
+            boolean gotoGoto = optimizerSettings.getOrDefault("InlineGotoGoto", false);
+            boolean gotoReturn = optimizerSettings.getOrDefault("InlineGotoReturn", false);
             boolean nopInstructions = optimizerSettings.getOrDefault("RemoveNopInstructions", false);
 
             return new OptimizerDelegator(new OptimizerSetup(nopInstructions, gotoGoto, gotoReturn));

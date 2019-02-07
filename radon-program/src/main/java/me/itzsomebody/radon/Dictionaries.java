@@ -49,9 +49,9 @@ public enum Dictionaries {
     }
 
     public static Dictionaries intToDictionary(int type) {
-        if (type >= values().length) {
+        if (type >= values().length)
             throw new IllegalDictionaryException();
-        }
+
         return values()[type];
     }
 

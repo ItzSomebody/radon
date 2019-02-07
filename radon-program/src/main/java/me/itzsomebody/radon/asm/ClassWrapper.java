@@ -65,9 +65,8 @@ public class ClassWrapper {
         ClassWrapper instance = this;
         classNode.methods.forEach(methodNode -> methods.add(new MethodWrapper(methodNode, instance, methodNode.name,
                 methodNode.desc)));
-        if (classNode.fields != null) {
+        if (classNode.fields != null)
             classNode.fields.forEach(fieldNode -> fields.add(new FieldWrapper(fieldNode, instance, fieldNode.name,
                     fieldNode.desc)));
-        }
     }
 }

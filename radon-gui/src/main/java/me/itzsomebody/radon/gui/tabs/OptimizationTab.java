@@ -58,7 +58,7 @@ public class OptimizationTab extends JPanel {
         optimizationSetupPanel.setBorder(new TitledBorder("Setup"));
         optimizationSetupPanel.setLayout(gbl_optimizationSetupPanel);
 
-        gotoGotoCheckBox = new JCheckBox("Remove Goto-Goto Sequences");
+        gotoGotoCheckBox = new JCheckBox("Inline Goto-Goto Sequences");
         GridBagConstraints gbc_gotoGotoCheckBox = new GridBagConstraints();
         gbc_gotoGotoCheckBox.anchor = GridBagConstraints.WEST;
         gbc_gotoGotoCheckBox.insets = new Insets(0, 0, 5, 0);
@@ -67,7 +67,7 @@ public class OptimizationTab extends JPanel {
         gotoGotoCheckBox.setEnabled(false);
         optimizationSetupPanel.add(gotoGotoCheckBox, gbc_gotoGotoCheckBox);
 
-        gotoReturnCheckBox = new JCheckBox("Remove Goto-Return Sequences");
+        gotoReturnCheckBox = new JCheckBox("Inline Goto-Return Sequences");
         GridBagConstraints gbc_gotoReturnCheckBox = new GridBagConstraints();
         gbc_gotoReturnCheckBox.anchor = GridBagConstraints.WEST;
         gbc_gotoReturnCheckBox.insets = new Insets(0, 0, 5, 0);

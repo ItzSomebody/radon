@@ -320,55 +320,20 @@ public class StackEmulator implements Opcodes {
                     case INVOKESPECIAL:
                     case INVOKEINTERFACE: {
                         stack.pop(); // Objectref
-                        Type[] args = Type.getArgumentTypes(((MethodInsnNode) insn).desc);
-                        Type returnType = Type.getReturnType(((MethodInsnNode) insn).desc);
-                        for (Type type : args) {
-                            if (type.getSort() == Type.LONG || type.getSort() == Type.DOUBLE)
-                                stack.pop();
-
-                            stack.pop();
-                        }
-                        if (returnType.getSort() == Type.LONG
-                                || returnType.getSort() == Type.DOUBLE)
-                            stack.push(null);
-                        if (returnType.getSort() != Type.VOID)
-                            stack.push(null);
+                        doMethodEmulation(stack, ((MethodInsnNode) insn).desc);
                         break;
                     }
                     case INVOKESTATIC: {
-                        Type[] args = Type.getArgumentTypes(((MethodInsnNode) insn).desc);
-                        Type returnType = Type.getReturnType(((MethodInsnNode) insn).desc);
-                        for (Type type : args) {
-                            if (type.getSort() == Type.LONG || type.getSort() == Type.DOUBLE)
-                                stack.pop();
-
-                            stack.pop();
-                        }
-                        if (returnType.getSort() == Type.LONG || returnType.getSort() == Type.DOUBLE)
-                            stack.push(null);
-                        if (returnType.getSort() != Type.VOID)
-                            stack.push(null);
+                        doMethodEmulation(stack, ((MethodInsnNode) insn).desc);
                         break;
                     }
                     case INVOKEDYNAMIC: {
-                        Type[] args = Type.getArgumentTypes(((InvokeDynamicInsnNode) insn).desc);
-                        Type returnType = Type.getReturnType(((InvokeDynamicInsnNode) insn).desc);
-                        for (Type type : args) {
-                            if (type.getSort() == Type.LONG || type.getSort() == Type.DOUBLE)
-                                stack.pop();
-
-                            stack.pop();
-                        }
-                        if (returnType.getSort() == Type.LONG || returnType.getSort() == Type.DOUBLE)
-                            stack.push(null);
-                        if (returnType.getSort() != Type.VOID)
-                            stack.push(null);
+                        doMethodEmulation(stack, ((InvokeDynamicInsnNode) insn).desc);
                         break;
                     }
                     case MULTIANEWARRAY: {
-                        for (int j = 0; j < ((MultiANewArrayInsnNode) insn).dims; j++) {
+                        for (int j = 0; j < ((MultiANewArrayInsnNode) insn).dims; j++)
                             stack.pop();
-                        }
 
                         stack.push(null); // arrayref
                         break;
@@ -381,8 +346,24 @@ public class StackEmulator implements Opcodes {
                         break;
                 }
             } catch (EmptyStackException empty) {
-                if (debug) empty.printStackTrace();
+                if (debug)
+                    empty.printStackTrace();
             }
         }
+    }
+
+    private static void doMethodEmulation(Stack<Object> stack, String desc) {
+        Type[] args = Type.getArgumentTypes(desc);
+        Type returnType = Type.getReturnType(desc);
+        for (Type type : args) {
+            if (type.getSort() == Type.LONG || type.getSort() == Type.DOUBLE)
+                stack.pop();
+
+            stack.pop();
+        }
+        if (returnType.getSort() == Type.LONG || returnType.getSort() == Type.DOUBLE)
+            stack.push(null);
+        if (returnType.getSort() != Type.VOID)
+            stack.push(null);
     }
 }

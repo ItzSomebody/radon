@@ -42,8 +42,8 @@ Renamer:
         - "Example.resource"
 Optimizer:
     Enabled: true
-    RemoveGotoGoto: true
-    RemoveGotoReturn: true
+    InlineGotoGoto: true
+    InlineGotoReturn: true
     RemoveNopInstructions: true
 Shrinker:
     Enabled: true
@@ -167,8 +167,8 @@ The optimizer key takes several arguments.
 | Key | Expected value(s) | Description |
 | --- | --- | --- |
 | Enabled | Boolean | Determines if optimization should be enabled. |
-| RemoveGotoGoto | Boolean | Determines if goto-goto sequences should be optimized. |
-| RemoveGotoReturn | Boolean | Determines if goto-return sequences should be optimized. |
+| InlineGotoGoto | Boolean | Determines if goto-goto sequences should be optimized. |
+| InlineGotoReturn | Boolean | Determines if goto-return sequences should be optimized. |
 | RemoveNopInstructions | Boolean | Determines if nop instructions should be removed. |
 
 ## Shrinker

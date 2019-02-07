@@ -53,7 +53,7 @@ public class FieldWrapper {
      * @param originalName        the original name of the field represented.
      * @param originalDescription the original description of the field represented.
      */
-    FieldWrapper(FieldNode fieldNode, ClassWrapper owner, String originalName, String originalDescription) {
+    public FieldWrapper(FieldNode fieldNode, ClassWrapper owner, String originalName, String originalDescription) {
         this.fieldNode = fieldNode;
         this.owner = owner;
         this.originalName = originalName;

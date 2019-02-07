@@ -53,7 +53,7 @@ public class MethodWrapper {
      * @param originalName        the original method name.
      * @param originalDescription the original method description.
      */
-    MethodWrapper(MethodNode methodNode, ClassWrapper owner, String originalName, String originalDescription) {
+    public MethodWrapper(MethodNode methodNode, ClassWrapper owner, String originalName, String originalDescription) {
         this.methodNode = methodNode;
         this.owner = owner;
         this.originalName = originalName;

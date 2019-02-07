@@ -66,19 +66,17 @@ public class Radon {
     }
 
     /**
-     * Execution order. Feel free to modifiy.
+     * Execution order. Feel free to modify.
      */
     public void run() {
         loadClassPath();
         loadInput();
         buildInheritance();
 
-        if (this.sessionInfo.getTrashClasses() > 0) {
+        if (this.sessionInfo.getTrashClasses() > 0)
             this.sessionInfo.getTransformers().add(new TrashClasses());
-        }
-        if (this.sessionInfo.getTransformers().isEmpty()) {
+        if (this.sessionInfo.getTransformers().isEmpty())
             throw new NoTransformersException();
-        }
         LoggerUtils.stdOut("------------------------------------------------");
         this.sessionInfo.getTransformers().stream().filter(Objects::nonNull).forEach(transformer -> {
             long current = System.currentTimeMillis();
@@ -95,9 +93,8 @@ public class Radon {
     private void writeOutput() {
         File output = this.sessionInfo.getOutput();
         LoggerUtils.stdOut(String.format("Writing output to \"%s\".", output.getAbsolutePath()));
-        if (output.exists()) {
+        if (output.exists())
             LoggerUtils.stdOut(String.format("Output file already exists, renamed to %s.", IOUtils.renameExistingFile(output)));
-        }
 
         try {
             ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(output));
@@ -136,16 +133,16 @@ public class Radon {
                     zos.putNextEntry(entry);
                     zos.write(bytes);
                     zos.closeEntry();
-                } catch (Throwable t) {
+                } catch (IOException ioe) {
                     LoggerUtils.stdErr(String.format("Error writing resource %s. Skipping.", name));
-                    t.printStackTrace();
+                    ioe.printStackTrace();
                 }
             });
 
             zos.setComment(Main.PROPAGANDA_GARBAGE);
             zos.close();
-        } catch (Throwable t) {
-            t.printStackTrace();
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
             throw new OutputWriteException();
         }
     }

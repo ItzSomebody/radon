@@ -168,12 +168,9 @@ public class Renamer extends Transformer {
         ClassTree tree = this.radon.getTree(owner);
         if (!visited.contains(tree)) {
             visited.add(tree);
-            if (excluded(owner + '.' + methodWrapper.originalName + methodWrapper.originalDescription)) {
+            if (excluded(owner + '.' + methodWrapper.originalName + methodWrapper.originalDescription)
+                    || mappings.containsKey(owner + '.' + methodWrapper.originalName + methodWrapper.originalDescription))
                 return false;
-            }
-            if (mappings.containsKey(owner + '.' + methodWrapper.originalName + methodWrapper.originalDescription)) {
-                return true;
-            }
             if (!methodWrapper.owner.originalName.equals(owner) && tree.classWrapper.libraryNode) {
                 for (MethodNode mn : tree.classWrapper.classNode.methods) {
                     if (mn.name.equals(methodWrapper.originalName)
@@ -217,11 +214,9 @@ public class Renamer extends Transformer {
         ClassTree tree = this.radon.getTree(owner);
         if (!visited.contains(tree)) {
             visited.add(tree);
-            if (excluded(owner + '.' + fieldWrapper.originalName + '.' + fieldWrapper.originalDescription)) {
+            if (excluded(owner + '.' + fieldWrapper.originalName + '.' + fieldWrapper.originalDescription)
+                    || mappings.containsKey(owner + '.' + fieldWrapper.originalName + '.' + fieldWrapper.originalDescription))
                 return false;
-            }
-            if (mappings.containsKey(owner + '.' + fieldWrapper.originalName + '.' + fieldWrapper.originalDescription))
-                return true;
             if (!fieldWrapper.owner.originalName.equals(owner) && tree.classWrapper.libraryNode) {
                 for (FieldNode fn : tree.classWrapper.classNode.fields) {
                     if (fieldWrapper.originalName.equals(fn.name) && fieldWrapper.originalDescription.equals(fn.desc)) {

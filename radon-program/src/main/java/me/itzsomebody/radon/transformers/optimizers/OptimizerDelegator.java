@@ -37,14 +37,14 @@ public class OptimizerDelegator extends Optimizer {
             nopRemover.transform();
         }
         if (this.setup.isGotoGotoEnabled()) {
-            GotoGotoRemover gotoGotoRemover = new GotoGotoRemover();
-            gotoGotoRemover.init(this.radon);
-            gotoGotoRemover.transform();
+            GotoGotoInliner gotoGotoInliner = new GotoGotoInliner();
+            gotoGotoInliner.init(this.radon);
+            gotoGotoInliner.transform();
         }
         if (this.setup.isGotoReturnEnabled()) {
-            GotoReturnRemover gotoReturnRemover = new GotoReturnRemover();
-            gotoReturnRemover.init(this.radon);
-            gotoReturnRemover.transform();
+            GotoReturnInliner gotoReturnInliner = new GotoReturnInliner();
+            gotoReturnInliner.init(this.radon);
+            gotoReturnInliner.transform();
         }
     }
 
