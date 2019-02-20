@@ -1,0 +1,13 @@
+version: '3.2'
+services:  
+  trilogy-radon:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+    volumes:
+      - type: bind
+        source: ../../
+        target: /data
+    container_name: trilogy-radon
+    network_mode: host
+
