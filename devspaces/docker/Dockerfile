@@ -11,5 +11,4 @@ RUN wget http://archive.apache.org/dist/maven/maven-3/$MAVEN_VERSION/binaries/ap
 
 WORKDIR "/data"
 
-CMD exec /bin/bash -c "trap : TERM INT; sleep infinity & wait"
-#CMD tail -f /dev/null
+CMD tail -f /dev/null
