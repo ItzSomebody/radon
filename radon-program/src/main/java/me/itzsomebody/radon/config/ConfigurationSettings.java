@@ -44,7 +44,8 @@ public enum ConfigurationSettings {
     SOURCE_DEBUG("SourceDebug"),
     RENAMER("Renamer"),
     DICTIONARY("Dictionary"),
-    TRASH_CLASSES("TrashClasses");
+    TRASH_CLASSES("TrashClasses"),
+	FakeTryCatch("FakeTryCatch");
 
     private String value;
 

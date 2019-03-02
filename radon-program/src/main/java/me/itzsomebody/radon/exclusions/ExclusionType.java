@@ -41,7 +41,8 @@ public enum ExclusionType {
     SOURCE_NAME("SourceName"),
     SOURCE_DEBUG("SourceDebug"),
     STRING_POOL("StringPool"),
-    RENAMER("Renamer");
+    RENAMER("Renamer"),
+	FAKETRYCATCH("FakeTryCatch");
 
     private String value;
 

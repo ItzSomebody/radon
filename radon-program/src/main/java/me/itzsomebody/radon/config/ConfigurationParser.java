@@ -40,6 +40,7 @@ import me.itzsomebody.radon.transformers.miscellaneous.watermarker.Watermarker;
 import me.itzsomebody.radon.transformers.miscellaneous.watermarker.WatermarkerSetup;
 import me.itzsomebody.radon.transformers.obfuscators.flow.FlowObfuscation;
 import me.itzsomebody.radon.transformers.obfuscators.invokedynamic.InvokeDynamic;
+import me.itzsomebody.radon.transformers.obfuscators.miscellaneous.FakeTryCatch;
 import me.itzsomebody.radon.transformers.obfuscators.miscellaneous.HideCode;
 import me.itzsomebody.radon.transformers.obfuscators.miscellaneous.LineNumbers;
 import me.itzsomebody.radon.transformers.obfuscators.miscellaneous.LocalVariables;
@@ -75,7 +76,7 @@ public class ConfigurationParser {
     }
 
     public ConfigurationParser(InputStream in) {
-        this.map = new Yaml().load(in);
+        this.map = (Map<String, Object>) new Yaml().load(in);
         this.map.keySet().forEach(s -> {
             if (!VALID_KEYS.contains(s))
                 throw new IllegalConfigurationKeyException(s);
@@ -173,12 +174,14 @@ public class ConfigurationParser {
         transformers.add(getOptimizerTransformer());
         transformers.add(getRenamerTransformer());
         transformers.add(getNumberObfuscationTransformer());
+        transformers.add(getFakeTryCatchTransformer());
         transformers.add(getInvokeDynamicTransformer());
         List<StringEncryption> stringEncrypters = getStringEncryptionTransformers();
         if (stringEncrypters != null) {
             transformers.addAll(stringEncrypters);
         }
         transformers.add(getFlowObfuscationTransformer());
+
         transformers.add(getShufflerTransformer());
         transformers.add(getLocalVariablesTransformer());
         transformers.add(getLineNumbersTransformer());
@@ -188,6 +191,11 @@ public class ConfigurationParser {
         transformers.add(getHideCodeTransformer());
         transformers.add(getExpirationTransformer());
         transformers.add(getWatermarkerTransformer());
+
+
+
+        
+        
 
         return transformers;
     }
@@ -215,6 +223,18 @@ public class ConfigurationParser {
         } catch (ClassCastException e) {
             throw new IllegalConfigurationValueException("Error while parsing shrinker setup: " + e.getMessage());
         }
+    }
+    
+    private FakeTryCatch getFakeTryCatchTransformer() {
+        Object o = map.get(ConfigurationSettings.FakeTryCatch.getValue());
+        if (o == null)
+            return null;
+        if (!(o instanceof Boolean))
+            throw new IllegalConfigurationValueException(ConfigurationSettings.FakeTryCatch.getValue(), Boolean.class,
+                    o.getClass());
+
+
+        return ((boolean) o) ? new FakeTryCatch() : null;
     }
 
     private Optimizer getOptimizerTransformer() {
