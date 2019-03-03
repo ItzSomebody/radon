@@ -154,7 +154,7 @@ public class ConfigurationParser {
             File[] fileLists = file.listFiles();
 
             for (int i = 0; i < fileLists.length; i++) {
-                // 输出元素名称
+                // 杈撳嚭鍏冪礌鍚嶇О
 
                 if (fileLists[i].isDirectory()) {
                     addSubDirFiles(fileLists[i], libraries);
@@ -226,11 +226,11 @@ public class ConfigurationParser {
     }
     
     private FakeTryCatch getFakeTryCatchTransformer() {
-        Object o = map.get(ConfigurationSettings.FakeTryCatch.getValue());
+        Object o = map.get(ConfigurationSettings.FAKETRYCATCH.getValue());
         if (o == null)
             return null;
         if (!(o instanceof Boolean))
-            throw new IllegalConfigurationValueException(ConfigurationSettings.FakeTryCatch.getValue(), Boolean.class,
+            throw new IllegalConfigurationValueException(ConfigurationSettings.FAKETRYCATCH.getValue(), Boolean.class,
                     o.getClass());
 
 
