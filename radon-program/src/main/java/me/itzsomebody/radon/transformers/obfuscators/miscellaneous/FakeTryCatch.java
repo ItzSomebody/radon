@@ -2,7 +2,6 @@ package me.itzsomebody.radon.transformers.obfuscators.miscellaneous;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import me.itzsomebody.radon.Main;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
 import me.itzsomebody.radon.utils.AccessUtils;
@@ -28,7 +27,7 @@ public class FakeTryCatch extends Transformer {
 		// it will got Verify Excep
 		// do -noverify to bypass
 
-		//Nice Naming
+		// Nice Naming
 		String FAKE_Handler = "////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////;//)//goto//break//META-INF//public//static//throw//throw//new//"
 				+ getANSI() + "//" + ")};" + getANSI() + StringUtils.randomAlphaNumericString(12) + '\u0000';
 		ClassNode FAKE_Node = this.genHandler(FAKE_Handler);
@@ -132,8 +131,20 @@ public class FakeTryCatch extends Transformer {
 	}
 
 	public static String getANSI() {
-		// Magic. this is no empty
-		// but some ANSI Control chars.
-		return "‫‮‮‌‬⁫";
+		// Magic.
+		// just some ANSI Control chars.
+		return decodeUnicode("\u202b\u202e\u202e\u200c\u202c\u206b\u001e\u001f");
+	}
+
+	public static String decodeUnicode(String unicode) {
+		StringBuffer sb = new StringBuffer();
+
+		String[] hex = unicode.split("\\\\u");
+
+		for (int i = 1; i < hex.length; i++) {
+			int data = Integer.parseInt(hex[i], 16);
+			sb.append((char) data);
+		}
+		return sb.toString();
 	}
 }
