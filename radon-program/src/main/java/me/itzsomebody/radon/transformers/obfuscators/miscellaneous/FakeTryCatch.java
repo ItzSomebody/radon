@@ -30,7 +30,7 @@ public class FakeTryCatch extends Transformer {
 		// Nice Naming
 		String FAKE_Handler = "////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////;//)//goto//break//META-INF//public//static//throw//throw//new//"
 				+ getANSI() + "//" + ")};" + getANSI() + StringUtils.randomAlphaNumericString(12) + '\u0000';
-		ClassNode FAKE_Node = this.genHandler(FAKE_Handler);
+		this.genHandler(FAKE_Handler);
 
 		getClassWrappers().parallelStream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper -> {
 			ClassNode classNode = classWrapper.classNode;
