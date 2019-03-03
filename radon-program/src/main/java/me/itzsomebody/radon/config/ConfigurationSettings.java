@@ -45,7 +45,7 @@ public enum ConfigurationSettings {
     RENAMER("Renamer"),
     DICTIONARY("Dictionary"),
     TRASH_CLASSES("TrashClasses"),
-	FakeTryCatch("FakeTryCatch");
+    FAKETRYCATCH("FakeTryCatch");
 
     private String value;
 
