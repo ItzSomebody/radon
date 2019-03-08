@@ -28,8 +28,7 @@ public class FakeTryCatch extends Transformer {
 		// do -noverify to bypass
 
 		// Nice Naming
-		String FAKE_Handler = "////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////;//)//goto//break//META-INF//public//static//throw//throw//new//"
-				+ getANSI() + "//" + ")};" + getANSI() + StringUtils.randomAlphaNumericString(12) + '\u0000';
+		String FAKE_Handler = getCrazy();
 		this.genHandler(FAKE_Handler);
 
 		getClassWrappers().parallelStream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper -> {
@@ -41,56 +40,76 @@ public class FakeTryCatch extends Transformer {
 								&& !AccessUtils.isNative(imethod.access) && !AccessUtils.isAbstract(imethod.access))
 						.forEach(mn -> {
 							// Very Nice
-							if (mn.localVariables != null) {
-								doobfu: {
-									for (int i = 1 + ((mn.localVariables.size() + 1) / 2); i > 0; i--) {
-										LabelNode begin = new LabelNode();
-										LabelNode handler = new LabelNode();
-										LabelNode end = new LabelNode();
+							doobfu: {
+								for (int i = 1 + ((mn.localVariables.size() + 1) / 2); i > 0; i--) {
+									LabelNode begin = new LabelNode();
+									LabelNode handler = new LabelNode();
+									LabelNode end = new LabelNode();
 
-										// Ship the Method if it has athrow.
-										for (AbstractInsnNode ai = mn.instructions.getFirst(); ai != null; ai = ai
-												.getNext()) {
+									// Ship the Method if it has athrow.
+									for (AbstractInsnNode ai = mn.instructions.getFirst(); ai != null; ai = ai
+											.getNext()) {
+
+										AbstractInsnNode bef = null;
+										if (((bef = ai.getPrevious()) == null
+												|| Opcodes.INVOKESPECIAL == bef.getOpcode())
+												&& Opcodes.ATHROW == ai.getOpcode()) {
 											counter_Shiped.incrementAndGet();
-											if (Opcodes.ATHROW == ai.getOpcode())
-												break doobfu;
-
-											counter_Shiped.decrementAndGet();
+											break doobfu;
 										}
-										if (mn.localVariables != null) {
-											mn.instructions.insert(begin);
-											mn.instructions.add(end);
-											mn.instructions.insert(end, new LdcInsnNode(getANSI()));
+										
 
-											// Bypass Some deobfuscator
-											mn.instructions.add(handler);
-											mn.instructions.insert(handler, new LdcInsnNode(getANSI()));
-
-											mn.instructions.add(new LdcInsnNode(getANSI()));
-
-											mn.instructions.add(new LdcInsnNode(
-													getANSI() + StringUtils.randomAlphaNumericString(16)));
-											mn.instructions.add(new InsnNode(Opcodes.ATHROW));
-
-											LocalVariableNode ex = new LocalVariableNode(
-													(Crasher ? classNode.name : FAKE_Handler), "L" + FAKE_Handler + ";",
-													null, begin, handler, mn.localVariables.size());
-											TryCatchBlockNode tryBlock = new TryCatchBlockNode(begin, end, handler,
-													"L" + (Crasher ? classNode.name : FAKE_Handler) + ";");
-											mn.localVariables.add(ex);
-											mn.tryCatchBlocks.add(tryBlock);
-											mn.exceptions.add(FAKE_Handler);
-										}
 									}
 
-									counter.incrementAndGet();
+									mn.instructions.insert(begin);
+									mn.instructions.add(end);
+									mn.instructions.add(handler);
+
+									mn.instructions.add(new LdcInsnNode('\u0000'));
+									mn.instructions.add(new LdcInsnNode(getANSI()));
+									mn.instructions.add(new LdcInsnNode('\u0000'));
+
+									mn.instructions
+											.add(new LdcInsnNode(getANSI() + StringUtils.randomAlphaNumericString(16)));
+
+									// I don't know what's this.
+									mn.instructions.add(new InsnNode(Opcodes.MONITOREXIT));
+
+									mn.instructions.add(new InsnNode(Opcodes.ACONST_NULL));
+									mn.instructions.add(new InsnNode(Opcodes.ATHROW));
+
+									//
+
+									LocalVariableNode ex = new LocalVariableNode(
+											(Crasher ? classNode.name : FAKE_Handler), "L" + FAKE_Handler + ";", null,
+											begin, handler, mn.localVariables.size() + 1);
+									TryCatchBlockNode tryBlock = new TryCatchBlockNode(begin, end, handler,
+											"L" + FAKE_Handler + ";");
+
+									mn.localVariables.add(ex);
+									mn.tryCatchBlocks.add(tryBlock);
+									mn.exceptions.add(FAKE_Handler);
+
 								}
+
+								counter.incrementAndGet();
 							}
+
 						});
 		});
 
 		LoggerUtils.stdOut(String.format("%d FakeTryCatch Added.", counter.get()));
 		LoggerUtils.stdOut(String.format("%d Method Shiped.", counter_Shiped.get()));
+	}
+
+	private static String getCrazy() {
+		StringBuffer sb = new StringBuffer();
+		while (sb.length() < 60) {
+			sb.append("////");
+		}
+		sb.append(getANSI() + getANSI() + StringUtils.randomAlphaNumericString(2));
+
+		return sb.toString();
 	}
 
 	@Override
@@ -103,7 +122,7 @@ public class FakeTryCatch extends Transformer {
 		return "FakeTryCatch";
 	}
 
-	public ClassNode genHandler(String na) {
+	private ClassNode genHandler(String na) {
 		ClassNode classNode = createClass(na);
 		ClassWriter cw = new ClassWriter(0);
 		cw.newUTF8("Radon_Fake_TryCatch_Extend");
@@ -115,7 +134,7 @@ public class FakeTryCatch extends Transformer {
 
 	private ClassNode createClass(String className) {
 		ClassNode classNode = new ClassNode();
-		classNode.visit(49, ACC_SUPER + ACC_PUBLIC, className, null, "java/lang/Throwable", null);
+		classNode.visit(47, ACC_SUPER + ACC_PUBLIC, className, "L" + className + ";", "java/lang/Throwable", null);
 
 		MethodVisitor mv = classNode.visitMethod(ACC_PUBLIC, "<init>", "()V", null, null);
 		mv.visitCode();
@@ -130,13 +149,13 @@ public class FakeTryCatch extends Transformer {
 		return classNode;
 	}
 
-	public static String getANSI() {
+	private static String getANSI() {
 		// Magic.
 		// just some ANSI Control chars.
 		return decodeUnicode("\u202b\u202e\u202e\u200c\u202c\u206b\u001e\u001f");
 	}
 
-	public static String decodeUnicode(String unicode) {
+	private static String decodeUnicode(String unicode) {
 		StringBuffer sb = new StringBuffer();
 
 		String[] hex = unicode.split("\\\\u");
