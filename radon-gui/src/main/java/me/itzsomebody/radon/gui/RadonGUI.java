@@ -26,12 +26,12 @@ import java.io.FileWriter;
 import java.io.InputStream;
 import java.util.ArrayList;
 import javax.swing.*;
+import me.itzsomebody.radon.Logger;
 import me.itzsomebody.radon.Main;
 import me.itzsomebody.radon.Radon;
 import me.itzsomebody.radon.SessionInfo;
 import me.itzsomebody.radon.config.ConfigurationParser;
 import me.itzsomebody.radon.config.ConfigurationWriter;
-import me.itzsomebody.radon.exceptions.ConfigurationParseException;
 import me.itzsomebody.radon.exceptions.RadonException;
 import me.itzsomebody.radon.gui.tabs.ConsoleTab;
 import me.itzsomebody.radon.gui.tabs.ExclusionsTab;
@@ -42,7 +42,6 @@ import me.itzsomebody.radon.gui.tabs.OptimizationTab;
 import me.itzsomebody.radon.gui.tabs.ShrinkingTab;
 import me.itzsomebody.radon.gui.tabs.WatermarkingTab;
 import me.itzsomebody.radon.transformers.Transformer;
-import me.itzsomebody.radon.Logger;
 
 class RadonGUI extends JFrame {
     RadonGUI() {
