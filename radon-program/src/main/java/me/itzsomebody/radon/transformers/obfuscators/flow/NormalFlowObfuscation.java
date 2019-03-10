@@ -20,6 +20,8 @@ package me.itzsomebody.radon.transformers.obfuscators.flow;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import me.itzsomebody.radon.asm.StackEmulator;
+import me.itzsomebody.radon.exceptions.RadonException;
+import me.itzsomebody.radon.exceptions.StackEmulationException;
 import me.itzsomebody.radon.utils.BytecodeUtils;
 import me.itzsomebody.radon.utils.RandomUtils;
 import me.itzsomebody.radon.utils.StringUtils;
@@ -62,8 +64,15 @@ public class NormalFlowObfuscation extends FlowObfuscation {
                 AbstractInsnNode[] untouchedList = methodNode.instructions.toArray();
                 LabelNode labelNode = exitLabel(methodNode);
                 boolean calledSuper = false;
-                Set<AbstractInsnNode> emptyAt = new StackEmulator(methodNode,
-                        methodNode.instructions.getLast()).getEmptyAt();
+                StackEmulator stackEmulator = new StackEmulator(methodNode, methodNode.instructions.getLast());
+                try {
+                    stackEmulator.execute(false);
+                } catch (StackEmulationException e) {
+                    e.printStackTrace();
+                    throw new RadonException(String.format("Error happened while trying to emulate the stack of %s.%s%s",
+                            classNode.name, methodNode.name, methodNode.desc));
+                }
+                Set<AbstractInsnNode> emptyAt = stackEmulator.getEmptyAt();
                 for (AbstractInsnNode insn : untouchedList) {
                     if (leeway < 10000)
                         break;
@@ -71,7 +80,6 @@ public class NormalFlowObfuscation extends FlowObfuscation {
                     if ("<init>".equals(methodNode.name))
                         calledSuper = (insn instanceof MethodInsnNode && insn.getOpcode() == INVOKESPECIAL
                                 && insn.getPrevious() instanceof VarInsnNode && ((VarInsnNode) insn.getPrevious()).var == 0);
-
                     if (insn != methodNode.instructions.getFirst() && !(insn instanceof LineNumberNode)) {
                         if ("<init>".equals(methodNode.name) && !calledSuper)
                             continue;

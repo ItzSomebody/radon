@@ -76,7 +76,7 @@ public class StackEmulator implements Opcodes {
     /**
      * Weakly emulates stack execution until no more instructions are left or the breakpoint is reached.
      */
-    private void execute(boolean debug) throws StackEmulationException {
+    public void execute(boolean debug) throws StackEmulationException {
         int stackSize = 0; // Emulated stack
         Set<LabelNode> excHandlers = new HashSet<>();
         methodNode.tryCatchBlocks.forEach(tryCatchBlockNode -> excHandlers.add(tryCatchBlockNode.handler));
