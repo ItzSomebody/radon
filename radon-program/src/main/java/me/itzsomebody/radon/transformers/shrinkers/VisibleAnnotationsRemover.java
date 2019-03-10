@@ -18,7 +18,7 @@
 package me.itzsomebody.radon.transformers.shrinkers;
 
 import java.util.concurrent.atomic.AtomicInteger;
-import me.itzsomebody.radon.utils.LoggerUtils;
+import me.itzsomebody.radon.Logger;
 import org.objectweb.asm.tree.ClassNode;
 
 /**
@@ -33,7 +33,7 @@ public class VisibleAnnotationsRemover extends Shrinker {
         AtomicInteger methodAnnotations = new AtomicInteger();
         AtomicInteger fieldAnnotations = new AtomicInteger();
 
-        getClassWrappers().parallelStream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper -> {
+        getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper -> {
             ClassNode classNode = classWrapper.classNode;
 
             if (classNode.visibleAnnotations != null) {
@@ -41,20 +41,20 @@ public class VisibleAnnotationsRemover extends Shrinker {
                 classNode.visibleAnnotations.clear();
             }
 
-            classWrapper.fields.parallelStream().filter(fieldWrapper -> !excluded(fieldWrapper)
+            classWrapper.fields.stream().filter(fieldWrapper -> !excluded(fieldWrapper)
                     && fieldWrapper.fieldNode.visibleAnnotations != null).forEach(fieldWrapper -> {
                 fieldAnnotations.addAndGet(fieldWrapper.fieldNode.visibleAnnotations.size());
                 fieldWrapper.fieldNode.visibleAnnotations.clear();
             });
 
-            classWrapper.methods.parallelStream().filter(methodWrapper -> !excluded(methodWrapper)
+            classWrapper.methods.stream().filter(methodWrapper -> !excluded(methodWrapper)
                     && methodWrapper.methodNode.visibleAnnotations != null).forEach(methodWrapper -> {
                 methodAnnotations.addAndGet(methodWrapper.methodNode.visibleAnnotations.size());
                 methodWrapper.methodNode.visibleAnnotations.clear();
             });
         });
 
-        LoggerUtils.stdOut(String.format("Removed %d class, %d method and %d field invisible annotations.",
+        Logger.stdOut(String.format("Removed %d class, %d method and %d field invisible annotations.",
                 classAnnotations.get(), methodAnnotations.get(), fieldAnnotations.get()));
     }
 

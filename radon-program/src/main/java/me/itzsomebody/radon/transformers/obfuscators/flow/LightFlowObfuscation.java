@@ -18,7 +18,7 @@
 package me.itzsomebody.radon.transformers.obfuscators.flow;
 
 import java.util.concurrent.atomic.AtomicInteger;
-import me.itzsomebody.radon.utils.LoggerUtils;
+import me.itzsomebody.radon.Logger;
 import me.itzsomebody.radon.utils.RandomUtils;
 import me.itzsomebody.radon.utils.StringUtils;
 import org.objectweb.asm.tree.AbstractInsnNode;
@@ -39,20 +39,19 @@ public class LightFlowObfuscation extends FlowObfuscation {
     public void transform() {
         AtomicInteger counter = new AtomicInteger();
 
-        this.getClassWrappers().parallelStream().filter(classWrapper ->
+        this.getClassWrappers().stream().filter(classWrapper ->
                 !excluded(classWrapper)).forEach(classWrapper -> {
             ClassNode classNode = classWrapper.classNode;
             String fieldName = StringUtils.randomSpacesString(RandomUtils.getRandomInt(10));
 
-            classWrapper.methods.parallelStream().filter(methodWrapper -> !excluded(methodWrapper)
+            classWrapper.methods.stream().filter(methodWrapper -> !excluded(methodWrapper)
                     && hasInstructions(methodWrapper.methodNode)).forEach(methodWrapper -> {
                 MethodNode methodNode = methodWrapper.methodNode;
                 int leeway = getSizeLeeway(methodNode);
 
                 for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
-                    if (leeway < 10000) {
+                    if (leeway < 10000)
                         break;
-                    }
 
                     if (insn.getOpcode() == GOTO) {
                         methodNode.instructions.insertBefore(insn, new FieldInsnNode(GETSTATIC, classNode.name,
@@ -69,7 +68,7 @@ public class LightFlowObfuscation extends FlowObfuscation {
             classNode.fields.add(new FieldNode(ACC_PUBLIC + ACC_STATIC + ACC_FINAL, fieldName, "Z", null, null));
         });
 
-        LoggerUtils.stdOut(String.format("Added %d fake throw-null sequences", counter.get()));
+        Logger.stdOut(String.format("Added %d fake throw-null sequences", counter.get()));
     }
 
     @Override

@@ -33,17 +33,17 @@ public class FieldWrapper {
     /**
      * Owner of this represented field.
      */
-    public ClassWrapper owner;
+    public final ClassWrapper owner;
 
     /**
      * Original field name.
      */
-    public String originalName;
+    public final String originalName;
 
     /**
      * Original field description.
      */
-    public String originalDescription;
+    public final String originalDescription;
 
     /**
      * Creates a FieldWrapper object.

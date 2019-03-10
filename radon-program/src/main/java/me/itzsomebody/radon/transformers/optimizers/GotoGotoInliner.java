@@ -18,7 +18,8 @@
 package me.itzsomebody.radon.transformers.optimizers;
 
 import java.util.concurrent.atomic.AtomicInteger;
-import me.itzsomebody.radon.utils.LoggerUtils;
+import java.util.stream.Stream;
+import me.itzsomebody.radon.Logger;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.MethodNode;
@@ -34,25 +35,25 @@ public class GotoGotoInliner extends Optimizer {
         AtomicInteger count = new AtomicInteger();
         long current = System.currentTimeMillis();
 
-        getClassWrappers().parallelStream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper ->
-                classWrapper.methods.parallelStream().filter(methodWrapper -> !excluded(methodWrapper)
+        getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper ->
+                classWrapper.methods.stream().filter(methodWrapper -> !excluded(methodWrapper)
                         && hasInstructions(methodWrapper.methodNode)).forEach(methodWrapper -> {
                     MethodNode methodNode = methodWrapper.methodNode;
 
-                    for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
-                        if (insn.getOpcode() == GOTO) {
-                            JumpInsnNode gotoJump = (JumpInsnNode) insn;
-                            AbstractInsnNode insnAfterTarget = gotoJump.label.getNext();
-                            if (insnAfterTarget != null && insnAfterTarget.getOpcode() == GOTO) {
-                                JumpInsnNode secGoto = (JumpInsnNode) insnAfterTarget;
-                                gotoJump.label = secGoto.label;
-                                count.incrementAndGet();
-                            }
-                        }
-                    }
+                    Stream.of(methodNode.instructions.toArray()).filter(insn -> insn.getOpcode() == GOTO)
+                            .forEach(insn -> {
+                                JumpInsnNode gotoJump = (JumpInsnNode) insn;
+                                AbstractInsnNode insnAfterTarget = gotoJump.label.getNext();
+
+                                if (insnAfterTarget != null && insnAfterTarget.getOpcode() == GOTO) {
+                                    JumpInsnNode secGoto = (JumpInsnNode) insnAfterTarget;
+                                    gotoJump.label = secGoto.label;
+                                    count.incrementAndGet();
+                                }
+                            });
                 }));
 
-        LoggerUtils.stdOut(String.format("Inlined %d GOTO->GOTO sequences. [%dms]", count.get(),
+        Logger.stdOut(String.format("Inlined %d GOTO->GOTO sequences. [%dms]", count.get(),
                 tookThisLong(current)));
     }
 

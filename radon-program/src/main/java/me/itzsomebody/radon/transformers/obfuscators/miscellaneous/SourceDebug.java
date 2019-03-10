@@ -20,7 +20,7 @@ package me.itzsomebody.radon.transformers.obfuscators.miscellaneous;
 import java.util.concurrent.atomic.AtomicInteger;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
-import me.itzsomebody.radon.utils.LoggerUtils;
+import me.itzsomebody.radon.Logger;
 
 /**
  * Obfuscate the sourcedebugextension attribute by either randomizing the data, or removing it altogether.
@@ -43,12 +43,12 @@ public class SourceDebug extends Transformer {
         AtomicInteger counter = new AtomicInteger();
 
         String newName = (remove) ? null : randomString(4) + ".java";
-        getClassWrappers().parallelStream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper -> {
+        getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper -> {
             classWrapper.classNode.sourceDebug = newName;
             counter.incrementAndGet();
         });
 
-        LoggerUtils.stdOut(String.format("%s %d source debug attributes.", (remove) ? "Removed" : "Obfuscated",
+        Logger.stdOut(String.format("%s %d source debug attributes.", (remove) ? "Removed" : "Obfuscated",
                 counter.get()));
     }
 

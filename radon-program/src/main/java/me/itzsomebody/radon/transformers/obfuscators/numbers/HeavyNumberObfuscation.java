@@ -20,7 +20,7 @@ package me.itzsomebody.radon.transformers.obfuscators.numbers;
 import java.util.concurrent.atomic.AtomicInteger;
 import me.itzsomebody.radon.asm.ClassWrapper;
 import me.itzsomebody.radon.utils.BytecodeUtils;
-import me.itzsomebody.radon.utils.LoggerUtils;
+import me.itzsomebody.radon.Logger;
 import me.itzsomebody.radon.utils.RandomUtils;
 import me.itzsomebody.radon.utils.StringUtils;
 import org.objectweb.asm.FieldVisitor;
@@ -46,9 +46,9 @@ public class HeavyNumberObfuscation extends NumberObfuscation {
     public void transform() {
         MemberNames memberNames = new MemberNames();
         AtomicInteger counter = new AtomicInteger();
-        this.getClassWrappers().parallelStream().filter(classWrapper ->
+        this.getClassWrappers().stream().filter(classWrapper ->
                 !excluded(classWrapper)).forEach(classWrapper ->
-                classWrapper.methods.parallelStream().filter(methodWrapper -> !excluded(methodWrapper)
+                classWrapper.methods.stream().filter(methodWrapper -> !excluded(methodWrapper)
                         && hasInstructions(methodWrapper.methodNode)).forEach(methodWrapper -> {
                     MethodNode methodNode = methodWrapper.methodNode;
                     int leeway = getSizeLeeway(methodNode);
@@ -161,7 +161,7 @@ public class HeavyNumberObfuscation extends NumberObfuscation {
         );
         ClassNode decoder = createConstantDecoder(memberNames);
         getClasses().put(decoder.name, new ClassWrapper(decoder, false));
-        LoggerUtils.stdOut(String.format("Obfuscated %d numbers.", counter.get()));
+        Logger.stdOut(String.format("Obfuscated %d numbers.", counter.get()));
     }
 
     private static int encodeInt(int n, int hashCode) {

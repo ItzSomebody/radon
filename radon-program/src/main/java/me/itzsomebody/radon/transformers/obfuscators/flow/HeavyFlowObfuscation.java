@@ -20,7 +20,7 @@ package me.itzsomebody.radon.transformers.obfuscators.flow;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import me.itzsomebody.radon.asm.StackEmulator;
-import me.itzsomebody.radon.utils.LoggerUtils;
+import me.itzsomebody.radon.Logger;
 import me.itzsomebody.radon.utils.RandomUtils;
 import me.itzsomebody.radon.utils.StringUtils;
 import org.objectweb.asm.tree.AbstractInsnNode;
@@ -45,14 +45,14 @@ public class HeavyFlowObfuscation extends NormalFlowObfuscation {
     public void transform() {
         AtomicInteger counter = new AtomicInteger();
 
-        this.getClassWrappers().parallelStream().filter(classWrapper ->
+        this.getClassWrappers().stream().filter(classWrapper ->
                 !excluded(classWrapper)).forEach(classWrapper -> {
             ClassNode classNode = classWrapper.classNode;
             FieldNode field = new FieldNode(ACC_PUBLIC + ACC_STATIC + ACC_FINAL,
                     StringUtils.randomSpacesString(RandomUtils.getRandomInt(10)), "Z", null, null);
 
             classNode.fields.add(field);
-            classWrapper.methods.parallelStream().filter(methodWrapper -> !excluded(methodWrapper)
+            classWrapper.methods.stream().filter(methodWrapper -> !excluded(methodWrapper)
                     && hasInstructions(methodWrapper.methodNode)).forEach(methodWrapper -> {
                 MethodNode methodNode = methodWrapper.methodNode;
                 int leeway = getSizeLeeway(methodNode);
@@ -64,13 +64,11 @@ public class HeavyFlowObfuscation extends NormalFlowObfuscation {
                 Set<AbstractInsnNode> emptyAt = new StackEmulator(methodNode,
                         methodNode.instructions.getLast()).getEmptyAt();
                 for (AbstractInsnNode insn : untouchedList) {
-                    if (leeway < 10000) {
+                    if (leeway < 10000)
                         break;
-                    }
-                    if ("<init>".equals(methodNode.name)) {
+                    if ("<init>".equals(methodNode.name))
                         calledSuper = (insn instanceof MethodInsnNode && insn.getOpcode() == INVOKESPECIAL
                                 && insn.getPrevious() instanceof VarInsnNode && ((VarInsnNode) insn.getPrevious()).var == 0);
-                    }
                     if (insn != methodNode.instructions.getFirst() && !(insn instanceof LineNumberNode)) {
                         if ("<init>".equals(methodNode.name) && !calledSuper)
                             continue;
@@ -102,7 +100,7 @@ public class HeavyFlowObfuscation extends NormalFlowObfuscation {
             });
         });
 
-        LoggerUtils.stdOut(String.format("Added %d fake jump sequences", counter.get()));
+        Logger.stdOut(String.format("Added %d fake jump sequences", counter.get()));
     }
 
     @Override

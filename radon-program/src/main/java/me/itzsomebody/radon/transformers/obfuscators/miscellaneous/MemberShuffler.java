@@ -21,7 +21,7 @@ import java.util.Collections;
 import java.util.concurrent.atomic.AtomicInteger;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
-import me.itzsomebody.radon.utils.LoggerUtils;
+import me.itzsomebody.radon.Logger;
 
 /**
  * Randomizes the order of methods and fields in a class.
@@ -31,7 +31,7 @@ public class MemberShuffler extends Transformer {
     public void transform() {
         AtomicInteger counter = new AtomicInteger();
 
-        getClassWrappers().parallelStream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper -> {
+        getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper -> {
             Collections.shuffle(classWrapper.classNode.methods);
             counter.addAndGet(classWrapper.classNode.methods.size());
             if (classWrapper.classNode.fields != null) {
@@ -40,7 +40,7 @@ public class MemberShuffler extends Transformer {
             }
         });
 
-        LoggerUtils.stdOut(String.format("Shuffled %d members.", counter.get()));
+        Logger.stdOut(String.format("Shuffled %d members.", counter.get()));
     }
 
     @Override

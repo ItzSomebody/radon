@@ -76,155 +76,155 @@ public class ConfigurationWriter {
             for (Transformer transformer : info.getTransformers()) {
                 if (transformer instanceof StringEncryption) {
                     StringEncryption encryption = (StringEncryption) transformer;
-                    documentMap.putIfAbsent(ConfigurationSettings.STRING_ENCRYPTION.getValue(),
+                    documentMap.putIfAbsent(ConfigurationSetting.STRING_ENCRYPTION.getValue(),
                             new LinkedHashMap<String, Object>());
-                    ((LinkedHashMap) documentMap.get(ConfigurationSettings.STRING_ENCRYPTION.getValue()))
+                    ((LinkedHashMap) documentMap.get(ConfigurationSetting.STRING_ENCRYPTION.getValue()))
                             .putIfAbsent("Enabled", true);
 
                     if (transformer instanceof LightStringEncryption)
-                        ((LinkedHashMap) documentMap.get(ConfigurationSettings.STRING_ENCRYPTION.getValue()))
+                        ((LinkedHashMap) documentMap.get(ConfigurationSetting.STRING_ENCRYPTION.getValue()))
                                 .put("Mode", "Light");
                     else if (transformer instanceof NormalStringEncryption)
-                        ((LinkedHashMap) documentMap.get(ConfigurationSettings.STRING_ENCRYPTION.getValue()))
+                        ((LinkedHashMap) documentMap.get(ConfigurationSetting.STRING_ENCRYPTION.getValue()))
                                 .put("Mode", "Normal");
                     else if (transformer instanceof HeavyStringEncryption)
-                        ((LinkedHashMap) documentMap.get(ConfigurationSettings.STRING_ENCRYPTION.getValue()))
+                        ((LinkedHashMap) documentMap.get(ConfigurationSetting.STRING_ENCRYPTION.getValue()))
                                 .put("Mode", "Heavy");
                     else if (transformer instanceof StringPool)
-                        ((LinkedHashMap) documentMap.get(ConfigurationSettings.STRING_ENCRYPTION.getValue()))
+                        ((LinkedHashMap) documentMap.get(ConfigurationSetting.STRING_ENCRYPTION.getValue()))
                                 .put("StringPool", true);
 
                     if (encryption.getExcludedStrings() != null)
-                        ((LinkedHashMap) documentMap.get(ConfigurationSettings.STRING_ENCRYPTION.getValue()))
+                        ((LinkedHashMap) documentMap.get(ConfigurationSetting.STRING_ENCRYPTION.getValue()))
                                 .putIfAbsent("Exclusions", encryption.getExcludedStrings());
 
                 } else if (transformer instanceof InvokeDynamic) {
                     if (transformer instanceof LightInvokeDynamic)
-                        documentMap.put(ConfigurationSettings.INVOKEDYNAMIC.getValue(), "Light");
+                        documentMap.put(ConfigurationSetting.INVOKEDYNAMIC.getValue(), "Light");
                     else if (transformer instanceof NormalInvokeDynamic)
-                        documentMap.put(ConfigurationSettings.INVOKEDYNAMIC.getValue(), "Normal");
+                        documentMap.put(ConfigurationSetting.INVOKEDYNAMIC.getValue(), "Normal");
                     else if (transformer instanceof HeavyInvokeDynamic)
-                        documentMap.put(ConfigurationSettings.INVOKEDYNAMIC.getValue(), "Heavy");
+                        documentMap.put(ConfigurationSetting.INVOKEDYNAMIC.getValue(), "Heavy");
 
                 } else if (transformer instanceof NumberObfuscation) {
                     if (transformer instanceof LightNumberObfuscation)
-                        documentMap.put(ConfigurationSettings.NUMBER_OBFUSCATION.getValue(), "Light");
+                        documentMap.put(ConfigurationSetting.NUMBER_OBFUSCATION.getValue(), "Light");
                     else if (transformer instanceof NormalNumberObfuscation)
-                        documentMap.put(ConfigurationSettings.NUMBER_OBFUSCATION.getValue(), "Normal");
+                        documentMap.put(ConfigurationSetting.NUMBER_OBFUSCATION.getValue(), "Normal");
                     else if (transformer instanceof HeavyNumberObfuscation)
-                        documentMap.put(ConfigurationSettings.NUMBER_OBFUSCATION.getValue(), "Heavy");
+                        documentMap.put(ConfigurationSetting.NUMBER_OBFUSCATION.getValue(), "Heavy");
 
                 } else if (transformer instanceof FlowObfuscation) {
                     if (transformer instanceof LightFlowObfuscation)
-                        documentMap.put(ConfigurationSettings.FLOW_OBFUSCATION.getValue(), "Light");
+                        documentMap.put(ConfigurationSetting.FLOW_OBFUSCATION.getValue(), "Light");
                     else if (transformer instanceof HeavyFlowObfuscation)
-                        documentMap.put(ConfigurationSettings.FLOW_OBFUSCATION.getValue(), "Heavy");
+                        documentMap.put(ConfigurationSetting.FLOW_OBFUSCATION.getValue(), "Heavy");
                     else if (transformer instanceof NormalFlowObfuscation)
-                        documentMap.put(ConfigurationSettings.FLOW_OBFUSCATION.getValue(), "Normal");
+                        documentMap.put(ConfigurationSetting.FLOW_OBFUSCATION.getValue(), "Normal");
 
                 } else if (transformer instanceof LocalVariables) {
-                    documentMap.putIfAbsent(ConfigurationSettings.LOCAL_VARIABLES.getValue(),
+                    documentMap.putIfAbsent(ConfigurationSetting.LOCAL_VARIABLES.getValue(),
                             new LinkedHashMap<String, Object>());
-                    ((LinkedHashMap) documentMap.get(ConfigurationSettings.LOCAL_VARIABLES.getValue()))
+                    ((LinkedHashMap) documentMap.get(ConfigurationSetting.LOCAL_VARIABLES.getValue()))
                             .put("Enabled", true);
-                    ((LinkedHashMap) documentMap.get(ConfigurationSettings.LOCAL_VARIABLES.getValue()))
+                    ((LinkedHashMap) documentMap.get(ConfigurationSetting.LOCAL_VARIABLES.getValue()))
                             .put("Remove", ((LocalVariables) transformer).isRemove());
                 } else if (transformer instanceof LineNumbers) {
-                    documentMap.putIfAbsent(ConfigurationSettings.LINE_NUMBERS.getValue(),
+                    documentMap.putIfAbsent(ConfigurationSetting.LINE_NUMBERS.getValue(),
                             new LinkedHashMap<String, Object>());
-                    ((LinkedHashMap) documentMap.get(ConfigurationSettings.LINE_NUMBERS.getValue()))
+                    ((LinkedHashMap) documentMap.get(ConfigurationSetting.LINE_NUMBERS.getValue()))
                             .put("Enabled", true);
-                    ((LinkedHashMap) documentMap.get(ConfigurationSettings.LINE_NUMBERS.getValue()))
+                    ((LinkedHashMap) documentMap.get(ConfigurationSetting.LINE_NUMBERS.getValue()))
                             .put("Remove", ((LineNumbers) transformer).isRemove());
                 } else if (transformer instanceof SourceName) {
-                    documentMap.putIfAbsent(ConfigurationSettings.SOURCE_NAME.getValue(),
+                    documentMap.putIfAbsent(ConfigurationSetting.SOURCE_NAME.getValue(),
                             new LinkedHashMap<String, Object>());
-                    ((LinkedHashMap) documentMap.get(ConfigurationSettings.SOURCE_NAME.getValue()))
+                    ((LinkedHashMap) documentMap.get(ConfigurationSetting.SOURCE_NAME.getValue()))
                             .put("Enabled", true);
-                    ((LinkedHashMap) documentMap.get(ConfigurationSettings.SOURCE_NAME.getValue()))
+                    ((LinkedHashMap) documentMap.get(ConfigurationSetting.SOURCE_NAME.getValue()))
                             .put("Remove", ((SourceName) transformer).isRemove());
                 } else if (transformer instanceof SourceDebug) {
-                    documentMap.putIfAbsent(ConfigurationSettings.SOURCE_DEBUG.getValue(),
+                    documentMap.putIfAbsent(ConfigurationSetting.SOURCE_DEBUG.getValue(),
                             new LinkedHashMap<String, Object>());
-                    ((LinkedHashMap) documentMap.get(ConfigurationSettings.SOURCE_DEBUG.getValue()))
+                    ((LinkedHashMap) documentMap.get(ConfigurationSetting.SOURCE_DEBUG.getValue()))
                             .put("Enabled", true);
-                    ((LinkedHashMap) documentMap.get(ConfigurationSettings.SOURCE_DEBUG.getValue()))
+                    ((LinkedHashMap) documentMap.get(ConfigurationSetting.SOURCE_DEBUG.getValue()))
                             .put("Remove", ((SourceDebug) transformer).isRemove());
                 } else if (transformer instanceof HideCode) {
-                    documentMap.put(ConfigurationSettings.HIDE_CODE.getValue(), true);
+                    documentMap.put(ConfigurationSetting.HIDE_CODE.getValue(), true);
                 } else if (transformer instanceof MemberShuffler) {
-                    documentMap.put(ConfigurationSettings.SHUFFLER.getValue(), true);
+                    documentMap.put(ConfigurationSetting.SHUFFLER.getValue(), true);
                 } else if (transformer instanceof Crasher) {
-                    documentMap.put(ConfigurationSettings.CRASHER.getValue(), true);
+                    documentMap.put(ConfigurationSetting.CRASHER.getValue(), true);
                 } else if (transformer instanceof Renamer) {
                     Renamer renamer = (Renamer) transformer;
-                    documentMap.putIfAbsent(ConfigurationSettings.RENAMER.getValue(),
+                    documentMap.putIfAbsent(ConfigurationSetting.RENAMER.getValue(),
                             new LinkedHashMap<String, Object>());
-                    ((LinkedHashMap) documentMap.get(ConfigurationSettings.RENAMER.getValue()))
+                    ((LinkedHashMap) documentMap.get(ConfigurationSetting.RENAMER.getValue()))
                             .put("Enabled", true);
                     if (renamer.getSetup().getRepackageName() != null)
-                        ((LinkedHashMap) documentMap.get(ConfigurationSettings.RENAMER.getValue()))
+                        ((LinkedHashMap) documentMap.get(ConfigurationSetting.RENAMER.getValue()))
                                 .put("Repackage", renamer.getSetup().getRepackageName());
                     if (renamer.getSetup().getAdaptTheseResources() != null)
-                        ((LinkedHashMap) documentMap.get(ConfigurationSettings.RENAMER.getValue()))
+                        ((LinkedHashMap) documentMap.get(ConfigurationSetting.RENAMER.getValue()))
                                 .put("AdaptResources", Arrays.asList(renamer.getSetup().getAdaptTheseResources()));
 
                 } else if (transformer instanceof OptimizerDelegator) {
                     OptimizerDelegator optimizer = (OptimizerDelegator) transformer;
-                    documentMap.putIfAbsent(ConfigurationSettings.OPTIMIZER.getValue(),
+                    documentMap.putIfAbsent(ConfigurationSetting.OPTIMIZER.getValue(),
                             new LinkedHashMap<String, Object>());
-                    ((LinkedHashMap) documentMap.get(ConfigurationSettings.OPTIMIZER.getValue())).put("Enabled", true);
+                    ((LinkedHashMap) documentMap.get(ConfigurationSetting.OPTIMIZER.getValue())).put("Enabled", true);
                     if (optimizer.getSetup().isGotoGotoEnabled())
-                        ((LinkedHashMap) documentMap.get(ConfigurationSettings.OPTIMIZER.getValue()))
+                        ((LinkedHashMap) documentMap.get(ConfigurationSetting.OPTIMIZER.getValue()))
                                 .put("RemoveGotoGoto", true);
                     if (optimizer.getSetup().isGotoReturnEnabled())
-                        ((LinkedHashMap) documentMap.get(ConfigurationSettings.OPTIMIZER.getValue()))
+                        ((LinkedHashMap) documentMap.get(ConfigurationSetting.OPTIMIZER.getValue()))
                                 .put("RemoveGotoReturn", true);
                     if (optimizer.getSetup().isNopRemoverEnabled())
-                        ((LinkedHashMap) documentMap.get(ConfigurationSettings.OPTIMIZER.getValue()))
+                        ((LinkedHashMap) documentMap.get(ConfigurationSetting.OPTIMIZER.getValue()))
                                 .put("RemoveNopInstructions", true);
                 } else if (transformer instanceof ShrinkerDelegator) {
                     ShrinkerDelegator shrinker = (ShrinkerDelegator) transformer;
-                    documentMap.putIfAbsent(ConfigurationSettings.SHRINKER.getValue(),
+                    documentMap.putIfAbsent(ConfigurationSetting.SHRINKER.getValue(),
                             new LinkedHashMap<String, Object>());
-                    ((LinkedHashMap) documentMap.get(ConfigurationSettings.SHRINKER.getValue())).put("Enabled", true);
+                    ((LinkedHashMap) documentMap.get(ConfigurationSetting.SHRINKER.getValue())).put("Enabled", true);
                     if (shrinker.getSetup().isRemoveAttributes())
-                        ((LinkedHashMap) documentMap.get(ConfigurationSettings.SHRINKER.getValue()))
+                        ((LinkedHashMap) documentMap.get(ConfigurationSetting.SHRINKER.getValue()))
                                 .put("RemoveAttributes", true);
                     if (shrinker.getSetup().isRemoveDebug())
-                        ((LinkedHashMap) documentMap.get(ConfigurationSettings.SHRINKER.getValue()))
+                        ((LinkedHashMap) documentMap.get(ConfigurationSetting.SHRINKER.getValue()))
                                 .put("RemoveDebug", true);
                     if (shrinker.getSetup().isRemoveInvisibleAnnotations())
-                        ((LinkedHashMap) documentMap.get(ConfigurationSettings.SHRINKER.getValue()))
+                        ((LinkedHashMap) documentMap.get(ConfigurationSetting.SHRINKER.getValue()))
                                 .put("RemoveInvisibleAnnotations", true);
                     if (shrinker.getSetup().isRemoveVisibleAnnotations())
-                        ((LinkedHashMap) documentMap.get(ConfigurationSettings.SHRINKER.getValue()))
+                        ((LinkedHashMap) documentMap.get(ConfigurationSetting.SHRINKER.getValue()))
                                 .put("RemoveVisibleAnnotations", true);
                 } else if (transformer instanceof Watermarker) {
                     Watermarker watermarker = (Watermarker) transformer;
-                    documentMap.putIfAbsent(ConfigurationSettings.WATERMARK.getValue(),
+                    documentMap.putIfAbsent(ConfigurationSetting.WATERMARK.getValue(),
                             new LinkedHashMap<String, Object>());
-                    ((LinkedHashMap) documentMap.get(ConfigurationSettings.WATERMARK.getValue())).put("Enabled", true);
+                    ((LinkedHashMap) documentMap.get(ConfigurationSetting.WATERMARK.getValue())).put("Enabled", true);
                     if (watermarker.getSetup().getMessage() != null)
-                        ((LinkedHashMap) documentMap.get(ConfigurationSettings.WATERMARK.getValue()))
+                        ((LinkedHashMap) documentMap.get(ConfigurationSetting.WATERMARK.getValue()))
                                 .put("Message", watermarker.getSetup().getMessage());
                     if (watermarker.getSetup().getKey() != null)
-                        ((LinkedHashMap) documentMap.get(ConfigurationSettings.WATERMARK.getValue()))
+                        ((LinkedHashMap) documentMap.get(ConfigurationSetting.WATERMARK.getValue()))
                                 .put("Key", watermarker.getSetup().getKey());
 
                 } else if (transformer instanceof Expiration) {
                     Expiration expiration = (Expiration) transformer;
-                    documentMap.putIfAbsent(ConfigurationSettings.EXPIRATION.getValue(),
+                    documentMap.putIfAbsent(ConfigurationSetting.EXPIRATION.getValue(),
                             new LinkedHashMap<String, Object>());
-                    ((LinkedHashMap) documentMap.get(ConfigurationSettings.EXPIRATION.getValue())).put("Enabled", true);
+                    ((LinkedHashMap) documentMap.get(ConfigurationSetting.EXPIRATION.getValue())).put("Enabled", true);
                     if (expiration.getSetup().getMessage() != null)
-                        ((LinkedHashMap) documentMap.get(ConfigurationSettings.EXPIRATION.getValue()))
+                        ((LinkedHashMap) documentMap.get(ConfigurationSetting.EXPIRATION.getValue()))
                                 .put("Message", expiration.getSetup().getMessage());
 
-                    ((LinkedHashMap) documentMap.get(ConfigurationSettings.EXPIRATION.getValue())).put("Expires",
+                    ((LinkedHashMap) documentMap.get(ConfigurationSetting.EXPIRATION.getValue())).put("Expires",
                             new SimpleDateFormat("MM/dd/yyyy").format(new Date(expiration.getSetup().getExpires())));
                     if (expiration.getSetup().isInjectJOptionPane())
-                        ((LinkedHashMap) documentMap.get(ConfigurationSettings.EXPIRATION.getValue()))
+                        ((LinkedHashMap) documentMap.get(ConfigurationSetting.EXPIRATION.getValue()))
                                 .put("InjectJOptionPane", expiration.getSetup().isInjectJOptionPane());
                 }
             }

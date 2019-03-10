@@ -107,9 +107,9 @@ public class WatermarkUtils {
 
     private static String constructString(Map<Integer, Character> embedMap) {
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < embedMap.size(); i++) {
+
+        for (int i = 0; i < embedMap.size(); i++)
             sb.append((char) embedMap.get(i));
-        }
 
         return sb.toString();
     }
@@ -119,9 +119,8 @@ public class WatermarkUtils {
         char[] keyChars = key.toCharArray();
         StringBuilder sb = new StringBuilder();
 
-        for (int i = 0; i < messageChars.length; i++) {
+        for (int i = 0; i < messageChars.length; i++)
             sb.append((char) (messageChars[i] ^ keyChars[i % keyChars.length]));
-        }
 
         return sb.toString();
     }

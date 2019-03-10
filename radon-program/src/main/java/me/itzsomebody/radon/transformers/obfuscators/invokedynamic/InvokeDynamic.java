@@ -34,18 +34,14 @@ public abstract class InvokeDynamic extends Transformer {
 
     public static InvokeDynamic getTransformerFromString(String s) {
         switch (s.toLowerCase()) {
-            case "light": {
+            case "light":
                 return new LightInvokeDynamic();
-            }
-            case "normal": {
+            case "normal":
                 return new NormalInvokeDynamic();
-            }
-            case "heavy": {
+            case "heavy":
                 return new HeavyInvokeDynamic();
-            }
-            default: {
+            default:
                 throw new IllegalConfigurationValueException("Did not expect " + s + " as a invokedynamic obfuscation mode");
-            }
         }
     }
 }

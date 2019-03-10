@@ -20,7 +20,7 @@ package me.itzsomebody.radon.transformers.miscellaneous.expiration;
 import java.util.concurrent.atomic.AtomicInteger;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
-import me.itzsomebody.radon.utils.LoggerUtils;
+import me.itzsomebody.radon.Logger;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.InsnList;
@@ -38,7 +38,7 @@ import org.objectweb.asm.tree.TypeInsnNode;
  * @author ItzSomebody
  */
 public class Expiration extends Transformer {
-    private ExpirationSetup setup;
+    private final ExpirationSetup setup;
 
     public Expiration(ExpirationSetup setup) {
         this.setup = setup;
@@ -48,7 +48,7 @@ public class Expiration extends Transformer {
     public void transform() {
         AtomicInteger counter = new AtomicInteger();
 
-        getClassWrappers().parallelStream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper -> {
+        getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper -> {
             ClassNode classNode = classWrapper.classNode;
 
             classNode.methods.stream().filter(methodNode -> "<init>".equals(methodNode.name)).forEach(methodNode -> {
@@ -58,7 +58,7 @@ public class Expiration extends Transformer {
             });
         });
 
-        LoggerUtils.stdOut(String.format("Added %d expiration code blocks.", counter.get()));
+        Logger.stdOut(String.format("Added %d expiration code blocks.", counter.get()));
     }
 
     private InsnList createExpirationInstructions() {

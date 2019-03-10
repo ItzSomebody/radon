@@ -17,11 +17,11 @@
 
 package me.itzsomebody.radon;
 
-import me.itzsomebody.radon.exceptions.IllegalDictionaryException;
+import me.itzsomebody.radon.exceptions.RadonException;
 
 /**
  * The dictionaries used for string generation.
- *
+ * <p>
  * {@link Dictionaries#SPACES} generates a string which is seen as spaces or related. The intent is to make the string
  * "invisible".
  * {@link Dictionaries#UNRECOGNIZED} generates a string full of unicode which the JVM is unable to parse. This leads to
@@ -50,7 +50,7 @@ public enum Dictionaries {
 
     public static Dictionaries intToDictionary(int type) {
         if (type >= values().length)
-            throw new IllegalDictionaryException();
+            throw new RadonException();
 
         return values()[type];
     }
@@ -66,7 +66,7 @@ public enum Dictionaries {
             case "alphanumeric":
                 return ALPHANUMERIC;
             default:
-                throw new IllegalDictionaryException();
+                throw new RadonException();
         }
     }
 }

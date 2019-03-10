@@ -18,11 +18,12 @@
 package me.itzsomebody.radon.transformers.shrinkers;
 
 import java.util.concurrent.atomic.AtomicInteger;
-import me.itzsomebody.radon.utils.LoggerUtils;
+import me.itzsomebody.radon.Logger;
 import org.objectweb.asm.tree.ClassNode;
 
 /**
  * Removes various debug information that lies around in classes.
+ * TODO: Split this into multiple classes.
  *
  * @author ItzSomebody
  */
@@ -73,7 +74,7 @@ public class DebugInfoRemover extends Shrinker {
             });
         });
 
-        LoggerUtils.stdOut(String.format("Removed %d inner classes, %d outer classes, %d outer methods, %d class " +
+        Logger.stdOut(String.format("Removed %d inner classes, %d outer classes, %d outer methods, %d class " +
                         "generic types, %d method generic types and %d field generic types.", innerClasses.get(),
                 outerClasses.get(), outerMethods.get(), classSignatures.get(), methodSignatures.get(),
                 fieldSignatures.get()));

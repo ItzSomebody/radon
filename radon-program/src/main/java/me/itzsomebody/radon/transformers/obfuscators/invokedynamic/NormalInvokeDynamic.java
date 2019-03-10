@@ -19,7 +19,7 @@ package me.itzsomebody.radon.transformers.obfuscators.invokedynamic;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import me.itzsomebody.radon.asm.ClassWrapper;
-import me.itzsomebody.radon.utils.LoggerUtils;
+import me.itzsomebody.radon.Logger;
 import me.itzsomebody.radon.utils.StringUtils;
 import org.objectweb.asm.Handle;
 import org.objectweb.asm.Label;
@@ -72,10 +72,9 @@ public class NormalInvokeDynamic extends InvokeDynamic {
                                     encrypt(methodInsnNode.name, 2993),
                                     encrypt(methodInsnNode.desc, 8372));
                             methodNode.instructions.set(insn, indy);
-                            if (returnType.getSort() == Type.ARRAY) {
+                            if (returnType.getSort() == Type.ARRAY)
                                 methodNode.instructions.insert(indy, new TypeInsnNode(CHECKCAST,
                                         returnType.getInternalName()));
-                            }
                             counter.incrementAndGet();
                         }
                     }
@@ -89,7 +88,7 @@ public class NormalInvokeDynamic extends InvokeDynamic {
         bsmHost.superName = "java/lang/Object";
         bsmHost.access = ACC_PUBLIC | ACC_SUPER;
         getClasses().put(className, new ClassWrapper(bsmHost, false));
-        LoggerUtils.stdOut(String.format("Replaced %d method invocations with invokedynamics.", counter.get()));
+        Logger.stdOut(String.format("Replaced %d method invocations with invokedynamics.", counter.get()));
     }
 
     private static String encrypt(String msg, int key) {

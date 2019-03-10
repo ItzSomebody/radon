@@ -19,7 +19,7 @@ package me.itzsomebody.radon.transformers.optimizers;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import me.itzsomebody.radon.utils.BytecodeUtils;
-import me.itzsomebody.radon.utils.LoggerUtils;
+import me.itzsomebody.radon.Logger;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.JumpInsnNode;
@@ -36,8 +36,8 @@ public class GotoReturnInliner extends Optimizer {
         AtomicInteger count = new AtomicInteger();
         long current = System.currentTimeMillis();
 
-        getClassWrappers().parallelStream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper ->
-                classWrapper.methods.parallelStream().filter(methodWrapper -> !excluded(methodWrapper)
+        getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper ->
+                classWrapper.methods.stream().filter(methodWrapper -> !excluded(methodWrapper)
                         && hasInstructions(methodWrapper.methodNode)).forEach(methodWrapper -> {
                     MethodNode methodNode = methodWrapper.methodNode;
 
@@ -53,7 +53,7 @@ public class GotoReturnInliner extends Optimizer {
                     }
                 }));
 
-        LoggerUtils.stdOut(String.format("Inlined %d GOTO->RETURN sequences. [%dms]", count.get(),
+        Logger.stdOut(String.format("Inlined %d GOTO->RETURN sequences. [%dms]", count.get(),
                 tookThisLong(current)));
     }
 

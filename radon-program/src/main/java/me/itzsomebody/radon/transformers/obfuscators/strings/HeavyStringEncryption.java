@@ -20,7 +20,7 @@ package me.itzsomebody.radon.transformers.obfuscators.strings;
 import java.util.concurrent.atomic.AtomicInteger;
 import me.itzsomebody.radon.asm.ClassWrapper;
 import me.itzsomebody.radon.utils.BytecodeUtils;
-import me.itzsomebody.radon.utils.LoggerUtils;
+import me.itzsomebody.radon.Logger;
 import me.itzsomebody.radon.utils.RandomUtils;
 import me.itzsomebody.radon.utils.StringUtils;
 import org.objectweb.asm.FieldVisitor;
@@ -57,9 +57,9 @@ public class HeavyStringEncryption extends StringEncryption {
                     int leeway = getSizeLeeway(methodNode);
 
                     for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
-                        if (leeway < 10000) {
+                        if (leeway < 10000)
                             break;
-                        }
+
                         if (insn instanceof LdcInsnNode) {
                             LdcInsnNode ldc = (LdcInsnNode) insn;
                             if (ldc.cst instanceof String) {
@@ -90,7 +90,7 @@ public class HeavyStringEncryption extends StringEncryption {
         ClassNode decryptor = createDecryptor(memberNames);
         getClasses().put(decryptor.name, new ClassWrapper(decryptor, false));
 
-        LoggerUtils.stdOut(String.format("Encrypted %d strings.", counter.get()));
+        Logger.stdOut(String.format("Encrypted %d strings.", counter.get()));
     }
 
     @Override
@@ -104,22 +104,18 @@ public class HeavyStringEncryption extends StringEncryption {
         char[] chars = msg.toCharArray();
         for (int i = 0; i < chars.length; i++) {
             switch (i % 4) {
-                case 0: {
+                case 0:
                     sb.append((char) (extraKey ^ callerClassHC ^ chars[i]));
                     break;
-                }
-                case 1: {
+                case 1:
                     sb.append((char) (extraKey ^ callerMethodHC ^ chars[i]));
                     break;
-                }
-                case 2: {
+                case 2:
                     sb.append((char) (extraKey ^ decryptorClassHC ^ chars[i]));
                     break;
-                }
-                case 3: {
+                case 3:
                     sb.append((char) (extraKey ^ decryptorMethodHC ^ chars[i]));
                     break;
-                }
             }
         }
 

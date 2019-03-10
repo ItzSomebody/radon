@@ -23,8 +23,8 @@ package me.itzsomebody.radon.transformers.miscellaneous.watermarker;
  * @author ItzSomebody
  */
 public class WatermarkerSetup {
-    private String message;
-    private String key;
+    private final String message;
+    private final String key;
 
     public WatermarkerSetup(String message, String key) {
         this.message = message;

@@ -22,7 +22,7 @@ import me.itzsomebody.radon.Main;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
 import me.itzsomebody.radon.utils.BytecodeUtils;
-import me.itzsomebody.radon.utils.LoggerUtils;
+import me.itzsomebody.radon.Logger;
 import me.itzsomebody.radon.utils.RandomUtils;
 import me.itzsomebody.radon.utils.StringUtils;
 import org.objectweb.asm.ClassWriter;
@@ -49,7 +49,7 @@ import org.objectweb.asm.tree.VarInsnNode;
  * @author ItzSomebody
  */
 public class TrashClasses extends Transformer {
-    private static ArrayList<String> DESCRIPTORS = new ArrayList<String>();
+    private static ArrayList<String> DESCRIPTORS = new ArrayList<>();
 
     static {
         DESCRIPTORS.add("Z");
@@ -60,14 +60,14 @@ public class TrashClasses extends Transformer {
         DESCRIPTORS.add("F");
         DESCRIPTORS.add("J");
         DESCRIPTORS.add("D");
+        DESCRIPTORS.add("V");
     }
 
     @Override
     public void transform() {
         ArrayList<String> classNames = new ArrayList<>(getClassPath().keySet());
-        for (int i = 0; i < classNames.size() % 20; i++) {
+        for (int i = 0; i < classNames.size() % 20; i++)
             DESCRIPTORS.add("L" + classNames.get(RandomUtils.getRandomIntNoOrigin(classNames.size())) + ";");
-        }
 
         for (int i = 0; i < this.radon.sessionInfo.getTrashClasses(); i++) {
             ClassNode classNode = generateClass();
@@ -78,16 +78,15 @@ public class TrashClasses extends Transformer {
             this.getResources().put(classNode.name + ".class", cw.toByteArray());
         }
 
-        LoggerUtils.stdOut(String.format("Generated %d trash classes.", this.radon.sessionInfo.getTrashClasses()));
+        Logger.stdOut(String.format("Generated %d trash classes.", this.radon.sessionInfo.getTrashClasses()));
     }
 
     private ClassNode generateClass() {
         ClassNode classNode = createClass(StringUtils.randomClassName(this.getClasses().keySet()));
         int methodsToGenerate = RandomUtils.getRandomInt(3) + 2;
 
-        for (int i = 0; i < methodsToGenerate; i++) {
+        for (int i = 0; i < methodsToGenerate; i++)
             classNode.methods.add(methodGen());
-        }
 
         return classNode;
     }
@@ -116,50 +115,42 @@ public class TrashClasses extends Transformer {
 
         InsnList insns = new InsnList();
 
-        for (int i = 0; i < instructions; ++i) {
+        for (int i = 0; i < instructions; ++i)
             insns.add(junkInstructions());
-        }
 
         Type returnType = Type.getReturnType(randDesc);
         switch (returnType.getSort()) {
-            case Type.VOID: {
+            case Type.VOID:
                 insns.add(new InsnNode(RETURN));
                 break;
-            }
             case Type.BOOLEAN:
             case Type.CHAR:
             case Type.BYTE:
             case Type.SHORT:
-            case Type.INT: {
-                if (RandomUtils.getRandomInt(10) % 2 == 1) {
+            case Type.INT:
+                if (RandomUtils.getRandomInt(10) % 2 == 1)
                     insns.add(new InsnNode(ICONST_0));
-                } else {
+                else
                     insns.add(new InsnNode(ICONST_1));
-                }
 
                 insns.add(new InsnNode(IRETURN));
                 break;
-            }
-            case Type.FLOAT: {
+            case Type.FLOAT:
                 insns.add(BytecodeUtils.getNumberInsn(RandomUtils.getRandomFloat()));
                 insns.add(new InsnNode(FRETURN));
                 break;
-            }
-            case Type.LONG: {
+            case Type.LONG:
                 insns.add(BytecodeUtils.getNumberInsn(RandomUtils.getRandomLong()));
                 insns.add(new InsnNode(LRETURN));
                 break;
-            }
-            case Type.DOUBLE: {
+            case Type.DOUBLE:
                 insns.add(BytecodeUtils.getNumberInsn(RandomUtils.getRandomDouble()));
                 insns.add(new InsnNode(DRETURN));
                 break;
-            }
-            default: {
+            default:
                 insns.add(new VarInsnNode(ALOAD, RandomUtils.getRandomInt(30)));
                 insns.add(new InsnNode(ARETURN));
                 break;
-            }
         }
 
         method.instructions = insns;
@@ -169,53 +160,11 @@ public class TrashClasses extends Transformer {
     private String descGen() {
         StringBuilder sb = new StringBuilder("(");
 
-        for (int i = 0; i < RandomUtils.getRandomInt(7); i++) {
+        for (int i = 0; i < RandomUtils.getRandomInt(7); i++)
             sb.append(DESCRIPTORS.get(RandomUtils.getRandomIntNoOrigin(DESCRIPTORS.size())));
-        }
 
         sb.append(")");
-        switch (RandomUtils.getRandomIntNoOrigin(10)) {
-            case 0: {
-                sb.append("V");
-                break;
-            }
-            case 1: {
-                sb.append("Z");
-                break;
-            }
-            case 2: {
-                sb.append("C");
-                break;
-            }
-            case 3: {
-                sb.append("B");
-                break;
-            }
-            case 4: {
-                sb.append("S");
-                break;
-            }
-            case 5: {
-                sb.append("I");
-                break;
-            }
-            case 6: {
-                sb.append("F");
-                break;
-            }
-            case 7: {
-                sb.append("J");
-                break;
-            }
-            case 8: {
-                sb.append("D");
-                break;
-            }
-            default: {
-                sb.append(DESCRIPTORS.get(RandomUtils.getRandomIntNoOrigin(DESCRIPTORS.size())));
-                break;
-            }
-        }
+        sb.append(DESCRIPTORS.get(RandomUtils.getRandomIntNoOrigin(DESCRIPTORS.size())));
 
         return sb.toString();
     }

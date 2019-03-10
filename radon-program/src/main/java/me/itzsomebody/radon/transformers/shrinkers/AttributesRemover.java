@@ -18,7 +18,7 @@
 package me.itzsomebody.radon.transformers.shrinkers;
 
 import java.util.concurrent.atomic.AtomicInteger;
-import me.itzsomebody.radon.utils.LoggerUtils;
+import me.itzsomebody.radon.Logger;
 import org.objectweb.asm.tree.ClassNode;
 
 /**
@@ -31,7 +31,7 @@ public class AttributesRemover extends Shrinker {
     public void transform() {
         AtomicInteger counter = new AtomicInteger();
 
-        getClassWrappers().parallelStream().filter(classWrapper -> excluded(classWrapper)
+        getClassWrappers().stream().filter(classWrapper -> excluded(classWrapper)
                 && classWrapper.classNode.attrs != null).forEach(classWrapper -> {
             ClassNode classNode = classWrapper.classNode;
 
@@ -39,7 +39,7 @@ public class AttributesRemover extends Shrinker {
             classNode.attrs.clear();
         });
 
-        LoggerUtils.stdOut(String.format("Removed %d attributes.", counter.get()));
+        Logger.stdOut(String.format("Removed %d attributes.", counter.get()));
     }
 
     @Override

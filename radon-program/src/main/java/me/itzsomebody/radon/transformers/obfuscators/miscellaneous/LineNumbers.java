@@ -18,11 +18,11 @@
 package me.itzsomebody.radon.transformers.obfuscators.miscellaneous;
 
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
-import me.itzsomebody.radon.utils.LoggerUtils;
+import me.itzsomebody.radon.Logger;
 import me.itzsomebody.radon.utils.RandomUtils;
-import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.LineNumberNode;
 
 /**
@@ -47,21 +47,17 @@ public class LineNumbers extends Transformer {
 
         this.getClassWrappers().parallelStream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper ->
                 classWrapper.classNode.methods.parallelStream().filter(this::hasInstructions).forEach(methodNode -> {
-                    for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
-                        if (insn instanceof LineNumberNode) {
-                            if (remove) {
-                                methodNode.instructions.remove(insn);
-                            } else {
-                                ((LineNumberNode) insn).line = RandomUtils.getRandomInt();
-                            }
+                    Stream.of(methodNode.instructions.toArray()).filter(insn -> insn instanceof LineNumberNode).forEach(insn -> {
+                        if (remove)
+                            methodNode.instructions.remove(insn);
+                        else
+                            ((LineNumberNode) insn).line = RandomUtils.getRandomInt();
 
-                            counter.incrementAndGet();
-                        }
-                    }
-                })
-        );
+                        counter.incrementAndGet();
+                    });
+                }));
 
-        LoggerUtils.stdOut(String.format("%s %d line numbers.", (remove) ? "Removed" : "Obfuscated", counter.get()));
+        Logger.stdOut(String.format("%s %d line numbers.", (remove) ? "Removed" : "Obfuscated", counter.get()));
     }
 
     @Override

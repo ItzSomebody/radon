@@ -34,18 +34,14 @@ public abstract class FlowObfuscation extends Transformer {
 
     public static FlowObfuscation getTransformerFromString(String s) {
         switch (s.toLowerCase()) {
-            case "light": {
+            case "light":
                 return new LightFlowObfuscation();
-            }
-            case "normal": {
+            case "normal":
                 return new NormalFlowObfuscation();
-            }
-            case "heavy": {
+            case "heavy":
                 return new HeavyFlowObfuscation();
-            }
-            default: {
+            default:
                 throw new IllegalConfigurationValueException("Did not expect " + s + " as a flow obfuscation mode");
-            }
         }
     }
 }

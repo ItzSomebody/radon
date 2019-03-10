@@ -23,9 +23,9 @@ package me.itzsomebody.radon.transformers.miscellaneous.expiration;
  * @author ItzSomebody
  */
 public class ExpirationSetup {
-    private String message;
-    private long expires;
-    private boolean injectJOptionPane;
+    private final String message;
+    private final long expires;
+    private final boolean injectJOptionPane;
 
     public ExpirationSetup(String message, long expires, boolean injectJOptionPane) {
         this.message = message;

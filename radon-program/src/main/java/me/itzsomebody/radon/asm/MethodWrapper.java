@@ -33,17 +33,17 @@ public class MethodWrapper {
     /**
      * Owner of the method this MethodWrapper represents.
      */
-    public ClassWrapper owner;
+    public final ClassWrapper owner;
 
     /**
      * Original method name;
      */
-    public String originalName;
+    public final String originalName;
 
     /**
      * Original method description.
      */
-    public String originalDescription;
+    public final String originalDescription;
 
     /**
      * Creates a MethodWrapper object.

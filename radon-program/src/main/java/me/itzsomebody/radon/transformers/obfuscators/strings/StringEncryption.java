@@ -35,11 +35,9 @@ public abstract class StringEncryption extends Transformer {
     }
 
     protected boolean excludedString(String str) {
-        for (String s : this.setup.getExemptedStrings()) {
-            if (str.contains(s)) {
+        for (String s : this.setup.getExemptedStrings())
+            if (str.contains(s))
                 return true;
-            }
-        }
 
         return false;
     }
@@ -55,18 +53,14 @@ public abstract class StringEncryption extends Transformer {
 
     public static StringEncryption getTransformerFromString(String s, StringEncryptionSetup setup) {
         switch (s.toLowerCase()) {
-            case "light": {
+            case "light":
                 return new LightStringEncryption(setup);
-            }
-            case "normal": {
+            case "normal":
                 return new NormalStringEncryption(setup);
-            }
-            case "heavy": {
+            case "heavy":
                 return new HeavyStringEncryption(setup);
-            }
-            default: {
+            default:
                 throw new IllegalConfigurationValueException("Did not expect " + s + " as a string obfuscation mode");
-            }
         }
     }
 }

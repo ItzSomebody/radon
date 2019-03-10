@@ -20,7 +20,7 @@ package me.itzsomebody.radon.transformers.obfuscators.strings;
 import java.util.concurrent.atomic.AtomicInteger;
 import me.itzsomebody.radon.asm.ClassWrapper;
 import me.itzsomebody.radon.utils.BytecodeUtils;
-import me.itzsomebody.radon.utils.LoggerUtils;
+import me.itzsomebody.radon.Logger;
 import me.itzsomebody.radon.utils.RandomUtils;
 import me.itzsomebody.radon.utils.StringUtils;
 import org.objectweb.asm.FieldVisitor;
@@ -55,9 +55,9 @@ public class NormalStringEncryption extends StringEncryption {
             int leeway = getSizeLeeway(methodNode);
 
             for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
-                if (leeway < 10000) {
+                if (leeway < 10000)
                     break;
-                }
+
                 if (insn instanceof LdcInsnNode) {
                     LdcInsnNode ldc = (LdcInsnNode) insn;
                     if (ldc.cst instanceof String) {
@@ -83,7 +83,7 @@ public class NormalStringEncryption extends StringEncryption {
         ClassNode decryptor = createDecryptor(memberNames);
         getClasses().put(decryptor.name, new ClassWrapper(decryptor, false));
 
-        LoggerUtils.stdOut(String.format("Encrypted %d strings.", counter.get()));
+        Logger.stdOut(String.format("Encrypted %d strings.", counter.get()));
     }
 
     @Override
@@ -98,38 +98,30 @@ public class NormalStringEncryption extends StringEncryption {
 
         for (int i = 0; i < chars.length; i++) {
             switch (i % 8) {
-                case 0: {
+                case 0:
                     sb.append((char) (chars[i] ^ callerClassNameHC ^ extraKey));
                     break;
-                }
-                case 1: {
+                case 1:
                     sb.append((char) (chars[i] ^ "<clinit>".hashCode() ^ callerMethodNameHC));
                     break;
-                }
-                case 2: {
+                case 2:
                     sb.append((char) (chars[i] ^ decryptorClassHC ^ callerClassNameHC));
                     break;
-                }
-                case 3: {
+                case 3:
                     sb.append((char) (chars[i] ^ extraKey ^ "<clinit>".hashCode()));
                     break;
-                }
-                case 4: {
+                case 4:
                     sb.append((char) (chars[i] ^ callerMethodNameHC ^ decryptorClassHC));
                     break;
-                }
-                case 5: {
+                case 5:
                     sb.append((char) (chars[i] ^ callerClassNameHC ^ "<clinit>".hashCode()));
                     break;
-                }
-                case 6: {
+                case 6:
                     sb.append((char) (chars[i] ^ callerMethodNameHC ^ callerClassNameHC));
                     break;
-                }
-                case 7: {
+                case 7:
                     sb.append((char) (chars[i] ^ extraKey ^ callerMethodNameHC));
                     break;
-                }
             }
         }
 

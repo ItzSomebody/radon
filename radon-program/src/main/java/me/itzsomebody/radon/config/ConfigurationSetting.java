@@ -22,7 +22,7 @@ package me.itzsomebody.radon.config;
  *
  * @author ItzSomebody
  */
-public enum ConfigurationSettings {
+public enum ConfigurationSetting {
     INPUT("Input"),
     OUTPUT("Output"),
     LIBRARIES("Libraries"),
@@ -46,9 +46,9 @@ public enum ConfigurationSettings {
     DICTIONARY("Dictionary"),
     TRASH_CLASSES("TrashClasses");
 
-    private String value;
+    private final String value;
 
-    ConfigurationSettings(String value) {
+    ConfigurationSetting(String value) {
         this.value = value;
     }
 

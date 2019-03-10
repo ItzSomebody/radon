@@ -26,15 +26,14 @@ import java.util.Collection;
  * @author ItzSomebody
  */
 public class StringUtils {
-    private static char ALPHA_NUM[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".toCharArray();
-    private static char ALPHA[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".toCharArray();
+    private final static char[] ALPHA_NUM = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".toCharArray();
+    private final static char[] ALPHA = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".toCharArray();
 
     public static String randomSpacesString(int length) {
         StringBuilder sb = new StringBuilder();
 
-        for (int i = 0; i < length; i++) {
+        for (int i = 0; i < length; i++)
             sb.append((char) (RandomUtils.getRandomIntNoOrigin(16) + '\u2000'));
-        }
 
         return sb.toString();
     }
@@ -42,9 +41,8 @@ public class StringUtils {
     public static String randomUnrecognizedString(int length) {
         StringBuilder sb = new StringBuilder();
 
-        for (int i = 0; i < length; i++) {
+        for (int i = 0; i < length; i++)
             sb.append((char) (RandomUtils.getRandomIntNoOrigin(8) + '\ua6ac'));
-        }
 
         return sb.toString();
     }
@@ -52,9 +50,8 @@ public class StringUtils {
     public static String randomAlphaString(int length) {
         StringBuilder sb = new StringBuilder();
 
-        for (int i = 0; i < length; i++) {
+        for (int i = 0; i < length; i++)
             sb.append(ALPHA[RandomUtils.getRandomIntNoOrigin(ALPHA.length)]);
-        }
 
         return sb.toString();
     }
@@ -62,9 +59,8 @@ public class StringUtils {
     public static String randomAlphaNumericString(int length) {
         StringBuilder sb = new StringBuilder();
 
-        for (int i = 0; i < length; i++) {
+        for (int i = 0; i < length; i++)
             sb.append(ALPHA_NUM[RandomUtils.getRandomIntNoOrigin(ALPHA_NUM.length)]);
-        }
 
         return sb.toString();
     }
@@ -74,6 +70,6 @@ public class StringUtils {
         String first = list.get(RandomUtils.getRandomIntNoOrigin(classNames.size()));
         String second = list.get(RandomUtils.getRandomIntNoOrigin(classNames.size()));
 
-        return first + '$' + second.substring(second.lastIndexOf("/") + 1, second.length());
+        return first + '$' + second.substring(second.lastIndexOf("/") + 1);
     }
 }

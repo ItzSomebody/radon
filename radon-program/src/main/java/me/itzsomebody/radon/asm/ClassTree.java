@@ -29,17 +29,17 @@ public class ClassTree {
     /**
      * Attached ClassWrapper.
      */
-    public ClassWrapper classWrapper;
+    public final ClassWrapper classWrapper;
 
     /**
      * Names of classes this represented class inherits from.
      */
-    public Set<String> parentClasses = new HashSet<>();
+    public final Set<String> parentClasses = new HashSet<>();
 
     /**
      * Names of classes this represented class is inherited by.
      */
-    public Set<String> subClasses = new HashSet<>();
+    public final Set<String> subClasses = new HashSet<>();
 
     /**
      * Creates a ClassTree object.

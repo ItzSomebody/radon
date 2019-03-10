@@ -17,14 +17,14 @@
 
 package me.itzsomebody.radon.cli;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import me.itzsomebody.radon.exceptions.CLIException;
+import me.itzsomebody.radon.exceptions.RadonException;
 
 public class CommandArgumentsParser {
-    private static final List<CommandSwitchStatement> commandSwitches = new LinkedList<>();
+    private static final List<CommandSwitchStatement> commandSwitches = new ArrayList<>();
     private final Map<String, String[]> argMap;
 
     public CommandArgumentsParser(String[] args) {
@@ -39,7 +39,7 @@ public class CommandArgumentsParser {
             else if (arg.startsWith("/"))
                 arg = arg.substring("/".length());
             else
-                throw new CLIException("Unexpected command argument: " + arg);
+                throw new RadonException("Unexpected command argument: " + arg);
 
             boolean knownSwitch = false;
             for (CommandSwitchStatement cmdSwitch : commandSwitches) {
@@ -50,9 +50,9 @@ public class CommandArgumentsParser {
                         try {
                             argsArr[j] = args[++i];
                         } catch (ArrayIndexOutOfBoundsException e) {
-                            throw new CLIException("Command switch \"" + arg + "\" expected "
-                                    + cmdSwitch.getnArgs() + ' ' + ((cmdSwitch.getnArgs() == 1) ? "argument" : "arguments")
-                                    + ", got " + j + " instead.");
+                            throw new RadonException(String.format("Command switch \"%s\" expected %d %s, got %d instead.",
+                                    arg, cmdSwitch.getnArgs(), (cmdSwitch.getnArgs() == 1) ? "argument" : "arguments",
+                                    j));
                         }
                     }
 
@@ -63,7 +63,7 @@ public class CommandArgumentsParser {
             }
 
             if (!knownSwitch)
-                throw new CLIException("Unknown command switch: \"" + arg + "\"");
+                throw new RadonException("Unknown command switch: \"" + arg + "\"");
         }
     }
 

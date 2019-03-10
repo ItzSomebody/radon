@@ -25,13 +25,14 @@ import java.util.zip.ZipFile;
 import me.itzsomebody.radon.cli.CommandArgumentsParser;
 import me.itzsomebody.radon.config.ConfigurationParser;
 import me.itzsomebody.radon.utils.IOUtils;
-import me.itzsomebody.radon.utils.LoggerUtils;
 import me.itzsomebody.radon.utils.WatermarkUtils;
 
 /**
  * Main class of obfuscator. \o/
  * TODO: Renamer transformer should correct strings used for reflection. (i.e. Class.forName("me.itzsomebody.Thing"))
- * TODO: Cleanup randomly scattered exception types by merging certain exception classes.
+ * TODO: Remove the "light, medium & heavy" garbage by allowing for individual compenent enabling.
+ * TODO: Clean code up in general.
+ * TODO: Remove debug obfuscation - it's pointless and you might as well just remove the info.
  *
  * @author ItzSomebody
  */
@@ -61,8 +62,8 @@ public class Main {
      */
     public static void main(String[] args) {
         System.out.println(RADON_ASCII_ART);
-        LoggerUtils.stdOut("Version: " + VERSION);
-        LoggerUtils.stdOut("Contributors: " + CONTRIBUTORS + "\n");
+        Logger.stdOut("Version: " + VERSION);
+        Logger.stdOut("Contributors: " + CONTRIBUTORS + "\n");
 
         CommandArgumentsParser.registerCommandSwitch("help", 0);
         CommandArgumentsParser.registerCommandSwitch("license", 0);
@@ -80,7 +81,7 @@ public class Main {
             try {
                 config = new ConfigurationParser(new FileInputStream(file));
             } catch (FileNotFoundException exc) {
-                LoggerUtils.stdErr(String.format("Configuration \"%s\" file not found", file.getName()));
+                Logger.stdErr(String.format("Configuration \"%s\" file not found", file.getName()));
                 return;
             }
 
@@ -90,13 +91,13 @@ public class Main {
             String[] switchArgs = parser.getSwitchArgs("extract");
             File leaked = new File(switchArgs[0]);
             if (!leaked.exists()) {
-                LoggerUtils.stdErr("Input file not found");
+                Logger.stdErr("Input file not found");
                 return;
             }
 
             try {
                 List<String> ids = WatermarkUtils.extractIds(new ZipFile(leaked), switchArgs[1]);
-                ids.forEach(LoggerUtils::stdOut);
+                ids.forEach(Logger::stdOut);
             } catch (Throwable t) {
                 t.printStackTrace();
             }
@@ -104,7 +105,7 @@ public class Main {
             showHelpMenu();
         }
 
-        LoggerUtils.dumpLog();
+        Logger.dumpLog();
     }
 
     private static String getProgramName() {
@@ -116,10 +117,10 @@ public class Main {
      */
     private static void showHelpMenu() {
         String name = getProgramName();
-        LoggerUtils.stdOut(String.format("CLI Usage:\t\t\tjava -jar %s --config example.config", name));
-        LoggerUtils.stdOut(String.format("Help Menu:\t\t\tjava -jar %s --help", name));
-        LoggerUtils.stdOut(String.format("License:\t\t\tjava -jar %s --license", name));
-        LoggerUtils.stdOut(String.format("Watermark Extraction:\tjava -jar %s --extract Input.jar exampleKey", name));
+        Logger.stdOut(String.format("CLI Usage:\t\t\tjava -jar %s --config example.config", name));
+        Logger.stdOut(String.format("Help Menu:\t\t\tjava -jar %s --help", name));
+        Logger.stdOut(String.format("License:\t\t\tjava -jar %s --license", name));
+        Logger.stdOut(String.format("Watermark Extraction:\tjava -jar %s --extract Input.jar exampleKey", name));
     }
 
     private static void showLicense() {

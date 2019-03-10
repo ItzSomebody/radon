@@ -32,6 +32,7 @@ import me.itzsomebody.radon.SessionInfo;
 import me.itzsomebody.radon.config.ConfigurationParser;
 import me.itzsomebody.radon.config.ConfigurationWriter;
 import me.itzsomebody.radon.exceptions.ConfigurationParseException;
+import me.itzsomebody.radon.exceptions.RadonException;
 import me.itzsomebody.radon.gui.tabs.ConsoleTab;
 import me.itzsomebody.radon.gui.tabs.ExclusionsTab;
 import me.itzsomebody.radon.gui.tabs.InputOutputTab;
@@ -41,7 +42,7 @@ import me.itzsomebody.radon.gui.tabs.OptimizationTab;
 import me.itzsomebody.radon.gui.tabs.ShrinkingTab;
 import me.itzsomebody.radon.gui.tabs.WatermarkingTab;
 import me.itzsomebody.radon.transformers.Transformer;
-import me.itzsomebody.radon.utils.LoggerUtils;
+import me.itzsomebody.radon.Logger;
 
 class RadonGUI extends JFrame {
     RadonGUI() {
@@ -98,7 +99,7 @@ class RadonGUI extends JFrame {
                             inputStream = new FileInputStream(chooser.getSelectedFile());
                         } catch (FileNotFoundException exception) {
                             exception.printStackTrace();
-                            throw new ConfigurationParseException("Could not find configuration file");
+                            throw new RadonException("Could not find configuration file");
                         }
 
                         SessionInfo info = new ConfigurationParser(inputStream).createSessionFromConfig();
@@ -215,7 +216,7 @@ class RadonGUI extends JFrame {
                         Radon radon = new Radon(sessionInfo);
                         radon.run();
 
-                        LoggerUtils.dumpLog();
+                        Logger.dumpLog();
 
                         JOptionPane.showMessageDialog(null, "Processed successfully.", "Done", JOptionPane.INFORMATION_MESSAGE);
                     } catch (Throwable t) {

@@ -21,6 +21,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * Used to generate various randoms.
+ * TODO: rewrite this absolute garbage.
  *
  * @author ItzSomebody
  * @author freeasbird

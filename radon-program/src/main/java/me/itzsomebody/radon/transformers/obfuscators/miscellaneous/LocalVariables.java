@@ -20,7 +20,7 @@ package me.itzsomebody.radon.transformers.obfuscators.miscellaneous;
 import java.util.concurrent.atomic.AtomicInteger;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
-import me.itzsomebody.radon.utils.LoggerUtils;
+import me.itzsomebody.radon.Logger;
 
 /**
  * Obfuscates local variable names by changing their names and descriptions, or removing them entirely.
@@ -47,18 +47,16 @@ public class LocalVariables extends Transformer {
                         methodNode.localVariables != null).forEach(methodNode -> {
                     counter.addAndGet(methodNode.localVariables.size());
 
-                    if (remove) {
+                    if (remove)
                         methodNode.localVariables = null;
-                    } else {
+                    else
                         methodNode.localVariables.forEach(localVariableNode -> {
                             localVariableNode.name = randomString(4);
                             localVariableNode.desc = "L" + localVariableNode.name + ";";
                         });
-                    }
-                })
-        );
+                }));
 
-        LoggerUtils.stdOut(String.format("%s %d local variables.", (remove) ? "Removed" : "Obfuscated", counter.get()));
+        Logger.stdOut(String.format("%s %d local variables.", (remove) ? "Removed" : "Obfuscated", counter.get()));
     }
 
     @Override

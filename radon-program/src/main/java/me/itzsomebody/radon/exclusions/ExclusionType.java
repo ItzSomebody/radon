@@ -43,7 +43,7 @@ public enum ExclusionType {
     STRING_POOL("StringPool"),
     RENAMER("Renamer");
 
-    private String value;
+    private final String value;
 
     ExclusionType(String value) {
         this.value = value;

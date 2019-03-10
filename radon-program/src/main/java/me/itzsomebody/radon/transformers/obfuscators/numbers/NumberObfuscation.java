@@ -33,18 +33,14 @@ public abstract class NumberObfuscation extends Transformer {
 
     public static NumberObfuscation getTransformerFromString(String s) {
         switch (s.toLowerCase()) {
-            case "light": {
+            case "light":
                 return new LightNumberObfuscation();
-            }
-            case "normal": {
+            case "normal":
                 return new NormalNumberObfuscation();
-            }
-            case "heavy": {
+            case "heavy":
                 return new HeavyNumberObfuscation();
-            }
-            default: {
+            default:
                 throw new RuntimeException("Did not expect " + s + " as a number obfuscation mode");
-            }
         }
     }
 }

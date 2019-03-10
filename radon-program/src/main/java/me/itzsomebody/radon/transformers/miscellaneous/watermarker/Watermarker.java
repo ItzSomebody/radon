@@ -17,13 +17,14 @@
 
 package me.itzsomebody.radon.transformers.miscellaneous.watermarker;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Stack;
+import java.util.Deque;
 import me.itzsomebody.radon.asm.ClassWrapper;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
 import me.itzsomebody.radon.utils.BytecodeUtils;
-import me.itzsomebody.radon.utils.LoggerUtils;
+import me.itzsomebody.radon.Logger;
 import me.itzsomebody.radon.utils.RandomUtils;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.MethodNode;
@@ -35,7 +36,7 @@ import org.objectweb.asm.tree.VarInsnNode;
  * @author ItzSomebody.
  */
 public class Watermarker extends Transformer {
-    private WatermarkerSetup setup;
+    private final WatermarkerSetup setup;
 
     public Watermarker(WatermarkerSetup setup) {
         this.setup = setup;
@@ -46,7 +47,7 @@ public class Watermarker extends Transformer {
         ArrayList<ClassWrapper> classWrappers = new ArrayList<>(this.getClassWrappers());
 
         for (int i = 0; i < 3; i++) { // Two extra injections helps with reliability of watermark to be extracted
-            Stack<Character> watermark = cipheredWatermark();
+            Deque<Character> watermark = cipheredWatermark();
             while (!watermark.isEmpty()) {
                 ClassWrapper classWrapper;
                 int counter = 0;
@@ -68,10 +69,10 @@ public class Watermarker extends Transformer {
             }
         }
 
-        LoggerUtils.stdOut("Successfully embedded watermark.");
+        Logger.stdOut("Successfully embedded watermark.");
     }
 
-    private static InsnList createInstructions(Stack<Character> watermark, MethodNode methodNode) {
+    private static InsnList createInstructions(Deque<Character> watermark, MethodNode methodNode) {
         int offset = methodNode.maxLocals;
         int xorKey = RandomUtils.getRandomInt();
         int watermarkChar = watermark.pop() ^ xorKey;
@@ -94,10 +95,10 @@ public class Watermarker extends Transformer {
     }
 
     // Really weak cipher, lul.
-    private Stack<Character> cipheredWatermark() {
+    private Deque<Character> cipheredWatermark() {
         char[] messageChars = setup.getMessage().toCharArray();
         char[] keyChars = setup.getKey().toCharArray();
-        Stack<Character> returnThis = new Stack<>();
+        Deque<Character> returnThis = new ArrayDeque<>();
 
         for (int i = 0; i < messageChars.length; i++) {
             returnThis.push((char) (messageChars[i] ^ keyChars[i % keyChars.length]));

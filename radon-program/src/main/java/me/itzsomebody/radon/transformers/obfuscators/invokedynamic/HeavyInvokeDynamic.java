@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import me.itzsomebody.radon.asm.ClassWrapper;
 import me.itzsomebody.radon.asm.FieldWrapper;
 import me.itzsomebody.radon.exceptions.MissingClassException;
-import me.itzsomebody.radon.utils.LoggerUtils;
+import me.itzsomebody.radon.Logger;
 import me.itzsomebody.radon.utils.StringUtils;
 import org.objectweb.asm.Handle;
 import org.objectweb.asm.Label;
@@ -49,12 +49,12 @@ public class HeavyInvokeDynamic extends InvokeDynamic {
         MemberNames memberNames = new MemberNames();
         Handle bsmHandle = new Handle(H_INVOKESTATIC, memberNames.className, memberNames.bootstrapMethodName,
                 "(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", false);
-        this.getClassWrappers().parallelStream().filter(classWrapper ->
+        this.getClassWrappers().stream().filter(classWrapper ->
                 !"java/lang/Enum".equals(classWrapper.classNode.superName) && !excluded(classWrapper)
                         && classWrapper.classNode.version >= V1_7).forEach(classWrapper -> {
             ClassNode classNode = classWrapper.classNode;
 
-            classWrapper.methods.parallelStream().filter(methodWrapper -> !excluded(methodWrapper)
+            classWrapper.methods.stream().filter(methodWrapper -> !excluded(methodWrapper)
                     && hasInstructions(methodWrapper.methodNode)).forEach(methodWrapper -> {
                 MethodNode methodNode = methodWrapper.methodNode;
 
@@ -69,9 +69,9 @@ public class HeavyInvokeDynamic extends InvokeDynamic {
                             Type[] args = Type.getArgumentTypes(newSig);
                             for (int i = 0; i < args.length; i++) {
                                 Type arg = args[i];
-                                if (arg.getSort() == Type.OBJECT) {
+
+                                if (arg.getSort() == Type.OBJECT)
                                     args[i] = Type.getType("Ljava/lang/Object;");
-                                }
                             }
                             newSig = Type.getMethodDescriptor(returnType, args);
                             StringBuilder sb = new StringBuilder();
@@ -80,22 +80,17 @@ public class HeavyInvokeDynamic extends InvokeDynamic {
 
                             switch (insn.getOpcode()) {
                                 case INVOKEINTERFACE:
-                                case INVOKEVIRTUAL: {
+                                case INVOKEVIRTUAL:
                                     sb.append("1<>").append(methodInsnNode.desc);
                                     break;
-                                }
-                                case INVOKESPECIAL: {
+                                case INVOKESPECIAL:
                                     sb.append("2<>").append(methodInsnNode.desc).append("<>").append(classNode.name
                                             .replace("/", "."));
                                     break;
-                                }
-                                case INVOKESTATIC: {
+                                case INVOKESTATIC:
                                     sb.append("0<>").append(methodInsnNode.desc);
+                                default:
                                     break;
-                                }
-                                default: {
-                                    break;
-                                }
                             }
 
                             InvokeDynamicInsnNode indy = new InvokeDynamicInsnNode(
@@ -105,26 +100,26 @@ public class HeavyInvokeDynamic extends InvokeDynamic {
                             );
 
                             methodNode.instructions.set(insn, indy);
-                            if (returnType.getSort() == Type.ARRAY) {
+                            if (returnType.getSort() == Type.ARRAY)
                                 methodNode.instructions.insert(indy, new TypeInsnNode(CHECKCAST,
                                         returnType.getInternalName()));
-                            }
+
                             counter.incrementAndGet();
                         }
                     } else if (insn instanceof FieldInsnNode && !"<init>".equals(methodNode.name)) {
                         FieldInsnNode fieldInsnNode = (FieldInsnNode) insn;
 
                         ClassWrapper cw = getClassPath().get(fieldInsnNode.owner);
-                        if (cw == null) {
+                        if (cw == null)
                             throw new MissingClassException(fieldInsnNode.owner + " does not exist in classpath");
-                        }
+
                         FieldWrapper fw = cw.fields.stream().filter(fieldWrapper ->
                                 fieldWrapper.fieldNode.name.equals(fieldInsnNode.name)
                                         && fieldWrapper.fieldNode.desc.equals(fieldInsnNode.desc)).findFirst()
                                 .orElse(null);
-                        if (fw != null && Modifier.isFinal(fw.fieldNode.access)) {
+                        if (fw != null && Modifier.isFinal(fw.fieldNode.access))
                             continue;
-                        }
+
 
                         boolean isStatic = (fieldInsnNode.getOpcode() == GETSTATIC
                                 || fieldInsnNode.getOpcode() == PUTSTATIC);
@@ -139,25 +134,19 @@ public class HeavyInvokeDynamic extends InvokeDynamic {
                                 .append("<>");
 
                         switch (insn.getOpcode()) {
-                            case GETSTATIC: {
+                            case GETSTATIC:
                                 sb.append("3");
                                 break;
-                            }
-                            case GETFIELD: {
+                            case GETFIELD:
                                 sb.append("4");
                                 break;
-                            }
-                            case PUTSTATIC: {
+                            case PUTSTATIC:
                                 sb.append("5");
                                 break;
-                            }
-                            case PUTFIELD: {
+                            case PUTFIELD:
                                 sb.append("6");
+                            default:
                                 break;
-                            }
-                            default: {
-                                break;
-                            }
                         }
 
                         InvokeDynamicInsnNode indy = new InvokeDynamicInsnNode(
@@ -175,7 +164,7 @@ public class HeavyInvokeDynamic extends InvokeDynamic {
 
         ClassNode decryptor = createBootstrap(memberNames);
         this.getClasses().put(decryptor.name, new ClassWrapper(decryptor, false));
-        LoggerUtils.stdOut(String.format("Hid %d field and/or method accesses with invokedynamics.", counter.get()));
+        Logger.stdOut(String.format("Hid %d field and/or method accesses with invokedynamics.", counter.get()));
     }
 
     @Override
@@ -188,22 +177,19 @@ public class HeavyInvokeDynamic extends InvokeDynamic {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < chars.length; i++) {
             switch (i % 4) {
-                case 0: {
+                case 0:
                     sb.append((char) (chars[i] ^ memberNames.className.replace("/", ".").hashCode()));
                     break;
-                }
-                case 1: {
+                case 1:
                     sb.append((char) (chars[i] ^ memberNames.bootstrapMethodName.hashCode()));
                     break;
-                }
-                case 2: {
+                case 2:
                     sb.append((char) (chars[i] ^ memberNames.className.replace("/", ".").hashCode()));
                     break;
-                }
-                case 3: {
+
+                case 3:
                     sb.append((char) (chars[i] ^ memberNames.decryptorMethodName.hashCode()));
                     break;
-                }
             }
         }
 

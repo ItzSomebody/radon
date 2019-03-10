@@ -25,10 +25,6 @@ import org.objectweb.asm.Opcodes;
  * @author ItzSomebody
  */
 public class AccessUtils {
-    public static boolean isAbstract(int access) {
-        return (Opcodes.ACC_ABSTRACT & access) != 0;
-    }
-
     public static boolean isNative(int access) {
         return (Opcodes.ACC_NATIVE & access) != 0;
     }

@@ -25,6 +25,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 import me.itzsomebody.radon.asm.ClassTree;
@@ -36,7 +37,7 @@ import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
 import me.itzsomebody.radon.utils.AccessUtils;
 import me.itzsomebody.radon.utils.IOUtils;
-import me.itzsomebody.radon.utils.LoggerUtils;
+import me.itzsomebody.radon.Logger;
 import org.objectweb.asm.commons.ClassRemapper;
 import org.objectweb.asm.commons.Remapper;
 import org.objectweb.asm.tree.ClassNode;
@@ -51,7 +52,7 @@ import org.objectweb.asm.tree.MethodNode;
  */
 public class Renamer extends Transformer {
     private RenamerSetup setup;
-    private HashMap<String, String> mappings = new HashMap<>();
+    private Map<String, String> mappings = new HashMap<>();
 
     public Renamer(RenamerSetup setup) {
         this.setup = setup;
@@ -59,22 +60,20 @@ public class Renamer extends Transformer {
 
     @Override
     public void transform() {
-        LoggerUtils.stdOut("Generating mappings.");
+        Logger.stdOut("Generating mappings.");
         long current = System.currentTimeMillis();
         AtomicInteger classCounter = new AtomicInteger();
         this.getClassWrappers().forEach(classWrapper -> {
             classWrapper.methods.stream().filter(methodWrapper -> !AccessUtils.isNative(methodWrapper.methodNode.access)
                     && !"main".equals(methodWrapper.methodNode.name) && !"premain".equals(methodWrapper.methodNode.name)
                     && !methodWrapper.methodNode.name.startsWith("<")).forEach(methodWrapper -> {
-                if (canRenameMethodTree(new HashSet<>(), methodWrapper, classWrapper.originalName)) {
+                if (canRenameMethodTree(new HashSet<>(), methodWrapper, classWrapper.originalName))
                     this.renameMethodTree(new HashSet<>(), methodWrapper, classWrapper.originalName, randomString(4));
-                }
             });
 
             classWrapper.fields.forEach(fieldWrapper -> {
-                if (canRenameFieldTree(new HashSet<>(), fieldWrapper, classWrapper.originalName)) {
+                if (canRenameFieldTree(new HashSet<>(), fieldWrapper, classWrapper.originalName))
                     this.renameFieldTree(new HashSet<>(), fieldWrapper, classWrapper.originalName, randomString(4));
-                }
             });
 
             if (!this.excluded(classWrapper)) {
@@ -83,8 +82,8 @@ public class Renamer extends Transformer {
                 classCounter.incrementAndGet();
             }
         });
-        LoggerUtils.stdOut(String.format("Finished generated mappings. [%dms]", tookThisLong(current)));
-        LoggerUtils.stdOut("Applying mappings.");
+        Logger.stdOut(String.format("Finished generated mappings. [%dms]", tookThisLong(current)));
+        Logger.stdOut("Applying mappings.");
         current = System.currentTimeMillis();
 
         // Apply mapping
@@ -113,11 +112,9 @@ public class Renamer extends Transformer {
                 }*/
             }
 
-            if (copy.fields != null) {
-                for (int i = 0; i < copy.fields.size(); i++) {
+            if (copy.fields != null)
+                for (int i = 0; i < copy.fields.size(); i++)
                     classWrapper.fields.get(i).fieldNode = copy.fields.get(i);
-                }
-            }
 
             classWrapper.classNode = copy;
             this.getClasses().remove(classWrapper.originalName);
@@ -125,11 +122,11 @@ public class Renamer extends Transformer {
             this.getClassPath().put(classWrapper.classNode.name, classWrapper);
         }
 
-        LoggerUtils.stdOut(String.format("Mapped %d members. [%dms]", mappings.size(), tookThisLong(current)));
+        Logger.stdOut(String.format("Mapped %d members. [%dms]", mappings.size(), tookThisLong(current)));
         current = System.currentTimeMillis();
 
         // Fix screw ups in resources.
-        LoggerUtils.stdOut("Attempting to map class names in resources");
+        Logger.stdOut("Attempting to map class names in resources");
         AtomicInteger fixed = new AtomicInteger();
         getResources().forEach((name, byteArray) -> {
             if (setup.getAdaptTheseResources() != null) {
@@ -145,12 +142,11 @@ public class Renamer extends Transformer {
                                 // manifest.
                                 // Example: name == Main
                                 if ("META-INF/MANIFEST.MF".equals(name) || "plugin.yml".equals(name)
-                                        || "bungee.yml".equals(name)) {
+                                        || "bungee.yml".equals(name))
                                     stringVer = stringVer.replaceAll("(?<=[: ])"
                                             + original, mappings.get(mapping).replace("/", "."));
-                                } else {
+                                else
                                     stringVer = stringVer.replace(original, mappings.get(mapping).replace("/", "."));
-                                }
                             }
                         }
 
@@ -160,7 +156,7 @@ public class Renamer extends Transformer {
                 }
             }
         });
-        LoggerUtils.stdOut(String.format("Mapped %d names in resources. [%dms]", fixed.get(), tookThisLong(current)));
+        Logger.stdOut(String.format("Mapped %d names in resources. [%dms]", fixed.get(), tookThisLong(current)));
         dumpMappings();
     }
 
@@ -168,27 +164,21 @@ public class Renamer extends Transformer {
         ClassTree tree = this.radon.getTree(owner);
         if (!visited.contains(tree)) {
             visited.add(tree);
+
             if (excluded(owner + '.' + methodWrapper.originalName + methodWrapper.originalDescription)
                     || mappings.containsKey(owner + '.' + methodWrapper.originalName + methodWrapper.originalDescription))
                 return false;
-            if (!methodWrapper.owner.originalName.equals(owner) && tree.classWrapper.libraryNode) {
-                for (MethodNode mn : tree.classWrapper.classNode.methods) {
+            if (!methodWrapper.owner.originalName.equals(owner) && tree.classWrapper.libraryNode)
+                for (MethodNode mn : tree.classWrapper.classNode.methods)
                     if (mn.name.equals(methodWrapper.originalName)
-                            & mn.desc.equals(methodWrapper.originalDescription)) {
+                            & mn.desc.equals(methodWrapper.originalDescription))
                         return false;
-                    }
-                }
-            }
-            for (String parent : tree.parentClasses) {
-                if (parent != null && !canRenameMethodTree(visited, methodWrapper, parent)) {
+            for (String parent : tree.parentClasses)
+                if (parent != null && !canRenameMethodTree(visited, methodWrapper, parent))
                     return false;
-                }
-            }
-            for (String sub : tree.subClasses) {
-                if (sub != null && !canRenameMethodTree(visited, methodWrapper, sub)) {
+            for (String sub : tree.subClasses)
+                if (sub != null && !canRenameMethodTree(visited, methodWrapper, sub))
                     return false;
-                }
-            }
         }
 
         return true;
@@ -201,12 +191,9 @@ public class Renamer extends Transformer {
         if (!tree.classWrapper.libraryNode && !visited.contains(tree)) {
             mappings.put(className + '.' + MethodWrapper.originalName + MethodWrapper.originalDescription, newName);
             visited.add(tree);
-            for (String parentClass : tree.parentClasses) {
-                this.renameMethodTree(visited, MethodWrapper, parentClass, newName);
-            }
-            for (String subClass : tree.subClasses) {
-                this.renameMethodTree(visited, MethodWrapper, subClass, newName);
-            }
+
+            tree.parentClasses.forEach(parentClass -> renameMethodTree(visited, MethodWrapper, parentClass, newName));
+            tree.subClasses.forEach(subClass -> renameMethodTree(visited, MethodWrapper, subClass, newName));
         }
     }
 
@@ -217,23 +204,16 @@ public class Renamer extends Transformer {
             if (excluded(owner + '.' + fieldWrapper.originalName + '.' + fieldWrapper.originalDescription)
                     || mappings.containsKey(owner + '.' + fieldWrapper.originalName + '.' + fieldWrapper.originalDescription))
                 return false;
-            if (!fieldWrapper.owner.originalName.equals(owner) && tree.classWrapper.libraryNode) {
-                for (FieldNode fn : tree.classWrapper.classNode.fields) {
-                    if (fieldWrapper.originalName.equals(fn.name) && fieldWrapper.originalDescription.equals(fn.desc)) {
+            if (!fieldWrapper.owner.originalName.equals(owner) && tree.classWrapper.libraryNode)
+                for (FieldNode fn : tree.classWrapper.classNode.fields)
+                    if (fieldWrapper.originalName.equals(fn.name) && fieldWrapper.originalDescription.equals(fn.desc))
                         return false;
-                    }
-                }
-            }
-            for (String parent : tree.parentClasses) {
-                if (parent != null && !canRenameFieldTree(visited, fieldWrapper, parent)) {
+            for (String parent : tree.parentClasses)
+                if (parent != null && !canRenameFieldTree(visited, fieldWrapper, parent))
                     return false;
-                }
-            }
-            for (String sub : tree.subClasses) {
-                if (sub != null && !canRenameFieldTree(visited, fieldWrapper, sub)) {
+            for (String sub : tree.subClasses)
+                if (sub != null && !canRenameFieldTree(visited, fieldWrapper, sub))
                     return false;
-                }
-            }
         }
 
         return true;
@@ -245,22 +225,18 @@ public class Renamer extends Transformer {
         if (!tree.classWrapper.libraryNode && !visited.contains(tree)) {
             mappings.put(owner + '.' + fieldWrapper.originalName + '.' + fieldWrapper.originalDescription, newName);
             visited.add(tree);
-            for (String parentClass : tree.parentClasses) {
-                this.renameFieldTree(visited, fieldWrapper, parentClass, newName);
-            }
-            for (String subClass : tree.subClasses) {
-                this.renameFieldTree(visited, fieldWrapper, subClass, newName);
-            }
+
+            tree.parentClasses.forEach(parentClass -> renameFieldTree(visited, fieldWrapper, parentClass, newName));
+            tree.subClasses.forEach(subClass -> renameFieldTree(visited, fieldWrapper, subClass, newName));
         }
     }
 
     private void dumpMappings() {
         long current = System.currentTimeMillis();
-        LoggerUtils.stdOut("Dumping mappings.");
+        Logger.stdOut("Dumping mappings.");
         File file = new File("mappings.txt");
-        if (file.exists()) {
+        if (file.exists())
             IOUtils.renameExistingFile(file);
-        }
 
         try {
             file.createNewFile();
@@ -270,17 +246,17 @@ public class Renamer extends Transformer {
                 try {
                     bw.append(oldName).append(" -> ").append(newName).append('\n');
                 } catch (IOException ioe) {
-                    LoggerUtils.stdErr(String.format("Ran into an error trying to append \"%s -> %s\"", oldName,
+                    Logger.stdErr(String.format("Ran into an error trying to append \"%s -> %s\"", oldName,
                             newName));
                     ioe.printStackTrace();
                 }
             });
 
             bw.close();
-            LoggerUtils.stdOut(String.format("Finished dumping mappings at %s. [%dms]", file.getAbsolutePath(),
+            Logger.stdOut(String.format("Finished dumping mappings at %s. [%dms]", file.getAbsolutePath(),
                     tookThisLong(current)));
         } catch (Throwable t) {
-            LoggerUtils.stdErr("Ran into an error trying to create the mappings file.");
+            Logger.stdErr("Ran into an error trying to create the mappings file.");
             t.printStackTrace();
         }
     }

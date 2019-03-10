@@ -18,6 +18,7 @@
 package me.itzsomebody.radon.asm;
 
 import java.util.ArrayList;
+import java.util.List;
 import org.objectweb.asm.tree.ClassNode;
 
 /**
@@ -34,22 +35,22 @@ public class ClassWrapper {
     /**
      * Original name of ClassNode. Really useful when class got renamed.
      */
-    public String originalName;
+    public final String originalName;
 
     /**
      * Quick way of figuring out if this is represents library class or not.
      */
-    public boolean libraryNode;
+    public final boolean libraryNode;
 
     /**
      * Methods.
      */
-    public ArrayList<MethodWrapper> methods = new ArrayList<>();
+    public final List<MethodWrapper> methods = new ArrayList<>();
 
     /**
      * Fields.
      */
-    public ArrayList<FieldWrapper> fields = new ArrayList<>();
+    public final List<FieldWrapper> fields = new ArrayList<>();
 
     /**
      * Creates a ClassWrapper object.

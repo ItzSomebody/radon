@@ -19,7 +19,7 @@ package me.itzsomebody.radon.transformers.obfuscators.numbers;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import me.itzsomebody.radon.utils.BytecodeUtils;
-import me.itzsomebody.radon.utils.LoggerUtils;
+import me.itzsomebody.radon.Logger;
 import me.itzsomebody.radon.utils.RandomUtils;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.InsnList;
@@ -35,9 +35,9 @@ public class NormalNumberObfuscation extends NumberObfuscation {
     @Override
     public void transform() {
         AtomicInteger counter = new AtomicInteger();
-        this.getClassWrappers().parallelStream().filter(classWrapper ->
+        this.getClassWrappers().stream().filter(classWrapper ->
                 !excluded(classWrapper)).forEach(classWrapper ->
-                classWrapper.methods.parallelStream().filter(methodWrapper -> !excluded(methodWrapper)
+                classWrapper.methods.stream().filter(methodWrapper -> !excluded(methodWrapper)
                         && hasInstructions(methodWrapper.methodNode)).forEach(methodWrapper -> {
                     MethodNode methodNode = methodWrapper.methodNode;
                     int leeway = getSizeLeeway(methodNode);
@@ -171,7 +171,7 @@ public class NormalNumberObfuscation extends NumberObfuscation {
                     }
                 })
         );
-        LoggerUtils.stdOut(String.format("Split %d numbers into math instructions.", counter.get()));
+        Logger.stdOut(String.format("Split %d numbers into math instructions.", counter.get()));
     }
 
     @Override

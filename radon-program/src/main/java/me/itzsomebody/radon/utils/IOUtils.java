@@ -21,7 +21,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import me.itzsomebody.radon.exceptions.ByteArrayConversionException;
+import me.itzsomebody.radon.exceptions.RadonException;
 
 /**
  * IO utilities.
@@ -71,7 +71,7 @@ public class IOUtils {
             return out.toByteArray();
         } catch (IOException ioe) {
             ioe.printStackTrace();
-            throw new ByteArrayConversionException(ioe);
+            throw new RadonException(ioe);
         }
     }
 }

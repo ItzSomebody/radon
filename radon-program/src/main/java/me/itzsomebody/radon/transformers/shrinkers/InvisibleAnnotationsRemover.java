@@ -18,7 +18,7 @@
 package me.itzsomebody.radon.transformers.shrinkers;
 
 import java.util.concurrent.atomic.AtomicInteger;
-import me.itzsomebody.radon.utils.LoggerUtils;
+import me.itzsomebody.radon.Logger;
 import org.objectweb.asm.tree.ClassNode;
 
 /**
@@ -33,7 +33,7 @@ public class InvisibleAnnotationsRemover extends Shrinker {
         AtomicInteger methodAnnotations = new AtomicInteger();
         AtomicInteger fieldAnnotations = new AtomicInteger();
 
-        getClassWrappers().parallelStream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper -> {
+        getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper -> {
             ClassNode classNode = classWrapper.classNode;
 
             if (classNode.invisibleAnnotations != null) {
@@ -41,20 +41,20 @@ public class InvisibleAnnotationsRemover extends Shrinker {
                 classNode.invisibleAnnotations.clear();
             }
 
-            classWrapper.fields.parallelStream().filter(fieldWrapper -> !excluded(fieldWrapper)
+            classWrapper.fields.stream().filter(fieldWrapper -> !excluded(fieldWrapper)
                     && fieldWrapper.fieldNode.invisibleAnnotations != null).forEach(fieldWrapper -> {
                 fieldAnnotations.addAndGet(fieldWrapper.fieldNode.invisibleAnnotations.size());
                 fieldWrapper.fieldNode.invisibleAnnotations.clear();
             });
 
-            classWrapper.methods.parallelStream().filter(methodWrapper -> !excluded(methodWrapper)
+            classWrapper.methods.stream().filter(methodWrapper -> !excluded(methodWrapper)
                     && methodWrapper.methodNode.invisibleAnnotations != null).forEach(methodWrapper -> {
                 methodAnnotations.addAndGet(methodWrapper.methodNode.invisibleAnnotations.size());
                 methodWrapper.methodNode.invisibleAnnotations.clear();
             });
         });
 
-        LoggerUtils.stdOut(String.format("Removed %d class, %d method and %d field invisible annotations.",
+        Logger.stdOut(String.format("Removed %d class, %d method and %d field invisible annotations.",
                 classAnnotations.get(), methodAnnotations.get(), fieldAnnotations.get()));
     }
 

@@ -17,6 +17,7 @@
 
 package me.itzsomebody.radon.utils;
 
+import me.itzsomebody.radon.exceptions.RadonException;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
@@ -147,7 +148,7 @@ public class BytecodeUtils {
             return (Integer) ((LdcInsnNode) insn).cst;
         }
 
-        throw new IllegalArgumentException("Unexpected instruction");
+        throw new RadonException("Unexpected instruction");
     }
 
     public static long getLongFromInsn(AbstractInsnNode insn) {
@@ -160,7 +161,7 @@ public class BytecodeUtils {
             return (Long) ((LdcInsnNode) insn).cst;
         }
 
-        throw new IllegalArgumentException("Unexpected instruction");
+        throw new RadonException("Unexpected instruction");
     }
 
     public static float getFloatFromInsn(AbstractInsnNode insn) {
@@ -173,7 +174,7 @@ public class BytecodeUtils {
             return (Float) ((LdcInsnNode) insn).cst;
         }
 
-        throw new IllegalArgumentException("Unexpected instruction");
+        throw new RadonException("Unexpected instruction");
     }
 
     public static double getDoubleFromInsn(AbstractInsnNode insn) {
@@ -186,6 +187,6 @@ public class BytecodeUtils {
             return (Double) ((LdcInsnNode) insn).cst;
         }
 
-        throw new IllegalArgumentException("Unexpected instruction");
+        throw new RadonException("Unexpected instruction");
     }
 }

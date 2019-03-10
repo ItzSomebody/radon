@@ -17,10 +17,8 @@
 
 package me.itzsomebody.radon.asm;
 
-import java.util.EmptyStackException;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.Stack;
 import me.itzsomebody.radon.exceptions.StackEmulationException;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
@@ -64,7 +62,6 @@ public class StackEmulator implements Opcodes {
         this.methodNode = methodNode;
         this.breakPoint = breakPoint;
         this.emptyAt = new HashSet<>();
-        execute(false);
     }
 
     /**
@@ -79,291 +76,264 @@ public class StackEmulator implements Opcodes {
     /**
      * Weakly emulates stack execution until no more instructions are left or the breakpoint is reached.
      */
-    private void execute(boolean debug) {
-        Stack<Object> stack = new Stack<>(); // Simulated stack
+    private void execute(boolean debug) throws StackEmulationException {
+        int stackSize = 0; // Emulated stack
         Set<LabelNode> excHandlers = new HashSet<>();
         methodNode.tryCatchBlocks.forEach(tryCatchBlockNode -> excHandlers.add(tryCatchBlockNode.handler));
         for (int i = 0; i < this.methodNode.instructions.size(); i++) {
             AbstractInsnNode insn = this.methodNode.instructions.get(i);
-            if (insn instanceof LabelNode
-                    && excHandlers.contains(insn)) {
-                stack.clear(); // Stack gets cleared and exception is pushed.
-                stack.push(null);
-            }
-            if (stack.isEmpty())
+
+            if (insn instanceof LabelNode && excHandlers.contains(insn))
+                stackSize = 1; // Stack gets cleared and exception is pushed.
+
+            if (stackSize < 0) // Should never happen
+                throw new StackEmulationException("stackSize < 0");
+            if (stackSize == 0)
                 this.emptyAt.add(insn);
+
             if (this.breakPoint == insn)
                 break;
-            try {
-                switch (insn.getOpcode()) {
-                    case NOP:
-                    case LALOAD: // (index, arrayref) -> (long, long_top)
-                    case DALOAD: // (index, arrayref) -> (double, double_top)
-                    case SWAP: // (value1, value2) -> (value2, value1)
-                    case INEG:
-                    case LNEG:
-                    case FNEG:
-                    case DNEG:
-                    case IINC:
-                    case I2F:
-                    case L2D:
-                    case F2I:
-                    case D2L:
-                    case I2B:
-                    case I2C:
-                    case I2S:
-                    case GOTO:
-                    case RETURN:
-                    case NEWARRAY:
-                    case ANEWARRAY:
-                    case ARRAYLENGTH:
-                    case CHECKCAST:
-                    case INSTANCEOF: {
-                        // Does nothing
-                        break;
-                    }
-                    case ACONST_NULL:
-                    case ICONST_M1:
-                    case ICONST_0:
-                    case ICONST_1:
-                    case ICONST_2:
-                    case ICONST_3:
-                    case ICONST_4:
-                    case ICONST_5:
-                    case FCONST_0:
-                    case FCONST_1:
-                    case FCONST_2:
-                    case BIPUSH:
-                    case SIPUSH:
-                    case ILOAD:
-                    case FLOAD:
-                    case ALOAD:
-                    case DUP:
-                    case DUP_X1:
-                    case DUP_X2:
-                    case I2L:
-                    case I2D:
-                    case F2L:
-                    case F2D:
-                    case NEW: {
-                        // Pushes one-word constant to stack
-                        stack.push(null);
-                        break;
-                    }
-                    case LDC: {
-                        LdcInsnNode ldc = (LdcInsnNode) insn;
-                        if (ldc.cst instanceof Long || ldc.cst instanceof Double)
-                            stack.push(null);
 
-                        stack.push(null);
-                        break;
-                    }
-                    case LCONST_0:
-                    case LCONST_1:
-                    case DCONST_0:
-                    case DCONST_1:
-                    case LLOAD:
-                    case DLOAD:
-                    case DUP2:
-                    case DUP2_X1:
-                    case DUP2_X2: {
-                        // Pushes two-word constant or two one-word constants to stack
-                        stack.push(null);
-                        stack.push(null);
-                        break;
-                    }
-                    case IALOAD: // (index, arrayref) -> (int)
-                    case FALOAD: // (index, arrayref) -> (float)
-                    case AALOAD: // (index, arrayref) -> (Object)
-                    case BALOAD: // (index, arrayref) -> (byte)
-                    case CALOAD: // (index, arrayref) -> (char)
-                    case SALOAD: // (index, arrayref) -> (short)
-                    case ISTORE:
-                    case FSTORE:
-                    case ASTORE:
-                    case POP:
-                    case IADD:
-                    case FADD:
-                    case ISUB:
-                    case FSUB:
-                    case IMUL:
-                    case FMUL:
-                    case IDIV:
-                    case FDIV:
-                    case IREM:
-                    case FREM:
-                    case ISHL:
-                    case ISHR:
-                    case IUSHR:
-                    case LSHL:
-                    case LSHR:
-                    case LUSHR:
-                    case IAND:
-                    case IOR:
-                    case IXOR:
-                    case L2I:
-                    case L2F:
-                    case D2I:
-                    case D2F:
-                    case FCMPL:
-                    case FCMPG:
-                    case IFEQ:
-                    case IFNE:
-                    case IFLT:
-                    case IFGE:
-                    case IFGT:
-                    case IFLE:
-                    case TABLESWITCH:
-                    case LOOKUPSWITCH:
-                    case IRETURN:
-                    case FRETURN:
-                    case ATHROW:
-                    case MONITORENTER:
-                    case MONITOREXIT:
-                    case IFNULL:
-                    case IFNONNULL:
-                    case ARETURN: {
-                        // Pops one-word constant off stack
-                        stack.pop();
-                        break;
-                    }
-                    case LSTORE:
-                    case DSTORE:
-                    case POP2:
-                    case LADD:
-                    case DADD:
-                    case LSUB:
-                    case DSUB:
-                    case LMUL:
-                    case DMUL:
-                    case LDIV:
-                    case DDIV:
-                    case LREM:
-                    case DREM:
-                    case LAND:
-                    case LOR:
-                    case LXOR:
-                    case IF_ICMPEQ:
-                    case IF_ICMPNE:
-                    case IF_ICMPLT:
-                    case IF_ICMPGE:
-                    case IF_ICMPGT:
-                    case IF_ICMPLE:
-                    case IF_ACMPEQ:
-                    case IF_ACMPNE:
-                    case LRETURN:
-                    case DRETURN: {
-                        // Pops two-word or two one-word constant(s) off stack
-                        stack.pop();
-                        stack.pop();
-                        break;
-                    }
-                    case IASTORE:
-                    case FASTORE:
-                    case AASTORE:
-                    case BASTORE:
-                    case CASTORE:
-                    case SASTORE:
-                    case LCMP:
-                    case DCMPL:
-                    case DCMPG: {
-                        // Pops three one-word constants off stack
-                        stack.pop();
-                        stack.pop();
-                        stack.pop();
-                        break;
-                    }
-                    case LASTORE:
-                    case DASTORE: {
-                        // Pops two one-word constants and one two-word constant off stack
-                        stack.pop();
-                        stack.pop();
-                        stack.pop();
-                        stack.pop();
-                        break;
-                    }
-                    case GETSTATIC: {
-                        Type type = Type.getType(((FieldInsnNode) insn).desc);
-                        stack.push(null);
+            switch (insn.getOpcode()) {
+                case NOP:
+                case LALOAD: // (index, arrayref) -> (long, long_top)
+                case DALOAD: // (index, arrayref) -> (double, double_top)
+                case SWAP: // (value1, value2) -> (value2, value1)
+                case INEG:
+                case LNEG:
+                case FNEG:
+                case DNEG:
+                case IINC:
+                case I2F:
+                case L2D:
+                case F2I:
+                case D2L:
+                case I2B:
+                case I2C:
+                case I2S:
+                case GOTO:
+                case RETURN:
+                case NEWARRAY:
+                case ANEWARRAY:
+                case ARRAYLENGTH:
+                case CHECKCAST:
+                case INSTANCEOF:
+                    // Does nothing
+                    break;
+                case ACONST_NULL:
+                case ICONST_M1:
+                case ICONST_0:
+                case ICONST_1:
+                case ICONST_2:
+                case ICONST_3:
+                case ICONST_4:
+                case ICONST_5:
+                case FCONST_0:
+                case FCONST_1:
+                case FCONST_2:
+                case BIPUSH:
+                case SIPUSH:
+                case ILOAD:
+                case FLOAD:
+                case ALOAD:
+                case DUP:
+                case DUP_X1:
+                case DUP_X2:
+                case I2L:
+                case I2D:
+                case F2L:
+                case F2D:
+                case NEW:
+                    // Pushes one-word constant to stack
+                    stackSize++;
+                    break;
+                case LDC:
+                    LdcInsnNode ldc = (LdcInsnNode) insn;
+                    if (ldc.cst instanceof Long || ldc.cst instanceof Double)
+                        stackSize++;
 
-                        if (type.getSort() == Type.LONG || type.getSort() == Type.DOUBLE)
-                            stack.push(null);
-                        break;
-                    }
-                    case PUTSTATIC: {
-                        Type type = Type.getType(((FieldInsnNode) insn).desc);
-                        stack.pop();
-
-                        if (type.getSort() == Type.LONG || type.getSort() == Type.DOUBLE)
-                            stack.pop();
-                        break;
-                    }
-                    case GETFIELD: {
-                        stack.pop(); // Objectref
-                        Type type = Type.getType(((FieldInsnNode) insn).desc);
-                        stack.push(null);
-
-                        if (type.getSort() == Type.LONG || type.getSort() == Type.DOUBLE)
-                            stack.push(null);
-                        break;
-                    }
-                    case PUTFIELD: {
-                        stack.pop(); // Objectref
-                        Type type = Type.getType(((FieldInsnNode) insn).desc);
-                        stack.pop();
-
-                        if (type.getSort() == Type.LONG || type.getSort() == Type.DOUBLE)
-                            stack.pop();
-                        break;
-                    }
-                    case INVOKEVIRTUAL:
-                    case INVOKESPECIAL:
-                    case INVOKEINTERFACE: {
-                        stack.pop(); // Objectref
-                        doMethodEmulation(stack, ((MethodInsnNode) insn).desc);
-                        break;
-                    }
-                    case INVOKESTATIC: {
-                        doMethodEmulation(stack, ((MethodInsnNode) insn).desc);
-                        break;
-                    }
-                    case INVOKEDYNAMIC: {
-                        doMethodEmulation(stack, ((InvokeDynamicInsnNode) insn).desc);
-                        break;
-                    }
-                    case MULTIANEWARRAY: {
-                        for (int j = 0; j < ((MultiANewArrayInsnNode) insn).dims; j++)
-                            stack.pop();
-
-                        stack.push(null); // arrayref
-                        break;
-                    }
-                    case JSR:
-                    case RET: {
-                        throw new StackEmulationException("Did not expect JSR/RET instructions");
-                    }
-                    default:
-                        break;
-                }
-            } catch (EmptyStackException empty) {
-                if (debug)
-                    empty.printStackTrace();
+                    stackSize++;
+                    break;
+                case LCONST_0:
+                case LCONST_1:
+                case DCONST_0:
+                case DCONST_1:
+                case LLOAD:
+                case DLOAD:
+                case DUP2:
+                case DUP2_X1:
+                case DUP2_X2:
+                    // Pushes two-word constant or two one-word constants to stack
+                    stackSize++;
+                    stackSize++;
+                    break;
+                case IALOAD: // (index, arrayref) -> (int)
+                case FALOAD: // (index, arrayref) -> (float)
+                case AALOAD: // (index, arrayref) -> (Object)
+                case BALOAD: // (index, arrayref) -> (byte)
+                case CALOAD: // (index, arrayref) -> (char)
+                case SALOAD: // (index, arrayref) -> (short)
+                case ISTORE:
+                case FSTORE:
+                case ASTORE:
+                case POP:
+                case IADD:
+                case FADD:
+                case ISUB:
+                case FSUB:
+                case IMUL:
+                case FMUL:
+                case IDIV:
+                case FDIV:
+                case IREM:
+                case FREM:
+                case ISHL:
+                case ISHR:
+                case IUSHR:
+                case LSHL:
+                case LSHR:
+                case LUSHR:
+                case IAND:
+                case IOR:
+                case IXOR:
+                case L2I:
+                case L2F:
+                case D2I:
+                case D2F:
+                case FCMPL:
+                case FCMPG:
+                case IFEQ:
+                case IFNE:
+                case IFLT:
+                case IFGE:
+                case IFGT:
+                case IFLE:
+                case TABLESWITCH:
+                case LOOKUPSWITCH:
+                case IRETURN:
+                case FRETURN:
+                case ATHROW:
+                case MONITORENTER:
+                case MONITOREXIT:
+                case IFNULL:
+                case IFNONNULL:
+                case ARETURN:
+                    // Pops one-word constant off stack
+                    stackSize--;
+                    break;
+                case LSTORE:
+                case DSTORE:
+                case POP2:
+                case LADD:
+                case DADD:
+                case LSUB:
+                case DSUB:
+                case LMUL:
+                case DMUL:
+                case LDIV:
+                case DDIV:
+                case LREM:
+                case DREM:
+                case LAND:
+                case LOR:
+                case LXOR:
+                case IF_ICMPEQ:
+                case IF_ICMPNE:
+                case IF_ICMPLT:
+                case IF_ICMPGE:
+                case IF_ICMPGT:
+                case IF_ICMPLE:
+                case IF_ACMPEQ:
+                case IF_ACMPNE:
+                case LRETURN:
+                case DRETURN:
+                    // Pops two-word or two one-word constant(s) off stack
+                    stackSize--;
+                    stackSize--;
+                    break;
+                case IASTORE:
+                case FASTORE:
+                case AASTORE:
+                case BASTORE:
+                case CASTORE:
+                case SASTORE:
+                case LCMP:
+                case DCMPL:
+                case DCMPG:
+                    // Pops three one-word constants off stack
+                    stackSize--;
+                    stackSize--;
+                    stackSize--;
+                    break;
+                case LASTORE:
+                case DASTORE:
+                    // Pops two one-word constants and one two-word constant off stack
+                    stackSize--;
+                    stackSize--;
+                    stackSize--;
+                    stackSize--;
+                    break;
+                case GETSTATIC:
+                    stackSize += doFieldEmulation(((FieldInsnNode) insn).desc, true);
+                    break;
+                case PUTSTATIC:
+                    stackSize += doFieldEmulation(((FieldInsnNode) insn).desc, false);
+                    break;
+                case GETFIELD:
+                    stackSize--; // Objectref
+                    stackSize += doFieldEmulation(((FieldInsnNode) insn).desc, true);
+                    break;
+                case PUTFIELD:
+                    stackSize--; // Objectref
+                    stackSize += doFieldEmulation(((FieldInsnNode) insn).desc, false);
+                    break;
+                case INVOKEVIRTUAL:
+                case INVOKESPECIAL:
+                case INVOKEINTERFACE:
+                    stackSize--; // Objectref
+                    stackSize += doMethodEmulation(((MethodInsnNode) insn).desc);
+                    break;
+                case INVOKESTATIC:
+                    stackSize += doMethodEmulation(((MethodInsnNode) insn).desc);
+                    break;
+                case INVOKEDYNAMIC:
+                    stackSize += doMethodEmulation(((InvokeDynamicInsnNode) insn).desc);
+                    break;
+                case MULTIANEWARRAY:
+                    stackSize -= ((MultiANewArrayInsnNode) insn).dims;
+                    stackSize++; // arrayref
+                    break;
+                case JSR:
+                case RET:
+                    throw new StackEmulationException("Did not expect JSR/RET instructions");
+                default:
+                    break;
             }
         }
     }
 
-    private static void doMethodEmulation(Stack<Object> stack, String desc) {
+    private static int doFieldEmulation(String desc, boolean isGet) {
+        Type type = Type.getType(desc);
+        int result = (type.getSort() == Type.LONG || type.getSort() == Type.DOUBLE) ? 2 : 1;
+
+        return (isGet) ? result : -result;
+    }
+
+    private static int doMethodEmulation(String desc) {
+        int result = 0;
         Type[] args = Type.getArgumentTypes(desc);
         Type returnType = Type.getReturnType(desc);
         for (Type type : args) {
             if (type.getSort() == Type.LONG || type.getSort() == Type.DOUBLE)
-                stack.pop();
+                result--;
 
-            stack.pop();
+            result--;
         }
         if (returnType.getSort() == Type.LONG || returnType.getSort() == Type.DOUBLE)
-            stack.push(null);
+            result++;
         if (returnType.getSort() != Type.VOID)
-            stack.push(null);
+            result++;
+
+        return result;
     }
 }

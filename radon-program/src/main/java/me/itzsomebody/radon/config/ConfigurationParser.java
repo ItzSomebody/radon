@@ -28,8 +28,8 @@ import java.util.Map;
 import java.util.Set;
 import me.itzsomebody.radon.Dictionaries;
 import me.itzsomebody.radon.SessionInfo;
-import me.itzsomebody.radon.exceptions.IllegalConfigurationKeyException;
 import me.itzsomebody.radon.exceptions.IllegalConfigurationValueException;
+import me.itzsomebody.radon.exceptions.RadonException;
 import me.itzsomebody.radon.exclusions.Exclusion;
 import me.itzsomebody.radon.exclusions.ExclusionManager;
 import me.itzsomebody.radon.transformers.Transformer;
@@ -67,10 +67,10 @@ import org.yaml.snakeyaml.Yaml;
  */
 public class ConfigurationParser {
     private Map<String, Object> map;
-    private final static Set<String> VALID_KEYS = new HashSet<String>();
+    private final static Set<String> VALID_KEYS = new HashSet<>();
 
     static {
-        for (ConfigurationSettings setting : ConfigurationSettings.values())
+        for (ConfigurationSetting setting : ConfigurationSetting.values())
             VALID_KEYS.add(setting.getValue());
     }
 
@@ -78,7 +78,7 @@ public class ConfigurationParser {
         this.map = new Yaml().load(in);
         this.map.keySet().forEach(s -> {
             if (!VALID_KEYS.contains(s))
-                throw new IllegalConfigurationKeyException(s);
+                throw new RadonException(s + " is not a valid configuration setting.");
         });
     }
 
@@ -96,27 +96,27 @@ public class ConfigurationParser {
     }
 
     private File getInput() {
-        Object o = map.get(ConfigurationSettings.INPUT.getValue());
+        Object o = map.get(ConfigurationSetting.INPUT.getValue());
         if (!(o instanceof String))
-            throw new IllegalConfigurationValueException(ConfigurationSettings.INPUT.getValue(), String.class,
+            throw new IllegalConfigurationValueException(ConfigurationSetting.INPUT.getValue(), String.class,
                     o.getClass());
 
         return new File((String) o);
     }
 
     private File getOutput() {
-        Object o = map.get(ConfigurationSettings.OUTPUT.getValue());
+        Object o = map.get(ConfigurationSetting.OUTPUT.getValue());
         if (!(o instanceof String))
-            throw new IllegalConfigurationValueException(ConfigurationSettings.OUTPUT.getValue(), String.class,
+            throw new IllegalConfigurationValueException(ConfigurationSetting.OUTPUT.getValue(), String.class,
                     o.getClass());
 
         return new File((String) o);
     }
 
     private List<File> getLibraries() {
-        Object o = map.get(ConfigurationSettings.LIBRARIES.getValue());
+        Object o = map.get(ConfigurationSetting.LIBRARIES.getValue());
         if (!(o instanceof List))
-            throw new IllegalConfigurationValueException(ConfigurationSettings.LIBRARIES.getValue(), List.class,
+            throw new IllegalConfigurationValueException(ConfigurationSetting.LIBRARIES.getValue(), List.class,
                     o.getClass());
 
         ArrayList<File> libraries = new ArrayList<>();
@@ -131,7 +131,7 @@ public class ConfigurationParser {
                     libraries.add(libFile);
                 }
             } catch (ClassCastException e) {
-                throw new IllegalConfigurationValueException(ConfigurationSettings.LIBRARIES.getValue(), String.class,
+                throw new IllegalConfigurationValueException(ConfigurationSetting.LIBRARIES.getValue(), String.class,
                         lib.getClass());
             }
         }
@@ -193,11 +193,11 @@ public class ConfigurationParser {
     }
 
     private Shrinker getShrinkerTransformer() {
-        Object o = map.get(ConfigurationSettings.SHRINKER.getValue());
+        Object o = map.get(ConfigurationSetting.SHRINKER.getValue());
         if (o == null)
             return null;
         if (!(o instanceof Map))
-            throw new IllegalConfigurationValueException(ConfigurationSettings.SHRINKER.getValue(), Map.class,
+            throw new IllegalConfigurationValueException(ConfigurationSetting.SHRINKER.getValue(), Map.class,
                     o.getClass());
 
         try {
@@ -218,11 +218,11 @@ public class ConfigurationParser {
     }
 
     private Optimizer getOptimizerTransformer() {
-        Object o = map.get(ConfigurationSettings.OPTIMIZER.getValue());
+        Object o = map.get(ConfigurationSetting.OPTIMIZER.getValue());
         if (o == null)
             return null;
         if (!(o instanceof Map))
-            throw new IllegalConfigurationValueException(ConfigurationSettings.OPTIMIZER.getValue(), Map.class,
+            throw new IllegalConfigurationValueException(ConfigurationSetting.OPTIMIZER.getValue(), Map.class,
                     o.getClass());
 
         try {
@@ -241,11 +241,11 @@ public class ConfigurationParser {
     }
 
     private Renamer getRenamerTransformer() {
-        Object o = map.get(ConfigurationSettings.RENAMER.getValue());
+        Object o = map.get(ConfigurationSetting.RENAMER.getValue());
         if (o == null)
             return null;
         if (!(o instanceof Map))
-            throw new IllegalConfigurationValueException(ConfigurationSettings.RENAMER.getValue(), Map.class,
+            throw new IllegalConfigurationValueException(ConfigurationSetting.RENAMER.getValue(), Map.class,
                     o.getClass());
 
         try {
@@ -269,11 +269,11 @@ public class ConfigurationParser {
     }
 
     private NumberObfuscation getNumberObfuscationTransformer() {
-        Object o = map.get(ConfigurationSettings.NUMBER_OBFUSCATION.getValue());
+        Object o = map.get(ConfigurationSetting.NUMBER_OBFUSCATION.getValue());
         if (o == null)
             return null;
         if (!(o instanceof String))
-            throw new IllegalConfigurationValueException(ConfigurationSettings.NUMBER_OBFUSCATION.getValue(),
+            throw new IllegalConfigurationValueException(ConfigurationSetting.NUMBER_OBFUSCATION.getValue(),
                     String.class, o.getClass());
 
         String s = (String) o;
@@ -285,11 +285,11 @@ public class ConfigurationParser {
     }
 
     private InvokeDynamic getInvokeDynamicTransformer() {
-        Object o = map.get(ConfigurationSettings.INVOKEDYNAMIC.getValue());
+        Object o = map.get(ConfigurationSetting.INVOKEDYNAMIC.getValue());
         if (o == null)
             return null;
         if (!(o instanceof String))
-            throw new IllegalConfigurationValueException(ConfigurationSettings.INVOKEDYNAMIC.getValue(), String.class,
+            throw new IllegalConfigurationValueException(ConfigurationSetting.INVOKEDYNAMIC.getValue(), String.class,
                     o.getClass());
         String s = (String) o;
         if (!"Light".equals(s) && !"Normal".equals(s) && !"Heavy".equals(s))
@@ -301,11 +301,11 @@ public class ConfigurationParser {
     }
 
     private List<StringEncryption> getStringEncryptionTransformers() {
-        Object o = map.get(ConfigurationSettings.STRING_ENCRYPTION.getValue());
+        Object o = map.get(ConfigurationSetting.STRING_ENCRYPTION.getValue());
         if (o == null)
             return null;
         if (!(o instanceof Map))
-            throw new IllegalConfigurationValueException(ConfigurationSettings.STRING_ENCRYPTION.getValue(), Map.class,
+            throw new IllegalConfigurationValueException(ConfigurationSetting.STRING_ENCRYPTION.getValue(), Map.class,
                     o.getClass());
 
         Map<String, Object> settings = (Map) o;
@@ -329,11 +329,11 @@ public class ConfigurationParser {
     }
 
     private FlowObfuscation getFlowObfuscationTransformer() {
-        Object o = map.get(ConfigurationSettings.FLOW_OBFUSCATION.getValue());
+        Object o = map.get(ConfigurationSetting.FLOW_OBFUSCATION.getValue());
         if (o == null)
             return null;
         if (!(o instanceof String))
-            throw new IllegalConfigurationValueException(ConfigurationSettings.FLOW_OBFUSCATION.getValue(),
+            throw new IllegalConfigurationValueException(ConfigurationSetting.FLOW_OBFUSCATION.getValue(),
                     String.class, o.getClass());
 
         String s = (String) o;
@@ -346,11 +346,11 @@ public class ConfigurationParser {
     }
 
     private MemberShuffler getShufflerTransformer() {
-        Object o = map.get(ConfigurationSettings.SHUFFLER.getValue());
+        Object o = map.get(ConfigurationSetting.SHUFFLER.getValue());
         if (o == null)
             return null;
         if (!(o instanceof Boolean))
-            throw new IllegalConfigurationValueException(ConfigurationSettings.SHUFFLER.getValue(), Boolean.class,
+            throw new IllegalConfigurationValueException(ConfigurationSetting.SHUFFLER.getValue(), Boolean.class,
                     o.getClass());
 
 
@@ -358,11 +358,11 @@ public class ConfigurationParser {
     }
 
     private LocalVariables getLocalVariablesTransformer() {
-        Object o = map.get(ConfigurationSettings.LOCAL_VARIABLES.getValue());
+        Object o = map.get(ConfigurationSetting.LOCAL_VARIABLES.getValue());
         if (o == null)
             return null;
         if (!(o instanceof Map))
-            throw new IllegalConfigurationValueException(ConfigurationSettings.LOCAL_VARIABLES.getValue(), Map.class,
+            throw new IllegalConfigurationValueException(ConfigurationSetting.LOCAL_VARIABLES.getValue(), Map.class,
                     o.getClass());
 
         try {
@@ -379,11 +379,11 @@ public class ConfigurationParser {
     }
 
     private LineNumbers getLineNumbersTransformer() {
-        Object o = map.get(ConfigurationSettings.LINE_NUMBERS.getValue());
+        Object o = map.get(ConfigurationSetting.LINE_NUMBERS.getValue());
         if (o == null)
             return null;
         if (!(o instanceof Map))
-            throw new IllegalConfigurationValueException(ConfigurationSettings.LINE_NUMBERS.getValue(), Map.class,
+            throw new IllegalConfigurationValueException(ConfigurationSetting.LINE_NUMBERS.getValue(), Map.class,
                     o.getClass());
 
         try {
@@ -399,11 +399,11 @@ public class ConfigurationParser {
     }
 
     private SourceName getSourceNameTransformer() {
-        Object o = map.get(ConfigurationSettings.SOURCE_NAME.getValue());
+        Object o = map.get(ConfigurationSetting.SOURCE_NAME.getValue());
         if (o == null)
             return null;
         if (!(o instanceof Map))
-            throw new IllegalConfigurationValueException(ConfigurationSettings.SOURCE_NAME.getValue(), Map.class,
+            throw new IllegalConfigurationValueException(ConfigurationSetting.SOURCE_NAME.getValue(), Map.class,
                     o.getClass());
 
         try {
@@ -419,11 +419,11 @@ public class ConfigurationParser {
     }
 
     private SourceDebug getSourceDebugTransformer() {
-        Object o = map.get(ConfigurationSettings.SOURCE_DEBUG.getValue());
+        Object o = map.get(ConfigurationSetting.SOURCE_DEBUG.getValue());
         if (o == null)
             return null;
         if (!(o instanceof Map))
-            throw new IllegalConfigurationValueException(ConfigurationSettings.SOURCE_DEBUG.getValue(), Map.class,
+            throw new IllegalConfigurationValueException(ConfigurationSetting.SOURCE_DEBUG.getValue(), Map.class,
                     o.getClass());
 
         try {
@@ -439,33 +439,33 @@ public class ConfigurationParser {
     }
 
     private Crasher getCrasherTransformer() {
-        Object o = map.get(ConfigurationSettings.CRASHER.getValue());
+        Object o = map.get(ConfigurationSetting.CRASHER.getValue());
         if (o == null)
             return null;
         if (!(o instanceof Boolean))
-            throw new IllegalConfigurationValueException(ConfigurationSettings.CRASHER.getValue(), Boolean.class,
+            throw new IllegalConfigurationValueException(ConfigurationSetting.CRASHER.getValue(), Boolean.class,
                     o.getClass());
 
         return ((Boolean) o) ? new Crasher() : null;
     }
 
     private HideCode getHideCodeTransformer() {
-        Object o = map.get(ConfigurationSettings.HIDE_CODE.getValue());
+        Object o = map.get(ConfigurationSetting.HIDE_CODE.getValue());
         if (o == null)
             return null;
         if (!(o instanceof Boolean))
-            throw new IllegalConfigurationValueException(ConfigurationSettings.HIDE_CODE.getValue(), Boolean.class,
+            throw new IllegalConfigurationValueException(ConfigurationSetting.HIDE_CODE.getValue(), Boolean.class,
                     o.getClass());
 
         return ((Boolean) o) ? new HideCode() : null;
     }
 
     private Expiration getExpirationTransformer() {
-        Object o = map.get(ConfigurationSettings.EXPIRATION.getValue());
+        Object o = map.get(ConfigurationSetting.EXPIRATION.getValue());
         if (o == null)
             return null;
         if (!(o instanceof Map))
-            throw new IllegalConfigurationValueException(ConfigurationSettings.EXPIRATION.getValue(), Map.class,
+            throw new IllegalConfigurationValueException(ConfigurationSetting.EXPIRATION.getValue(), Map.class,
                     o.getClass());
 
         try {
@@ -484,11 +484,11 @@ public class ConfigurationParser {
     }
 
     private Watermarker getWatermarkerTransformer() {
-        Object o = map.get(ConfigurationSettings.WATERMARK.getValue());
+        Object o = map.get(ConfigurationSetting.WATERMARK.getValue());
         if (o == null)
             return null;
         if (!(o instanceof Map))
-            throw new IllegalConfigurationValueException(ConfigurationSettings.WATERMARK.getValue(), Map.class,
+            throw new IllegalConfigurationValueException(ConfigurationSetting.WATERMARK.getValue(), Map.class,
                     o.getClass());
 
         try {
@@ -507,11 +507,11 @@ public class ConfigurationParser {
 
     private ExclusionManager getExclusions() {
         ExclusionManager exclusions = new ExclusionManager();
-        Object o = map.get(ConfigurationSettings.EXCLUSIONS.getValue());
+        Object o = map.get(ConfigurationSetting.EXCLUSIONS.getValue());
         if (o == null)
             return exclusions;
         if (!(o instanceof List))
-            throw new IllegalConfigurationValueException(ConfigurationSettings.EXCLUSIONS.getValue(), List.class,
+            throw new IllegalConfigurationValueException(ConfigurationSetting.EXCLUSIONS.getValue(), List.class,
                     o.getClass());
 
         try {
@@ -525,21 +525,21 @@ public class ConfigurationParser {
     }
 
     private int getTrashClasses() {
-        Object o = map.get(ConfigurationSettings.TRASH_CLASSES.getValue());
+        Object o = map.get(ConfigurationSetting.TRASH_CLASSES.getValue());
         if (o == null)
             return -1;
         if (!(o instanceof Integer))
-            throw new IllegalConfigurationValueException(ConfigurationSettings.TRASH_CLASSES.getValue(), Integer.class,
+            throw new IllegalConfigurationValueException(ConfigurationSetting.TRASH_CLASSES.getValue(), Integer.class,
                     o.getClass());
         return (int) o;
     }
 
     private Dictionaries getDictionary() {
-        Object o = map.get(ConfigurationSettings.DICTIONARY.getValue());
+        Object o = map.get(ConfigurationSetting.DICTIONARY.getValue());
         if (o == null)
             return Dictionaries.ALPHABETICAL;
         if (!(o instanceof String) && !(o instanceof Integer))
-            throw new IllegalConfigurationValueException(ConfigurationSettings.DICTIONARY.getValue(), String.class,
+            throw new IllegalConfigurationValueException(ConfigurationSetting.DICTIONARY.getValue(), String.class,
                     o.getClass());
 
         if (o instanceof String)

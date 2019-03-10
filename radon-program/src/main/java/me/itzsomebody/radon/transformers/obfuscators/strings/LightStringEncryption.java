@@ -20,7 +20,7 @@ package me.itzsomebody.radon.transformers.obfuscators.strings;
 import java.util.concurrent.atomic.AtomicInteger;
 import me.itzsomebody.radon.asm.ClassWrapper;
 import me.itzsomebody.radon.utils.BytecodeUtils;
-import me.itzsomebody.radon.utils.LoggerUtils;
+import me.itzsomebody.radon.Logger;
 import me.itzsomebody.radon.utils.RandomUtils;
 import me.itzsomebody.radon.utils.StringUtils;
 import org.objectweb.asm.FieldVisitor;
@@ -55,9 +55,9 @@ public class LightStringEncryption extends StringEncryption {
                     int leeway = getSizeLeeway(methodNode);
 
                     for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
-                        if (leeway < 10000) {
+                        if (leeway < 10000)
                             break;
-                        }
+
                         if (insn instanceof LdcInsnNode) {
                             LdcInsnNode ldc = (LdcInsnNode) insn;
                             if (ldc.cst instanceof String) {
@@ -81,14 +81,14 @@ public class LightStringEncryption extends StringEncryption {
         ClassNode decryptor = createDecryptor(memberNames);
         getClasses().put(decryptor.name, new ClassWrapper(decryptor, false));
 
-        LoggerUtils.stdOut(String.format("Encrypted %d strings.", counter.get()));
+        Logger.stdOut(String.format("Encrypted %d strings.", counter.get()));
     }
 
     private static String encrypt(String msg, int key) {
         StringBuilder sb = new StringBuilder();
-        for (char c : msg.toCharArray()) {
+        for (char c : msg.toCharArray())
             sb.append((char) (c ^ key));
-        }
+
 
         return sb.toString();
     }

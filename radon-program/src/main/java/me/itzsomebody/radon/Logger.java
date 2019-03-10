@@ -15,41 +15,40 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package me.itzsomebody.radon.utils;
+package me.itzsomebody.radon;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import me.itzsomebody.radon.Main;
 
 /**
  * Utils to print fancy stuff in the console and to write log file.
  *
  * @author ItzSomebody
  */
-public class LoggerUtils {
+public class Logger {
     /**
      * The {@link SimpleDateFormat} that will be used for logging.
      */
-    private static SimpleDateFormat FORMAT = new SimpleDateFormat("MM/dd/yyyy-HH:mm:ss");
-
-    private static List<String> strings = new ArrayList<>();
+    private final static SimpleDateFormat FORMAT = new SimpleDateFormat("MM/dd/yyyy-HH:mm:ss");
+    private final static List<String> STRINGS = new ArrayList<>();
 
     /**
      * Writes strings to log.
      */
     public static void dumpLog() {
-        if (!strings.isEmpty()) {
+        if (!STRINGS.isEmpty()) {
             BufferedWriter bw;
             try {
                 File log = new File("Radon.log");
-                if (!log.exists()) {
+                if (!log.exists())
                     log.createNewFile();
-                }
+
                 bw = new BufferedWriter(new FileWriter(log));
                 bw.append("##############################################\n");
                 bw.append("# +----------------------------------------+ #\n");
@@ -66,11 +65,15 @@ public class LoggerUtils {
                 bw.append("\n");
                 bw.append("Version: ").append(Main.VERSION).append('\n');
                 bw.append("Contributors: ").append(Main.CONTRIBUTORS).append('\n');
-                for (String msg : strings) {
-                    bw.append(msg);
-                    bw.newLine();
-                }
-                strings.clear();
+                STRINGS.forEach(s -> {
+                    try {
+                        bw.append(s);
+                        bw.newLine();
+                    } catch (IOException ioe) {
+                        ioe.printStackTrace();
+                    }
+                });
+                STRINGS.clear();
                 bw.close();
             } catch (Throwable t) {
                 stdErr("Error occurred while writing log.");
@@ -89,7 +92,7 @@ public class LoggerUtils {
         String date = FORMAT.format(new Date(System.currentTimeMillis()));
         String formatted = "[" + date + "] INFO: " + string;
         System.out.println(formatted);
-        strings.add(formatted);
+        STRINGS.add(formatted);
     }
 
     /**
@@ -102,7 +105,7 @@ public class LoggerUtils {
         String date = FORMAT.format(new Date(System.currentTimeMillis()));
         String formatted = "[" + date + "] ERROR: " + string;
         System.out.println(formatted);
-        strings.add(formatted);
+        STRINGS.add(formatted);
     }
 
     /**
@@ -115,6 +118,6 @@ public class LoggerUtils {
         String date = FORMAT.format(new Date(System.currentTimeMillis()));
         String formatted = "[" + date + "] WARNING: " + string;
         System.out.println(formatted);
-        strings.add(formatted);
+        STRINGS.add(formatted);
     }
 }

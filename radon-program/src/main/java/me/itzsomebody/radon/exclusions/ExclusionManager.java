@@ -17,7 +17,9 @@
 
 package me.itzsomebody.radon.exclusions;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Class containing a {@link LinkedList<Exclusion>} of all the created exclusions.
@@ -25,9 +27,9 @@ import java.util.LinkedList;
  * @author ItzSomebody
  */
 public class ExclusionManager {
-    private LinkedList<Exclusion> exclusions = new LinkedList<>();
+    private List<Exclusion> exclusions = new ArrayList<>();
 
-    public LinkedList<Exclusion> getExclusions() {
+    public List<Exclusion> getExclusions() {
         return this.exclusions;
     }
 
@@ -36,12 +38,10 @@ public class ExclusionManager {
     }
 
     public boolean isExcluded(String pattern, ExclusionType type) {
-        for (Exclusion exclusion : this.exclusions) {
+        for (Exclusion exclusion : this.exclusions)
             if ((exclusion.getExclusionType() == type || exclusion.getExclusionType() == ExclusionType.GLOBAL)
-                    && exclusion.matches(pattern)) {
+                    && exclusion.matches(pattern))
                 return true;
-            }
-        }
 
         return false;
     }

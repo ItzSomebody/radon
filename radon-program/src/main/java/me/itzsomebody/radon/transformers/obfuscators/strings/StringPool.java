@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.utils.BytecodeUtils;
-import me.itzsomebody.radon.utils.LoggerUtils;
+import me.itzsomebody.radon.Logger;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.FieldNode;
@@ -91,10 +91,9 @@ public class StringPool extends StringEncryption {
                     insns.add(new InsnNode(RETURN));
                     clinit.instructions = insns;
                     classWrapper.classNode.methods.add(clinit);
-                } else {
+                } else
                     clinit.instructions.insertBefore(clinit.instructions.getFirst(), new MethodInsnNode(INVOKESTATIC,
                             classWrapper.classNode.name, methodName, "()V", false));
-                }
                 FieldNode fieldNode = new FieldNode(ACC_PRIVATE + ACC_STATIC + ACC_SYNTHETIC, fieldName,
                         "[Ljava/lang/String;", null, null);
                 if (classWrapper.classNode.fields == null)
@@ -102,7 +101,7 @@ public class StringPool extends StringEncryption {
                 classWrapper.classNode.fields.add(fieldNode);
             }
         });
-        LoggerUtils.stdOut(String.format("Pooled %d strings.", counter.get()));
+        Logger.stdOut(String.format("Pooled %d strings.", counter.get()));
     }
 
     private MethodNode stringPool(String className, String methodName, String fieldName, ArrayList<String> strings) {
@@ -111,30 +110,29 @@ public class StringPool extends StringEncryption {
 
         method.visitCode();
         int numberOfStrings = strings.size();
-        if (numberOfStrings <= 5) {
+        if (numberOfStrings <= 5)
             method.visitInsn(numberOfStrings + 3);
-        } else if (numberOfStrings <= 127) {
+        else if (numberOfStrings <= 127)
             method.visitIntInsn(BIPUSH, strings.size());
-        } else if (numberOfStrings <= 32767) {
+        else if (numberOfStrings <= 32767)
             method.visitIntInsn(SIPUSH, strings.size());
-        } else {
+        else
             method.visitLdcInsn(strings.size());
-        }
+
 
         method.visitTypeInsn(ANEWARRAY, "java/lang/String");
 
         for (int i = 0; i < strings.size(); i++) {
             method.visitInsn(DUP);
 
-            if (i <= 5) {
+            if (i <= 5)
                 method.visitInsn(i + 3);
-            } else if (i <= 127) {
+            else if (i <= 127)
                 method.visitIntInsn(BIPUSH, i);
-            } else if (i <= 32767) {
+            else if (i <= 32767)
                 method.visitIntInsn(SIPUSH, i);
-            } else {
+            else
                 method.visitLdcInsn(i);
-            }
 
             method.visitLdcInsn(strings.get(i));
             method.visitInsn(AASTORE);

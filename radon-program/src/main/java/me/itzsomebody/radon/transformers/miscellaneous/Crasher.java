@@ -24,6 +24,7 @@ import org.objectweb.asm.tree.ClassNode;
 
 /**
  * Sets the class signature to a random string. A known trick to work on JD, CFR, Procyon and Javap.
+ * TODO: rewrite this.
  *
  * @author ItzSomebody
  */
@@ -32,7 +33,7 @@ public class Crasher extends Transformer {
     public void transform() {
         AtomicInteger counter = new AtomicInteger();
 
-        getClassWrappers().parallelStream().filter(classWrapper -> !excluded(classWrapper)
+        getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)
                 && classWrapper.classNode.signature == null).forEach(classWrapper -> {
             ClassNode classNode = classWrapper.classNode;
             classNode.signature = randomString(4);

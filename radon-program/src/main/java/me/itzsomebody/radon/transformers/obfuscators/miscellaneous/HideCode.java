@@ -22,7 +22,7 @@ import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
 import me.itzsomebody.radon.utils.AccessUtils;
 import me.itzsomebody.radon.utils.BytecodeUtils;
-import me.itzsomebody.radon.utils.LoggerUtils;
+import me.itzsomebody.radon.Logger;
 import org.objectweb.asm.tree.ClassNode;
 
 /**
@@ -36,14 +36,14 @@ public class HideCode extends Transformer {
     public void transform() {
         AtomicInteger counter = new AtomicInteger();
 
-        getClassWrappers().parallelStream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper -> {
+        getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper -> {
             ClassNode classNode = classWrapper.classNode;
             if (!AccessUtils.isSynthetic(classNode.access) && !BytecodeUtils.hasAnnotations(classNode)) {
                 classNode.access |= ACC_SYNTHETIC;
                 counter.incrementAndGet();
             }
 
-            classNode.methods.parallelStream().filter(methodNode ->
+            classNode.methods.stream().filter(methodNode ->
                     !BytecodeUtils.hasAnnotations(methodNode)).forEach(methodNode -> {
                 boolean hidOnce = false;
                 if (!AccessUtils.isSynthetic(methodNode.access)) {
@@ -61,14 +61,14 @@ public class HideCode extends Transformer {
             });
 
             if (classNode.fields != null)
-                classNode.fields.parallelStream().filter(fieldNode -> !BytecodeUtils.hasAnnotations(fieldNode)
+                classNode.fields.stream().filter(fieldNode -> !BytecodeUtils.hasAnnotations(fieldNode)
                         && !AccessUtils.isSynthetic(fieldNode.access)).forEach(fieldNode -> {
                     fieldNode.access |= ACC_SYNTHETIC;
                     counter.incrementAndGet();
                 });
         });
 
-        LoggerUtils.stdOut(String.format("Hid %d members.", counter.get()));
+        Logger.stdOut(String.format("Hid %d members.", counter.get()));
     }
 
     @Override

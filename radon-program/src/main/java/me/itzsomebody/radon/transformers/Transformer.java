@@ -24,7 +24,7 @@ import me.itzsomebody.radon.Radon;
 import me.itzsomebody.radon.asm.ClassWrapper;
 import me.itzsomebody.radon.asm.FieldWrapper;
 import me.itzsomebody.radon.asm.MethodWrapper;
-import me.itzsomebody.radon.exceptions.IllegalDictionaryException;
+import me.itzsomebody.radon.exceptions.RadonException;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.utils.StringUtils;
 import org.objectweb.asm.Opcodes;
@@ -75,7 +75,8 @@ public abstract class Transformer implements Opcodes {
     protected int getSizeLeeway(MethodNode methodNode) {
         CodeSizeEvaluator cse = new CodeSizeEvaluator(null);
         methodNode.accept(cse);
-        // Max allowed method size is 65534 (https://docs.oracle.com/javase/specs/jvms/se10/html/jvms-4.html#jvms-4.7.3)
+        // Max allowed method size is 65534
+        // https://docs.oracle.com/javase/specs/jvms/se10/html/jvms-4.html#jvms-4.7.3
         return (65534 - cse.getMaxSize());
     }
 
@@ -99,20 +100,16 @@ public abstract class Transformer implements Opcodes {
 
     private String getRandomString(int length) {
         switch (radon.sessionInfo.getDictionaryType()) {
-            case SPACES: {
+            case SPACES:
                 return StringUtils.randomSpacesString(length);
-            }
-            case UNRECOGNIZED: {
+            case UNRECOGNIZED:
                 return StringUtils.randomUnrecognizedString(length);
-            }
-            case ALPHABETICAL: {
+            case ALPHABETICAL:
                 return StringUtils.randomAlphaString(length);
-            }
-            case ALPHANUMERIC: {
+            case ALPHANUMERIC:
                 return StringUtils.randomAlphaNumericString(length);
-            }
             default: {
-                throw new IllegalDictionaryException();
+                throw new RadonException("Illegal dictionary type: " + radon.sessionInfo.getDictionaryType());
             }
         }
     }
