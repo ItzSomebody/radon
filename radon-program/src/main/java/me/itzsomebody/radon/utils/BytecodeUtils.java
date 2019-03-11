@@ -19,16 +19,7 @@ package me.itzsomebody.radon.utils;
 
 import me.itzsomebody.radon.exceptions.RadonException;
 import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.FieldNode;
-import org.objectweb.asm.tree.FrameNode;
-import org.objectweb.asm.tree.InsnNode;
-import org.objectweb.asm.tree.IntInsnNode;
-import org.objectweb.asm.tree.LabelNode;
-import org.objectweb.asm.tree.LdcInsnNode;
-import org.objectweb.asm.tree.LineNumberNode;
-import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.tree.*;
 
 /**
  * Bytecode utilities for bytecode instructions.
@@ -188,5 +179,10 @@ public class BytecodeUtils {
         }
 
         throw new RadonException("Unexpected instruction");
+    }
+
+    public static void replaceInsn(InsnList insnList, AbstractInsnNode insn, InsnList replacementInsnList) {
+        insnList.insert(insn, replacementInsnList);
+        insnList.remove(insn);
     }
 }
