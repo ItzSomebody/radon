@@ -84,6 +84,10 @@ public abstract class Transformer implements Opcodes {
         return methodNode.instructions != null && methodNode.instructions.size() > 0;
     }
 
+    protected boolean hasInstructions(MethodWrapper methodWrapper) {
+        return hasInstructions(methodWrapper.methodNode);
+    }
+
     protected long tookThisLong(long from) {
         return System.currentTimeMillis() - from;
     }

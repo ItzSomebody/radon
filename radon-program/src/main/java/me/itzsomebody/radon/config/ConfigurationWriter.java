@@ -33,15 +33,15 @@ import me.itzsomebody.radon.transformers.obfuscators.flow.HeavyFlowObfuscation;
 import me.itzsomebody.radon.transformers.obfuscators.flow.LightFlowObfuscation;
 import me.itzsomebody.radon.transformers.obfuscators.flow.NormalFlowObfuscation;
 import me.itzsomebody.radon.transformers.obfuscators.invokedynamic.HeavyInvokeDynamic;
-import me.itzsomebody.radon.transformers.obfuscators.invokedynamic.InvokeDynamic;
+import me.itzsomebody.radon.transformers.obfuscators.references.InvokeDynamic;
 import me.itzsomebody.radon.transformers.obfuscators.invokedynamic.LightInvokeDynamic;
 import me.itzsomebody.radon.transformers.obfuscators.invokedynamic.NormalInvokeDynamic;
-import me.itzsomebody.radon.transformers.obfuscators.miscellaneous.HideCode;
-import me.itzsomebody.radon.transformers.obfuscators.miscellaneous.LineNumbers;
-import me.itzsomebody.radon.transformers.obfuscators.miscellaneous.LocalVariables;
-import me.itzsomebody.radon.transformers.obfuscators.miscellaneous.MemberShuffler;
-import me.itzsomebody.radon.transformers.obfuscators.miscellaneous.SourceDebug;
-import me.itzsomebody.radon.transformers.obfuscators.miscellaneous.SourceName;
+import me.itzsomebody.radon.transformers.obfuscators.HideCode;
+import me.itzsomebody.radon.transformers.shrinkers.LineNumberRemover;
+import me.itzsomebody.radon.transformers.shrinkers.LocalVariableRemover;
+import me.itzsomebody.radon.transformers.obfuscators.MemberShuffler;
+import me.itzsomebody.radon.transformers.shrinkers.SourceDebugRemover;
+import me.itzsomebody.radon.transformers.shrinkers.SourceFileRemover;
 import me.itzsomebody.radon.transformers.obfuscators.numbers.HeavyNumberObfuscation;
 import me.itzsomebody.radon.transformers.obfuscators.numbers.LightNumberObfuscation;
 import me.itzsomebody.radon.transformers.obfuscators.numbers.NormalNumberObfuscation;
@@ -122,34 +122,34 @@ public class ConfigurationWriter {
                     else if (transformer instanceof NormalFlowObfuscation)
                         documentMap.put(ConfigurationSetting.FLOW_OBFUSCATION.getValue(), "Normal");
 
-                } else if (transformer instanceof LocalVariables) {
+                } else if (transformer instanceof LocalVariableRemover) {
                     documentMap.putIfAbsent(ConfigurationSetting.LOCAL_VARIABLES.getValue(),
                             new LinkedHashMap<String, Object>());
                     ((LinkedHashMap) documentMap.get(ConfigurationSetting.LOCAL_VARIABLES.getValue()))
                             .put("Enabled", true);
                     ((LinkedHashMap) documentMap.get(ConfigurationSetting.LOCAL_VARIABLES.getValue()))
-                            .put("Remove", ((LocalVariables) transformer).isRemove());
-                } else if (transformer instanceof LineNumbers) {
+                            .put("Remove", ((LocalVariableRemover) transformer).isRemove());
+                } else if (transformer instanceof LineNumberRemover) {
                     documentMap.putIfAbsent(ConfigurationSetting.LINE_NUMBERS.getValue(),
                             new LinkedHashMap<String, Object>());
                     ((LinkedHashMap) documentMap.get(ConfigurationSetting.LINE_NUMBERS.getValue()))
                             .put("Enabled", true);
                     ((LinkedHashMap) documentMap.get(ConfigurationSetting.LINE_NUMBERS.getValue()))
-                            .put("Remove", ((LineNumbers) transformer).isRemove());
-                } else if (transformer instanceof SourceName) {
+                            .put("Remove", ((LineNumberRemover) transformer).isRemove());
+                } else if (transformer instanceof SourceFileRemover) {
                     documentMap.putIfAbsent(ConfigurationSetting.SOURCE_NAME.getValue(),
                             new LinkedHashMap<String, Object>());
                     ((LinkedHashMap) documentMap.get(ConfigurationSetting.SOURCE_NAME.getValue()))
                             .put("Enabled", true);
                     ((LinkedHashMap) documentMap.get(ConfigurationSetting.SOURCE_NAME.getValue()))
-                            .put("Remove", ((SourceName) transformer).isRemove());
-                } else if (transformer instanceof SourceDebug) {
+                            .put("Remove", ((SourceFileRemover) transformer).isRemove());
+                } else if (transformer instanceof SourceDebugRemover) {
                     documentMap.putIfAbsent(ConfigurationSetting.SOURCE_DEBUG.getValue(),
                             new LinkedHashMap<String, Object>());
                     ((LinkedHashMap) documentMap.get(ConfigurationSetting.SOURCE_DEBUG.getValue()))
                             .put("Enabled", true);
                     ((LinkedHashMap) documentMap.get(ConfigurationSetting.SOURCE_DEBUG.getValue()))
-                            .put("Remove", ((SourceDebug) transformer).isRemove());
+                            .put("Remove", ((SourceDebugRemover) transformer).isRemove());
                 } else if (transformer instanceof HideCode) {
                     documentMap.put(ConfigurationSetting.HIDE_CODE.getValue(), true);
                 } else if (transformer instanceof MemberShuffler) {

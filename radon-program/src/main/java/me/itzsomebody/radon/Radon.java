@@ -74,6 +74,7 @@ public class Radon {
             this.sessionInfo.getTransformers().add(new TrashClasses());
         if (this.sessionInfo.getTransformers().isEmpty())
             throw new RadonException("No transformers are enabled.");
+
         Logger.stdOut("------------------------------------------------");
         this.sessionInfo.getTransformers().stream().filter(Objects::nonNull).forEach(transformer -> {
             long current = System.currentTimeMillis();
@@ -90,6 +91,7 @@ public class Radon {
     private void writeOutput() {
         File output = this.sessionInfo.getOutput();
         Logger.stdOut(String.format("Writing output to \"%s\".", output.getAbsolutePath()));
+
         if (output.exists())
             Logger.stdOut(String.format("Output file already exists, renamed to %s.", IOUtils.renameExistingFile(output)));
 
@@ -162,7 +164,8 @@ public class Radon {
 
                                 this.classPath.put(classWrapper.originalName, classWrapper);
                             } catch (Throwable t) {
-                                // Don't care.
+                                Logger.stdErr(String.format("Error while loading library class \"%s\".", entry.getName().replace(".class", "")));
+                                t.printStackTrace();
                             }
                         }
                     }
@@ -242,21 +245,26 @@ public class Radon {
     private void buildHierarchy(ClassWrapper classWrapper, ClassWrapper sub) {
         if (hierarchy.get(classWrapper.classNode.name) == null) {
             ClassTree tree = new ClassTree(classWrapper);
+
             if (classWrapper.classNode.superName != null) {
                 tree.parentClasses.add(classWrapper.classNode.superName);
+
                 ClassWrapper superClass = classPath.get(classWrapper.classNode.superName);
                 if (superClass == null)
                     throw new RadonException(classWrapper.classNode.superName + " is missing in the classpath.");
+
                 buildHierarchy(superClass, classWrapper);
             }
             if (classWrapper.classNode.interfaces != null && !classWrapper.classNode.interfaces.isEmpty()) {
-                for (String s : classWrapper.classNode.interfaces) {
+                classWrapper.classNode.interfaces.forEach(s -> {
                     tree.parentClasses.add(s);
+
                     ClassWrapper interfaceClass = classPath.get(s);
                     if (interfaceClass == null)
                         throw new RadonException(s + " is missing in the classpath.");
+
                     buildHierarchy(interfaceClass, classWrapper);
-                }
+                });
             }
             hierarchy.put(classWrapper.classNode.name, tree);
         }
@@ -300,11 +308,13 @@ public class Radon {
             else if (Modifier.isInterface(first.access) || Modifier.isInterface(second.access))
                 return "java/lang/Object";
             else {
+                String temp;
+
                 do {
-                    type1 = first.superName;
-                    first = returnClazz(type1);
-                } while (!isAssignableFrom(type1, type2));
-                return type1;
+                    temp = first.superName;
+                    first = returnClazz(temp);
+                } while (!isAssignableFrom(temp, type2));
+                return temp;
             }
         }
 

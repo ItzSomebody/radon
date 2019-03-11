@@ -26,8 +26,28 @@ import me.itzsomebody.radon.transformers.Transformer;
  * @author ItzSomebody
  */
 public abstract class Shrinker extends Transformer {
+    private ShrinkerSetup setup;
+
+    public void initSetup(ShrinkerSetup setup) {
+        this.setup = setup;
+    }
+
+    @Override
+    public void transform() {
+        // TODO
+    }
+
+    @Override
+    public String getName() {
+        return "Shrinker";
+    }
+
     @Override
     protected ExclusionType getExclusionType() {
         return ExclusionType.SHRINKER;
+    }
+
+    public ShrinkerSetup getSetup() {
+        return setup;
     }
 }

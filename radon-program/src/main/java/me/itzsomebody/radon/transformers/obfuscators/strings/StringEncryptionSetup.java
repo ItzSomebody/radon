@@ -26,6 +26,8 @@ import java.util.List;
  */
 public class StringEncryptionSetup {
     private final List<String> exemptedStrings;
+    private boolean checkContext;
+    private boolean poolStrings;
 
     public StringEncryptionSetup(List<String> exemptedStrings) {
         this.exemptedStrings = exemptedStrings;
@@ -33,5 +35,21 @@ public class StringEncryptionSetup {
 
     public List<String> getExemptedStrings() {
         return this.exemptedStrings;
+    }
+
+    public boolean isCheckContext() {
+        return checkContext;
+    }
+
+    public void setCheckContext(boolean checkContext) {
+        this.checkContext = checkContext;
+    }
+
+    public boolean isPoolStrings() {
+        return poolStrings;
+    }
+
+    public void setPoolStrings(boolean poolStrings) {
+        this.poolStrings = poolStrings;
     }
 }

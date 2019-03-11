@@ -36,4 +36,12 @@ public class AccessUtils {
     public static boolean isBridge(int access) {
         return (Opcodes.ACC_BRIDGE & access) != 0;
     }
+
+    public static boolean isVarargs(int access) {
+        return (Opcodes.ACC_VARARGS & access) != 0;
+    }
+
+    public static boolean isDeprecated(int access) {
+        return (Opcodes.ACC_DEPRECATED & access) != 0;
+    }
 }

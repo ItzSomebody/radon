@@ -18,15 +18,17 @@
 package me.itzsomebody.radon.transformers.shrinkers;
 
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 import me.itzsomebody.radon.Logger;
+import org.objectweb.asm.Attribute;
 import org.objectweb.asm.tree.ClassNode;
 
 /**
- * Removes all attributes from the classes.
+ * Removes all unknown attributes from the classes.
  *
  * @author ItzSomebody
  */
-public class AttributesRemover extends Shrinker {
+public class UnknownAttributesRemover extends Shrinker {
     @Override
     public void transform() {
         AtomicInteger counter = new AtomicInteger();
@@ -35,8 +37,10 @@ public class AttributesRemover extends Shrinker {
                 && classWrapper.classNode.attrs != null).forEach(classWrapper -> {
             ClassNode classNode = classWrapper.classNode;
 
-            counter.addAndGet(classNode.attrs.size());
-            classNode.attrs.clear();
+            Stream.of(classNode.attrs.toArray(new Attribute[0])).filter(Attribute::isUnknown).forEach(attr -> {
+                classNode.attrs.remove(attr);
+                counter.incrementAndGet();
+            });
         });
 
         Logger.stdOut(String.format("Removed %d attributes.", counter.get()));

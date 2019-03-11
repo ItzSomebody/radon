@@ -25,22 +25,23 @@ import me.itzsomebody.radon.transformers.Transformer;
  *
  * @author ItzSomebody
  */
-public abstract class NumberObfuscation extends Transformer {
+public class NumberObfuscation extends Transformer {
+    @Override
+    public void transform() {
+        getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper ->
+                classWrapper.methods.stream().filter(methodWrapper -> !excluded(methodWrapper))
+                        .forEach(methodWrapper -> {
+
+                        }));
+    }
+
+    @Override
+    public String getName() {
+        return "Number obfuscation";
+    }
+
     @Override
     protected ExclusionType getExclusionType() {
         return ExclusionType.NUMBER_OBFUSCATION;
-    }
-
-    public static NumberObfuscation getTransformerFromString(String s) {
-        switch (s.toLowerCase()) {
-            case "light":
-                return new LightNumberObfuscation();
-            case "normal":
-                return new NormalNumberObfuscation();
-            case "heavy":
-                return new HeavyNumberObfuscation();
-            default:
-                throw new RuntimeException("Did not expect " + s + " as a number obfuscation mode");
-        }
     }
 }

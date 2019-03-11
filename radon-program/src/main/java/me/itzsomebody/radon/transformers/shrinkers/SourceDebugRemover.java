@@ -15,50 +15,32 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package me.itzsomebody.radon.transformers.obfuscators.miscellaneous;
+package me.itzsomebody.radon.transformers.shrinkers;
 
 import java.util.concurrent.atomic.AtomicInteger;
-import me.itzsomebody.radon.exclusions.ExclusionType;
-import me.itzsomebody.radon.transformers.Transformer;
 import me.itzsomebody.radon.Logger;
 
 /**
- * Obfuscate the source name attribute by either randomizing the data, or removing it altogether.
+ * Removes the sourcedebugextension attribute.
  *
  * @author ItzSomebody
  */
-public class SourceName extends Transformer {
-    private boolean remove;
-
-    public SourceName(boolean remove) {
-        this.remove = remove;
-    }
-
-    public boolean isRemove() {
-        return remove;
-    }
-
+public class SourceDebugRemover extends Shrinker {
     @Override
     public void transform() {
         AtomicInteger counter = new AtomicInteger();
 
-        String newName = (remove) ? null : randomString(4) + ".java";
-        getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper -> {
-            classWrapper.classNode.sourceFile = newName;
+        getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)
+                && classWrapper.classNode.sourceDebug != null).forEach(classWrapper -> {
+            classWrapper.classNode.sourceDebug = null;
             counter.incrementAndGet();
         });
 
-        Logger.stdOut(String.format("%s %d source name attributes.", (remove) ? "Removed" : "Obfuscated",
-                counter.get()));
-    }
-
-    @Override
-    protected ExclusionType getExclusionType() {
-        return ExclusionType.SOURCE_NAME;
+        Logger.stdOut(String.format("Remove %d source debug attributes.", counter.get()));
     }
 
     @Override
     public String getName() {
-        return "Source name";
+        return "Source debug";
     }
 }

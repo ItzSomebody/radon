@@ -5,7 +5,7 @@
     <parent>
         <artifactId>radon</artifactId>
         <groupId>me.itzsomebody</groupId>
-        <version>1.0.5</version>
+        <version>2.0.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>radon-gui</artifactId>
@@ -50,7 +50,7 @@
         <dependency>
             <groupId>me.itzsomebody</groupId>
             <artifactId>radon-program</artifactId>
-            <version>1.0.5</version>
+            <version>2.0.0</version>
         </dependency>
     </dependencies>
 </project>

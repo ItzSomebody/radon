@@ -18,11 +18,10 @@
 package me.itzsomebody.radon.exclusions;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Class containing a {@link LinkedList<Exclusion>} of all the created exclusions.
+ * Class containing a {@link List<Exclusion>} of all the created exclusions.
  *
  * @author ItzSomebody
  */

@@ -26,8 +26,28 @@ import me.itzsomebody.radon.transformers.Transformer;
  * @author ItzSomebody
  */
 public abstract class Optimizer extends Transformer {
+    private OptimizerSetup setup;
+
+    public void initSetup(OptimizerSetup setup) {
+        this.setup = setup;
+    }
+
+    @Override
+    public void transform() {
+        // TODO
+    }
+
+    @Override
+    public String getName() {
+        return "Optimizer";
+    }
+
     @Override
     protected ExclusionType getExclusionType() {
         return ExclusionType.OPTIMIZER;
+    }
+
+    public OptimizerSetup getSetup() {
+        return setup;
     }
 }

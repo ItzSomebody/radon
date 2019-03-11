@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 import me.itzsomebody.radon.Dictionaries;
 import me.itzsomebody.radon.SessionInfo;
 import me.itzsomebody.radon.exceptions.IllegalConfigurationValueException;
@@ -39,13 +40,13 @@ import me.itzsomebody.radon.transformers.miscellaneous.expiration.ExpirationSetu
 import me.itzsomebody.radon.transformers.miscellaneous.watermarker.Watermarker;
 import me.itzsomebody.radon.transformers.miscellaneous.watermarker.WatermarkerSetup;
 import me.itzsomebody.radon.transformers.obfuscators.flow.FlowObfuscation;
-import me.itzsomebody.radon.transformers.obfuscators.invokedynamic.InvokeDynamic;
-import me.itzsomebody.radon.transformers.obfuscators.miscellaneous.HideCode;
-import me.itzsomebody.radon.transformers.obfuscators.miscellaneous.LineNumbers;
-import me.itzsomebody.radon.transformers.obfuscators.miscellaneous.LocalVariables;
-import me.itzsomebody.radon.transformers.obfuscators.miscellaneous.MemberShuffler;
-import me.itzsomebody.radon.transformers.obfuscators.miscellaneous.SourceDebug;
-import me.itzsomebody.radon.transformers.obfuscators.miscellaneous.SourceName;
+import me.itzsomebody.radon.transformers.obfuscators.references.InvokeDynamic;
+import me.itzsomebody.radon.transformers.obfuscators.HideCode;
+import me.itzsomebody.radon.transformers.shrinkers.LineNumberRemover;
+import me.itzsomebody.radon.transformers.shrinkers.LocalVariableRemover;
+import me.itzsomebody.radon.transformers.obfuscators.MemberShuffler;
+import me.itzsomebody.radon.transformers.shrinkers.SourceDebugRemover;
+import me.itzsomebody.radon.transformers.shrinkers.SourceFileRemover;
 import me.itzsomebody.radon.transformers.obfuscators.numbers.NumberObfuscation;
 import me.itzsomebody.radon.transformers.obfuscators.renamer.Renamer;
 import me.itzsomebody.radon.transformers.obfuscators.renamer.RenamerSetup;
@@ -67,7 +68,7 @@ import org.yaml.snakeyaml.Yaml;
  */
 public class ConfigurationParser {
     private Map<String, Object> map;
-    private final static Set<String> VALID_KEYS = new HashSet<>();
+    private static final Set<String> VALID_KEYS = new HashSet<>();
 
     static {
         for (ConfigurationSetting setting : ConfigurationSetting.values())
@@ -121,20 +122,20 @@ public class ConfigurationParser {
 
         ArrayList<File> libraries = new ArrayList<>();
         List<?> libs = (List) o;
-        for (Object lib : libs) {
+        libs.forEach(lib -> {
             try {
                 String s = (String) lib;
                 File libFile = new File(s);
-                if (libFile.isDirectory()) {
+                if (libFile.isDirectory())
                     addSubDirFiles(libFile, libraries);
-                } else {
+                else
                     libraries.add(libFile);
-                }
+
             } catch (ClassCastException e) {
                 throw new IllegalConfigurationValueException(ConfigurationSetting.LIBRARIES.getValue(), String.class,
                         lib.getClass());
             }
-        }
+        });
 
         return libraries;
     }
@@ -142,8 +143,8 @@ public class ConfigurationParser {
     /**
      * Searches sub directories for libraries
      *
-     * @param file      should be directory
-     * @param libraries
+     * @param file      should be directory.
+     * @param libraries all the libraries found.
      * @author Richard Xing
      */
     private static void addSubDirFiles(File file, List<File> libraries) {
@@ -152,17 +153,14 @@ public class ConfigurationParser {
         } else {
             File[] fileLists = file.listFiles();
 
-            for (int i = 0; i < fileLists.length; i++) {
-                // 输出元素名称
-
-                if (fileLists[i].isDirectory()) {
-                    addSubDirFiles(fileLists[i], libraries);
-                } else {
-                    if (fileLists[i].getName().toLowerCase().endsWith(".jar")) {
-                        //System.out.println(fileLists[i].getName());
-                        libraries.add(fileLists[i]);
-                    }
-                }
+            if (fileLists != null) {
+                Stream.of(fileLists).forEach(f -> {
+                    // 输出元素名称
+                    if (f.isDirectory())
+                        addSubDirFiles(f, libraries);
+                    else if (f.getName().toLowerCase().endsWith(".jar"))
+                        libraries.add(f);
+                });
             }
         }
     }
@@ -174,10 +172,6 @@ public class ConfigurationParser {
         transformers.add(getRenamerTransformer());
         transformers.add(getNumberObfuscationTransformer());
         transformers.add(getInvokeDynamicTransformer());
-        List<StringEncryption> stringEncrypters = getStringEncryptionTransformers();
-        if (stringEncrypters != null) {
-            transformers.addAll(stringEncrypters);
-        }
         transformers.add(getFlowObfuscationTransformer());
         transformers.add(getShufflerTransformer());
         transformers.add(getLocalVariablesTransformer());
@@ -188,6 +182,10 @@ public class ConfigurationParser {
         transformers.add(getHideCodeTransformer());
         transformers.add(getExpirationTransformer());
         transformers.add(getWatermarkerTransformer());
+        List<StringEncryption> stringEncrypters = getStringEncryptionTransformers();
+        if (stringEncrypters != null) {
+            transformers.addAll(stringEncrypters);
+        }
 
         return transformers;
     }
@@ -253,12 +251,8 @@ public class ConfigurationParser {
             if (!(boolean) renamerSettings.get("Enabled"))
                 return null;
 
-            List objects = (List) renamerSettings.getOrDefault("AdaptResources", new ArrayList<String>());
-            String[] adaptThese = new String[objects.size()];
-
-            for (int i = 0; i < objects.size(); i++) {
-                adaptThese[i] = (String) objects.get(i);
-            }
+            List<String> objects = (List) renamerSettings.getOrDefault("AdaptResources", new ArrayList<String>());
+            String[] adaptThese = objects.toArray(new String[0]);
 
             String repackageName = (String) renamerSettings.get("Repackage");
 
@@ -357,7 +351,7 @@ public class ConfigurationParser {
         return ((boolean) o) ? new MemberShuffler() : null;
     }
 
-    private LocalVariables getLocalVariablesTransformer() {
+    private LocalVariableRemover getLocalVariablesTransformer() {
         Object o = map.get(ConfigurationSetting.LOCAL_VARIABLES.getValue());
         if (o == null)
             return null;
@@ -371,14 +365,14 @@ public class ConfigurationParser {
                 return null;
             }
 
-            return new LocalVariables(settings.getOrDefault("Remove", false));
+            return new LocalVariableRemover(settings.getOrDefault("Remove", false));
         } catch (ClassCastException e) {
             throw new IllegalConfigurationValueException("Error while parsing local variable obfuscation setup: "
                     + e.getMessage());
         }
     }
 
-    private LineNumbers getLineNumbersTransformer() {
+    private LineNumberRemover getLineNumbersTransformer() {
         Object o = map.get(ConfigurationSetting.LINE_NUMBERS.getValue());
         if (o == null)
             return null;
@@ -391,14 +385,14 @@ public class ConfigurationParser {
             if (!settings.get("Enabled"))
                 return null;
 
-            return new LineNumbers(settings.getOrDefault("Remove", false));
+            return new LineNumberRemover(settings.getOrDefault("Remove", false));
         } catch (ClassCastException e) {
             throw new IllegalConfigurationValueException("Error while parsing line number obfuscation setup: "
                     + e.getMessage());
         }
     }
 
-    private SourceName getSourceNameTransformer() {
+    private SourceFileRemover getSourceNameTransformer() {
         Object o = map.get(ConfigurationSetting.SOURCE_NAME.getValue());
         if (o == null)
             return null;
@@ -411,14 +405,14 @@ public class ConfigurationParser {
             if (!settings.get("Enabled"))
                 return null;
 
-            return new SourceName(settings.getOrDefault("Remove", false));
+            return new SourceFileRemover(settings.getOrDefault("Remove", false));
         } catch (ClassCastException e) {
             throw new IllegalConfigurationValueException("Error while parsing source name obfuscation setup: "
                     + e.getMessage());
         }
     }
 
-    private SourceDebug getSourceDebugTransformer() {
+    private SourceDebugRemover getSourceDebugTransformer() {
         Object o = map.get(ConfigurationSetting.SOURCE_DEBUG.getValue());
         if (o == null)
             return null;
@@ -431,7 +425,7 @@ public class ConfigurationParser {
             if (!settings.get("Enabled"))
                 return null;
 
-            return new SourceDebug(settings.getOrDefault("Remove", false));
+            return new SourceDebugRemover(settings.getOrDefault("Remove", false));
         } catch (ClassCastException e) {
             throw new IllegalConfigurationValueException("Error while parsing source debug obfuscation setup: "
                     + e.getMessage());

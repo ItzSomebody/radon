@@ -50,17 +50,4 @@ public abstract class StringEncryption extends Transformer {
     public List<String> getExcludedStrings() {
         return this.setup.getExemptedStrings();
     }
-
-    public static StringEncryption getTransformerFromString(String s, StringEncryptionSetup setup) {
-        switch (s.toLowerCase()) {
-            case "light":
-                return new LightStringEncryption(setup);
-            case "normal":
-                return new NormalStringEncryption(setup);
-            case "heavy":
-                return new HeavyStringEncryption(setup);
-            default:
-                throw new IllegalConfigurationValueException("Did not expect " + s + " as a string obfuscation mode");
-        }
-    }
 }

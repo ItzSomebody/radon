@@ -17,7 +17,6 @@
 
 package me.itzsomebody.radon.transformers.obfuscators.flow;
 
-import me.itzsomebody.radon.exceptions.IllegalConfigurationValueException;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
 
@@ -26,22 +25,19 @@ import me.itzsomebody.radon.transformers.Transformer;
  *
  * @author ItzSomebody
  */
-public abstract class FlowObfuscation extends Transformer {
+public class FlowObfuscation extends Transformer {
+    @Override
+    public void transform() {
+
+    }
+
+    @Override
+    public String getName() {
+        return "Flow Obfuscation";
+    }
+
     @Override
     protected ExclusionType getExclusionType() {
         return ExclusionType.FLOW_OBFUSCATION;
-    }
-
-    public static FlowObfuscation getTransformerFromString(String s) {
-        switch (s.toLowerCase()) {
-            case "light":
-                return new LightFlowObfuscation();
-            case "normal":
-                return new NormalFlowObfuscation();
-            case "heavy":
-                return new HeavyFlowObfuscation();
-            default:
-                throw new IllegalConfigurationValueException("Did not expect " + s + " as a flow obfuscation mode");
-        }
     }
 }

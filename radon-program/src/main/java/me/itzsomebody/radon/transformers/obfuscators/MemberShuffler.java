@@ -15,50 +15,41 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package me.itzsomebody.radon.transformers.obfuscators.miscellaneous;
+package me.itzsomebody.radon.transformers.obfuscators;
 
+import java.util.Collections;
 import java.util.concurrent.atomic.AtomicInteger;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
 import me.itzsomebody.radon.Logger;
 
 /**
- * Obfuscate the sourcedebugextension attribute by either randomizing the data, or removing it altogether.
- *
- * @author ItzSomebody
+ * Randomizes the order of methods and fields in a class.
  */
-public class SourceDebug extends Transformer {
-    private boolean remove;
-
-    public SourceDebug(boolean remove) {
-        this.remove = remove;
-    }
-
-    public boolean isRemove() {
-        return remove;
-    }
-
+public class MemberShuffler extends Transformer {
     @Override
     public void transform() {
         AtomicInteger counter = new AtomicInteger();
 
-        String newName = (remove) ? null : randomString(4) + ".java";
         getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper -> {
-            classWrapper.classNode.sourceDebug = newName;
-            counter.incrementAndGet();
+            Collections.shuffle(classWrapper.classNode.methods);
+            counter.addAndGet(classWrapper.classNode.methods.size());
+            if (classWrapper.classNode.fields != null) {
+                Collections.shuffle(classWrapper.classNode.fields);
+                counter.addAndGet(classWrapper.classNode.fields.size());
+            }
         });
 
-        Logger.stdOut(String.format("%s %d source debug attributes.", (remove) ? "Removed" : "Obfuscated",
-                counter.get()));
+        Logger.stdOut(String.format("Shuffled %d members.", counter.get()));
     }
 
     @Override
     protected ExclusionType getExclusionType() {
-        return ExclusionType.SOURCE_NAME;
+        return ExclusionType.SHUFFLER;
     }
 
     @Override
     public String getName() {
-        return "Source debug";
+        return "Member Shuffler";
     }
 }

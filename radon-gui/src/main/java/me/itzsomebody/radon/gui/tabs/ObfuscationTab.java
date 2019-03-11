@@ -31,15 +31,15 @@ import me.itzsomebody.radon.transformers.obfuscators.flow.HeavyFlowObfuscation;
 import me.itzsomebody.radon.transformers.obfuscators.flow.LightFlowObfuscation;
 import me.itzsomebody.radon.transformers.obfuscators.flow.NormalFlowObfuscation;
 import me.itzsomebody.radon.transformers.obfuscators.invokedynamic.HeavyInvokeDynamic;
-import me.itzsomebody.radon.transformers.obfuscators.invokedynamic.InvokeDynamic;
+import me.itzsomebody.radon.transformers.obfuscators.references.InvokeDynamic;
 import me.itzsomebody.radon.transformers.obfuscators.invokedynamic.LightInvokeDynamic;
 import me.itzsomebody.radon.transformers.obfuscators.invokedynamic.NormalInvokeDynamic;
-import me.itzsomebody.radon.transformers.obfuscators.miscellaneous.HideCode;
-import me.itzsomebody.radon.transformers.obfuscators.miscellaneous.LineNumbers;
-import me.itzsomebody.radon.transformers.obfuscators.miscellaneous.LocalVariables;
-import me.itzsomebody.radon.transformers.obfuscators.miscellaneous.MemberShuffler;
-import me.itzsomebody.radon.transformers.obfuscators.miscellaneous.SourceDebug;
-import me.itzsomebody.radon.transformers.obfuscators.miscellaneous.SourceName;
+import me.itzsomebody.radon.transformers.obfuscators.HideCode;
+import me.itzsomebody.radon.transformers.shrinkers.LineNumberRemover;
+import me.itzsomebody.radon.transformers.shrinkers.LocalVariableRemover;
+import me.itzsomebody.radon.transformers.obfuscators.MemberShuffler;
+import me.itzsomebody.radon.transformers.shrinkers.SourceDebugRemover;
+import me.itzsomebody.radon.transformers.shrinkers.SourceFileRemover;
 import me.itzsomebody.radon.transformers.obfuscators.numbers.HeavyNumberObfuscation;
 import me.itzsomebody.radon.transformers.obfuscators.numbers.LightNumberObfuscation;
 import me.itzsomebody.radon.transformers.obfuscators.numbers.NormalNumberObfuscation;
@@ -528,20 +528,20 @@ public class ObfuscationTab extends JPanel {
         }
     }
 
-    public LocalVariables getLocalVarObfuscation() {
-        return (localVarCheckBox.isSelected()) ? new LocalVariables(localVarsRemove.isSelected()) : null;
+    public LocalVariableRemover getLocalVarObfuscation() {
+        return (localVarCheckBox.isSelected()) ? new LocalVariableRemover(localVarsRemove.isSelected()) : null;
     }
 
-    public LineNumbers getLineNumberObfuscation() {
-        return (lineNumbersCheckBox.isSelected()) ? new LineNumbers(lineNumbersRemove.isSelected()) : null;
+    public LineNumberRemover getLineNumberObfuscation() {
+        return (lineNumbersCheckBox.isSelected()) ? new LineNumberRemover(lineNumbersRemove.isSelected()) : null;
     }
 
-    public SourceName getSourceNameObfuscation() {
-        return (sourceNameCheckBox.isSelected()) ? new SourceName(sourceNameRemove.isSelected()) : null;
+    public SourceFileRemover getSourceNameObfuscation() {
+        return (sourceNameCheckBox.isSelected()) ? new SourceFileRemover(sourceNameRemove.isSelected()) : null;
     }
 
-    public SourceDebug getSourceDebugObfuscation() {
-        return (sourceDebugCheckBox.isSelected()) ? new SourceDebug(sourceDebugRemove.isSelected()) : null;
+    public SourceDebugRemover getSourceDebugObfuscation() {
+        return (sourceDebugCheckBox.isSelected()) ? new SourceDebugRemover(sourceDebugRemove.isSelected()) : null;
     }
 
     public HideCode getHideCodeObfuscation() {
@@ -682,22 +682,22 @@ public class ObfuscationTab extends JPanel {
                     } else if (transformer instanceof HeavyNumberObfuscation) {
                         numberObfuscationComboBox.setSelectedIndex(2);
                     }
-                } else if (transformer instanceof LocalVariables) {
+                } else if (transformer instanceof LocalVariableRemover) {
                     localVarCheckBox.setSelected(true);
                     localVarsRemove.setEnabled(true);
-                    localVarsRemove.setSelected(((LocalVariables) transformer).isRemove());
-                } else if (transformer instanceof LineNumbers) {
+                    localVarsRemove.setSelected(((LocalVariableRemover) transformer).isRemove());
+                } else if (transformer instanceof LineNumberRemover) {
                     lineNumbersCheckBox.setSelected(true);
                     lineNumbersRemove.setEnabled(true);
-                    lineNumbersRemove.setSelected(((LineNumbers) transformer).isRemove());
-                } else if (transformer instanceof SourceName) {
+                    lineNumbersRemove.setSelected(((LineNumberRemover) transformer).isRemove());
+                } else if (transformer instanceof SourceFileRemover) {
                     sourceNameCheckBox.setSelected(true);
                     sourceNameRemove.setEnabled(true);
-                    sourceNameRemove.setSelected(((SourceName) transformer).isRemove());
-                } else if (transformer instanceof SourceDebug) {
+                    sourceNameRemove.setSelected(((SourceFileRemover) transformer).isRemove());
+                } else if (transformer instanceof SourceDebugRemover) {
                     sourceDebugCheckBox.setSelected(true);
                     sourceDebugRemove.setEnabled(true);
-                    sourceDebugRemove.setSelected(((SourceDebug) transformer).isRemove());
+                    sourceDebugRemove.setSelected(((SourceDebugRemover) transformer).isRemove());
                 } else if (transformer instanceof HideCode) {
                     hideCodeCheckBox.setSelected(true);
                 } else if (transformer instanceof MemberShuffler) {

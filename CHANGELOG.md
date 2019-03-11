@@ -1,3 +1,6 @@
+# 2.0.0
+* TODO
+
 ## 1.0.5
 * Fixes bug that caused all exclusions to not work.
 * Fixes a flaw in the light string encryption decryption code which could lead to collision issues (Thanks [visleaf](https://github.com/visleaf)).

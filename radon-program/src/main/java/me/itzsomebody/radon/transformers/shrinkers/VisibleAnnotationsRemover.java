@@ -22,40 +22,37 @@ import me.itzsomebody.radon.Logger;
 import org.objectweb.asm.tree.ClassNode;
 
 /**
- * Removes annotations visible to the runtime from classes, methods and fields.
+ * Removes annotations visible to the runtime.
  *
  * @author ItzSomebody
  */
 public class VisibleAnnotationsRemover extends Shrinker {
     @Override
     public void transform() {
-        AtomicInteger classAnnotations = new AtomicInteger();
-        AtomicInteger methodAnnotations = new AtomicInteger();
-        AtomicInteger fieldAnnotations = new AtomicInteger();
+        AtomicInteger counter = new AtomicInteger();
 
         getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper -> {
             ClassNode classNode = classWrapper.classNode;
 
             if (classNode.visibleAnnotations != null) {
-                classAnnotations.addAndGet(classNode.visibleAnnotations.size());
-                classNode.visibleAnnotations.clear();
+                counter.addAndGet(classNode.visibleAnnotations.size());
+                classNode.visibleAnnotations = null;
             }
 
             classWrapper.fields.stream().filter(fieldWrapper -> !excluded(fieldWrapper)
                     && fieldWrapper.fieldNode.visibleAnnotations != null).forEach(fieldWrapper -> {
-                fieldAnnotations.addAndGet(fieldWrapper.fieldNode.visibleAnnotations.size());
-                fieldWrapper.fieldNode.visibleAnnotations.clear();
+                counter.addAndGet(fieldWrapper.fieldNode.visibleAnnotations.size());
+                fieldWrapper.fieldNode.visibleAnnotations = null;
             });
 
             classWrapper.methods.stream().filter(methodWrapper -> !excluded(methodWrapper)
                     && methodWrapper.methodNode.visibleAnnotations != null).forEach(methodWrapper -> {
-                methodAnnotations.addAndGet(methodWrapper.methodNode.visibleAnnotations.size());
-                methodWrapper.methodNode.visibleAnnotations.clear();
+                counter.addAndGet(methodWrapper.methodNode.visibleAnnotations.size());
+                methodWrapper.methodNode.visibleAnnotations = null;
             });
         });
 
-        Logger.stdOut(String.format("Removed %d class, %d method and %d field invisible annotations.",
-                classAnnotations.get(), methodAnnotations.get(), fieldAnnotations.get()));
+        Logger.stdOut(String.format("Removed %d visible annotations.", counter.get()));
     }
 
     @Override

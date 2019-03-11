@@ -29,33 +29,30 @@ import org.objectweb.asm.tree.ClassNode;
 public class InvisibleAnnotationsRemover extends Shrinker {
     @Override
     public void transform() {
-        AtomicInteger classAnnotations = new AtomicInteger();
-        AtomicInteger methodAnnotations = new AtomicInteger();
-        AtomicInteger fieldAnnotations = new AtomicInteger();
+        AtomicInteger counter = new AtomicInteger();
 
         getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper -> {
             ClassNode classNode = classWrapper.classNode;
 
             if (classNode.invisibleAnnotations != null) {
-                classAnnotations.addAndGet(classNode.invisibleAnnotations.size());
-                classNode.invisibleAnnotations.clear();
+                counter.addAndGet(classNode.invisibleAnnotations.size());
+                classNode.invisibleAnnotations = null;
             }
 
             classWrapper.fields.stream().filter(fieldWrapper -> !excluded(fieldWrapper)
                     && fieldWrapper.fieldNode.invisibleAnnotations != null).forEach(fieldWrapper -> {
-                fieldAnnotations.addAndGet(fieldWrapper.fieldNode.invisibleAnnotations.size());
-                fieldWrapper.fieldNode.invisibleAnnotations.clear();
+                counter.addAndGet(fieldWrapper.fieldNode.invisibleAnnotations.size());
+                fieldWrapper.fieldNode.invisibleAnnotations = null;
             });
 
             classWrapper.methods.stream().filter(methodWrapper -> !excluded(methodWrapper)
                     && methodWrapper.methodNode.invisibleAnnotations != null).forEach(methodWrapper -> {
-                methodAnnotations.addAndGet(methodWrapper.methodNode.invisibleAnnotations.size());
-                methodWrapper.methodNode.invisibleAnnotations.clear();
+                counter.addAndGet(methodWrapper.methodNode.invisibleAnnotations.size());
+                methodWrapper.methodNode.invisibleAnnotations = null;
             });
         });
 
-        Logger.stdOut(String.format("Removed %d class, %d method and %d field invisible annotations.",
-                classAnnotations.get(), methodAnnotations.get(), fieldAnnotations.get()));
+        Logger.stdOut(String.format("Removed %d invisible annotations.", counter.get()));
     }
 
     @Override

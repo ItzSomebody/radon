@@ -15,41 +15,34 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package me.itzsomebody.radon.transformers.obfuscators.miscellaneous;
+package me.itzsomebody.radon.transformers.shrinkers;
 
-import java.util.Collections;
 import java.util.concurrent.atomic.AtomicInteger;
+import me.itzsomebody.radon.Logger;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
-import me.itzsomebody.radon.Logger;
 
 /**
- * Randomizes the order of methods and fields in a class.
+ * Removes the sourcefile attribute.
+ *
+ * @author ItzSomebody
  */
-public class MemberShuffler extends Transformer {
+public class SourceFileRemover extends Shrinker {
     @Override
     public void transform() {
         AtomicInteger counter = new AtomicInteger();
 
-        getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper -> {
-            Collections.shuffle(classWrapper.classNode.methods);
-            counter.addAndGet(classWrapper.classNode.methods.size());
-            if (classWrapper.classNode.fields != null) {
-                Collections.shuffle(classWrapper.classNode.fields);
-                counter.addAndGet(classWrapper.classNode.fields.size());
-            }
+        getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)
+                && classWrapper.classNode.sourceFile != null).forEach(classWrapper -> {
+            classWrapper.classNode.sourceFile = null;
+            counter.incrementAndGet();
         });
 
-        Logger.stdOut(String.format("Shuffled %d members.", counter.get()));
-    }
-
-    @Override
-    protected ExclusionType getExclusionType() {
-        return ExclusionType.SHUFFLER;
+        Logger.stdOut(String.format("Removed %d source name attributes.", counter.get()));
     }
 
     @Override
     public String getName() {
-        return "Member Shuffler";
+        return "Source name";
     }
 }
