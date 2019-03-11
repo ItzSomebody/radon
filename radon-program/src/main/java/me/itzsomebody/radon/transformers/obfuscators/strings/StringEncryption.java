@@ -56,7 +56,7 @@ public abstract class StringEncryption extends Transformer {
 
     protected InsnList getSafeStringInsnList(String string) {
         InsnList insnList = new InsnList();
-        if (StringUtils.getUtf8StringSize(string) <= StringUtils.MAX_SAFE_BYTE_COUNT) {
+        if (StringUtils.getUtf8StringSize(string) < StringUtils.MAX_SAFE_BYTE_COUNT) {
             insnList.add(new LdcInsnNode(string));
             return insnList;
         }
