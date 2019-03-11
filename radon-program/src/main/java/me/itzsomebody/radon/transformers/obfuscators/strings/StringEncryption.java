@@ -18,9 +18,12 @@
 package me.itzsomebody.radon.transformers.obfuscators.strings;
 
 import java.util.List;
+
 import me.itzsomebody.radon.exceptions.IllegalConfigurationValueException;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
+import me.itzsomebody.radon.utils.StringUtils;
+import org.objectweb.asm.tree.*;
 
 /**
  * Abstract class for string encryption transformers.
@@ -32,6 +35,19 @@ public abstract class StringEncryption extends Transformer {
 
     public StringEncryption(StringEncryptionSetup setup) {
         this.setup = setup;
+    }
+
+    public static StringEncryption getTransformerFromString(String s, StringEncryptionSetup setup) {
+        switch (s.toLowerCase()) {
+            case "light":
+                return new LightStringEncryption(setup);
+            case "normal":
+                return new NormalStringEncryption(setup);
+            case "heavy":
+                return new HeavyStringEncryption(setup);
+            default:
+                throw new IllegalConfigurationValueException("Did not expect " + s + " as a string obfuscation mode");
+        }
     }
 
     protected boolean excludedString(String str) {
@@ -51,16 +67,24 @@ public abstract class StringEncryption extends Transformer {
         return this.setup.getExemptedStrings();
     }
 
-    public static StringEncryption getTransformerFromString(String s, StringEncryptionSetup setup) {
-        switch (s.toLowerCase()) {
-            case "light":
-                return new LightStringEncryption(setup);
-            case "normal":
-                return new NormalStringEncryption(setup);
-            case "heavy":
-                return new HeavyStringEncryption(setup);
-            default:
-                throw new IllegalConfigurationValueException("Did not expect " + s + " as a string obfuscation mode");
+    protected InsnList getSafeStringInsnList(String string) {
+        InsnList insnList = new InsnList();
+        if (StringUtils.getUtf8StringSize(string) < StringUtils.MAX_SAFE_BYTE_COUNT) {
+            insnList.add(new LdcInsnNode(string));
+            return insnList;
         }
+
+        insnList.add(new TypeInsnNode(NEW, "java/lang/StringBuilder"));
+        insnList.add(new InsnNode(DUP));
+        insnList.add(new MethodInsnNode(INVOKESPECIAL, "java/lang/StringBuilder", "<init>", "()V", false));
+
+        String[] chunks = StringUtils.splitUtf8ToChunks(string, StringUtils.MAX_SAFE_BYTE_COUNT);
+        for (String chunk : chunks) {
+            insnList.add(new LdcInsnNode(chunk));
+            insnList.add(new MethodInsnNode(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/String;)Ljava/lang/StringBuilder;", false));
+        }
+        insnList.add(new MethodInsnNode(INVOKEVIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;", false));
+
+        return insnList;
     }
 }

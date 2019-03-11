@@ -65,11 +65,14 @@ public class LightStringEncryption extends StringEncryption {
 
                                 if (!excludedString(cst)) {
                                     int extraKey = RandomUtils.getRandomInt();
-                                    ldc.cst = encrypt(cst, extraKey);
                                     methodNode.instructions.insert(insn, new MethodInsnNode(INVOKESTATIC,
                                             memberNames.className, memberNames.decryptMethodName,
                                             "(Ljava/lang/String;I)Ljava/lang/String;", false));
                                     methodNode.instructions.insert(insn, BytecodeUtils.getNumberInsn(extraKey));
+
+                                    String encryptedString = encrypt(cst, extraKey);
+                                    BytecodeUtils.replaceInsn(methodNode.instructions, insn, getSafeStringInsnList(encryptedString));
+
                                     leeway -= 7;
                                     counter.incrementAndGet();
                                 }
