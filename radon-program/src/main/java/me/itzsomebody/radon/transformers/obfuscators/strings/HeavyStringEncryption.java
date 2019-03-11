@@ -71,14 +71,17 @@ public class HeavyStringEncryption extends StringEncryption {
                                     int callerMethodHC = methodNode.name.hashCode();
                                     int decryptorClassHC = memberNames.className.replace("/", ".").hashCode();
                                     int decryptorMethodHC = memberNames.decryptorMethodName.hashCode();
-                                    ldc.cst = encrypt(cst, callerClassHC, callerMethodHC, decryptorClassHC,
-                                            decryptorMethodHC, extraKey);
                                     methodNode.instructions.insert(insn, new MethodInsnNode(INVOKESTATIC,
                                             memberNames.className, memberNames.decryptorMethodName,
                                             "(Ljava/lang/Object;I)Ljava/lang/String;", false));
                                     methodNode.instructions.insert(insn, new InsnNode(POP));
                                     methodNode.instructions.insert(insn, new InsnNode(DUP_X1));
                                     methodNode.instructions.insertBefore(insn, BytecodeUtils.getNumberInsn(extraKey));
+
+                                    String encryptedString = encrypt(cst, callerClassHC, callerMethodHC, decryptorClassHC,
+                                            decryptorMethodHC, extraKey);
+                                    BytecodeUtils.replaceInsn(methodNode.instructions, insn, getSafeStringInsnList(encryptedString));
+
                                     leeway -= 10;
                                     counter.incrementAndGet();
                                 }
