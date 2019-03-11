@@ -18,6 +18,7 @@
 package me.itzsomebody.radon.transformers.obfuscators.strings;
 
 import java.util.concurrent.atomic.AtomicInteger;
+
 import me.itzsomebody.radon.asm.ClassWrapper;
 import me.itzsomebody.radon.utils.BytecodeUtils;
 import me.itzsomebody.radon.utils.LoggerUtils;
@@ -40,6 +41,15 @@ import org.objectweb.asm.tree.MethodNode;
 public class LightStringEncryption extends StringEncryption {
     public LightStringEncryption(StringEncryptionSetup setup) {
         super(setup);
+    }
+
+    private static String encrypt(String msg, int key) {
+        StringBuilder sb = new StringBuilder();
+        for (char c : msg.toCharArray()) {
+            sb.append((char) (c ^ key));
+        }
+
+        return sb.toString();
     }
 
     @Override
@@ -65,11 +75,14 @@ public class LightStringEncryption extends StringEncryption {
 
                                 if (!excludedString(cst)) {
                                     int extraKey = RandomUtils.getRandomInt();
-                                    ldc.cst = encrypt(cst, extraKey);
                                     methodNode.instructions.insert(insn, new MethodInsnNode(INVOKESTATIC,
                                             memberNames.className, memberNames.decryptMethodName,
                                             "(Ljava/lang/String;I)Ljava/lang/String;", false));
                                     methodNode.instructions.insert(insn, BytecodeUtils.getNumberInsn(extraKey));
+
+                                    String encryptedString = encrypt(cst, extraKey);
+                                    BytecodeUtils.replaceInsn(methodNode.instructions, insn, getSafeStringInsnList(encryptedString));
+
                                     leeway -= 7;
                                     counter.incrementAndGet();
                                 }
@@ -82,15 +95,6 @@ public class LightStringEncryption extends StringEncryption {
         getClasses().put(decryptor.name, new ClassWrapper(decryptor, false));
 
         LoggerUtils.stdOut(String.format("Encrypted %d strings.", counter.get()));
-    }
-
-    private static String encrypt(String msg, int key) {
-        StringBuilder sb = new StringBuilder();
-        for (char c : msg.toCharArray()) {
-            sb.append((char) (c ^ key));
-        }
-
-        return sb.toString();
     }
 
     @Override

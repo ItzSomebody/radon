@@ -19,6 +19,7 @@ package me.itzsomebody.radon.utils;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Utilities for strings. Primarily used for string generation.
@@ -26,6 +27,8 @@ import java.util.Collection;
  * @author ItzSomebody
  */
 public class StringUtils {
+    public static final int MAX_SAFE_BYTE_COUNT = 65535;
+
     private static char ALPHA_NUM[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".toCharArray();
     private static char ALPHA[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".toCharArray();
 
@@ -75,5 +78,50 @@ public class StringUtils {
         String second = list.get(RandomUtils.getRandomIntNoOrigin(classNames.size()));
 
         return first + '$' + second.substring(second.lastIndexOf("/") + 1, second.length());
+    }
+
+    public static String[] splitUtf8ToChunks(String text, int maxBytes) {
+        List<String> parts = new ArrayList<>();
+
+        char[] chars = text.toCharArray();
+
+        int lastCharIndex = 0;
+        int currentChunkSize = 0;
+
+        for (int i = 0; i < chars.length; i++) {
+            char c = chars[i];
+            int charSize = getUtf8CharSize(c);
+            if (currentChunkSize + charSize < maxBytes) {
+                currentChunkSize += charSize;
+            } else {
+                parts.add(text.substring(lastCharIndex, i));
+                currentChunkSize = 0;
+                lastCharIndex = i;
+            }
+        }
+
+        if (currentChunkSize != 0) {
+            parts.add(text.substring(lastCharIndex));
+        }
+
+        return parts.toArray(new String[0]);
+    }
+
+    public static int getUtf8CharSize(char c) {
+        if (c >= 0x0001 && c <= 0x007F) {
+            return 1;
+        } else if (c <= 0x07FF) {
+            return 2;
+        }
+        return 3;
+    }
+
+    public static int getUtf8StringSize(String string) {
+        int byteLength = 0;
+        for (int i = 0; i < string.length(); ++i) {
+            char charValue = string.charAt(i);
+            byteLength += getUtf8CharSize(charValue);
+        }
+        return byteLength;
     }
 }
