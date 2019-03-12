@@ -19,8 +19,6 @@ package me.itzsomebody.radon.transformers.obfuscators.antidebug;
 
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
-import me.itzsomebody.radon.transformers.obfuscators.numbers.HeavyNumberObfuscation;
-import me.itzsomebody.radon.transformers.obfuscators.numbers.NormalNumberObfuscation;
 import me.itzsomebody.radon.utils.AccessUtils;
 import me.itzsomebody.radon.utils.MethodNodeUtils;
 import me.itzsomebody.radon.utils.RandomUtils;
