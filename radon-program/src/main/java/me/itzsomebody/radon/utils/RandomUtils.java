@@ -57,4 +57,8 @@ public class RandomUtils {public static int getRandomInt() {
     public static double getRandomDouble() {
         return ThreadLocalRandom.current().nextDouble();
     }
+
+    public static boolean getRandomBoolean() {
+        return ThreadLocalRandom.current().nextBoolean();
+    }
 }

@@ -36,4 +36,8 @@ public class AccessUtils {
     public static boolean isBridge(int access) {
         return (Opcodes.ACC_BRIDGE & access) != 0;
     }
+
+    public static boolean isInterface(int access) {
+        return (Opcodes.ACC_INTERFACE & access) != 0;
+    }
 }

@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import me.itzsomebody.radon.Dictionaries;
 import me.itzsomebody.radon.SessionInfo;
 import me.itzsomebody.radon.exceptions.IllegalConfigurationValueException;
@@ -38,6 +39,8 @@ import me.itzsomebody.radon.transformers.miscellaneous.expiration.Expiration;
 import me.itzsomebody.radon.transformers.miscellaneous.expiration.ExpirationSetup;
 import me.itzsomebody.radon.transformers.miscellaneous.watermarker.Watermarker;
 import me.itzsomebody.radon.transformers.miscellaneous.watermarker.WatermarkerSetup;
+import me.itzsomebody.radon.transformers.obfuscators.antidebug.Antidebug;
+import me.itzsomebody.radon.transformers.obfuscators.antidebug.AntidebugSetup;
 import me.itzsomebody.radon.transformers.obfuscators.flow.FlowObfuscation;
 import me.itzsomebody.radon.transformers.obfuscators.invokedynamic.InvokeDynamic;
 import me.itzsomebody.radon.transformers.obfuscators.miscellaneous.HideCode;
@@ -66,7 +69,6 @@ import org.yaml.snakeyaml.Yaml;
  * @author ItzSomebody
  */
 public class ConfigurationParser {
-    private Map<String, Object> map;
     private final static Set<String> VALID_KEYS = new HashSet<>();
 
     static {
@@ -74,12 +76,42 @@ public class ConfigurationParser {
             VALID_KEYS.add(setting.getValue());
     }
 
+    private Map<String, Object> map;
+
     public ConfigurationParser(InputStream in) {
         this.map = new Yaml().load(in);
         this.map.keySet().forEach(s -> {
             if (!VALID_KEYS.contains(s))
                 throw new RadonException(s + " is not a valid configuration setting.");
         });
+    }
+
+    /**
+     * Searches sub directories for libraries
+     *
+     * @param file      should be directory
+     * @param libraries
+     * @author Richard Xing
+     */
+    private static void addSubDirFiles(File file, List<File> libraries) {
+        if (file.isFile()) {
+            System.out.println("should be a directory");
+        } else {
+            File[] fileLists = file.listFiles();
+
+            for (int i = 0; i < fileLists.length; i++) {
+                // 输出元素名称
+
+                if (fileLists[i].isDirectory()) {
+                    addSubDirFiles(fileLists[i], libraries);
+                } else {
+                    if (fileLists[i].getName().toLowerCase().endsWith(".jar")) {
+                        //System.out.println(fileLists[i].getName());
+                        libraries.add(fileLists[i]);
+                    }
+                }
+            }
+        }
     }
 
     public SessionInfo createSessionFromConfig() {
@@ -139,39 +171,12 @@ public class ConfigurationParser {
         return libraries;
     }
 
-    /**
-     * Searches sub directories for libraries
-     *
-     * @param file      should be directory
-     * @param libraries
-     * @author Richard Xing
-     */
-    private static void addSubDirFiles(File file, List<File> libraries) {
-        if (file.isFile()) {
-            System.out.println("should be a directory");
-        } else {
-            File[] fileLists = file.listFiles();
-
-            for (int i = 0; i < fileLists.length; i++) {
-                // 输出元素名称
-
-                if (fileLists[i].isDirectory()) {
-                    addSubDirFiles(fileLists[i], libraries);
-                } else {
-                    if (fileLists[i].getName().toLowerCase().endsWith(".jar")) {
-                        //System.out.println(fileLists[i].getName());
-                        libraries.add(fileLists[i]);
-                    }
-                }
-            }
-        }
-    }
-
     private List<Transformer> getTransformers() {
         ArrayList<Transformer> transformers = new ArrayList<>();
         transformers.add(getShrinkerTransformer());
         transformers.add(getOptimizerTransformer());
         transformers.add(getRenamerTransformer());
+        transformers.add(getAntidebugTransformer());
         transformers.add(getNumberObfuscationTransformer());
         transformers.add(getInvokeDynamicTransformer());
         List<StringEncryption> stringEncrypters = getStringEncryptionTransformers();
@@ -502,6 +507,29 @@ public class ConfigurationParser {
             return new Watermarker(new WatermarkerSetup(message, key));
         } catch (ClassCastException e) {
             throw new IllegalConfigurationValueException("Error while parsing watermark setup: " + e.getMessage());
+        }
+    }
+
+
+    private Antidebug getAntidebugTransformer() {
+        Object o = map.get(ConfigurationSetting.ANTIDEBUG.getValue());
+        if (o == null)
+            return null;
+        if (!(o instanceof Map))
+            throw new IllegalConfigurationValueException(ConfigurationSetting.ANTIDEBUG.getValue(), Map.class,
+                    o.getClass());
+
+        try {
+            Map<String, Object> settings = (Map) o;
+            if (!(Boolean) settings.get("Enabled"))
+                return null;
+
+            String message = (String) settings.getOrDefault("Message", null);
+            Boolean blockJavaAgent = (Boolean) settings.getOrDefault("BlockJavaAgent", false);
+
+            return new Antidebug(new AntidebugSetup(message, blockJavaAgent));
+        } catch (ClassCastException e) {
+            throw new IllegalConfigurationValueException("Error while parsing antidebug setup: " + e.getMessage());
         }
     }
 
