@@ -17,28 +17,18 @@
 
 package me.itzsomebody.radon.transformers.miscellaneous;
 
-import java.util.concurrent.atomic.AtomicInteger;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
-import org.objectweb.asm.tree.ClassNode;
 
 /**
- * Sets the class signature to a random string. A known trick to work on JD, CFR, Procyon and Javap.
- * TODO: rewrite this.
+ * Uses some tricks to try to crash decompilers
  *
  * @author ItzSomebody
  */
 public class Crasher extends Transformer {
     @Override
     public void transform() {
-        AtomicInteger counter = new AtomicInteger();
-
-        getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)
-                && classWrapper.classNode.signature == null).forEach(classWrapper -> {
-            ClassNode classNode = classWrapper.classNode;
-            classNode.signature = randomString(4);
-            counter.incrementAndGet();
-        });
+        // TODO
     }
 
     @Override

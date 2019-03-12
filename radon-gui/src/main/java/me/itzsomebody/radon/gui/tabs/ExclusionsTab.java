@@ -20,7 +20,7 @@ package me.itzsomebody.radon.gui.tabs;
 import java.awt.*;
 import java.util.List;
 import javax.swing.*;
-import me.itzsomebody.radon.SessionInfo;
+import me.itzsomebody.radon.ObfuscationConfiguration;
 import me.itzsomebody.radon.exclusions.Exclusion;
 import me.itzsomebody.radon.exclusions.ExclusionManager;
 import me.itzsomebody.radon.exclusions.ExclusionType;
@@ -123,11 +123,11 @@ public class ExclusionsTab extends JPanel {
     }
 
     /**
-     * Sets the tab settings accordingly with the provided {@link SessionInfo}.
+     * Sets the tab settings accordingly with the provided {@link ObfuscationConfiguration}.
      *
-     * @param info the {@link SessionInfo} used to determine the tab setup.
+     * @param info the {@link ObfuscationConfiguration} used to determine the tab setup.
      */
-    public void setSettings(SessionInfo info) {
+    public void setSettings(ObfuscationConfiguration info) {
         exclusions.clear();
 
         if (info.getExclusionManager() != null) {

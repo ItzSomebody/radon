@@ -19,22 +19,28 @@ package me.itzsomebody.radon.transformers.obfuscators;
 
 import java.util.Collections;
 import java.util.concurrent.atomic.AtomicInteger;
+import me.itzsomebody.radon.Logger;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
-import me.itzsomebody.radon.Logger;
 
 /**
  * Randomizes the order of methods and fields in a class.
  */
 public class MemberShuffler extends Transformer {
+    private boolean shuffleMethodsEnabled;
+    private boolean shuffleFieldsEnabled;
+
     @Override
     public void transform() {
         AtomicInteger counter = new AtomicInteger();
 
         getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper -> {
-            Collections.shuffle(classWrapper.classNode.methods);
-            counter.addAndGet(classWrapper.classNode.methods.size());
-            if (classWrapper.classNode.fields != null) {
+            if (isShuffleMethodsEnabled()) {
+                Collections.shuffle(classWrapper.classNode.methods);
+                counter.addAndGet(classWrapper.classNode.methods.size());
+            }
+
+            if (isShuffleFieldsEnabled() && classWrapper.classNode.fields != null) {
                 Collections.shuffle(classWrapper.classNode.fields);
                 counter.addAndGet(classWrapper.classNode.fields.size());
             }
@@ -51,5 +57,21 @@ public class MemberShuffler extends Transformer {
     @Override
     public String getName() {
         return "Member Shuffler";
+    }
+
+    public boolean isShuffleMethodsEnabled() {
+        return shuffleMethodsEnabled;
+    }
+
+    public void setShuffleMethodsEnabled(boolean shuffleMethodsEnabled) {
+        this.shuffleMethodsEnabled = shuffleMethodsEnabled;
+    }
+
+    public boolean isShuffleFieldsEnabled() {
+        return shuffleFieldsEnabled;
+    }
+
+    public void setShuffleFieldsEnabled(boolean shuffleFieldsEnabled) {
+        this.shuffleFieldsEnabled = shuffleFieldsEnabled;
     }
 }

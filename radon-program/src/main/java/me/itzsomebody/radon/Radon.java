@@ -38,6 +38,7 @@ import me.itzsomebody.radon.asm.ClassWrapper;
 import me.itzsomebody.radon.exceptions.MissingClassException;
 import me.itzsomebody.radon.exceptions.RadonException;
 import me.itzsomebody.radon.transformers.miscellaneous.TrashClasses;
+import me.itzsomebody.radon.utils.FileUtils;
 import me.itzsomebody.radon.utils.IOUtils;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
@@ -47,18 +48,18 @@ import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
 
 /**
- * This class is how Radon processes the provided {@link SessionInfo} to produce an obfuscated jar.
+ * This class is how Radon processes the provided {@link ObfuscationConfiguration} to produce an obfuscated jar.
  *
  * @author ItzSomebody
  */
 public class Radon {
-    public SessionInfo sessionInfo;
+    public ObfuscationConfiguration sessionInfo;
     private Map<String, ClassTree> hierarchy = new HashMap<>();
     public Map<String, ClassWrapper> classes = new HashMap<>();
     public Map<String, ClassWrapper> classPath = new HashMap<>();
     public Map<String, byte[]> resources = new HashMap<>();
 
-    public Radon(SessionInfo sessionInfo) {
+    public Radon(ObfuscationConfiguration sessionInfo) {
         this.sessionInfo = sessionInfo;
     }
 
@@ -70,7 +71,7 @@ public class Radon {
         loadInput();
         buildInheritance();
 
-        if (this.sessionInfo.getTrashClasses() > 0)
+        if (this.sessionInfo.getnTrashClasses() > 0)
             this.sessionInfo.getTransformers().add(new TrashClasses());
         if (this.sessionInfo.getTransformers().isEmpty())
             throw new RadonException("No transformers are enabled.");
@@ -93,7 +94,7 @@ public class Radon {
         Logger.stdOut(String.format("Writing output to \"%s\".", output.getAbsolutePath()));
 
         if (output.exists())
-            Logger.stdOut(String.format("Output file already exists, renamed to %s.", IOUtils.renameExistingFile(output)));
+            Logger.stdOut(String.format("Output file already exists, renamed to %s.", FileUtils.renameExistingFile(output)));
 
         try {
             ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(output));
@@ -138,7 +139,7 @@ public class Radon {
                 }
             });
 
-            zos.setComment(Main.PROPAGANDA_GARBAGE);
+            zos.setComment(Main.ATTRIBUTION);
             zos.close();
         } catch (IOException ioe) {
             ioe.printStackTrace();

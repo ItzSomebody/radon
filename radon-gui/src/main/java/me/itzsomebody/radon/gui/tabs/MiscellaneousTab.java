@@ -23,10 +23,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
-import me.itzsomebody.radon.Dictionaries;
+import me.itzsomebody.radon.DictionaryType;
 import me.itzsomebody.radon.Main;
-import me.itzsomebody.radon.SessionInfo;
-import me.itzsomebody.radon.transformers.miscellaneous.expiration.Expiration;
+import me.itzsomebody.radon.ObfuscationConfiguration;
+import me.itzsomebody.radon.transformers.miscellaneous.Expiration;
 import me.itzsomebody.radon.transformers.miscellaneous.expiration.ExpirationSetup;
 
 /**
@@ -190,10 +190,10 @@ public class MiscellaneousTab extends JPanel {
         gbc_dictionaryComboBox.fill = GridBagConstraints.HORIZONTAL;
         gbc_dictionaryComboBox.gridx = 0;
         gbc_dictionaryComboBox.gridy = 0;
-        dictionaryComboBox.addItem(Dictionaries.SPACES.getValue());
-        dictionaryComboBox.addItem(Dictionaries.UNRECOGNIZED.getValue());
-        dictionaryComboBox.addItem(Dictionaries.ALPHABETICAL.getValue());
-        dictionaryComboBox.addItem(Dictionaries.ALPHANUMERIC.getValue());
+        dictionaryComboBox.addItem(DictionaryType.SPACES.getValue());
+        dictionaryComboBox.addItem(DictionaryType.UNRECOGNIZED.getValue());
+        dictionaryComboBox.addItem(DictionaryType.ALPHABETICAL.getValue());
+        dictionaryComboBox.addItem(DictionaryType.ALPHANUMERIC.getValue());
         dictionaryPanel.add(dictionaryComboBox, gbc_dictionaryComboBox);
 
         JPanel trashClassPanel = new JPanel();
@@ -228,7 +228,7 @@ public class MiscellaneousTab extends JPanel {
         gbc_aboutButton.insets = new Insets(0, 5, 5, 5);
         gbc_aboutButton.gridx = 0;
         gbc_aboutButton.gridy = 1;
-        aboutButton.addActionListener((e) -> JOptionPane.showMessageDialog(null, Main.PROPAGANDA_GARBAGE));
+        aboutButton.addActionListener((e) -> JOptionPane.showMessageDialog(null, Main.ATTRIBUTION));
         miscOtherPanel.add(aboutButton, gbc_aboutButton);
     }
 
@@ -255,20 +255,20 @@ public class MiscellaneousTab extends JPanel {
     }
 
     /**
-     * Returns the desired {@link Dictionaries} instance as specified in the GUI.
+     * Returns the desired {@link DictionaryType} instance as specified in the GUI.
      *
-     * @return the desired {@link Dictionaries} instance as specified in the GUI.
+     * @return the desired {@link DictionaryType} instance as specified in the GUI.
      */
-    public Dictionaries getDictionary() {
-        return Dictionaries.intToDictionary(dictionaryComboBox.getSelectedIndex());
+    public DictionaryType getDictionary() {
+        return DictionaryType.intToDictionary(dictionaryComboBox.getSelectedIndex());
     }
 
     /**
-     * Sets the tab settings accordingly with the provided {@link SessionInfo}.
+     * Sets the tab settings accordingly with the provided {@link ObfuscationConfiguration}.
      *
-     * @param info the {@link SessionInfo} used to determine the tab setup.
+     * @param info the {@link ObfuscationConfiguration} used to determine the tab setup.
      */
-    public void setSettings(SessionInfo info) {
+    public void setSettings(ObfuscationConfiguration info) {
         expirationEnabledCheckBox.setSelected(false);
         expirationSwingCheckBox.setSelected(false);
         expirationSwingCheckBox.setEnabled(false);

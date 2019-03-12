@@ -26,13 +26,19 @@ import me.itzsomebody.radon.transformers.Transformer;
  * @author ItzSomebody
  */
 public class NumberObfuscation extends Transformer {
+    private boolean integerTamperingEnabled;
+    private boolean longTamperingEnabled;
+    private boolean floatTamperingEnabled;
+    private boolean doubleTamperingEnabled;
+
+    private boolean bitwiseOperationsEnabled;
+    private boolean arithmeticOperationsEnabled;
+
+    private boolean contextCheckingEnabled;
+
     @Override
     public void transform() {
-        getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper ->
-                classWrapper.methods.stream().filter(methodWrapper -> !excluded(methodWrapper))
-                        .forEach(methodWrapper -> {
-
-                        }));
+        // TODO
     }
 
     @Override
@@ -43,5 +49,61 @@ public class NumberObfuscation extends Transformer {
     @Override
     protected ExclusionType getExclusionType() {
         return ExclusionType.NUMBER_OBFUSCATION;
+    }
+
+    public boolean isIntegerTamperingEnabled() {
+        return integerTamperingEnabled;
+    }
+
+    public void setIntegerTamperingEnabled(boolean integerTamperingEnabled) {
+        this.integerTamperingEnabled = integerTamperingEnabled;
+    }
+
+    public boolean isLongTamperingEnabled() {
+        return longTamperingEnabled;
+    }
+
+    public void setLongTamperingEnabled(boolean longTamperingEnabled) {
+        this.longTamperingEnabled = longTamperingEnabled;
+    }
+
+    public boolean isFloatTamperingEnabled() {
+        return floatTamperingEnabled;
+    }
+
+    public void setFloatTamperingEnabled(boolean floatTamperingEnabled) {
+        this.floatTamperingEnabled = floatTamperingEnabled;
+    }
+
+    public boolean isDoubleTamperingEnabled() {
+        return doubleTamperingEnabled;
+    }
+
+    public void setDoubleTamperingEnabled(boolean doubleTamperingEnabled) {
+        this.doubleTamperingEnabled = doubleTamperingEnabled;
+    }
+
+    public boolean isBitwiseOperationsEnabled() {
+        return bitwiseOperationsEnabled;
+    }
+
+    public void setBitwiseOperationsEnabled(boolean bitwiseOperationsEnabled) {
+        this.bitwiseOperationsEnabled = bitwiseOperationsEnabled;
+    }
+
+    public boolean isArithmeticOperationsEnabled() {
+        return arithmeticOperationsEnabled;
+    }
+
+    public void setArithmeticOperationsEnabled(boolean arithmeticOperationsEnabled) {
+        this.arithmeticOperationsEnabled = arithmeticOperationsEnabled;
+    }
+
+    public boolean isContextCheckingEnabled() {
+        return contextCheckingEnabled;
+    }
+
+    public void setContextCheckingEnabled(boolean contextCheckingEnabled) {
+        this.contextCheckingEnabled = contextCheckingEnabled;
     }
 }

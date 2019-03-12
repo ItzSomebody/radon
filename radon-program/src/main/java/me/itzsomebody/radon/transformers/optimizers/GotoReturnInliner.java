@@ -18,8 +18,9 @@
 package me.itzsomebody.radon.transformers.optimizers;
 
 import java.util.concurrent.atomic.AtomicInteger;
-import me.itzsomebody.radon.utils.BytecodeUtils;
+import java.util.stream.Stream;
 import me.itzsomebody.radon.Logger;
+import me.itzsomebody.radon.utils.BytecodeUtils;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.JumpInsnNode;
@@ -41,16 +42,16 @@ public class GotoReturnInliner extends Optimizer {
                         && hasInstructions(methodWrapper.methodNode)).forEach(methodWrapper -> {
                     MethodNode methodNode = methodWrapper.methodNode;
 
-                    for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
-                        if (insn.getOpcode() == GOTO) {
-                            JumpInsnNode gotoJump = (JumpInsnNode) insn;
-                            AbstractInsnNode insnAfterTarget = gotoJump.label.getNext();
-                            if (insnAfterTarget != null && BytecodeUtils.isReturn(insnAfterTarget.getOpcode())) {
-                                methodNode.instructions.set(insn, new InsnNode(insnAfterTarget.getOpcode()));
-                                count.incrementAndGet();
-                            }
-                        }
-                    }
+                    Stream.of(methodNode.instructions.toArray()).filter(insn -> insn.getOpcode() == GOTO)
+                            .forEach(insn -> {
+                                JumpInsnNode gotoJump = (JumpInsnNode) insn;
+                                AbstractInsnNode insnAfterTarget = gotoJump.label.getNext();
+
+                                if (insnAfterTarget != null && BytecodeUtils.isReturn(insnAfterTarget.getOpcode())) {
+                                    methodNode.instructions.set(insn, new InsnNode(insnAfterTarget.getOpcode()));
+                                    count.incrementAndGet();
+                                }
+                            });
                 }));
 
         Logger.stdOut(String.format("Inlined %d GOTO->RETURN sequences. [%dms]", count.get(),
@@ -59,6 +60,6 @@ public class GotoReturnInliner extends Optimizer {
 
     @Override
     public String getName() {
-        return "GOTO->Return Remover";
+        return "GOTO->RETURN Inliner";
     }
 }

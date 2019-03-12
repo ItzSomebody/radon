@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
-import me.itzsomebody.radon.SessionInfo;
+import me.itzsomebody.radon.ObfuscationConfiguration;
 
 /**
  * A {@link JPanel} used to set the input, output and libraries.
@@ -289,11 +289,11 @@ public class InputOutputTab extends JPanel {
     }
 
     /**
-     * Sets the tab settings accordingly with the provided {@link SessionInfo}.
+     * Sets the tab settings accordingly with the provided {@link ObfuscationConfiguration}.
      *
-     * @param info the {@link SessionInfo} used to determine the tab setup.
+     * @param info the {@link ObfuscationConfiguration} used to determine the tab setup.
      */
-    public void setSettings(SessionInfo info) {
+    public void setSettings(ObfuscationConfiguration info) {
         inputField.setText(null);
         outputField.setText(null);
         libraryList.clear();

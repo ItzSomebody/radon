@@ -25,12 +25,11 @@ import me.itzsomebody.radon.transformers.Transformer;
  *
  * @author ItzSomebody
  */
-public abstract class Optimizer extends Transformer {
-    private OptimizerSetup setup;
-
-    public void initSetup(OptimizerSetup setup) {
-        this.setup = setup;
-    }
+public class Optimizer extends Transformer {
+    private boolean removeNopsEnabled;
+    private boolean inlineGotoGotosEnabled;
+    private boolean inlineGotoReturnEnabled;
+    // TODO Add some more inliners cuz why not
 
     @Override
     public void transform() {
@@ -47,7 +46,27 @@ public abstract class Optimizer extends Transformer {
         return ExclusionType.OPTIMIZER;
     }
 
-    public OptimizerSetup getSetup() {
-        return setup;
+    public boolean isRemoveNopsEnabled() {
+        return removeNopsEnabled;
+    }
+
+    public void setRemoveNopsEnabled(boolean removeNopsEnabled) {
+        this.removeNopsEnabled = removeNopsEnabled;
+    }
+
+    public boolean isInlineGotoGotosEnabled() {
+        return inlineGotoGotosEnabled;
+    }
+
+    public void setInlineGotoGotosEnabled(boolean inlineGotoGotosEnabled) {
+        this.inlineGotoGotosEnabled = inlineGotoGotosEnabled;
+    }
+
+    public boolean isInlineGotoReturnEnabled() {
+        return inlineGotoReturnEnabled;
+    }
+
+    public void setInlineGotoReturnEnabled(boolean inlineGotoReturnEnabled) {
+        this.inlineGotoReturnEnabled = inlineGotoReturnEnabled;
     }
 }

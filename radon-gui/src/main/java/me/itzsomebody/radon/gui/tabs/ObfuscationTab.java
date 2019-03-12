@@ -23,7 +23,7 @@ import java.util.Arrays;
 import java.util.Objects;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
-import me.itzsomebody.radon.SessionInfo;
+import me.itzsomebody.radon.ObfuscationConfiguration;
 import me.itzsomebody.radon.gui.StringEncryptionExclusionGUI;
 import me.itzsomebody.radon.transformers.miscellaneous.Crasher;
 import me.itzsomebody.radon.transformers.obfuscators.flow.FlowObfuscation;
@@ -557,11 +557,11 @@ public class ObfuscationTab extends JPanel {
     }
 
     /**
-     * Sets the tab settings accordingly with the provided {@link SessionInfo}.
+     * Sets the tab settings accordingly with the provided {@link ObfuscationConfiguration}.
      *
-     * @param info the {@link SessionInfo} used to determine the tab setup.
+     * @param info the {@link ObfuscationConfiguration} used to determine the tab setup.
      */
-    public void setSettings(SessionInfo info) {
+    public void setSettings(ObfuscationConfiguration info) {
         stringEncryptionEnabledCheckBox.setSelected(false);
         stringEncryptionTypeSelector.setSelectedIndex(0);
         stringEncryptionTypeSelector.setEnabled(false);

@@ -29,7 +29,7 @@ import javax.swing.*;
 import me.itzsomebody.radon.Logger;
 import me.itzsomebody.radon.Main;
 import me.itzsomebody.radon.Radon;
-import me.itzsomebody.radon.SessionInfo;
+import me.itzsomebody.radon.ObfuscationConfiguration;
 import me.itzsomebody.radon.config.ConfigurationParser;
 import me.itzsomebody.radon.config.ConfigurationWriter;
 import me.itzsomebody.radon.exceptions.RadonException;
@@ -101,7 +101,7 @@ class RadonGUI extends JFrame {
                             throw new RadonException("Could not find configuration file");
                         }
 
-                        SessionInfo info = new ConfigurationParser(inputStream).createSessionFromConfig();
+                        ObfuscationConfiguration info = new ConfigurationParser(inputStream).createSessionFromConfig();
                         inputOutputTab.setSettings(info);
                         obfuscationPanel.setSettings(info);
                         optimizationPanel.setSettings(info);
@@ -127,7 +127,7 @@ class RadonGUI extends JFrame {
             if (result == 0) {
                 SwingUtilities.invokeLater(() -> {
                     try {
-                        SessionInfo sessionInfo = new SessionInfo();
+                        ObfuscationConfiguration sessionInfo = new ObfuscationConfiguration();
 
                         sessionInfo.setInput(new File(inputOutputTab.getInputPath()));
                         sessionInfo.setOutput(new File(inputOutputTab.getOutputPath()));
@@ -181,7 +181,7 @@ class RadonGUI extends JFrame {
                 @Override
                 protected Object doInBackground() {
                     try {
-                        SessionInfo sessionInfo = new SessionInfo();
+                        ObfuscationConfiguration sessionInfo = new ObfuscationConfiguration();
 
                         sessionInfo.setInput(new File(inputOutputTab.getInputPath()));
                         sessionInfo.setOutput(new File(inputOutputTab.getOutputPath()));

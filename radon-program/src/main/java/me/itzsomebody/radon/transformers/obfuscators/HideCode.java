@@ -18,12 +18,14 @@
 package me.itzsomebody.radon.transformers.obfuscators;
 
 import java.util.concurrent.atomic.AtomicInteger;
+import me.itzsomebody.radon.Logger;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
 import me.itzsomebody.radon.utils.AccessUtils;
 import me.itzsomebody.radon.utils.BytecodeUtils;
-import me.itzsomebody.radon.Logger;
 import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.FieldNode;
+import org.objectweb.asm.tree.MethodNode;
 
 /**
  * Adds a synthetic modifier and bridge modifier if possible to attempt to hide code against some lower-quality
@@ -32,40 +34,54 @@ import org.objectweb.asm.tree.ClassNode;
  * @author ItzSomebody
  */
 public class HideCode extends Transformer {
+    private boolean hideClassesEnabled;
+    private boolean hideMethodsEnabled;
+    private boolean hideFieldsEnabled;
+
     @Override
     public void transform() {
         AtomicInteger counter = new AtomicInteger();
 
         getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper -> {
-            ClassNode classNode = classWrapper.classNode;
-            if (!AccessUtils.isSynthetic(classNode.access) && !BytecodeUtils.hasAnnotations(classNode)) {
-                classNode.access |= ACC_SYNTHETIC;
-                counter.incrementAndGet();
+            if (isHideClassesEnabled()) {
+                ClassNode classNode = classWrapper.classNode;
+
+                if (!AccessUtils.isSynthetic(classNode.access) && !BytecodeUtils.hasAnnotations(classNode)) {
+                    classNode.access |= ACC_SYNTHETIC;
+                    counter.incrementAndGet();
+                }
             }
+            if (isHideMethodsEnabled()) {
+                classWrapper.methods.stream().filter(methodWrapper -> !excluded(methodWrapper)
+                        && !BytecodeUtils.hasAnnotations(methodWrapper.methodNode)).forEach(methodWrapper -> {
+                    boolean atLeastOnce = false;
+                    MethodNode methodNode = methodWrapper.methodNode;
 
-            classNode.methods.stream().filter(methodNode ->
-                    !BytecodeUtils.hasAnnotations(methodNode)).forEach(methodNode -> {
-                boolean hidOnce = false;
-                if (!AccessUtils.isSynthetic(methodNode.access)) {
-                    methodNode.access |= ACC_SYNTHETIC;
-                    hidOnce = true;
-                }
+                    if (!AccessUtils.isSynthetic(methodNode.access)) {
+                        methodNode.access |= ACC_SYNTHETIC;
+                        atLeastOnce = true;
+                    }
+                    if (!AccessUtils.isBridge(methodNode.access)) {
+                        methodNode.access |= ACC_BRIDGE;
+                        atLeastOnce = true;
+                    }
 
-                if (!AccessUtils.isBridge(methodNode.access) && !methodNode.name.startsWith("<")) {
-                    methodNode.access |= ACC_BRIDGE;
-                    hidOnce = true;
-                }
+                    if (atLeastOnce)
+                        counter.incrementAndGet();
 
-                if (hidOnce)
-                    counter.incrementAndGet();
-            });
-
-            if (classNode.fields != null)
-                classNode.fields.stream().filter(fieldNode -> !BytecodeUtils.hasAnnotations(fieldNode)
-                        && !AccessUtils.isSynthetic(fieldNode.access)).forEach(fieldNode -> {
-                    fieldNode.access |= ACC_SYNTHETIC;
-                    counter.incrementAndGet();
                 });
+            }
+            if (isHideFieldsEnabled()) {
+                classWrapper.fields.stream().filter(fieldWrapper -> !excluded(fieldWrapper)
+                        && !BytecodeUtils.hasAnnotations(fieldWrapper.fieldNode)).forEach(fieldWrapper -> {
+                    FieldNode fieldNode = fieldWrapper.fieldNode;
+
+                    if (!AccessUtils.isSynthetic(fieldNode.access)) {
+                        fieldNode.access |= ACC_SYNTHETIC;
+                        counter.incrementAndGet();
+                    }
+                });
+            }
         });
 
         Logger.stdOut(String.format("Hid %d members.", counter.get()));
@@ -79,5 +95,29 @@ public class HideCode extends Transformer {
     @Override
     public String getName() {
         return "Hide code";
+    }
+
+    public boolean isHideClassesEnabled() {
+        return hideClassesEnabled;
+    }
+
+    public void setHideClassesEnabled(boolean hideClassesEnabled) {
+        this.hideClassesEnabled = hideClassesEnabled;
+    }
+
+    public boolean isHideMethodsEnabled() {
+        return hideMethodsEnabled;
+    }
+
+    public void setHideMethodsEnabled(boolean hideMethodsEnabled) {
+        this.hideMethodsEnabled = hideMethodsEnabled;
+    }
+
+    public boolean isHideFieldsEnabled() {
+        return hideFieldsEnabled;
+    }
+
+    public void setHideFieldsEnabled(boolean hideFieldsEnabled) {
+        this.hideFieldsEnabled = hideFieldsEnabled;
     }
 }

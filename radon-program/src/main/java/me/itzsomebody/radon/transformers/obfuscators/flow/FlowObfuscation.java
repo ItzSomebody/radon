@@ -26,9 +26,16 @@ import me.itzsomebody.radon.transformers.Transformer;
  * @author ItzSomebody
  */
 public class FlowObfuscation extends Transformer {
+    private boolean replaceGotoEnabled;
+    private boolean insertBogusJumpsEnabled;
+    private boolean rearrangeFlowEnabled;
+    private boolean fakeCatchBlocksEnabled;
+    private boolean mutilateNullCheckEnabled;
+    private boolean combineTryWithCatchEnabled;
+
     @Override
     public void transform() {
-
+        // TODO
     }
 
     @Override
@@ -39,5 +46,53 @@ public class FlowObfuscation extends Transformer {
     @Override
     protected ExclusionType getExclusionType() {
         return ExclusionType.FLOW_OBFUSCATION;
+    }
+
+    public boolean isReplaceGotoEnabled() {
+        return replaceGotoEnabled;
+    }
+
+    public void setReplaceGotoEnabled(boolean replaceGotoEnabled) {
+        this.replaceGotoEnabled = replaceGotoEnabled;
+    }
+
+    public boolean isInsertBogusJumpsEnabled() {
+        return insertBogusJumpsEnabled;
+    }
+
+    public void setInsertBogusJumpsEnabled(boolean insertBogusJumpsEnabled) {
+        this.insertBogusJumpsEnabled = insertBogusJumpsEnabled;
+    }
+
+    public boolean isRearrangeFlowEnabled() {
+        return rearrangeFlowEnabled;
+    }
+
+    public void setRearrangeFlowEnabled(boolean rearrangeFlowEnabled) {
+        this.rearrangeFlowEnabled = rearrangeFlowEnabled;
+    }
+
+    public boolean isFakeCatchBlocksEnabled() {
+        return fakeCatchBlocksEnabled;
+    }
+
+    public void setFakeCatchBlocksEnabled(boolean fakeCatchBlocksEnabled) {
+        this.fakeCatchBlocksEnabled = fakeCatchBlocksEnabled;
+    }
+
+    public boolean isMutilateNullCheckEnabled() {
+        return mutilateNullCheckEnabled;
+    }
+
+    public void setMutilateNullCheckEnabled(boolean mutilateNullCheckEnabled) {
+        this.mutilateNullCheckEnabled = mutilateNullCheckEnabled;
+    }
+
+    public boolean isCombineTryWithCatchEnabled() {
+        return combineTryWithCatchEnabled;
+    }
+
+    public void setCombineTryWithCatchEnabled(boolean combineTryWithCatchEnabled) {
+        this.combineTryWithCatchEnabled = combineTryWithCatchEnabled;
     }
 }

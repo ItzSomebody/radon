@@ -25,12 +25,19 @@ import java.util.regex.Pattern;
  * @author ItzSomebody
  */
 public class Exclusion {
+    /**
+     * Compiled regex pattern.
+     */
     private Pattern exclusion;
+
+    /**
+     * The exclusion type.
+     */
     private ExclusionType exclusionType;
 
     public Exclusion(String exclusion) {
         for (ExclusionType type : ExclusionType.values()) {
-            if (exclusion.startsWith(type.getValue())) {
+            if (exclusion.startsWith(type.getName())) {
                 initFields(exclusion, type);
                 return;
             }

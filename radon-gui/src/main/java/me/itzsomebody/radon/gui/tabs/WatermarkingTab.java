@@ -24,9 +24,9 @@ import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
-import me.itzsomebody.radon.SessionInfo;
+import me.itzsomebody.radon.ObfuscationConfiguration;
 import me.itzsomebody.radon.exceptions.RadonException;
-import me.itzsomebody.radon.transformers.miscellaneous.watermarker.Watermarker;
+import me.itzsomebody.radon.transformers.miscellaneous.Watermarker;
 import me.itzsomebody.radon.transformers.miscellaneous.watermarker.WatermarkerSetup;
 import me.itzsomebody.radon.utils.WatermarkUtils;
 
@@ -239,11 +239,11 @@ public class WatermarkingTab extends JPanel {
     }
 
     /**
-     * Sets the tab settings accordingly with the provided {@link SessionInfo}.
+     * Sets the tab settings accordingly with the provided {@link ObfuscationConfiguration}.
      *
-     * @param info the {@link SessionInfo} used to determine the tab setup.
+     * @param info the {@link ObfuscationConfiguration} used to determine the tab setup.
      */
-    public void setSettings(SessionInfo info) {
+    public void setSettings(ObfuscationConfiguration info) {
         watermarkerEnabledCheckBox.setSelected(false);
         watermarkMessageField.setText(null);
         watermarkMessageField.setEditable(false);

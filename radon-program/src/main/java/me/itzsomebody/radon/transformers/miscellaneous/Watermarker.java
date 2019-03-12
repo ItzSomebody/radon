@@ -15,16 +15,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package me.itzsomebody.radon.transformers.miscellaneous.watermarker;
+package me.itzsomebody.radon.transformers.miscellaneous;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
+import me.itzsomebody.radon.Logger;
 import me.itzsomebody.radon.asm.ClassWrapper;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
 import me.itzsomebody.radon.utils.BytecodeUtils;
-import me.itzsomebody.radon.Logger;
 import me.itzsomebody.radon.utils.RandomUtils;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.MethodNode;
@@ -36,11 +36,8 @@ import org.objectweb.asm.tree.VarInsnNode;
  * @author ItzSomebody.
  */
 public class Watermarker extends Transformer {
-    private final WatermarkerSetup setup;
-
-    public Watermarker(WatermarkerSetup setup) {
-        this.setup = setup;
-    }
+    private String message;
+    private String key;
 
     @Override
     public void transform() {
@@ -96,8 +93,8 @@ public class Watermarker extends Transformer {
 
     // Really weak cipher, lul.
     private Deque<Character> cipheredWatermark() {
-        char[] messageChars = setup.getMessage().toCharArray();
-        char[] keyChars = setup.getKey().toCharArray();
+        char[] messageChars = getMessage().toCharArray();
+        char[] keyChars = getKey().toCharArray();
         Deque<Character> returnThis = new ArrayDeque<>();
 
         for (int i = 0; i < messageChars.length; i++) {
@@ -117,7 +114,19 @@ public class Watermarker extends Transformer {
         return "Watermarker";
     }
 
-    public WatermarkerSetup getSetup() {
-        return setup;
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 }

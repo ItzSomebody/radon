@@ -20,7 +20,7 @@ package me.itzsomebody.radon.gui.tabs;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
-import me.itzsomebody.radon.SessionInfo;
+import me.itzsomebody.radon.ObfuscationConfiguration;
 import me.itzsomebody.radon.transformers.optimizers.OptimizerDelegator;
 import me.itzsomebody.radon.transformers.optimizers.OptimizerSetup;
 
@@ -111,11 +111,11 @@ public class OptimizationTab extends JPanel {
     }
 
     /**
-     * Sets the tab settings accordingly with the provided {@link SessionInfo}.
+     * Sets the tab settings accordingly with the provided {@link ObfuscationConfiguration}.
      *
-     * @param info the {@link SessionInfo} used to determine the tab setup.
+     * @param info the {@link ObfuscationConfiguration} used to determine the tab setup.
      */
-    public void setSettings(SessionInfo info) {
+    public void setSettings(ObfuscationConfiguration info) {
         optimizationEnabledCheckBox.setSelected(false);
         nopCheckBox.setSelected(false);
         nopCheckBox.setEnabled(false);

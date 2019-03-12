@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package me.itzsomebody.radon.transformers.miscellaneous.expiration;
+package me.itzsomebody.radon.transformers.miscellaneous;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import me.itzsomebody.radon.exclusions.ExclusionType;
@@ -38,11 +38,9 @@ import org.objectweb.asm.tree.TypeInsnNode;
  * @author ItzSomebody
  */
 public class Expiration extends Transformer {
-    private final ExpirationSetup setup;
-
-    public Expiration(ExpirationSetup setup) {
-        this.setup = setup;
-    }
+    private String message;
+    private long expires;
+    private boolean injectJOptionPaneEnabled;
 
     @Override
     public void transform() {
@@ -62,34 +60,33 @@ public class Expiration extends Transformer {
     }
 
     private InsnList createExpirationInstructions() {
-        InsnList expiryCode = new InsnList();
+        InsnList insns = new InsnList();
         LabelNode injectedLabel = new LabelNode(new Label());
 
-        expiryCode.add(new TypeInsnNode(NEW, "java/util/Date"));
-        expiryCode.add(new InsnNode(DUP));
-        expiryCode.add(new MethodInsnNode(INVOKESPECIAL, "java/util/Date", "<init>", "()V", false));
-        expiryCode.add(new TypeInsnNode(NEW, "java/util/Date"));
-        expiryCode.add(new InsnNode(DUP));
-        expiryCode.add(new LdcInsnNode(this.setup.getExpires()));
-        expiryCode.add(new MethodInsnNode(INVOKESPECIAL, "java/util/Date", "<init>", "(J)V", false));
-        expiryCode.add(new MethodInsnNode(INVOKEVIRTUAL, "java/util/Date", "after", "(Ljava/util/Date;)Z", false));
-        expiryCode.add(new JumpInsnNode(IFEQ, injectedLabel));
-        expiryCode.add(new TypeInsnNode(NEW, "java/lang/Throwable"));
-        expiryCode.add(new InsnNode(DUP));
-        expiryCode.add(new LdcInsnNode(this.setup.getMessage()));
-        if (this.setup.isInjectJOptionPane()) {
-            expiryCode.add(new InsnNode(DUP));
-            expiryCode.add(new InsnNode(ACONST_NULL));
-            expiryCode.add(new InsnNode(SWAP));
-            expiryCode.add(new MethodInsnNode(INVOKESTATIC, "javax/swing/JOptionPane", "showMessageDialog",
+        insns.add(new TypeInsnNode(NEW, "java/util/Date"));
+        insns.add(new InsnNode(DUP));
+        insns.add(new MethodInsnNode(INVOKESPECIAL, "java/util/Date", "<init>", "()V", false));
+        insns.add(new TypeInsnNode(NEW, "java/util/Date"));
+        insns.add(new InsnNode(DUP));
+        insns.add(new LdcInsnNode(getExpires()));
+        insns.add(new MethodInsnNode(INVOKESPECIAL, "java/util/Date", "<init>", "(J)V", false));
+        insns.add(new MethodInsnNode(INVOKEVIRTUAL, "java/util/Date", "after", "(Ljava/util/Date;)Z", false));
+        insns.add(new JumpInsnNode(IFEQ, injectedLabel));
+        insns.add(new TypeInsnNode(NEW, "java/lang/Throwable"));
+        insns.add(new InsnNode(DUP));
+        insns.add(new LdcInsnNode(getMessage()));
+        if (isInjectJOptionPaneEnabled()) {
+            insns.add(new InsnNode(DUP));
+            insns.add(new InsnNode(ACONST_NULL));
+            insns.add(new InsnNode(SWAP));
+            insns.add(new MethodInsnNode(INVOKESTATIC, "javax/swing/JOptionPane", "showMessageDialog",
                     "(Ljava/awt/Component;Ljava/lang/Object;)V", false));
         }
-        expiryCode.add(new MethodInsnNode(INVOKESPECIAL, "java/lang/Throwable", "<init>", "(Ljava/lang/String;)V",
-                false));
-        expiryCode.add(new InsnNode(ATHROW));
-        expiryCode.add(injectedLabel);
+        insns.add(new MethodInsnNode(INVOKESPECIAL, "java/lang/Throwable", "<init>", "(Ljava/lang/String;)V", false));
+        insns.add(new InsnNode(ATHROW));
+        insns.add(injectedLabel);
 
-        return expiryCode;
+        return insns;
     }
 
     @Override
@@ -102,7 +99,27 @@ public class Expiration extends Transformer {
         return "Expiration";
     }
 
-    public ExpirationSetup getSetup() {
-        return setup;
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public long getExpires() {
+        return expires;
+    }
+
+    public void setExpires(long expires) {
+        this.expires = expires;
+    }
+
+    public boolean isInjectJOptionPaneEnabled() {
+        return injectJOptionPaneEnabled;
+    }
+
+    public void setInjectJOptionPaneEnabled(boolean injectJOptionPaneEnabled) {
+        this.injectJOptionPaneEnabled = injectJOptionPaneEnabled;
     }
 }

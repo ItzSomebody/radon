@@ -248,8 +248,7 @@ public class StackEmulator implements Opcodes {
                 case LRETURN:
                 case DRETURN:
                     // Pops two-word or two one-word constant(s) off stack
-                    stackSize--;
-                    stackSize--;
+                    stackSize -= 2;
                     break;
                 case IASTORE:
                 case FASTORE:
@@ -261,17 +260,12 @@ public class StackEmulator implements Opcodes {
                 case DCMPL:
                 case DCMPG:
                     // Pops three one-word constants off stack
-                    stackSize--;
-                    stackSize--;
-                    stackSize--;
+                    stackSize -= 3;
                     break;
                 case LASTORE:
                 case DASTORE:
                     // Pops two one-word constants and one two-word constant off stack
-                    stackSize--;
-                    stackSize--;
-                    stackSize--;
-                    stackSize--;
+                    stackSize -= 4;
                     break;
                 case GETSTATIC:
                     stackSize += doFieldEmulation(((FieldInsnNode) insn).desc, true);

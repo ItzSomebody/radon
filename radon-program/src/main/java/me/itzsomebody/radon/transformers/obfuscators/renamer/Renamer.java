@@ -28,6 +28,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
+import me.itzsomebody.radon.Logger;
 import me.itzsomebody.radon.asm.ClassTree;
 import me.itzsomebody.radon.asm.ClassWrapper;
 import me.itzsomebody.radon.asm.FieldWrapper;
@@ -36,8 +37,7 @@ import me.itzsomebody.radon.asm.MethodWrapper;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
 import me.itzsomebody.radon.utils.AccessUtils;
-import me.itzsomebody.radon.utils.IOUtils;
-import me.itzsomebody.radon.Logger;
+import me.itzsomebody.radon.utils.FileUtils;
 import org.objectweb.asm.commons.ClassRemapper;
 import org.objectweb.asm.commons.Remapper;
 import org.objectweb.asm.tree.ClassNode;
@@ -47,16 +47,15 @@ import org.objectweb.asm.tree.MethodNode;
 
 /**
  * Transformer which renames classes and their members.
+ * TODO: Clean this bloody mess up already.
  *
  * @author ItzSomebody
  */
 public class Renamer extends Transformer {
-    private RenamerSetup setup;
+    private String[] adaptTheseResources;
+    private String repackageName;
+    private boolean overloadEnabled; // If not, then we'll just generate names randomly
     private Map<String, String> mappings = new HashMap<>();
-
-    public Renamer(RenamerSetup setup) {
-        this.setup = setup;
-    }
 
     @Override
     public void transform() {
@@ -77,8 +76,8 @@ public class Renamer extends Transformer {
             });
 
             if (!this.excluded(classWrapper)) {
-                this.mappings.put(classWrapper.originalName, (setup.getRepackageName() != null)
-                        ? setup.getRepackageName() + '/' + randomString(4) : randomString(4));
+                this.mappings.put(classWrapper.originalName, (repackageName != null)
+                        ? repackageName + '/' + randomString(4) : randomString(4));
                 classCounter.incrementAndGet();
             }
         });
@@ -87,12 +86,12 @@ public class Renamer extends Transformer {
         current = System.currentTimeMillis();
 
         // Apply mapping
-        Remapper simpleRemapper = new MemberRemapper(this.mappings);
+        Remapper remapper = new MemberRemapper(this.mappings);
         for (ClassWrapper classWrapper : new ArrayList<>(this.getClassWrappers())) {
             ClassNode classNode = classWrapper.classNode;
 
             ClassNode copy = new ClassNode();
-            classNode.accept(new ClassRemapper(copy, simpleRemapper));
+            classNode.accept(new ClassRemapper(copy, remapper));
             for (int i = 0; i < copy.methods.size(); i++) {
                 classWrapper.methods.get(i).methodNode = copy.methods.get(i);
 
@@ -129,8 +128,8 @@ public class Renamer extends Transformer {
         Logger.stdOut("Attempting to map class names in resources");
         AtomicInteger fixed = new AtomicInteger();
         getResources().forEach((name, byteArray) -> {
-            if (setup.getAdaptTheseResources() != null) {
-                for (String s : setup.getAdaptTheseResources()) {
+            if (adaptTheseResources != null) {
+                for (String s : adaptTheseResources) {
                     Pattern pattern = Pattern.compile(s);
 
                     if (pattern.matcher(name).matches()) {
@@ -236,7 +235,7 @@ public class Renamer extends Transformer {
         Logger.stdOut("Dumping mappings.");
         File file = new File("mappings.txt");
         if (file.exists())
-            IOUtils.renameExistingFile(file);
+            FileUtils.renameExistingFile(file);
 
         try {
             file.createNewFile();
@@ -271,7 +270,27 @@ public class Renamer extends Transformer {
         return "Renamer";
     }
 
-    public RenamerSetup getSetup() {
-        return setup;
+    public String[] getAdaptTheseResources() {
+        return adaptTheseResources;
+    }
+
+    public void setAdaptTheseResources(String[] adaptTheseResources) {
+        this.adaptTheseResources = adaptTheseResources;
+    }
+
+    public String getRepackageName() {
+        return repackageName;
+    }
+
+    public void setRepackageName(String repackageName) {
+        this.repackageName = repackageName;
+    }
+
+    public boolean isOverloadEnabled() {
+        return overloadEnabled;
+    }
+
+    public void setOverloadEnabled(boolean overloadEnabled) {
+        this.overloadEnabled = overloadEnabled;
     }
 }

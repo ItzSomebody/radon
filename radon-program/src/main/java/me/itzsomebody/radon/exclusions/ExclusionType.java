@@ -23,28 +23,23 @@ package me.itzsomebody.radon.exclusions;
  * @author ItzSomebody
  */
 public enum ExclusionType {
-    GLOBAL("Global"),
-    EXTENDS("Extends"), // TODO
-    IMPLEMENTS("Implements"), // TODO
-    STRING_ENCRYPTION("StringEncryption"),
-    INVOKEDYNAMIC("InvokeDynamic"),
-    FLOW_OBFUSCATION("FlowObfuscation"),
-    NUMBER_OBFUSCATION("NumberObfuscation"),
-    HIDE_CODE("HideCode"),
-    CRASHER("Crasher"),
-    EXPIRATION("Expiration"),
-    OPTIMIZER("Optimizer"),
-    SHRINKER("Shrinker"),
-    SHUFFLER("Shuffler"),
-    RENAMER("Renamer");
+    GLOBAL,
+    EXTENDS, // TODO
+    IMPLEMENTS, // TODO
+    STRING_ENCRYPTION,
+    REFERENCE_OBFUSCATION,
+    FLOW_OBFUSCATION,
+    NUMBER_OBFUSCATION,
+    HIDE_CODE,
+    CRASHER,
+    EXPIRATION,
+    OPTIMIZER,
+    SHRINKER,
+    SHUFFLER,
+    RENAMER,
+    ANTI_TAMPER;
 
-    private final String value;
-
-    ExclusionType(String value) {
-        this.value = value;
-    }
-
-    public String getValue() {
-        return this.value;
+    public String getName() {
+        return name().toLowerCase();
     }
 }

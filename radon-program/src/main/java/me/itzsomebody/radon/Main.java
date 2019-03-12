@@ -32,15 +32,14 @@ import me.itzsomebody.radon.utils.WatermarkUtils;
  * TODO: Renamer transformer should correct strings used for reflection. (i.e. Class.forName("me.itzsomebody.Thing"))
  * TODO: Remove the "light, medium & heavy" garbage by allowing for individual compenent enabling.
  * TODO: Clean code up in general.
- * TODO: Remove debug obfuscation - it's pointless and you might as well just remove the info.
  *
  * @author ItzSomebody
  */
 public class Main {
     public static final String PREFIX = "[Radon]";
-    public static final String VERSION = "1.0.5";
+    public static final String VERSION = "2.0.0";
     public static final String CONTRIBUTORS = "ItzSomebody, x0ark, Col-E, Artel, kazigk, Olexorus and freeasbird";
-    public static final String PROPAGANDA_GARBAGE = String.format("Radon is a free and open-source Java obfuscator " +
+    public static final String ATTRIBUTION = String.format("Radon is a free and open-source Java obfuscator " +
                     "with contributions from %s.\nVersion: %s\nWebsite: https://github.com/ItzSomebody/Radon",
             Main.CONTRIBUTORS, Main.VERSION);
     public static final String RADON_ASCII_ART = "##############################################\n" +
@@ -61,16 +60,21 @@ public class Main {
      * @param args arguments from command line.
      */
     public static void main(String[] args) {
+        // SPAMMING LOTS OF TEXT IS A NECESSITY
         System.out.println(RADON_ASCII_ART);
         Logger.stdOut("Version: " + VERSION);
         Logger.stdOut("Contributors: " + CONTRIBUTORS + "\n");
 
+        // Registers the switches.
         CommandArgumentsParser.registerCommandSwitch("help", 0);
         CommandArgumentsParser.registerCommandSwitch("license", 0);
         CommandArgumentsParser.registerCommandSwitch("config", 1);
         CommandArgumentsParser.registerCommandSwitch("extract", 2);
 
+        // Parse away!
         CommandArgumentsParser parser = new CommandArgumentsParser(args);
+
+        // Switch handling.
         if (parser.containsSwitch("help")) {
             showHelpMenu();
         } else if (parser.containsSwitch("license")) {
@@ -85,10 +89,14 @@ public class Main {
                 return;
             }
 
+            // Parse the config and let's run Radon.
             Radon radon = new Radon(config.createSessionFromConfig());
             radon.run();
         } else if (parser.containsSwitch("extract")) {
+            // Watermark extraction.
             String[] switchArgs = parser.getSwitchArgs("extract");
+
+            // Input file.
             File leaked = new File(switchArgs[0]);
             if (!leaked.exists()) {
                 Logger.stdErr("Input file not found");
@@ -96,8 +104,8 @@ public class Main {
             }
 
             try {
-                List<String> ids = WatermarkUtils.extractIds(new ZipFile(leaked), switchArgs[1]);
-                ids.forEach(Logger::stdOut);
+                // Extract the ids and stick them into the console.
+                Logger.stdOut(WatermarkUtils.extractIds(new ZipFile(leaked), switchArgs[1]));
             } catch (Throwable t) {
                 t.printStackTrace();
             }
@@ -123,6 +131,9 @@ public class Main {
         Logger.stdOut(String.format("Watermark Extraction:\tjava -jar %s --extract Input.jar exampleKey", name));
     }
 
+    /**
+     * Spams the user's console full of legalese they don't care about whatsoever.
+     */
     private static void showLicense() {
         System.out.println(new String(IOUtils.toByteArray(Main.class.getResourceAsStream("/license.txt"))));
     }

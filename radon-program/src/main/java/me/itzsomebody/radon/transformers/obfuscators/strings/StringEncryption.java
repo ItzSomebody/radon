@@ -18,7 +18,6 @@
 package me.itzsomebody.radon.transformers.obfuscators.strings;
 
 import java.util.List;
-import me.itzsomebody.radon.exceptions.IllegalConfigurationValueException;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
 
@@ -27,19 +26,19 @@ import me.itzsomebody.radon.transformers.Transformer;
  *
  * @author ItzSomebody
  */
-public abstract class StringEncryption extends Transformer {
-    protected StringEncryptionSetup setup;
+public class StringEncryption extends Transformer {
+    private List<String> exemptedStrings;
+    private boolean contextCheckingEnabled;
+    private boolean stringPoolingEnabled;
 
-    public StringEncryption(StringEncryptionSetup setup) {
-        this.setup = setup;
+    @Override
+    public void transform() {
+
     }
 
-    protected boolean excludedString(String str) {
-        for (String s : this.setup.getExemptedStrings())
-            if (str.contains(s))
-                return true;
-
-        return false;
+    @Override
+    public String getName() {
+        return null;
     }
 
     @Override
@@ -47,7 +46,35 @@ public abstract class StringEncryption extends Transformer {
         return ExclusionType.STRING_ENCRYPTION;
     }
 
-    public List<String> getExcludedStrings() {
-        return this.setup.getExemptedStrings();
+    protected boolean excludedString(String str) {
+        for (String s : exemptedStrings)
+            if (str.contains(s))
+                return true;
+
+        return false;
+    }
+
+    public List<String> getExemptedStrings() {
+        return exemptedStrings;
+    }
+
+    public void setExemptedStrings(List<String> exemptedStrings) {
+        this.exemptedStrings = exemptedStrings;
+    }
+
+    public boolean isContextCheckingEnabled() {
+        return contextCheckingEnabled;
+    }
+
+    public void setContextCheckingEnabled(boolean contextCheckingEnabled) {
+        this.contextCheckingEnabled = contextCheckingEnabled;
+    }
+
+    public boolean isStringPoolingEnabled() {
+        return stringPoolingEnabled;
+    }
+
+    public void setStringPoolingEnabled(boolean stringPoolingEnabled) {
+        this.stringPoolingEnabled = stringPoolingEnabled;
     }
 }

@@ -53,12 +53,11 @@ public class GotoGotoInliner extends Optimizer {
                             });
                 }));
 
-        Logger.stdOut(String.format("Inlined %d GOTO->GOTO sequences. [%dms]", count.get(),
-                tookThisLong(current)));
+        Logger.stdOut(String.format("Inlined %d GOTO->GOTO sequences. [%dms]", count.get(), tookThisLong(current)));
     }
 
     @Override
     public String getName() {
-        return "GOTO->GOTO Remover";
+        return "GOTO->GOTO Inliner";
     }
 }

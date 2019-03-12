@@ -5,8 +5,8 @@ public class IllegalConfigurationValueException extends RuntimeException {
         super(msg);
     }
 
-    public IllegalConfigurationValueException(String value, Class expected, Class gotInstead) {
-        super(String.format("Value %s was expected to be %s, got %s instead.", value, expected.getName(),
+    public IllegalConfigurationValueException(String value, Class expectedType, Class gotInstead) {
+        super(String.format("Value %s was expected to be %s, got %s instead.", value, expectedType,
                 gotInstead.getName()));
     }
 }

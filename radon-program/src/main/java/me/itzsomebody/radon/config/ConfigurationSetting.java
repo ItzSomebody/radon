@@ -17,42 +17,55 @@
 
 package me.itzsomebody.radon.config;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
 /**
  * An {@link Enum} containing all the allowed standalone configuration keys allowed.
  *
  * @author ItzSomebody
  */
 public enum ConfigurationSetting {
-    INPUT("Input"),
-    OUTPUT("Output"),
-    LIBRARIES("Libraries"),
-    EXCLUSIONS("Exclusions"),
-    STRING_ENCRYPTION("StringEncryption"),
-    FLOW_OBFUSCATION("FlowObfuscation"),
-    INVOKEDYNAMIC("InvokeDynamic"),
-    LINE_NUMBERS("LineNumberRemover"),
-    LOCAL_VARIABLES("LocalVariableRemover"),
-    NUMBER_OBFUSCATION("NumberObfuscation"),
-    HIDE_CODE("HideCode"),
-    CRASHER("Crasher"),
-    EXPIRATION("Expiration"),
-    WATERMARK("Watermarker"),
-    OPTIMIZER("Optimizer"),
-    SHRINKER("Shrinker"),
-    SHUFFLER("Shuffler"),
-    SOURCE_NAME("SourceFileRemover"),
-    SOURCE_DEBUG("SourceDebugRemover"),
-    RENAMER("Renamer"),
-    DICTIONARY("Dictionary"),
-    TRASH_CLASSES("TrashClasses");
+    INPUT(String.class),
+    OUTPUT(String.class),
+    LIBRARIES(List.class),
+    EXCLUSIONS(List.class),
+    STRING_ENCRYPTION(Map.class),
+    FLOW_OBFUSCATION(Map.class),
+    REFERENCE_OBFUSCATION(Map.class),
+    NUMBER_OBFUSCATION(Map.class),
+    ANTI_TAMPER(String.class), // TODO
+    VIRTUAL_MACHINE(Boolean.class), // TODO: ;)
+    RESOURCE_ENCRYPTION(Boolean.class), // TODO
+    RESOURCE_RENAMER(Boolean.class), // TODO
+    //CLASS_ENCRYPTION(Map.class), // Just kidding, lol
+    HIDE_CODE(Map.class),
+    CRASHER(Boolean.class),
+    EXPIRATION(Map.class),
+    WATERMARK(Map.class),
+    OPTIMIZER(Map.class),
+    SHRINKER(Map.class),
+    MEMBER_SHUFFLER(Boolean.class),
+    RENAMER(Map.class),
+    DICTIONARY(String.class),
+    RANDOMIZED_STRING_LENGTH(Integer.class),
+    COMPRESSION_LEVEL(Integer.class),
+    VERIFY(Boolean.class),
+    TRASH_CLASSES(Integer.class);
 
-    private final String value;
+    private final Class expectedType;
 
-    ConfigurationSetting(String value) {
-        this.value = value;
+    ConfigurationSetting(Class expectedType) {
+        this.expectedType = expectedType;
     }
 
-    public String getValue() {
-        return value;
+    public Class getExpectedType() {
+        return expectedType;
+    }
+
+    public String getName() {
+        return name().toLowerCase();
     }
 }

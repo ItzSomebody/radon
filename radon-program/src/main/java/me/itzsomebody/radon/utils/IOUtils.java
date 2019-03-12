@@ -30,28 +30,6 @@ import me.itzsomebody.radon.exceptions.RadonException;
  */
 public class IOUtils {
     /**
-     * Renames an existing file to EXISTING-FILE.jar.BACKUP-X.
-     *
-     * @param existing existing file to rename.
-     * @return the new name of the existing name.
-     */
-    public static String renameExistingFile(File existing) {
-        int i = 0;
-
-        while (true) {
-            i++;
-            String newName = existing.getAbsolutePath() + ".BACKUP-" + String.valueOf(i);
-            File backUpName = new File(newName);
-            if (!backUpName.exists()) {
-                existing.renameTo(backUpName);
-                existing.delete();
-                return newName;
-            }
-        }
-
-    }
-
-    /**
      * Creates a byte array from a given {@link InputStream}.
      *
      * @param in {@link InputStream} to convert to a byte array.

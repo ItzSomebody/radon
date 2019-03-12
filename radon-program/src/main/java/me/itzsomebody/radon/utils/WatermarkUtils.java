@@ -17,11 +17,9 @@
 
 package me.itzsomebody.radon.utils;
 
-import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -37,8 +35,7 @@ import org.objectweb.asm.tree.MethodNode;
  * @author ItzSomebody
  */
 public class WatermarkUtils {
-    public static List<String> extractIds(ZipFile zipFile, String key) throws Throwable {
-        ArrayList<String> ids = new ArrayList<>();
+    public static String extractIds(ZipFile zipFile, String key) throws Throwable {
         Enumeration<? extends ZipEntry> entries = zipFile.entries();
         Map<String, ClassNode> classes = new HashMap<>();
         try {
@@ -83,24 +80,19 @@ public class WatermarkUtils {
                 }
             }
         }
-        if (enoughInfo(embedMap)) {
-            String result = decrypt(constructString(embedMap), key);
-            ids.add("Watermark: " + result);
-        }
+        if (enoughInfo(embedMap))
+            return decrypt(constructString(embedMap), key);
 
-        return ids;
+        return "No IDs found.";
     }
 
     private static boolean enoughInfo(Map<Integer, Character> embedMap) {
-        if (embedMap.size() < 1) {
+        if (embedMap.size() < 1)
             return false;
-        }
 
-        for (int i = 0; i < embedMap.size(); i++) {
-            if (!embedMap.containsKey(i)) {
+        for (int i = 0; i < embedMap.size(); i++)
+            if (!embedMap.containsKey(i))
                 return false;
-            }
-        }
 
         return true;
     }

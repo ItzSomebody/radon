@@ -22,68 +22,77 @@ import java.util.List;
 import me.itzsomebody.radon.exclusions.ExclusionManager;
 import me.itzsomebody.radon.transformers.Transformer;
 
-public class SessionInfo {
+public class ObfuscationConfiguration {
     private File input;
     private File output;
     private List<File> libraries;
     private List<Transformer> transformers;
     private ExclusionManager exclusions;
-    private int trashClasses;
-    private Dictionaries dictionaryType;
+    private int nTrashClasses;
+    private int randomizedStringLength;
+    private DictionaryType dictionaryType;
+
+    public File getInput() {
+        return input;
+    }
 
     public void setInput(File input) {
         this.input = input;
     }
 
-    public File getInput() {
-        return this.input;
+    public File getOutput() {
+        return output;
     }
 
     public void setOutput(File output) {
         this.output = output;
     }
 
-    public File getOutput() {
-        return this.output;
+    public List<File> getLibraries() {
+        return libraries;
     }
 
     public void setLibraries(List<File> libraries) {
         this.libraries = libraries;
     }
 
-    public List<File> getLibraries() {
-        return libraries;
+    public List<Transformer> getTransformers() {
+        return transformers;
     }
 
     public void setTransformers(List<Transformer> transformers) {
         this.transformers = transformers;
     }
 
-    public List<Transformer> getTransformers() {
-        return this.transformers;
+    public ExclusionManager getExclusions() {
+        return exclusions;
     }
 
     public void setExclusions(ExclusionManager exclusions) {
         this.exclusions = exclusions;
     }
 
-    public ExclusionManager getExclusionManager() {
-        return this.exclusions;
+    public int getnTrashClasses() {
+        return nTrashClasses;
     }
 
-    public void setTrashClasses(int trashClasses) {
-        this.trashClasses = trashClasses;
+    public void setnTrashClasses(int nTrashClasses) {
+        this.nTrashClasses = nTrashClasses;
     }
 
-    public int getTrashClasses() {
-        return this.trashClasses;
+    public int getRandomizedStringLength() {
+        return randomizedStringLength;
     }
 
-    public void setDictionaryType(Dictionaries dictionaryType) {
+    public void setRandomizedStringLength(int randomizedStringLength) {
+        this.randomizedStringLength = randomizedStringLength;
+    }
+
+    public DictionaryType getDictionaryType() {
+        return dictionaryType;
+    }
+
+    public void setDictionaryType(DictionaryType dictionaryType) {
         this.dictionaryType = dictionaryType;
-    }
-
-    public Dictionaries getDictionaryType() {
-        return this.dictionaryType;
     }
 }
