@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2018 ItzSomebody
+ * Radon - An open-source Java obfuscator
+ * Copyright (C) 2019 ItzSomebody
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,10 +16,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package me.itzsomebody.radon.transformers.obfuscators;
+package me.itzsomebody.radon.transformers.obfuscators.hidecode;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
 import me.itzsomebody.radon.Logger;
+import me.itzsomebody.radon.config.ConfigurationSetting;
+import me.itzsomebody.radon.exceptions.InvalidConfigurationValueException;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
 import me.itzsomebody.radon.utils.AccessUtils;
@@ -27,6 +34,8 @@ import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.MethodNode;
 
+import static me.itzsomebody.radon.utils.ConfigUtils.getValueOrDefault;
+
 /**
  * Adds a synthetic modifier and bridge modifier if possible to attempt to hide code against some lower-quality
  * decompilers.
@@ -34,9 +43,14 @@ import org.objectweb.asm.tree.MethodNode;
  * @author ItzSomebody
  */
 public class HideCode extends Transformer {
+    private static final Map<String, HideCodeSetting> KEY_MAP = new HashMap<>();
     private boolean hideClassesEnabled;
     private boolean hideMethodsEnabled;
     private boolean hideFieldsEnabled;
+
+    static {
+        Stream.of(HideCodeSetting.values()).forEach(setting -> KEY_MAP.put(setting.getName(), setting));
+    }
 
     @Override
     public void transform() {
@@ -88,7 +102,7 @@ public class HideCode extends Transformer {
     }
 
     @Override
-    protected ExclusionType getExclusionType() {
+    public ExclusionType getExclusionType() {
         return ExclusionType.HIDE_CODE;
     }
 
@@ -97,27 +111,59 @@ public class HideCode extends Transformer {
         return "Hide code";
     }
 
-    public boolean isHideClassesEnabled() {
+    @Override
+    public Map<String, Object> getConfiguration() {
+        Map<String, Object> config = new LinkedHashMap<>();
+
+        config.put(HideCodeSetting.HIDE_CLASSES.getName(), isHideClassesEnabled());
+        config.put(HideCodeSetting.HIDE_METHODS.getName(), isHideMethodsEnabled());
+        config.put(HideCodeSetting.HIDE_FIELDS.getName(), isHideFieldsEnabled());
+
+        return config;
+    }
+
+    @Override
+    public void setConfiguration(Map<String, Object> config) {
+        setHideClassesEnabled(getValueOrDefault(HideCodeSetting.HIDE_CLASSES.getName(), config, false));
+        setHideFieldsEnabled(getValueOrDefault(HideCodeSetting.HIDE_FIELDS.getName(), config, false));
+        setHideMethodsEnabled(getValueOrDefault(HideCodeSetting.HIDE_METHODS.getName(), config, false));
+    }
+
+    @Override
+    public void verifyConfiguration(Map<String, Object> config) {
+        config.forEach((k, v) -> {
+            HideCodeSetting setting = KEY_MAP.get(k);
+
+            if (setting == null)
+                throw new InvalidConfigurationValueException(ConfigurationSetting.HIDE_CODE.getName() + '.' + k
+                        + " is an invalid configuration key");
+            if (!setting.getExpectedType().isInstance(v))
+                throw new InvalidConfigurationValueException(ConfigurationSetting.HIDE_CODE.getName() + '.' + k,
+                        setting.getExpectedType(), v.getClass());
+        });
+    }
+
+    private boolean isHideClassesEnabled() {
         return hideClassesEnabled;
     }
 
-    public void setHideClassesEnabled(boolean hideClassesEnabled) {
+    private void setHideClassesEnabled(boolean hideClassesEnabled) {
         this.hideClassesEnabled = hideClassesEnabled;
     }
 
-    public boolean isHideMethodsEnabled() {
+    private boolean isHideMethodsEnabled() {
         return hideMethodsEnabled;
     }
 
-    public void setHideMethodsEnabled(boolean hideMethodsEnabled) {
+    private void setHideMethodsEnabled(boolean hideMethodsEnabled) {
         this.hideMethodsEnabled = hideMethodsEnabled;
     }
 
-    public boolean isHideFieldsEnabled() {
+    private boolean isHideFieldsEnabled() {
         return hideFieldsEnabled;
     }
 
-    public void setHideFieldsEnabled(boolean hideFieldsEnabled) {
+    private void setHideFieldsEnabled(boolean hideFieldsEnabled) {
         this.hideFieldsEnabled = hideFieldsEnabled;
     }
 }

@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2018 ItzSomebody
+ * Radon - An open-source Java obfuscator
+ * Copyright (C) 2019 ItzSomebody
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,10 +18,6 @@
 
 package me.itzsomebody.radon.gui;
 
-import java.io.File;
-import javax.swing.*;
-import me.itzsomebody.radon.gui.exceptions.RadonInstanceNotFound;
-
 /**
  * Main class. \o/
  *
@@ -28,32 +25,6 @@ import me.itzsomebody.radon.gui.exceptions.RadonInstanceNotFound;
  */
 public class Main {
     public static void main(String[] args) {
-        runChecks();
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-        } catch (Exception e) {
-            // Ignored
-        }
-        new RadonGUI();
-    }
-
-    /**
-     * Makes sure the obfuscator jar actually exists before we start to screw around with the GUI.
-     */
-    private static void runChecks() {
-        File file = new File("Radon-Program.jar");
-        if (!file.exists()) {
-            JOptionPane.showMessageDialog(null, "Radon-Program.jar was not found in directory.", "Radon not found.",
-                    JOptionPane.ERROR_MESSAGE);
-            throw new RadonInstanceNotFound();
-        }
-
-        try {
-            Class.forName("me.itzsomebody.radon.Radon");
-        } catch (ClassNotFoundException e) {
-            JOptionPane.showMessageDialog(null, "me.itzsomebody.radon.Radon class was not found.",
-                    "Radon instance class not found.", JOptionPane.ERROR_MESSAGE);
-            throw new RadonInstanceNotFound();
-        }
+        // TODO
     }
 }

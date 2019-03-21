@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2018 ItzSomebody
+ * Radon - An open-source Java obfuscator
+ * Copyright (C) 2019 ItzSomebody
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,10 +28,12 @@ public class ObfuscationConfiguration {
     private File output;
     private List<File> libraries;
     private List<Transformer> transformers;
-    private ExclusionManager exclusions;
+    private ExclusionManager exclusionManager;
     private int nTrashClasses;
     private int randomizedStringLength;
     private DictionaryType dictionaryType;
+    private int compressionLevel;
+    private boolean verify;
 
     public File getInput() {
         return input;
@@ -64,12 +67,12 @@ public class ObfuscationConfiguration {
         this.transformers = transformers;
     }
 
-    public ExclusionManager getExclusions() {
-        return exclusions;
+    public ExclusionManager getExclusionManager() {
+        return exclusionManager;
     }
 
-    public void setExclusions(ExclusionManager exclusions) {
-        this.exclusions = exclusions;
+    public void setExclusionManager(ExclusionManager exclusionManager) {
+        this.exclusionManager = exclusionManager;
     }
 
     public int getnTrashClasses() {
@@ -94,5 +97,21 @@ public class ObfuscationConfiguration {
 
     public void setDictionaryType(DictionaryType dictionaryType) {
         this.dictionaryType = dictionaryType;
+    }
+
+    public int getCompressionLevel() {
+        return compressionLevel;
+    }
+
+    public void setCompressionLevel(int compressionLevel) {
+        this.compressionLevel = compressionLevel;
+    }
+
+    public boolean isVerify() {
+        return verify;
+    }
+
+    public void setVerify(boolean verify) {
+        this.verify = verify;
     }
 }

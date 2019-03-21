@@ -2,7 +2,7 @@
 * TODO
 
 ## 1.0.5
-* Fixes bug that caused all exclusions to not work.
+* Fixes bug that caused all exclusionManager to not work.
 * Fixes a flaw in the light string encryption decryption code which could lead to collision issues (Thanks [visleaf](https://github.com/visleaf)).
 * Radon now searches sub-directories for libraries (Thanks [freeasbird](https://github.com/freeasbird)).
 * Radon no longer uses the same shared object for randoms (Thanks [freeasbird](https://github.com/freeasbird)).

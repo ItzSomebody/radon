@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2018 ItzSomebody
+ * Radon - An open-source Java obfuscator
+ * Copyright (C) 2019 ItzSomebody
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,7 +21,6 @@ package me.itzsomebody.radon;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.util.List;
 import java.util.zip.ZipFile;
 import me.itzsomebody.radon.cli.CommandArgumentsParser;
 import me.itzsomebody.radon.config.ConfigurationParser;
@@ -30,7 +30,7 @@ import me.itzsomebody.radon.utils.WatermarkUtils;
 /**
  * Main class of obfuscator. \o/
  * TODO: Renamer transformer should correct strings used for reflection. (i.e. Class.forName("me.itzsomebody.Thing"))
- * TODO: Remove the "light, medium & heavy" garbage by allowing for individual compenent enabling.
+ * <p>
  * TODO: Clean code up in general.
  *
  * @author ItzSomebody
@@ -90,7 +90,7 @@ public class Main {
             }
 
             // Parse the config and let's run Radon.
-            Radon radon = new Radon(config.createSessionFromConfig());
+            Radon radon = new Radon(config.createObfuscatorConfiguration());
             radon.run();
         } else if (parser.containsSwitch("extract")) {
             // Watermark extraction.

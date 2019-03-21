@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2018 ItzSomebody
+ * Radon - An open-source Java obfuscator
+ * Copyright (C) 2019 ItzSomebody
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -37,6 +38,7 @@ import me.itzsomebody.radon.asm.ClassTree;
 import me.itzsomebody.radon.asm.ClassWrapper;
 import me.itzsomebody.radon.exceptions.MissingClassException;
 import me.itzsomebody.radon.exceptions.RadonException;
+import me.itzsomebody.radon.transformers.Transformer;
 import me.itzsomebody.radon.transformers.miscellaneous.TrashClasses;
 import me.itzsomebody.radon.utils.FileUtils;
 import me.itzsomebody.radon.utils.IOUtils;
@@ -53,14 +55,14 @@ import org.objectweb.asm.tree.MethodNode;
  * @author ItzSomebody
  */
 public class Radon {
-    public ObfuscationConfiguration sessionInfo;
+    public ObfuscationConfiguration config;
     private Map<String, ClassTree> hierarchy = new HashMap<>();
     public Map<String, ClassWrapper> classes = new HashMap<>();
     public Map<String, ClassWrapper> classPath = new HashMap<>();
     public Map<String, byte[]> resources = new HashMap<>();
 
-    public Radon(ObfuscationConfiguration sessionInfo) {
-        this.sessionInfo = sessionInfo;
+    public Radon(ObfuscationConfiguration config) {
+        this.config = config;
     }
 
     /**
@@ -71,13 +73,15 @@ public class Radon {
         loadInput();
         buildInheritance();
 
-        if (this.sessionInfo.getnTrashClasses() > 0)
-            this.sessionInfo.getTransformers().add(new TrashClasses());
-        if (this.sessionInfo.getTransformers().isEmpty())
+        if (config.getnTrashClasses() > 0)
+            config.getTransformers().add(0, new TrashClasses());
+        if (config.getTransformers().isEmpty())
             throw new RadonException("No transformers are enabled.");
 
+        Transformer.sort(config.getTransformers());
+
         Logger.stdOut("------------------------------------------------");
-        this.sessionInfo.getTransformers().stream().filter(Objects::nonNull).forEach(transformer -> {
+        this.config.getTransformers().stream().filter(Objects::nonNull).forEach(transformer -> {
             long current = System.currentTimeMillis();
             Logger.stdOut(String.format("Running %s transformer.", transformer.getName()));
             transformer.init(this);
@@ -90,7 +94,7 @@ public class Radon {
     }
 
     private void writeOutput() {
-        File output = this.sessionInfo.getOutput();
+        File output = config.getOutput();
         Logger.stdOut(String.format("Writing output to \"%s\".", output.getAbsolutePath()));
 
         if (output.exists())
@@ -98,14 +102,15 @@ public class Radon {
 
         try {
             ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(output));
+            zos.setLevel(config.getCompressionLevel());
 
             this.classes.values().forEach(classWrapper -> {
                 try {
                     ZipEntry entry = new ZipEntry(classWrapper.classNode.name + ".class");
-                    entry.setCompressedSize(-1);
 
                     ClassWriter cw = new CustomClassWriter(ClassWriter.COMPUTE_FRAMES);
                     cw.newUTF8("RADON" + Main.VERSION);
+
                     try {
                         classWrapper.classNode.accept(cw);
                     } catch (Throwable t) {
@@ -128,7 +133,6 @@ public class Radon {
             this.resources.forEach((name, bytes) -> {
                 try {
                     ZipEntry entry = new ZipEntry(name);
-                    entry.setCompressedSize(-1);
 
                     zos.putNextEntry(entry);
                     zos.write(bytes);
@@ -148,15 +152,18 @@ public class Radon {
     }
 
     private void loadClassPath() {
-        for (File file : this.sessionInfo.getLibraries()) {
+        config.getLibraries().forEach(file -> {
             if (file.exists()) {
                 Logger.stdOut(String.format("Loading library \"%s\".", file.getAbsolutePath()));
+
                 try {
                     ZipFile zipFile = new ZipFile(file);
                     Enumeration<? extends ZipEntry> entries = zipFile.entries();
+
                     while (entries.hasMoreElements()) {
                         ZipEntry entry = entries.nextElement();
-                        if (!entry.isDirectory() && entry.getName().endsWith(".class")) {
+
+                        if (!entry.isDirectory() && entry.getName().endsWith(".class"))
                             try {
                                 ClassReader cr = new ClassReader(zipFile.getInputStream(entry));
                                 ClassNode classNode = new ClassNode();
@@ -168,7 +175,6 @@ public class Radon {
                                 Logger.stdErr(String.format("Error while loading library class \"%s\".", entry.getName().replace(".class", "")));
                                 t.printStackTrace();
                             }
-                        }
                     }
                 } catch (ZipException e) {
                     Logger.stdErr(String.format("Library \"%s\" could not be opened as a zip file.", file.getAbsolutePath()));
@@ -177,35 +183,38 @@ public class Radon {
                     Logger.stdErr(String.format("IOException happened while trying to load classes from \"%s\".", file.getAbsolutePath()));
                     e.printStackTrace();
                 }
-            } else {
+            } else
                 Logger.stdWarn(String.format("Library \"%s\" could not be found and will be ignored.", file.getAbsolutePath()));
-            }
-        }
+        });
     }
 
     private void loadInput() {
-        File input = this.sessionInfo.getInput();
+        File input = this.config.getInput();
+
         if (input.exists()) {
             Logger.stdOut(String.format("Loading input \"%s\".", input.getAbsolutePath()));
+
             try {
                 ZipFile zipFile = new ZipFile(input);
                 Enumeration<? extends ZipEntry> entries = zipFile.entries();
+
                 while (entries.hasMoreElements()) {
                     ZipEntry entry = entries.nextElement();
-                    if (!entry.isDirectory()) {
-                        if (entry.getName().endsWith(".class")) {
+
+                    if (!entry.isDirectory())
+                        if (entry.getName().endsWith(".class"))
                             try {
                                 ClassReader cr = new ClassReader(zipFile.getInputStream(entry));
                                 ClassNode classNode = new ClassNode();
                                 cr.accept(classNode, ClassReader.SKIP_FRAMES);
-                                if (classNode.version <= Opcodes.V1_5) {
+                                if (classNode.version <= Opcodes.V1_5)
                                     for (int i = 0; i < classNode.methods.size(); i++) {
                                         MethodNode methodNode = classNode.methods.get(i);
                                         JSRInlinerAdapter adapter = new JSRInlinerAdapter(methodNode, methodNode.access, methodNode.name, methodNode.desc, methodNode.signature, methodNode.exceptions.toArray(new String[0]));
                                         methodNode.accept(adapter);
                                         classNode.methods.set(i, adapter);
                                     }
-                                }
+
                                 ClassWrapper classWrapper = new ClassWrapper(classNode, false);
 
                                 this.classPath.put(classWrapper.originalName, classWrapper);
@@ -214,10 +223,8 @@ public class Radon {
                                 Logger.stdWarn(String.format("Could not load %s as a class.", entry.getName()));
                                 this.resources.put(entry.getName(), IOUtils.toByteArray(zipFile.getInputStream(entry)));
                             }
-                        } else {
+                        else
                             this.resources.put(entry.getName(), IOUtils.toByteArray(zipFile.getInputStream(entry)));
-                        }
-                    }
                 }
             } catch (ZipException e) {
                 Logger.stdErr(String.format("Input file \"%s\" could not be opened as a zip file.", input.getAbsolutePath()));
@@ -256,7 +263,7 @@ public class Radon {
 
                 buildHierarchy(superClass, classWrapper);
             }
-            if (classWrapper.classNode.interfaces != null && !classWrapper.classNode.interfaces.isEmpty()) {
+            if (classWrapper.classNode.interfaces != null)
                 classWrapper.classNode.interfaces.forEach(s -> {
                     tree.parentClasses.add(s);
 
@@ -266,16 +273,51 @@ public class Radon {
 
                     buildHierarchy(interfaceClass, classWrapper);
                 });
-            }
             hierarchy.put(classWrapper.classNode.name, tree);
         }
-        if (sub != null) {
+
+        if (sub != null)
             hierarchy.get(classWrapper.classNode.name).subClasses.add(sub.classNode.name);
-        }
     }
 
     private void buildInheritance() {
         classes.values().forEach(classWrapper -> buildHierarchy(classWrapper, null));
+    }
+
+    private ClassNode returnClazz(String ref) {
+        ClassWrapper clazz = classPath.get(ref);
+
+        if (clazz == null)
+            throw new MissingClassException(ref + " does not exist in classpath!");
+
+        return clazz.classNode;
+    }
+
+    public boolean isAssignableFrom(String type1, String type2) {
+        if ("java/lang/Object".equals(type1))
+            return true;
+        if (type1.equals(type2))
+            return true;
+
+        returnClazz(type1);
+        returnClazz(type2);
+
+        ClassTree firstTree = getTree(type1);
+        if (firstTree == null)
+            throw new MissingClassException("Could not find " + type1 + " in the built class hierarchy");
+
+        Set<String> allChildren = new HashSet<>();
+        Deque<String> toProcess = new ArrayDeque<>(firstTree.subClasses);
+        while (!toProcess.isEmpty()) {
+            String s = toProcess.poll();
+
+            if (allChildren.add(s)) {
+                returnClazz(s);
+                ClassTree tempTree = getTree(s);
+                toProcess.addAll(tempTree.subClasses);
+            }
+        }
+        return allChildren.contains(type2);
     }
 
     class CustomClassWriter extends ClassWriter {
@@ -317,39 +359,6 @@ public class Radon {
                 } while (!isAssignableFrom(temp, type2));
                 return temp;
             }
-        }
-
-        private ClassNode returnClazz(String ref) {
-            ClassWrapper clazz = classPath.get(ref);
-            if (clazz == null)
-                throw new MissingClassException(ref + " does not exist in classpath!");
-
-            return clazz.classNode;
-        }
-
-        private boolean isAssignableFrom(String type1, String type2) {
-            if ("java/lang/Object".equals(type1))
-                return true;
-            if (type1.equals(type2))
-                return true;
-
-            returnClazz(type1);
-            returnClazz(type2);
-            ClassTree firstTree = getTree(type1);
-            if (firstTree == null) {
-                throw new MissingClassException("Could not find " + type1 + " in the built class hierarchy");
-            }
-            Set<String> allChildren = new HashSet<>();
-            Deque<String> toProcess = new ArrayDeque<>(firstTree.subClasses);
-            while (!toProcess.isEmpty()) {
-                String s = toProcess.poll();
-                if (allChildren.add(s)) {
-                    returnClazz(s);
-                    ClassTree tempTree = getTree(s);
-                    toProcess.addAll(tempTree.subClasses);
-                }
-            }
-            return allChildren.contains(type2);
         }
     }
 }

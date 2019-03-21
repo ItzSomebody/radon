@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2018 ItzSomebody
+ * Radon - An open-source Java obfuscator
+ * Copyright (C) 2019 ItzSomebody
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -43,5 +44,9 @@ public enum DictionaryType {
             throw new RadonException("Illegal dictionary type: " + type);
 
         return values()[type];
+    }
+
+    public String getName() {
+        return name().toLowerCase();
     }
 }

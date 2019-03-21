@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2018 ItzSomebody
+ * Radon - An open-source Java obfuscator
+ * Copyright (C) 2019 ItzSomebody
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,8 +18,19 @@
 
 package me.itzsomebody.radon.transformers.obfuscators.numbers;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
+import me.itzsomebody.radon.config.ConfigurationSetting;
+import me.itzsomebody.radon.exceptions.InvalidConfigurationValueException;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
+import me.itzsomebody.radon.utils.RandomUtils;
+
+import static me.itzsomebody.radon.utils.ConfigUtils.getValueOrDefault;
 
 /**
  * Abstract class for number obfuscation transformers.
@@ -26,19 +38,27 @@ import me.itzsomebody.radon.transformers.Transformer;
  * @author ItzSomebody
  */
 public class NumberObfuscation extends Transformer {
+    private static final Map<String, NumberObfuscationSetting> KEY_MAP = new HashMap<>();
+    private static final Map<NumberObfuscation, NumberObfuscationSetting> NUMBEROBF_SETTING_MAP = new HashMap<>();
+    private final List<NumberObfuscation> numberObfuscators = new ArrayList<>();
     private boolean integerTamperingEnabled;
     private boolean longTamperingEnabled;
     private boolean floatTamperingEnabled;
     private boolean doubleTamperingEnabled;
 
-    private boolean bitwiseOperationsEnabled;
-    private boolean arithmeticOperationsEnabled;
-
-    private boolean contextCheckingEnabled;
+    static {
+        NumberObfuscationSetting[] values = NumberObfuscationSetting.values();
+        Stream.of(values).forEach(setting -> KEY_MAP.put(setting.getName(), setting));
+        Stream.of(values).filter(setting -> setting.getNumberObfuscation() != null)
+                .forEach(setting -> NUMBEROBF_SETTING_MAP.put(setting.getNumberObfuscation(), setting));
+    }
 
     @Override
     public void transform() {
-        // TODO
+        numberObfuscators.forEach(numberObfuscation -> {
+            numberObfuscation.init(radon);
+            numberObfuscation.transform();
+        });
     }
 
     @Override
@@ -47,63 +67,110 @@ public class NumberObfuscation extends Transformer {
     }
 
     @Override
-    protected ExclusionType getExclusionType() {
+    public ExclusionType getExclusionType() {
         return ExclusionType.NUMBER_OBFUSCATION;
     }
 
-    public boolean isIntegerTamperingEnabled() {
+    @Override
+    public Map<String, Object> getConfiguration() {
+        Map<String, Object> config = new LinkedHashMap<>();
+
+        numberObfuscators.forEach(obfuscator -> config.put(obfuscator.getNumberObfuscationSetting().getName(), true));
+
+        config.put(NumberObfuscationSetting.DOUBLE_TAMPERING.getName(), isDoubleTamperingEnabled());
+        config.put(NumberObfuscationSetting.FLOAT_TAMPERING.getName(), isFloatTamperingEnabled());
+        config.put(NumberObfuscationSetting.INTEGER_TAMPERING.getName(), isIntegerTamperingEnabled());
+        config.put(NumberObfuscationSetting.LONG_TAMPERING.getName(), isLongTamperingEnabled());
+
+        return config;
+    }
+
+    @Override
+    public void setConfiguration(Map<String, Object> config) {
+        Stream.of(NumberObfuscationSetting.values()).filter(setting -> setting.getNumberObfuscation() != null
+                && config.containsKey(setting.getName())).forEach(setting -> numberObfuscators.add(setting.getNumberObfuscation()));
+
+        setDoubleTamperingEnabled(getValueOrDefault(NumberObfuscationSetting.DOUBLE_TAMPERING.getName(), config, false));
+        setFloatTamperingEnabled(getValueOrDefault(NumberObfuscationSetting.FLOAT_TAMPERING.getName(), config, false));
+        setIntegerTamperingEnabled(getValueOrDefault(NumberObfuscationSetting.INTEGER_TAMPERING.getName(), config, false));
+        setLongTamperingEnabled(getValueOrDefault(NumberObfuscationSetting.LONG_TAMPERING.getName(), config, false));
+    }
+
+    @Override
+    public void verifyConfiguration(Map<String, Object> config) {
+        config.forEach((k, v) -> {
+            NumberObfuscationSetting setting = KEY_MAP.get(k);
+
+            if (setting == null)
+                throw new InvalidConfigurationValueException(ConfigurationSetting.NUMBER_OBFUSCATION.getName() + '.' + k
+                        + " is an invalid configuration key");
+            if (!setting.getExpectedType().isInstance(v))
+                throw new InvalidConfigurationValueException(ConfigurationSetting.NUMBER_OBFUSCATION.getName() + '.' + k,
+                        setting.getExpectedType(), v.getClass());
+        });
+    }
+
+    protected static int randomInt(int bounds) {
+        if (bounds == 0)
+            return RandomUtils.getRandomInt(Short.MAX_VALUE);
+
+        return RandomUtils.getRandomInt(Math.abs(bounds));
+    }
+
+    protected static long randomLong(long bounds) {
+        if (bounds == 0)
+            return RandomUtils.getRandomLong(Integer.MAX_VALUE);
+
+        return RandomUtils.getRandomLong(Math.abs(bounds));
+    }
+
+    protected static float randomFloat(float bounds) {
+        if (bounds == 0)
+            return RandomUtils.getRandomFloat(Float.MAX_VALUE);
+
+        return RandomUtils.getRandomFloat(Math.abs(bounds));
+    }
+
+    protected static double randomDouble(double bounds) {
+        if (bounds == 0)
+            return RandomUtils.getRandomDouble(Float.MAX_VALUE);
+
+        return RandomUtils.getRandomDouble(Math.abs(bounds));
+    }
+
+    protected boolean isIntegerTamperingEnabled() {
         return integerTamperingEnabled;
     }
 
-    public void setIntegerTamperingEnabled(boolean integerTamperingEnabled) {
+    protected void setIntegerTamperingEnabled(boolean integerTamperingEnabled) {
         this.integerTamperingEnabled = integerTamperingEnabled;
     }
 
-    public boolean isLongTamperingEnabled() {
+    protected boolean isLongTamperingEnabled() {
         return longTamperingEnabled;
     }
 
-    public void setLongTamperingEnabled(boolean longTamperingEnabled) {
+    protected void setLongTamperingEnabled(boolean longTamperingEnabled) {
         this.longTamperingEnabled = longTamperingEnabled;
     }
 
-    public boolean isFloatTamperingEnabled() {
+    protected boolean isFloatTamperingEnabled() {
         return floatTamperingEnabled;
     }
 
-    public void setFloatTamperingEnabled(boolean floatTamperingEnabled) {
+    protected void setFloatTamperingEnabled(boolean floatTamperingEnabled) {
         this.floatTamperingEnabled = floatTamperingEnabled;
     }
 
-    public boolean isDoubleTamperingEnabled() {
+    protected boolean isDoubleTamperingEnabled() {
         return doubleTamperingEnabled;
     }
 
-    public void setDoubleTamperingEnabled(boolean doubleTamperingEnabled) {
+    protected void setDoubleTamperingEnabled(boolean doubleTamperingEnabled) {
         this.doubleTamperingEnabled = doubleTamperingEnabled;
     }
 
-    public boolean isBitwiseOperationsEnabled() {
-        return bitwiseOperationsEnabled;
-    }
-
-    public void setBitwiseOperationsEnabled(boolean bitwiseOperationsEnabled) {
-        this.bitwiseOperationsEnabled = bitwiseOperationsEnabled;
-    }
-
-    public boolean isArithmeticOperationsEnabled() {
-        return arithmeticOperationsEnabled;
-    }
-
-    public void setArithmeticOperationsEnabled(boolean arithmeticOperationsEnabled) {
-        this.arithmeticOperationsEnabled = arithmeticOperationsEnabled;
-    }
-
-    public boolean isContextCheckingEnabled() {
-        return contextCheckingEnabled;
-    }
-
-    public void setContextCheckingEnabled(boolean contextCheckingEnabled) {
-        this.contextCheckingEnabled = contextCheckingEnabled;
+    private NumberObfuscationSetting getNumberObfuscationSetting() {
+        return NUMBEROBF_SETTING_MAP.get(this);
     }
 }

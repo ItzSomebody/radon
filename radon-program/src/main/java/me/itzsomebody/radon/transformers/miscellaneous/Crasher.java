@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2018 ItzSomebody
+ * Radon - An open-source Java obfuscator
+ * Copyright (C) 2019 ItzSomebody
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +18,7 @@
 
 package me.itzsomebody.radon.transformers.miscellaneous;
 
+import java.util.Map;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
 
@@ -32,12 +34,27 @@ public class Crasher extends Transformer {
     }
 
     @Override
-    protected ExclusionType getExclusionType() {
+    public ExclusionType getExclusionType() {
         return ExclusionType.CRASHER;
     }
 
     @Override
     public String getName() {
         return "Crasher";
+    }
+
+    @Override
+    public Map<String, Object> getConfiguration() {
+        return null;
+    }
+
+    @Override
+    public void setConfiguration(Map<String, Object> config) {
+        // Not needed
+    }
+
+    @Override
+    public void verifyConfiguration(Map<String, Object> config) {
+        // Not needed
     }
 }

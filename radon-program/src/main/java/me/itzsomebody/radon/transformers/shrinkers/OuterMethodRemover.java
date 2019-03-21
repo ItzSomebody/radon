@@ -1,4 +1,5 @@
 /*
+ * Radon - An open-source Java obfuscator
  * Copyright (C) 2019 ItzSomebody
  *
  * This program is free software: you can redistribute it and/or modify
@@ -22,6 +23,8 @@ import me.itzsomebody.radon.Logger;
 
 /**
  * Removes outer methods.
+ *
+ * @author ItzSomebody
  */
 public class OuterMethodRemover extends Shrinker {
     @Override

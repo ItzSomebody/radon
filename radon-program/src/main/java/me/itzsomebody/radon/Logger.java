@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2018 ItzSomebody
+ * Radon - An open-source Java obfuscator
+ * Copyright (C) 2019 ItzSomebody
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,6 +29,7 @@ import java.util.List;
 
 /**
  * Utils to print fancy stuff in the console and to write log file.
+ * TODO: Switch to {@link java.util.logging.Logger} at some point.
  *
  * @author ItzSomebody
  */

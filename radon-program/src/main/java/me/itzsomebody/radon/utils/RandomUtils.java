@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2018 ItzSomebody
+ * Radon - An open-source Java obfuscator
+ * Copyright (C) 2019 ItzSomebody
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,20 +27,17 @@ import java.util.concurrent.ThreadLocalRandom;
  * @author ItzSomebody
  * @author freeasbird
  */
-public class RandomUtils {public static int getRandomInt() {
+public class RandomUtils {
+    public static int getRandomInt() {
         return ThreadLocalRandom.current().nextInt();
     }
 
     public static int getRandomInt(int bounds) {
-        return ThreadLocalRandom.current().nextInt(1, bounds);
+        return ThreadLocalRandom.current().nextInt(bounds);
     }
 
     public static int getRandomInt(int origin, int bounds) {
         return ThreadLocalRandom.current().nextInt(origin, bounds);
-    }
-
-    public static int getRandomIntNoOrigin(int bounds) {
-        return ThreadLocalRandom.current().nextInt(bounds);
     }
 
     public static long getRandomLong() {
@@ -47,14 +45,22 @@ public class RandomUtils {public static int getRandomInt() {
     }
 
     public static long getRandomLong(long bounds) {
-        return ThreadLocalRandom.current().nextLong(1, bounds);
+        return ThreadLocalRandom.current().nextLong(bounds);
     }
 
     public static float getRandomFloat() {
         return ThreadLocalRandom.current().nextFloat();
     }
 
+    public static float getRandomFloat(float bounds) {
+        return (float) ThreadLocalRandom.current().nextDouble(bounds);
+    }
+
     public static double getRandomDouble() {
         return ThreadLocalRandom.current().nextDouble();
+    }
+
+    public static double getRandomDouble(double bounds) {
+        return ThreadLocalRandom.current().nextDouble(bounds);
     }
 }

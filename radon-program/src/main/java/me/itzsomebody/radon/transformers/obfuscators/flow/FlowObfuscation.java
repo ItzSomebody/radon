@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2018 ItzSomebody
+ * Radon - An open-source Java obfuscator
+ * Copyright (C) 2019 ItzSomebody
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +18,14 @@
 
 package me.itzsomebody.radon.transformers.obfuscators.flow;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
+import me.itzsomebody.radon.config.ConfigurationSetting;
+import me.itzsomebody.radon.exceptions.InvalidConfigurationValueException;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
 
@@ -26,16 +35,22 @@ import me.itzsomebody.radon.transformers.Transformer;
  * @author ItzSomebody
  */
 public class FlowObfuscation extends Transformer {
-    private boolean replaceGotoEnabled;
-    private boolean insertBogusJumpsEnabled;
-    private boolean rearrangeFlowEnabled;
-    private boolean fakeCatchBlocksEnabled;
-    private boolean mutilateNullCheckEnabled;
-    private boolean combineTryWithCatchEnabled;
+    private static final Map<String, FlowObfuscationSetting> KEY_MAP = new HashMap<>();
+    private static final Map<FlowObfuscation, FlowObfuscationSetting> FLOW_SETTING_MAP = new HashMap<>();
+    private final List<FlowObfuscation> flowObfuscators = new ArrayList<>();
+
+    static {
+        FlowObfuscationSetting[] values = FlowObfuscationSetting.values();
+        Stream.of(values).forEach(setting -> KEY_MAP.put(setting.getName(), setting));
+        Stream.of(values).forEach(setting -> FLOW_SETTING_MAP.put(setting.getFlowObfuscation(), setting));
+    }
 
     @Override
     public void transform() {
-        // TODO
+        flowObfuscators.forEach(flowObfuscator -> {
+            flowObfuscator.init(radon);
+            flowObfuscator.transform();
+        });
     }
 
     @Override
@@ -44,55 +59,40 @@ public class FlowObfuscation extends Transformer {
     }
 
     @Override
-    protected ExclusionType getExclusionType() {
+    public ExclusionType getExclusionType() {
         return ExclusionType.FLOW_OBFUSCATION;
     }
 
-    public boolean isReplaceGotoEnabled() {
-        return replaceGotoEnabled;
+    @Override
+    public Map<String, Object> getConfiguration() {
+        Map<String, Object> config = new LinkedHashMap<>();
+
+        flowObfuscators.forEach(obfuscator -> config.put(obfuscator.getFlowObfuscationSetting().getName(), true));
+
+        return config;
     }
 
-    public void setReplaceGotoEnabled(boolean replaceGotoEnabled) {
-        this.replaceGotoEnabled = replaceGotoEnabled;
+    @Override
+    public void setConfiguration(Map<String, Object> config) {
+        Stream.of(FlowObfuscationSetting.values()).filter(setting -> config.containsKey(setting.getName()))
+                .forEach(setting -> flowObfuscators.add(setting.getFlowObfuscation()));
     }
 
-    public boolean isInsertBogusJumpsEnabled() {
-        return insertBogusJumpsEnabled;
+    @Override
+    public void verifyConfiguration(Map<String, Object> config) {
+        config.forEach((k, v) -> {
+            FlowObfuscationSetting setting = KEY_MAP.get(k);
+
+            if (setting == null)
+                throw new InvalidConfigurationValueException(ConfigurationSetting.FLOW_OBFUSCATION.getName() + '.' + k
+                        + " is an invalid configuration key");
+            if (!setting.getExpectedType().isInstance(v))
+                throw new InvalidConfigurationValueException(ConfigurationSetting.FLOW_OBFUSCATION.getName() + '.' + k,
+                        setting.getExpectedType(), v.getClass());
+        });
     }
 
-    public void setInsertBogusJumpsEnabled(boolean insertBogusJumpsEnabled) {
-        this.insertBogusJumpsEnabled = insertBogusJumpsEnabled;
-    }
-
-    public boolean isRearrangeFlowEnabled() {
-        return rearrangeFlowEnabled;
-    }
-
-    public void setRearrangeFlowEnabled(boolean rearrangeFlowEnabled) {
-        this.rearrangeFlowEnabled = rearrangeFlowEnabled;
-    }
-
-    public boolean isFakeCatchBlocksEnabled() {
-        return fakeCatchBlocksEnabled;
-    }
-
-    public void setFakeCatchBlocksEnabled(boolean fakeCatchBlocksEnabled) {
-        this.fakeCatchBlocksEnabled = fakeCatchBlocksEnabled;
-    }
-
-    public boolean isMutilateNullCheckEnabled() {
-        return mutilateNullCheckEnabled;
-    }
-
-    public void setMutilateNullCheckEnabled(boolean mutilateNullCheckEnabled) {
-        this.mutilateNullCheckEnabled = mutilateNullCheckEnabled;
-    }
-
-    public boolean isCombineTryWithCatchEnabled() {
-        return combineTryWithCatchEnabled;
-    }
-
-    public void setCombineTryWithCatchEnabled(boolean combineTryWithCatchEnabled) {
-        this.combineTryWithCatchEnabled = combineTryWithCatchEnabled;
+    private FlowObfuscationSetting getFlowObfuscationSetting() {
+        return FLOW_SETTING_MAP.get(this);
     }
 }

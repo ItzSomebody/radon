@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2018 ItzSomebody
+ * Radon - An open-source Java obfuscator
+ * Copyright (C) 2019 ItzSomebody
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +20,7 @@ package me.itzsomebody.radon.exclusions;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Class containing a {@link List<Exclusion>} of all the created exclusions.
@@ -37,11 +39,9 @@ public class ExclusionManager {
     }
 
     public boolean isExcluded(String pattern, ExclusionType type) {
-        for (Exclusion exclusion : this.exclusions)
-            if ((exclusion.getExclusionType() == type || exclusion.getExclusionType() == ExclusionType.GLOBAL)
-                    && exclusion.matches(pattern))
-                return true;
+        Optional<Exclusion> result = exclusions.stream().filter(exclusion -> exclusion.getExclusionType() == type
+                || exclusion.getExclusionType() == ExclusionType.GLOBAL).findFirst();
 
-        return false;
+        return result.isPresent() && result.get().matches(pattern);
     }
 }

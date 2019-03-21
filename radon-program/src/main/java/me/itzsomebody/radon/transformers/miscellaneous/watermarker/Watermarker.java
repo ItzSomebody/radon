@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2018 ItzSomebody
+ * Radon - An open-source Java obfuscator
+ * Copyright (C) 2019 ItzSomebody
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,13 +16,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package me.itzsomebody.radon.transformers.miscellaneous;
+package me.itzsomebody.radon.transformers.miscellaneous.watermarker;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.stream.Stream;
 import me.itzsomebody.radon.Logger;
 import me.itzsomebody.radon.asm.ClassWrapper;
+import me.itzsomebody.radon.config.ConfigurationSetting;
+import me.itzsomebody.radon.exceptions.InvalidConfigurationValueException;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
 import me.itzsomebody.radon.utils.BytecodeUtils;
@@ -30,14 +37,21 @@ import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
+import static me.itzsomebody.radon.utils.ConfigUtils.getValueOrDefault;
+
 /**
  * Embeds a watermark into random classes.
  *
  * @author ItzSomebody.
  */
 public class Watermarker extends Transformer {
+    private final Map<String, WatermarkerSetting> KEY_MAP = new HashMap<>();
     private String message;
     private String key;
+
+    public Watermarker() {
+        Stream.of(WatermarkerSetting.values()).forEach(setting -> KEY_MAP.put(setting.getName(), setting));
+    }
 
     @Override
     public void transform() {
@@ -105,8 +119,39 @@ public class Watermarker extends Transformer {
     }
 
     @Override
-    protected ExclusionType getExclusionType() {
+    public ExclusionType getExclusionType() {
         return null;
+    }
+
+    @Override
+    public Map<String, Object> getConfiguration() {
+        Map<String, Object> config = new LinkedHashMap<>();
+
+        setMessage(getValueOrDefault(WatermarkerSetting.MESSAGE.getName(), config, null));
+        setKey(getValueOrDefault(WatermarkerSetting.KEY.getName(), config, null));
+
+        return config;
+    }
+
+    @Override
+    public void setConfiguration(Map<String, Object> config) {
+        config.put(WatermarkerSetting.MESSAGE.getName(), getMessage());
+        config.put(WatermarkerSetting.KEY.getName(), getKey());
+    }
+
+    @Override
+    public void verifyConfiguration(Map<String, Object> config) {
+        config.forEach((k, v) -> {
+            WatermarkerSetting setting = KEY_MAP.get(k);
+
+            if (setting == null)
+                throw new InvalidConfigurationValueException(ConfigurationSetting.WATERMARK.getName() + '.' + k
+                        + " is an invalid configuration key");
+            if (!setting.getExpectedType().isInstance(v))
+                throw new InvalidConfigurationValueException(ConfigurationSetting.WATERMARK.getName() + '.' + k,
+                        setting.getExpectedType(), v.getClass());
+
+        });
     }
 
     @Override
@@ -114,19 +159,19 @@ public class Watermarker extends Transformer {
         return "Watermarker";
     }
 
-    public String getMessage() {
+    private String getMessage() {
         return message;
     }
 
-    public void setMessage(String message) {
+    private void setMessage(String message) {
         this.message = message;
     }
 
-    public String getKey() {
+    private String getKey() {
         return key;
     }
 
-    public void setKey(String key) {
+    private void setKey(String key) {
         this.key = key;
     }
 }

@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2018 ItzSomebody
+ * Radon - An open-source Java obfuscator
+ * Copyright (C) 2019 ItzSomebody
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,6 +20,7 @@ package me.itzsomebody.radon.transformers;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import me.itzsomebody.radon.Radon;
 import me.itzsomebody.radon.asm.ClassWrapper;
@@ -44,24 +46,24 @@ public abstract class Transformer implements Opcodes {
      */
     private HashSet<String> usedStrings = new HashSet<>();
 
-    public void init(Radon radon) {
+    public final void init(Radon radon) {
         this.radon = radon;
     }
 
-    protected boolean excluded(String str) {
-        return this.radon.sessionInfo.getExclusionManager().isExcluded(str, getExclusionType());
+    protected final boolean excluded(String str) {
+        return this.radon.config.getExclusionManager().isExcluded(str, getExclusionType());
     }
 
-    protected boolean excluded(ClassWrapper classWrapper) {
+    protected final boolean excluded(ClassWrapper classWrapper) {
         return this.excluded(classWrapper.originalName);
     }
 
-    protected boolean excluded(MethodWrapper methodWrapper) {
+    protected final boolean excluded(MethodWrapper methodWrapper) {
         return this.excluded(methodWrapper.owner.originalName + '.' + methodWrapper.originalName
                 + methodWrapper.originalDescription);
     }
 
-    protected boolean excluded(FieldWrapper fieldWrapper) {
+    protected final boolean excluded(FieldWrapper fieldWrapper) {
         return this.excluded(fieldWrapper.owner.originalName + '.' + fieldWrapper.originalName + '.'
                 + fieldWrapper.originalDescription);
     }
@@ -75,35 +77,39 @@ public abstract class Transformer implements Opcodes {
     protected int getSizeLeeway(MethodNode methodNode) {
         CodeSizeEvaluator cse = new CodeSizeEvaluator(null);
         methodNode.accept(cse);
-        // Max allowed method size is 65534
+        // Max allowed method size is 65535
         // https://docs.oracle.com/javase/specs/jvms/se10/html/jvms-4.html#jvms-4.7.3
-        return (65534 - cse.getMaxSize());
+        return (65535 - cse.getMaxSize());
     }
 
-    protected boolean hasInstructions(MethodNode methodNode) {
+    protected final boolean hasInstructions(MethodNode methodNode) {
         return methodNode.instructions != null && methodNode.instructions.size() > 0;
     }
 
-    protected boolean hasInstructions(MethodWrapper methodWrapper) {
+    protected final boolean hasInstructions(MethodWrapper methodWrapper) {
         return hasInstructions(methodWrapper.methodNode);
     }
 
-    protected long tookThisLong(long from) {
+    protected final long tookThisLong(long from) {
         return System.currentTimeMillis() - from;
     }
 
-    protected String randomString(int length) {
+    protected String randomString() {
         String str;
-        do {
-            str = getRandomString(length);
-        } while (usedStrings.contains(str));
+        int count = 0;
 
-        usedStrings.add(str);
+        do {
+            if (count++ > 20)
+                throw new RadonException("Unable to generate an unused string (try increasing randomised string length)");
+
+            str = getRandomString(radon.config.getRandomizedStringLength());
+        } while (!usedStrings.add(str));
+
         return str;
     }
 
     private String getRandomString(int length) {
-        switch (radon.sessionInfo.getDictionaryType()) {
+        switch (radon.config.getDictionaryType()) {
             case SPACES:
                 return StringUtils.randomSpacesString(length);
             case UNRECOGNIZED:
@@ -113,24 +119,24 @@ public abstract class Transformer implements Opcodes {
             case ALPHANUMERIC:
                 return StringUtils.randomAlphaNumericString(length);
             default: {
-                throw new RadonException("Illegal dictionary type: " + radon.sessionInfo.getDictionaryType());
+                throw new RadonException("Illegal dictionary type: " + radon.config.getDictionaryType());
             }
         }
     }
 
-    protected Map<String, ClassWrapper> getClasses() {
+    protected final Map<String, ClassWrapper> getClasses() {
         return this.radon.classes;
     }
 
-    protected Collection<ClassWrapper> getClassWrappers() {
+    protected final Collection<ClassWrapper> getClassWrappers() {
         return this.radon.classes.values();
     }
 
-    protected Map<String, ClassWrapper> getClassPath() {
+    protected final Map<String, ClassWrapper> getClassPath() {
         return this.radon.classPath;
     }
 
-    protected Map<String, byte[]> getResources() {
+    protected final Map<String, byte[]> getResources() {
         return this.radon.resources;
     }
 
@@ -138,5 +144,35 @@ public abstract class Transformer implements Opcodes {
 
     public abstract String getName();
 
-    protected abstract ExclusionType getExclusionType();
+    public abstract ExclusionType getExclusionType();
+
+    public abstract Map<String, Object> getConfiguration();
+
+    public abstract void setConfiguration(Map<String, Object> config);
+
+    public abstract void verifyConfiguration(Map<String, Object> config);
+
+    /**
+     * Insertion sorts the provided {@link List<Transformer>} using the {@link ExclusionType} ordinal as the priority
+     * key. O(n^2) here we come \o/
+     *
+     * @param transformers @link List<Transformer>} to be sorted.
+     */
+    public static void sort(List<Transformer> transformers) {
+        if (transformers.size() < 2) // Already sorted
+            return;
+
+        for (int i = 1; i < transformers.size(); i++) {
+            Transformer transformer = transformers.get(i);
+            int key = transformer.getExclusionType().ordinal();
+
+            int j = i - 1;
+            while (j >= 0 && transformers.get(j).getExclusionType().ordinal() > key) {
+                transformers.set(j + 1, transformers.get(j));
+                j -= 1;
+            }
+
+            transformers.set(j + 1, transformer);
+        }
+    }
 }

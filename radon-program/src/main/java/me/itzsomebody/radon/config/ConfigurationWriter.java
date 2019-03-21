@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2018 ItzSomebody
+ * Radon - An open-source Java obfuscator
+ * Copyright (C) 2019 ItzSomebody
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,19 +20,44 @@ package me.itzsomebody.radon.config;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 import me.itzsomebody.radon.ObfuscationConfiguration;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 
 /**
- * Another big mess which somehow dumps a configuration file from a given {@link ObfuscationConfiguration}.
+ * Dumps a configuration file from a given {@link ObfuscationConfiguration}.
  *
  * @author ItzSomebody
  */
 public class ConfigurationWriter {
     private Map<String, Object> documentMap = new LinkedHashMap<>();
+    private ObfuscationConfiguration configuration;
 
-    // TODO
+    public ConfigurationWriter(ObfuscationConfiguration configuration) {
+        this.configuration = configuration;
+    }
+
+    private void putIfNonNull(String key, Object value) {
+        if (key != null && value != null)
+            documentMap.put(key, value);
+    }
+
+    public void setConfigurationValues() {
+        putIfNonNull(ConfigurationSetting.INPUT.getName(), configuration.getInput());
+        putIfNonNull(ConfigurationSetting.OUTPUT.getName(), configuration.getOutput());
+        putIfNonNull(ConfigurationSetting.LIBRARIES.getName(), configuration.getLibraries());
+
+        configuration.getTransformers().stream().filter(Objects::nonNull).forEach(transformer ->
+                putIfNonNull(transformer.getExclusionType().getName(), transformer.getConfiguration()));
+
+        putIfNonNull(ConfigurationSetting.EXCLUSIONS.getName(), configuration.getExclusionManager().getExclusions());
+        putIfNonNull(ConfigurationSetting.TRASH_CLASSES.getName(), configuration.getnTrashClasses());
+        putIfNonNull(ConfigurationSetting.RANDOMIZED_STRING_LENGTH.getName(), configuration.getRandomizedStringLength());
+        putIfNonNull(ConfigurationSetting.DICTIONARY.getName(), configuration.getDictionaryType().getName());
+        putIfNonNull(ConfigurationSetting.COMPRESSION_LEVEL.getName(), configuration.getCompressionLevel());
+        putIfNonNull(ConfigurationSetting.VERIFY.getName(), configuration.isVerify());
+    }
 
     public String dump() {
         DumperOptions options = new DumperOptions();

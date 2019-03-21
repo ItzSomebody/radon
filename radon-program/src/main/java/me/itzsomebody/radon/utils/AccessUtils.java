@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2018 ItzSomebody
+ * Radon - An open-source Java obfuscator
+ * Copyright (C) 2019 ItzSomebody
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +18,7 @@
 
 package me.itzsomebody.radon.utils;
 
+import me.itzsomebody.radon.asm.MethodWrapper;
 import org.objectweb.asm.Opcodes;
 
 /**
@@ -29,19 +31,39 @@ public class AccessUtils {
         return (Opcodes.ACC_NATIVE & access) != 0;
     }
 
+    public static boolean isNative(MethodWrapper wrapper) {
+        return isNative(wrapper.methodNode.access);
+    }
+
     public static boolean isSynthetic(int access) {
         return (Opcodes.ACC_SYNTHETIC & access) != 0;
+    }
+
+    public static boolean isSynthetic(MethodWrapper wrapper) {
+        return isSynthetic(wrapper.methodNode.access);
     }
 
     public static boolean isBridge(int access) {
         return (Opcodes.ACC_BRIDGE & access) != 0;
     }
 
+    public static boolean isBridge(MethodWrapper wrapper) {
+        return isBridge(wrapper.methodNode.access);
+    }
+
     public static boolean isVarargs(int access) {
         return (Opcodes.ACC_VARARGS & access) != 0;
     }
 
+    public static boolean isVarargs(MethodWrapper wrapper) {
+        return isVarargs(wrapper.methodNode.access);
+    }
+
     public static boolean isDeprecated(int access) {
         return (Opcodes.ACC_DEPRECATED & access) != 0;
+    }
+
+    public static boolean isDeprecated(MethodWrapper wrapper) {
+        return isDeprecated(wrapper.methodNode.access);
     }
 }

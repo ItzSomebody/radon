@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2018 ItzSomebody
+ * Radon - An open-source Java obfuscator
+ * Copyright (C) 2019 ItzSomebody
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,11 +33,11 @@ import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.MultiANewArrayInsnNode;
 
 /**
- * Attempts to emulate the stack in a method up to a breakpoint.
+ * Attempts to find all points where the stack height is zero (or in simple terms: empty) in a method.
  *
  * @author ItzSomebody
  */
-public class StackEmulator implements Opcodes {
+public class StackHeightZeroFinder implements Opcodes {
     /**
      * {@link MethodNode} we are checking.
      */
@@ -53,12 +54,12 @@ public class StackEmulator implements Opcodes {
     private Set<AbstractInsnNode> emptyAt;
 
     /**
-     * Constructor to create a {@link StackEmulator} object.
+     * Constructor to create a {@link StackHeightZeroFinder} object.
      *
      * @param methodNode the method node we want to check.
      * @param breakPoint the opcode we want to break on.
      */
-    public StackEmulator(MethodNode methodNode, AbstractInsnNode breakPoint) {
+    public StackHeightZeroFinder(MethodNode methodNode, AbstractInsnNode breakPoint) {
         this.methodNode = methodNode;
         this.breakPoint = breakPoint;
         this.emptyAt = new HashSet<>();
@@ -95,31 +96,6 @@ public class StackEmulator implements Opcodes {
                 break;
 
             switch (insn.getOpcode()) {
-                case NOP:
-                case LALOAD: // (index, arrayref) -> (long, long_top)
-                case DALOAD: // (index, arrayref) -> (double, double_top)
-                case SWAP: // (value1, value2) -> (value2, value1)
-                case INEG:
-                case LNEG:
-                case FNEG:
-                case DNEG:
-                case IINC:
-                case I2F:
-                case L2D:
-                case F2I:
-                case D2L:
-                case I2B:
-                case I2C:
-                case I2S:
-                case GOTO:
-                case RETURN:
-                case NEWARRAY:
-                case ANEWARRAY:
-                case ARRAYLENGTH:
-                case CHECKCAST:
-                case INSTANCEOF:
-                    // Does nothing
-                    break;
                 case ACONST_NULL:
                 case ICONST_M1:
                 case ICONST_0:
@@ -164,8 +140,7 @@ public class StackEmulator implements Opcodes {
                 case DUP2_X1:
                 case DUP2_X2:
                     // Pushes two-word constant or two one-word constants to stack
-                    stackSize++;
-                    stackSize++;
+                    stackSize += 2;
                     break;
                 case IALOAD: // (index, arrayref) -> (int)
                 case FALOAD: // (index, arrayref) -> (float)

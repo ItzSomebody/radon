@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2018 ItzSomebody
+ * Radon - An open-source Java obfuscator
+ * Copyright (C) 2019 ItzSomebody
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,10 +18,25 @@
 
 package me.itzsomebody.radon.config;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import me.itzsomebody.radon.transformers.Transformer;
+import me.itzsomebody.radon.transformers.miscellaneous.Crasher;
+import me.itzsomebody.radon.transformers.miscellaneous.expiration.Expiration;
+import me.itzsomebody.radon.transformers.miscellaneous.watermarker.Watermarker;
+import me.itzsomebody.radon.transformers.obfuscators.AntiTamper;
+import me.itzsomebody.radon.transformers.obfuscators.ResourceEncryption;
+import me.itzsomebody.radon.transformers.obfuscators.ResourceRenamer;
+import me.itzsomebody.radon.transformers.obfuscators.Virtualizer;
+import me.itzsomebody.radon.transformers.obfuscators.flow.FlowObfuscation;
+import me.itzsomebody.radon.transformers.obfuscators.hidecode.HideCode;
+import me.itzsomebody.radon.transformers.obfuscators.numbers.NumberObfuscation;
+import me.itzsomebody.radon.transformers.obfuscators.references.ReferenceObfuscation;
+import me.itzsomebody.radon.transformers.obfuscators.renamer.Renamer;
+import me.itzsomebody.radon.transformers.obfuscators.shuffler.MemberShuffler;
+import me.itzsomebody.radon.transformers.obfuscators.strings.StringEncryption;
+import me.itzsomebody.radon.transformers.optimizers.Optimizer;
+import me.itzsomebody.radon.transformers.shrinkers.Shrinker;
 
 /**
  * An {@link Enum} containing all the allowed standalone configuration keys allowed.
@@ -28,43 +44,64 @@ import java.util.Map;
  * @author ItzSomebody
  */
 public enum ConfigurationSetting {
-    INPUT(String.class),
-    OUTPUT(String.class),
-    LIBRARIES(List.class),
-    EXCLUSIONS(List.class),
-    STRING_ENCRYPTION(Map.class),
-    FLOW_OBFUSCATION(Map.class),
-    REFERENCE_OBFUSCATION(Map.class),
-    NUMBER_OBFUSCATION(Map.class),
-    ANTI_TAMPER(String.class), // TODO
-    VIRTUAL_MACHINE(Boolean.class), // TODO: ;)
-    RESOURCE_ENCRYPTION(Boolean.class), // TODO
-    RESOURCE_RENAMER(Boolean.class), // TODO
-    //CLASS_ENCRYPTION(Map.class), // Just kidding, lol
-    HIDE_CODE(Map.class),
-    CRASHER(Boolean.class),
-    EXPIRATION(Map.class),
-    WATERMARK(Map.class),
-    OPTIMIZER(Map.class),
-    SHRINKER(Map.class),
-    MEMBER_SHUFFLER(Boolean.class),
-    RENAMER(Map.class),
-    DICTIONARY(String.class),
-    RANDOMIZED_STRING_LENGTH(Integer.class),
-    COMPRESSION_LEVEL(Integer.class),
-    VERIFY(Boolean.class),
-    TRASH_CLASSES(Integer.class);
+    INPUT(String.class, null),
+    OUTPUT(String.class, null),
+    LIBRARIES(List.class, null),
+    EXCLUSIONS(List.class, null),
+    STRING_ENCRYPTION(Map.class, new StringEncryption()),
+    FLOW_OBFUSCATION(Map.class, new FlowObfuscation()),
+    REFERENCE_OBFUSCATION(Map.class, new ReferenceObfuscation()),
+    NUMBER_OBFUSCATION(Map.class, new NumberObfuscation()),
+    ANTI_TAMPER(String.class, new AntiTamper()), // TODO
+    VIRTUALIZER(Boolean.class, new Virtualizer()), // TODO: ;)
+    RESOURCE_ENCRYPTION(Boolean.class, new ResourceEncryption()), // TODO
+    RESOURCE_RENAMER(Boolean.class, new ResourceRenamer()), // TODO
+    //CLASS_ENCRYPTION(Map.class, new ClassEncryption()), // Just kidding, lol
+    HIDE_CODE(Map.class, new HideCode()),
+    CRASHER(Boolean.class, new Crasher()),
+    EXPIRATION(Map.class, new Expiration()),
+    WATERMARK(Map.class, new Watermarker()),
+    OPTIMIZER(Map.class, new Optimizer()),
+    SHRINKER(Map.class, new Shrinker()),
+    MEMBER_SHUFFLER(Boolean.class, new MemberShuffler()),
+    RENAMER(Map.class, new Renamer()),
+    DICTIONARY(String.class, null),
+    RANDOMIZED_STRING_LENGTH(Integer.class, null),
+    COMPRESSION_LEVEL(Integer.class, null),
+    VERIFY(Boolean.class, null),
+    TRASH_CLASSES(Integer.class, null);
 
     private final Class expectedType;
+    private final Transformer transformer;
 
-    ConfigurationSetting(Class expectedType) {
+    ConfigurationSetting(Class expectedType, Transformer transformer) {
         this.expectedType = expectedType;
+        this.transformer = transformer;
     }
 
+    /**
+     * Returns the expected class type of the key represented by this {@link ConfigurationSetting}.
+     *
+     * @return expected class type of the key represented by this {@link ConfigurationSetting}.
+     */
     public Class getExpectedType() {
         return expectedType;
     }
 
+    /**
+     * Returns the corresponding transformer to this {@link ConfigurationSetting} if any.
+     *
+     * @return The corresponding transformer to this {@link ConfigurationSetting} if any.
+     */
+    public Transformer getTransformer() {
+        return transformer;
+    }
+
+    /**
+     * Returns the name of this Enum constant in lowercase.
+     *
+     * @return the name of this Enum constant in lowercase.
+     */
     public String getName() {
         return name().toLowerCase();
     }

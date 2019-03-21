@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2018 ItzSomebody
+ * Radon - An open-source Java obfuscator
+ * Copyright (C) 2019 ItzSomebody
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,19 +22,22 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.Modifier;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 import me.itzsomebody.radon.Logger;
 import me.itzsomebody.radon.asm.ClassTree;
-import me.itzsomebody.radon.asm.ClassWrapper;
 import me.itzsomebody.radon.asm.FieldWrapper;
 import me.itzsomebody.radon.asm.MemberRemapper;
 import me.itzsomebody.radon.asm.MethodWrapper;
+import me.itzsomebody.radon.config.ConfigurationSetting;
+import me.itzsomebody.radon.exceptions.InvalidConfigurationValueException;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
 import me.itzsomebody.radon.utils.AccessUtils;
@@ -41,8 +45,8 @@ import me.itzsomebody.radon.utils.FileUtils;
 import org.objectweb.asm.commons.ClassRemapper;
 import org.objectweb.asm.commons.Remapper;
 import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.FieldNode;
-import org.objectweb.asm.tree.MethodNode;
+
+import static me.itzsomebody.radon.utils.ConfigUtils.getValueOrDefault;
 
 
 /**
@@ -52,98 +56,100 @@ import org.objectweb.asm.tree.MethodNode;
  * @author ItzSomebody
  */
 public class Renamer extends Transformer {
+    private static final Map<String, RenamerSetting> KEY_MAP = new HashMap<>();
     private String[] adaptTheseResources;
     private String repackageName;
-    private boolean overloadEnabled; // If not, then we'll just generate names randomly
-    private Map<String, String> mappings = new HashMap<>();
+    private Map<String, String> mappings;
+
+    static {
+        Stream.of(RenamerSetting.values()).forEach(setting -> KEY_MAP.put(setting.getName(), setting));
+    }
+
+    private static boolean methodCanBeRenamed(MethodWrapper wrapper) {
+        return !AccessUtils.isNative(wrapper.methodNode.access) && !"main".equals(wrapper.originalName)
+                && !"premain".equals(wrapper.originalName) && !wrapper.originalName.startsWith("<");
+    }
 
     @Override
     public void transform() {
+        mappings = new HashMap<>();
+
         Logger.stdOut("Generating mappings.");
         long current = System.currentTimeMillis();
-        AtomicInteger classCounter = new AtomicInteger();
-        this.getClassWrappers().forEach(classWrapper -> {
-            classWrapper.methods.stream().filter(methodWrapper -> !AccessUtils.isNative(methodWrapper.methodNode.access)
-                    && !"main".equals(methodWrapper.methodNode.name) && !"premain".equals(methodWrapper.methodNode.name)
-                    && !methodWrapper.methodNode.name.startsWith("<")).forEach(methodWrapper -> {
-                if (canRenameMethodTree(new HashSet<>(), methodWrapper, classWrapper.originalName))
-                    this.renameMethodTree(new HashSet<>(), methodWrapper, classWrapper.originalName, randomString(4));
+
+        getClassWrappers().forEach(classWrapper -> {
+            classWrapper.methods.stream().filter(Renamer::methodCanBeRenamed).forEach(methodWrapper -> {
+                String newName = (cannotRenameMethod(radon.getTree(classWrapper.originalName), methodWrapper))
+                        ? methodWrapper.originalName : randomString();
+
+                genMethodMappings(methodWrapper, methodWrapper.owner.originalName, newName);
             });
 
             classWrapper.fields.forEach(fieldWrapper -> {
-                if (canRenameFieldTree(new HashSet<>(), fieldWrapper, classWrapper.originalName))
-                    this.renameFieldTree(new HashSet<>(), fieldWrapper, classWrapper.originalName, randomString(4));
+                String newName = (cannotRenameField(radon.getTree(classWrapper.originalName), fieldWrapper))
+                        ? fieldWrapper.originalName : randomString();
+
+                genFieldMappings(fieldWrapper, fieldWrapper.owner.originalName, newName);
             });
 
-            if (!this.excluded(classWrapper)) {
-                this.mappings.put(classWrapper.originalName, (repackageName != null)
-                        ? repackageName + '/' + randomString(4) : randomString(4));
-                classCounter.incrementAndGet();
-            }
+            if (!excluded(classWrapper))
+                mappings.put(classWrapper.originalName, (getRepackageName() != null) ? getRepackageName() + '/'
+                        + randomString() : randomString());
         });
+
         Logger.stdOut(String.format("Finished generated mappings. [%dms]", tookThisLong(current)));
         Logger.stdOut("Applying mappings.");
         current = System.currentTimeMillis();
 
-        // Apply mapping
-        Remapper remapper = new MemberRemapper(this.mappings);
-        for (ClassWrapper classWrapper : new ArrayList<>(this.getClassWrappers())) {
+        // Apply mappings
+        Remapper simpleRemapper = new MemberRemapper(mappings);
+        new ArrayList<>(getClassWrappers()).forEach(classWrapper -> {
             ClassNode classNode = classWrapper.classNode;
 
             ClassNode copy = new ClassNode();
-            classNode.accept(new ClassRemapper(copy, remapper));
-            for (int i = 0; i < copy.methods.size(); i++) {
+            classNode.accept(new ClassRemapper(copy, simpleRemapper));
+
+            // In order to preserve the original names to prevent exclusions from breaking,
+            // we reassign the MethodNode/FieldNode/ClassNode each wrapper wraps instead.
+            for (int i = 0; i < copy.methods.size(); i++)
                 classWrapper.methods.get(i).methodNode = copy.methods.get(i);
-
-                /*for (AbstractInsnNode insn : methodNode.instructions.toArray()) { // TODO: Fix lambdas + interface
-                    if (insn instanceof InvokeDynamicInsnNode) {
-                        InvokeDynamicInsnNode indy = (InvokeDynamicInsnNode) insn;
-                        if (indy.bsm.getOwner().equals("java/lang/invoke/LambdaMetafactory")) {
-                            Handle handle = (Handle) indy.bsmArgs[1];
-                            String newName = mappings.get(handle.getOwner() + '.' + handle.getName() + handle.getDesc());
-
-                            if (newName != null) {
-                                indy.name = newName;
-                                indy.bsm = new Handle(handle.getTag(), handle.getOwner(), newName, handle.getDesc(), false);
-                            }
-                        }
-                    }
-                }*/
-            }
 
             if (copy.fields != null)
                 for (int i = 0; i < copy.fields.size(); i++)
                     classWrapper.fields.get(i).fieldNode = copy.fields.get(i);
 
             classWrapper.classNode = copy;
-            this.getClasses().remove(classWrapper.originalName);
-            this.getClasses().put(classWrapper.classNode.name, classWrapper);
-            this.getClassPath().put(classWrapper.classNode.name, classWrapper);
-        }
+
+            getClasses().remove(classWrapper.originalName);
+            getClasses().put(classWrapper.classNode.name, classWrapper);
+            getClassPath().put(classWrapper.classNode.name, classWrapper);
+        });
 
         Logger.stdOut(String.format("Mapped %d members. [%dms]", mappings.size(), tookThisLong(current)));
         current = System.currentTimeMillis();
 
-        // Fix screw ups in resources.
+        // Now we gotta fix those resources because we probably screwed up random files.
         Logger.stdOut("Attempting to map class names in resources");
         AtomicInteger fixed = new AtomicInteger();
         getResources().forEach((name, byteArray) -> {
-            if (adaptTheseResources != null) {
-                for (String s : adaptTheseResources) {
+            if (getAdaptTheseResources() != null)
+                Stream.of(getAdaptTheseResources()).forEach(s -> {
                     Pattern pattern = Pattern.compile(s);
 
                     if (pattern.matcher(name).matches()) {
                         String stringVer = new String(byteArray);
+
                         for (String mapping : mappings.keySet()) {
                             String original = mapping.replace("/", ".");
                             if (stringVer.contains(original)) {
                                 // Regex that ensures that class names that match words in the manifest don't break the
                                 // manifest.
                                 // Example: name == Main
-                                if ("META-INF/MANIFEST.MF".equals(name) || "plugin.yml".equals(name)
-                                        || "bungee.yml".equals(name))
-                                    stringVer = stringVer.replaceAll("(?<=[: ])"
-                                            + original, mappings.get(mapping).replace("/", "."));
+                                if ("META-INF/MANIFEST.MF".equals(name) // Manifest
+                                        || "plugin.yml".equals(name) // Spigot plugin
+                                        || "bungee.yml".equals(name)) // Bungeecord plugin
+                                    stringVer = stringVer.replaceAll("(?<=[: ])" + original,
+                                            mappings.get(mapping).replace("/", "."));
                                 else
                                     stringVer = stringVer.replace(original, mappings.get(mapping).replace("/", "."));
                             }
@@ -152,82 +158,56 @@ public class Renamer extends Transformer {
                         getResources().put(name, stringVer.getBytes(StandardCharsets.UTF_8));
                         fixed.incrementAndGet();
                     }
-                }
-            }
+                });
         });
+
         Logger.stdOut(String.format("Mapped %d names in resources. [%dms]", fixed.get(), tookThisLong(current)));
+
         dumpMappings();
     }
 
-    private boolean canRenameMethodTree(HashSet<ClassTree> visited, MethodWrapper methodWrapper, String owner) {
-        ClassTree tree = this.radon.getTree(owner);
-        if (!visited.contains(tree)) {
-            visited.add(tree);
+    private void genMethodMappings(MethodWrapper methodWrapper, String owner, String newName) {
+        // This (supposedly) will always stop the recursion because the tree was already renamed
+        if (mappings.containsKey(owner + '.' + methodWrapper.originalName + methodWrapper.originalDescription))
+            return;
 
-            if (excluded(owner + '.' + methodWrapper.originalName + methodWrapper.originalDescription)
-                    || mappings.containsKey(owner + '.' + methodWrapper.originalName + methodWrapper.originalDescription))
-                return false;
-            if (!methodWrapper.owner.originalName.equals(owner) && tree.classWrapper.libraryNode)
-                for (MethodNode mn : tree.classWrapper.classNode.methods)
-                    if (mn.name.equals(methodWrapper.originalName)
-                            & mn.desc.equals(methodWrapper.originalDescription))
-                        return false;
-            for (String parent : tree.parentClasses)
-                if (parent != null && !canRenameMethodTree(visited, methodWrapper, parent))
-                    return false;
-            for (String sub : tree.subClasses)
-                if (sub != null && !canRenameMethodTree(visited, methodWrapper, sub))
-                    return false;
-        }
+        ClassTree tree = radon.getTree(owner);
 
-        return true;
-    }
+        mappings.put(owner + '.' + methodWrapper.originalName + methodWrapper.originalDescription, newName);
 
-    private void renameMethodTree(HashSet<ClassTree> visited, MethodWrapper MethodWrapper, String className,
-                                  String newName) {
-        ClassTree tree = this.radon.getTree(className);
-
-        if (!tree.classWrapper.libraryNode && !visited.contains(tree)) {
-            mappings.put(className + '.' + MethodWrapper.originalName + MethodWrapper.originalDescription, newName);
-            visited.add(tree);
-
-            tree.parentClasses.forEach(parentClass -> renameMethodTree(visited, MethodWrapper, parentClass, newName));
-            tree.subClasses.forEach(subClass -> renameMethodTree(visited, MethodWrapper, subClass, newName));
+        if (!Modifier.isStatic(methodWrapper.methodNode.access)) { // Static methods can't be overridden
+            tree.parentClasses.forEach(parentClass -> genMethodMappings(methodWrapper, parentClass, newName));
+            tree.subClasses.forEach(subClass -> genMethodMappings(methodWrapper, subClass, newName));
         }
     }
 
-    private boolean canRenameFieldTree(HashSet<ClassTree> visited, FieldWrapper fieldWrapper, String owner) {
-        ClassTree tree = this.radon.getTree(owner);
-        if (!visited.contains(tree)) {
-            visited.add(tree);
-            if (excluded(owner + '.' + fieldWrapper.originalName + '.' + fieldWrapper.originalDescription)
-                    || mappings.containsKey(owner + '.' + fieldWrapper.originalName + '.' + fieldWrapper.originalDescription))
-                return false;
-            if (!fieldWrapper.owner.originalName.equals(owner) && tree.classWrapper.libraryNode)
-                for (FieldNode fn : tree.classWrapper.classNode.fields)
-                    if (fieldWrapper.originalName.equals(fn.name) && fieldWrapper.originalDescription.equals(fn.desc))
-                        return false;
-            for (String parent : tree.parentClasses)
-                if (parent != null && !canRenameFieldTree(visited, fieldWrapper, parent))
-                    return false;
-            for (String sub : tree.subClasses)
-                if (sub != null && !canRenameFieldTree(visited, fieldWrapper, sub))
-                    return false;
-        }
-
-        return true;
+    private boolean cannotRenameMethod(ClassTree tree, MethodWrapper wrapper) {
+        return (excluded(tree.classWrapper.originalName + '.' + wrapper.originalName + wrapper.originalDescription))
+                || (tree.classWrapper.libraryNode)
+                || (tree.parentClasses.stream().anyMatch(s -> cannotRenameMethod(radon.getTree(s), wrapper)))
+                || (tree.subClasses.stream().anyMatch(s -> cannotRenameMethod(radon.getTree(s), wrapper)));
     }
 
-    private void renameFieldTree(HashSet<ClassTree> visited, FieldWrapper fieldWrapper, String owner, String newName) {
-        ClassTree tree = this.radon.getTree(owner);
+    private void genFieldMappings(FieldWrapper fieldWrapper, String owner, String newName) {
+        // This (supposedly) will always stop the recursion because the tree was already renamed
+        if (mappings.containsKey(owner + '.' + fieldWrapper.originalName + '.' + fieldWrapper.originalDescription))
+            return;
 
-        if (!tree.classWrapper.libraryNode && !visited.contains(tree)) {
-            mappings.put(owner + '.' + fieldWrapper.originalName + '.' + fieldWrapper.originalDescription, newName);
-            visited.add(tree);
+        ClassTree tree = radon.getTree(owner);
 
-            tree.parentClasses.forEach(parentClass -> renameFieldTree(visited, fieldWrapper, parentClass, newName));
-            tree.subClasses.forEach(subClass -> renameFieldTree(visited, fieldWrapper, subClass, newName));
+        mappings.put(owner + '.' + fieldWrapper.originalName + '.' + fieldWrapper.originalDescription, newName);
+
+        if (!Modifier.isStatic(fieldWrapper.fieldNode.access)) { // Static fields can't be overridden
+            tree.parentClasses.forEach(parentClass -> genFieldMappings(fieldWrapper, parentClass, newName));
+            tree.subClasses.forEach(subClass -> genFieldMappings(fieldWrapper, subClass, newName));
         }
+    }
+
+    private boolean cannotRenameField(ClassTree tree, FieldWrapper wrapper) {
+        return (excluded(tree.classWrapper.originalName + '.' + wrapper.originalName + '.' + wrapper.originalDescription))
+                || (tree.classWrapper.libraryNode)
+                || (tree.parentClasses.stream().anyMatch(s -> cannotRenameField(radon.getTree(s), wrapper)))
+                || (tree.subClasses.stream().anyMatch(s -> cannotRenameField(radon.getTree(s), wrapper)));
     }
 
     private void dumpMappings() {
@@ -261,7 +241,7 @@ public class Renamer extends Transformer {
     }
 
     @Override
-    protected ExclusionType getExclusionType() {
+    public ExclusionType getExclusionType() {
         return ExclusionType.RENAMER;
     }
 
@@ -270,27 +250,49 @@ public class Renamer extends Transformer {
         return "Renamer";
     }
 
-    public String[] getAdaptTheseResources() {
+    @Override
+    public Map<String, Object> getConfiguration() {
+        Map<String, Object> config = new LinkedHashMap<>();
+
+        config.put(RenamerSetting.ADAPT_THESE_RESOURCES.getName(), getAdaptTheseResources());
+        config.put(RenamerSetting.REPACKAGE_NAME.getName(), getRepackageName());
+
+        return config;
+    }
+
+    @Override
+    public void setConfiguration(Map<String, Object> config) {
+        setAdaptTheseResources(getValueOrDefault(RenamerSetting.ADAPT_THESE_RESOURCES.getName(), config, new String[0]));
+        setRepackageName(getValueOrDefault(RenamerSetting.REPACKAGE_NAME.getName(), config, null));
+    }
+
+    @Override
+    public void verifyConfiguration(Map<String, Object> config) {
+        config.forEach((k, v) -> {
+            RenamerSetting setting = KEY_MAP.get(k);
+
+            if (setting == null)
+                throw new InvalidConfigurationValueException(ConfigurationSetting.RENAMER.getName() + '.' + k
+                        + " is an invalid configuration key");
+            if (!setting.getExpectedType().isInstance(v))
+                throw new InvalidConfigurationValueException(ConfigurationSetting.RENAMER.getName() + '.' + k,
+                        setting.getExpectedType(), v.getClass());
+        });
+    }
+
+    private String[] getAdaptTheseResources() {
         return adaptTheseResources;
     }
 
-    public void setAdaptTheseResources(String[] adaptTheseResources) {
+    private void setAdaptTheseResources(String[] adaptTheseResources) {
         this.adaptTheseResources = adaptTheseResources;
     }
 
-    public String getRepackageName() {
+    private String getRepackageName() {
         return repackageName;
     }
 
-    public void setRepackageName(String repackageName) {
+    private void setRepackageName(String repackageName) {
         this.repackageName = repackageName;
-    }
-
-    public boolean isOverloadEnabled() {
-        return overloadEnabled;
-    }
-
-    public void setOverloadEnabled(boolean overloadEnabled) {
-        this.overloadEnabled = overloadEnabled;
     }
 }

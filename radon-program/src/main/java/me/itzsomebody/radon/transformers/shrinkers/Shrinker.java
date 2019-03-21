@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2018 ItzSomebody
+ * Radon - An open-source Java obfuscator
+ * Copyright (C) 2019 ItzSomebody
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,6 +19,13 @@
 package me.itzsomebody.radon.transformers.shrinkers;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
+import me.itzsomebody.radon.config.ConfigurationSetting;
+import me.itzsomebody.radon.exceptions.InvalidConfigurationValueException;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
 
@@ -27,77 +35,18 @@ import me.itzsomebody.radon.transformers.Transformer;
  * @author ItzSomebody
  */
 public class Shrinker extends Transformer {
-    private boolean removeDeprecatedEnabled;
-    private boolean removeInnerClassesEnabled;
-    private boolean removeLineNumbersEnabled;
-    private boolean removeLocalVarsEnabled;
-    private boolean removeOuterMethodEnabled;
-    private boolean removeSignatureEnabled;
-    private boolean removeSourceDebugEnabled;
-    private boolean removeSourceFileEnabled;
-    private boolean removeSyntheticEnabled;
-    private boolean removeUnknownAttributesEnabled;
+    private static final Map<String, ShrinkerSetting> KEY_MAP = new HashMap<>();
+    private static final Map<Shrinker, ShrinkerSetting> SHRINKER_SETTING_MAP = new HashMap<>();
+    private final List<Shrinker> shrinkers = new ArrayList<>();
 
-    private boolean removeInvisibleAnnotationsEnabled;
-    private boolean removeInvisibleParametersAnnotationsEnabled;
-    private boolean removeInvisibleTypeAnnotationsEnabled;
-
-    private boolean removeVisibleAnnotationsEnabled;
-    private boolean removeVisibleParametersAnnotationsEnabled;
-    private boolean removeVisibleTypeAnnotationsEnabled;
+    static {
+        ShrinkerSetting[] values = ShrinkerSetting.values();
+        Stream.of(values).forEach(setting -> KEY_MAP.put(setting.getName(), setting));
+        Stream.of(values).forEach(setting -> SHRINKER_SETTING_MAP.put(setting.getShrinker(), setting));
+    }
 
     @Override
     public void transform() {
-        ArrayList<Shrinker> shrinkers = new ArrayList<>();
-
-        if (isRemoveDeprecatedEnabled())
-            shrinkers.add(new DeprecatedAccessRemover());
-
-        if (isRemoveInnerClassesEnabled())
-            shrinkers.add(new InnerClassesRemover());
-
-        if (isRemoveLineNumbersEnabled())
-            shrinkers.add(new LineNumberRemover());
-
-        if (isRemoveLocalVarsEnabled())
-            shrinkers.add(new LocalVariableRemover());
-
-        if (isRemoveOuterMethodEnabled())
-            shrinkers.add(new OuterMethodRemover());
-
-        if (isRemoveSignatureEnabled())
-            shrinkers.add(new SignatureRemover());
-
-        if (isRemoveSourceDebugEnabled())
-            shrinkers.add(new SourceDebugRemover());
-
-        if (isRemoveSourceFileEnabled())
-            shrinkers.add(new SourceFileRemover());
-
-        if (isRemoveSyntheticEnabled())
-            shrinkers.add(new SyntheticAccessRemover());
-
-        if (isRemoveUnknownAttributesEnabled())
-            shrinkers.add(new UnknownAttributesRemover());
-
-        if (isRemoveInvisibleAnnotationsEnabled())
-            shrinkers.add(new InvisibleAnnotationsRemover());
-
-        if (isRemoveInvisibleParametersAnnotationsEnabled())
-            shrinkers.add(new InvisibleParameterAnnotationsRemover());
-
-        if (isRemoveInvisibleTypeAnnotationsEnabled())
-            shrinkers.add(new InvisibleTypeAnnotationsRemover());
-
-        if (isRemoveVisibleAnnotationsEnabled())
-            shrinkers.add(new InvisibleAnnotationsRemover());
-
-        if (isRemoveVisibleParametersAnnotationsEnabled())
-            shrinkers.add(new InvisibleParameterAnnotationsRemover());
-
-        if (isRemoveVisibleTypeAnnotationsEnabled())
-            shrinkers.add(new InvisibleTypeAnnotationsRemover());
-
         shrinkers.forEach(shrinker -> {
             shrinker.init(radon);
             shrinker.transform();
@@ -110,135 +59,40 @@ public class Shrinker extends Transformer {
     }
 
     @Override
-    protected ExclusionType getExclusionType() {
+    public ExclusionType getExclusionType() {
         return ExclusionType.SHRINKER;
     }
 
-    public boolean isRemoveDeprecatedEnabled() {
-        return removeDeprecatedEnabled;
+    @Override
+    public Map<String, Object> getConfiguration() {
+        Map<String, Object> config = new LinkedHashMap<>();
+
+        shrinkers.forEach(shrinker -> config.put(shrinker.getShrinkerSetting().getName(), true));
+
+        return config;
     }
 
-    public void setRemoveDeprecatedEnabled(boolean removeDeprecatedEnabled) {
-        this.removeDeprecatedEnabled = removeDeprecatedEnabled;
+    @Override
+    public void setConfiguration(Map<String, Object> config) {
+        Stream.of(ShrinkerSetting.values()).filter(setting -> config.containsKey(setting.getName()))
+                .forEach(setting -> shrinkers.add(setting.getShrinker()));
     }
 
-    public boolean isRemoveInnerClassesEnabled() {
-        return removeInnerClassesEnabled;
+    @Override
+    public void verifyConfiguration(Map<String, Object> config) {
+        config.forEach((k, v) -> {
+            ShrinkerSetting setting = KEY_MAP.get(k);
+
+            if (setting == null)
+                throw new InvalidConfigurationValueException(ConfigurationSetting.SHRINKER.getName() + '.' + k
+                        + " is an invalid configuration key");
+            if (!setting.getExpectedType().isInstance(v))
+                throw new InvalidConfigurationValueException(ConfigurationSetting.SHRINKER.getName() + '.' + k,
+                        setting.getExpectedType(), v.getClass());
+        });
     }
 
-    public void setRemoveInnerClassesEnabled(boolean removeInnerClassesEnabled) {
-        this.removeInnerClassesEnabled = removeInnerClassesEnabled;
-    }
-
-    public boolean isRemoveLineNumbersEnabled() {
-        return removeLineNumbersEnabled;
-    }
-
-    public void setRemoveLineNumbersEnabled(boolean removeLineNumbersEnabled) {
-        this.removeLineNumbersEnabled = removeLineNumbersEnabled;
-    }
-
-    public boolean isRemoveLocalVarsEnabled() {
-        return removeLocalVarsEnabled;
-    }
-
-    public void setRemoveLocalVarsEnabled(boolean removeLocalVarsEnabled) {
-        this.removeLocalVarsEnabled = removeLocalVarsEnabled;
-    }
-
-    public boolean isRemoveOuterMethodEnabled() {
-        return removeOuterMethodEnabled;
-    }
-
-    public void setRemoveOuterMethodEnabled(boolean removeOuterMethodEnabled) {
-        this.removeOuterMethodEnabled = removeOuterMethodEnabled;
-    }
-
-    public boolean isRemoveSignatureEnabled() {
-        return removeSignatureEnabled;
-    }
-
-    public void setRemoveSignatureEnabled(boolean removeSignatureEnabled) {
-        this.removeSignatureEnabled = removeSignatureEnabled;
-    }
-
-    public boolean isRemoveSourceDebugEnabled() {
-        return removeSourceDebugEnabled;
-    }
-
-    public void setRemoveSourceDebugEnabled(boolean removeSourceDebugEnabled) {
-        this.removeSourceDebugEnabled = removeSourceDebugEnabled;
-    }
-
-    public boolean isRemoveSourceFileEnabled() {
-        return removeSourceFileEnabled;
-    }
-
-    public void setRemoveSourceFileEnabled(boolean removeSourceFileEnabled) {
-        this.removeSourceFileEnabled = removeSourceFileEnabled;
-    }
-
-    public boolean isRemoveSyntheticEnabled() {
-        return removeSyntheticEnabled;
-    }
-
-    public void setRemoveSyntheticEnabled(boolean removeSyntheticEnabled) {
-        this.removeSyntheticEnabled = removeSyntheticEnabled;
-    }
-
-    public boolean isRemoveUnknownAttributesEnabled() {
-        return removeUnknownAttributesEnabled;
-    }
-
-    public void setRemoveUnknownAttributesEnabled(boolean removeUnknownAttributesEnabled) {
-        this.removeUnknownAttributesEnabled = removeUnknownAttributesEnabled;
-    }
-
-    public boolean isRemoveInvisibleAnnotationsEnabled() {
-        return removeInvisibleAnnotationsEnabled;
-    }
-
-    public void setRemoveInvisibleAnnotationsEnabled(boolean removeInvisibleAnnotationsEnabled) {
-        this.removeInvisibleAnnotationsEnabled = removeInvisibleAnnotationsEnabled;
-    }
-
-    public boolean isRemoveInvisibleParametersAnnotationsEnabled() {
-        return removeInvisibleParametersAnnotationsEnabled;
-    }
-
-    public void setRemoveInvisibleParametersAnnotationsEnabled(boolean removeInvisibleParametersAnnotationsEnabled) {
-        this.removeInvisibleParametersAnnotationsEnabled = removeInvisibleParametersAnnotationsEnabled;
-    }
-
-    public boolean isRemoveInvisibleTypeAnnotationsEnabled() {
-        return removeInvisibleTypeAnnotationsEnabled;
-    }
-
-    public void setRemoveInvisibleTypeAnnotationsEnabled(boolean removeInvisibleTypeAnnotationsEnabled) {
-        this.removeInvisibleTypeAnnotationsEnabled = removeInvisibleTypeAnnotationsEnabled;
-    }
-
-    public boolean isRemoveVisibleAnnotationsEnabled() {
-        return removeVisibleAnnotationsEnabled;
-    }
-
-    public void setRemoveVisibleAnnotationsEnabled(boolean removeVisibleAnnotationsEnabled) {
-        this.removeVisibleAnnotationsEnabled = removeVisibleAnnotationsEnabled;
-    }
-
-    public boolean isRemoveVisibleParametersAnnotationsEnabled() {
-        return removeVisibleParametersAnnotationsEnabled;
-    }
-
-    public void setRemoveVisibleParametersAnnotationsEnabled(boolean removeVisibleParametersAnnotationsEnabled) {
-        this.removeVisibleParametersAnnotationsEnabled = removeVisibleParametersAnnotationsEnabled;
-    }
-
-    public boolean isRemoveVisibleTypeAnnotationsEnabled() {
-        return removeVisibleTypeAnnotationsEnabled;
-    }
-
-    public void setRemoveVisibleTypeAnnotationsEnabled(boolean removeVisibleTypeAnnotationsEnabled) {
-        this.removeVisibleTypeAnnotationsEnabled = removeVisibleTypeAnnotationsEnabled;
+    private ShrinkerSetting getShrinkerSetting() {
+        return SHRINKER_SETTING_MAP.get(this);
     }
 }
