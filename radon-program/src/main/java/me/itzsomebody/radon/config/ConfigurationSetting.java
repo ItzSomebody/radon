@@ -27,7 +27,6 @@ import me.itzsomebody.radon.transformers.miscellaneous.watermarker.Watermarker;
 import me.itzsomebody.radon.transformers.obfuscators.AntiTamper;
 import me.itzsomebody.radon.transformers.obfuscators.ResourceEncryption;
 import me.itzsomebody.radon.transformers.obfuscators.ResourceRenamer;
-import me.itzsomebody.radon.transformers.obfuscators.Virtualizer;
 import me.itzsomebody.radon.transformers.obfuscators.flow.FlowObfuscation;
 import me.itzsomebody.radon.transformers.obfuscators.hidecode.HideCode;
 import me.itzsomebody.radon.transformers.obfuscators.numbers.NumberObfuscation;
@@ -35,6 +34,7 @@ import me.itzsomebody.radon.transformers.obfuscators.references.ReferenceObfusca
 import me.itzsomebody.radon.transformers.obfuscators.renamer.Renamer;
 import me.itzsomebody.radon.transformers.obfuscators.shuffler.MemberShuffler;
 import me.itzsomebody.radon.transformers.obfuscators.strings.StringEncryption;
+import me.itzsomebody.radon.transformers.obfuscators.virtualizer.Virtualizer;
 import me.itzsomebody.radon.transformers.optimizers.Optimizer;
 import me.itzsomebody.radon.transformers.shrinkers.Shrinker;
 

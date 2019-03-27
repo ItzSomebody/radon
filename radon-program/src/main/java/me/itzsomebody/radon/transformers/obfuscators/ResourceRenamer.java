@@ -35,7 +35,7 @@ public class ResourceRenamer extends Transformer {
 
     @Override
     public ExclusionType getExclusionType() {
-        return null; // FIXME
+        return ExclusionType.RESOURCE_RENAMER;
     }
 
     @Override

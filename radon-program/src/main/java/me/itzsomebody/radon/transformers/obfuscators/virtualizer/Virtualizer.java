@@ -16,27 +16,34 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package me.itzsomebody.radon.transformers.obfuscators;
+package me.itzsomebody.radon.transformers.obfuscators.virtualizer;
 
 import java.util.Map;
+import java.util.stream.Stream;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
 
 /**
  * Translates Java bytecode instructions into a custom bytecode instruction set which
- * can (theoretically) only be understood by the obfuscator's embeddable virtual machine.
+ * can (theoretically) only be understood by a custom virtual machine.
  *
  * @author ItzSomebody
  */
 public class Virtualizer extends Transformer {
     @Override
     public void transform() {
-        // TODO
+        getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper ->
+                classWrapper.methods.stream().filter(methodWrapper -> !excluded(methodWrapper)
+                        && hasInstructions(methodWrapper)).forEach(methodWrapper -> {
+                    Stream.of(methodWrapper.methodNode.instructions).forEach(insn -> {
+                        // TODO
+                    });
+                }));
     }
 
     @Override
     public ExclusionType getExclusionType() {
-        return null; // FIXME
+        return ExclusionType.VIRTUALIZER; // FIXME
     }
 
     @Override

@@ -51,6 +51,11 @@ public class Exclusion {
         this.exclusionType = ExclusionType.GLOBAL;
     }
 
+    public Exclusion(String pattern, ExclusionType type) {
+        this.exclusion = Pattern.compile(pattern);
+        this.exclusionType = type;
+    }
+
     private void initFields(String exclusion, ExclusionType type) {
         this.exclusion = Pattern.compile(exclusion.substring(type.getName().length() + 2));
         this.exclusionType = type;

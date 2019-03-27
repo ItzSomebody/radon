@@ -34,10 +34,10 @@ import org.objectweb.asm.tree.VarInsnNode;
  * Combines the handler region of a try block into its trap region. The idea of this is from
  * https://github.com/Janmm14/decompiler-vulnerabilities-and-bugs/blob/master/DVB/DVB-0004.md.
  * <p>
- * To achieve this, we first change the handler start to the trap start, then insert a condition at the start of the
- * trap start which indicates if execution should move into the trap or catch region.
+ * To achieve this, we first change the handler start to the trap start then we insert a condition at the start of the
+ * trap which indicates if execution should move into the trap or catch region.
  * <p>
- * FIXME: breaks a lot of stuff
+ * FIXME: breaks almost everything
  *
  * @author ItzSombody
  */

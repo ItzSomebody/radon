@@ -35,7 +35,7 @@ public class ResourceEncryption extends Transformer {
 
     @Override
     public ExclusionType getExclusionType() {
-        return null; // FIXME
+        return ExclusionType.RESOURCE_ENCRYPTION;
     }
 
     @Override

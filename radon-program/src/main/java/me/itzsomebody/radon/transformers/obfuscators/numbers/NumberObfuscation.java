@@ -111,31 +111,31 @@ public class NumberObfuscation extends Transformer {
     }
 
     protected static int randomInt(int bounds) {
-        if (bounds == 0)
-            return RandomUtils.getRandomInt(Short.MAX_VALUE);
+        if (bounds <= 0)
+            return RandomUtils.getRandomInt(Integer.MAX_VALUE);
 
-        return RandomUtils.getRandomInt(Math.abs(bounds));
+        return RandomUtils.getRandomInt(bounds);
     }
 
     protected static long randomLong(long bounds) {
-        if (bounds == 0)
-            return RandomUtils.getRandomLong(Integer.MAX_VALUE);
+        if (bounds <= 0)
+            return RandomUtils.getRandomLong(Long.MAX_VALUE);
 
-        return RandomUtils.getRandomLong(Math.abs(bounds));
+        return RandomUtils.getRandomLong(bounds);
     }
 
     protected static float randomFloat(float bounds) {
-        if (bounds == 0)
+        if (bounds <= 0)
             return RandomUtils.getRandomFloat(Float.MAX_VALUE);
 
-        return RandomUtils.getRandomFloat(Math.abs(bounds));
+        return RandomUtils.getRandomFloat(bounds);
     }
 
     protected static double randomDouble(double bounds) {
-        if (bounds == 0)
-            return RandomUtils.getRandomDouble(Float.MAX_VALUE);
+        if (bounds <= 0)
+            return RandomUtils.getRandomDouble(Double.MAX_VALUE);
 
-        return RandomUtils.getRandomDouble(Math.abs(bounds));
+        return RandomUtils.getRandomDouble(bounds);
     }
 
     protected boolean isIntegerTamperingEnabled() {

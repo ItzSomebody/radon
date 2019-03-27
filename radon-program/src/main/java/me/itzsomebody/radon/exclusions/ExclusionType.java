@@ -38,7 +38,10 @@ public enum ExclusionType {
     SHRINKER,
     SHUFFLER,
     RENAMER,
-    ANTI_TAMPER;
+    ANTI_TAMPER,
+    RESOURCE_ENCRYPTION,
+    RESOURCE_RENAMER,
+    VIRTUALIZER;
 
     public String getName() {
         return name().toLowerCase();
