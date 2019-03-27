@@ -19,6 +19,8 @@
 package me.itzsomebody.radon.transformers.obfuscators.flow;
 
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
+import me.itzsomebody.radon.Logger;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.JumpInsnNode;
@@ -37,6 +39,8 @@ import org.objectweb.asm.tree.MethodNode;
 public class BlockRearranger extends FlowObfuscation {
     @Override
     public void transform() {
+        AtomicInteger counter = new AtomicInteger();
+
         getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper ->
                 classWrapper.methods.stream().filter(methodWrapper -> !excluded(methodWrapper)).forEach(methodWrapper -> {
                     MethodNode methodNode = methodWrapper.methodNode;
@@ -49,6 +53,11 @@ public class BlockRearranger extends FlowObfuscation {
                         AbstractInsnNode p2End = methodNode.instructions.getLast();
 
                         AbstractInsnNode p1Start = methodNode.instructions.getFirst();
+
+                        // We can't have trap ranges mutilated by block splitting
+                        if (methodNode.tryCatchBlocks.stream().anyMatch(tcbn ->
+                                methodNode.instructions.indexOf(tcbn.end) >= methodNode.instructions.indexOf(p2Start)))
+                            return;
 
                         ArrayList<AbstractInsnNode> insnNodes = new ArrayList<>();
                         AbstractInsnNode currentInsn = p1Start;
@@ -72,7 +81,15 @@ public class BlockRearranger extends FlowObfuscation {
                         methodNode.instructions.insert(p2End, p1Block);
                         methodNode.instructions.insertBefore(p2Start, new JumpInsnNode(GOTO, p1));
                         methodNode.instructions.insertBefore(p2Start, p2);
+
+                        // We might have messed up variable ranges when rearranging the block order.
+                        if (methodNode.localVariables != null)
+                            new ArrayList<>(methodNode.localVariables).stream().filter(lvn ->
+                                methodNode.instructions.indexOf(lvn.end) < methodNode.instructions.indexOf(lvn.start)
+                            ).forEach(methodNode.localVariables::remove);
                     }
                 }));
+
+        Logger.stdOut("Rearranged " + counter.get() + " blocks");
     }
 }
