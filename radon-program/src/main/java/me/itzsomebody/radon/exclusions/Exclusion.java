@@ -38,16 +38,29 @@ public class Exclusion {
      */
     private ExclusionType exclusionType;
 
+    /**
+     * Determines if this {@link Exclusion} should be seen as an inclusion or exclusion
+     */
+    private boolean shouldInclude;
+
     public Exclusion(String exclusion) {
+        String exc;
+
+        if (exclusion.startsWith("!")) {
+            shouldInclude = true;
+            exc = exclusion.substring(1);
+        } else
+            exc = exclusion;
+
         Optional<ExclusionType> result =
-                Stream.of(ExclusionType.values()).filter(type -> exclusion.startsWith(type.getName())).findFirst();
+                Stream.of(ExclusionType.values()).filter(type -> exc.startsWith(type.getName())).findFirst();
 
         if (result.isPresent()) {
-            initFields(exclusion, result.get());
+            initFields(exc, result.get());
             return;
         }
 
-        this.exclusion = Pattern.compile(exclusion);
+        this.exclusion = Pattern.compile(exc);
         this.exclusionType = ExclusionType.GLOBAL;
     }
 
@@ -62,11 +75,14 @@ public class Exclusion {
     }
 
     public ExclusionType getExclusionType() {
-        return this.exclusionType;
+        return exclusionType;
     }
 
     public boolean matches(String other) {
-        return this.exclusion.matcher(other).matches();
+        if (shouldInclude)
+            return !exclusion.matcher(other).matches();
+        else
+            return exclusion.matcher(other).matches();
     }
 
     public Pattern getPattern() {
