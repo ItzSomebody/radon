@@ -74,8 +74,8 @@ public class FlowObfuscation extends Transformer {
 
     @Override
     public void setConfiguration(Map<String, Object> config) {
-        Stream.of(FlowObfuscationSetting.values()).filter(setting -> config.containsKey(setting.getName()))
-                .forEach(setting -> flowObfuscators.add(setting.getFlowObfuscation()));
+        Stream.of(FlowObfuscationSetting.values()).filter(setting -> config.containsKey(setting.getName())
+                && (Boolean) config.get(setting.getName())).forEach(setting -> flowObfuscators.add(setting.getFlowObfuscation()));
     }
 
     @Override

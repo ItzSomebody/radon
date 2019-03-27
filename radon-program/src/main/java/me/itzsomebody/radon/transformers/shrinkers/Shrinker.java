@@ -74,8 +74,8 @@ public class Shrinker extends Transformer {
 
     @Override
     public void setConfiguration(Map<String, Object> config) {
-        Stream.of(ShrinkerSetting.values()).filter(setting -> config.containsKey(setting.getName()))
-                .forEach(setting -> shrinkers.add(setting.getShrinker()));
+        Stream.of(ShrinkerSetting.values()).filter(setting -> config.containsKey(setting.getName())
+                && (Boolean) config.get(setting.getName())).forEach(setting -> shrinkers.add(setting.getShrinker()));
     }
 
     @Override

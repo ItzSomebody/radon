@@ -88,7 +88,8 @@ public class NumberObfuscation extends Transformer {
     @Override
     public void setConfiguration(Map<String, Object> config) {
         Stream.of(NumberObfuscationSetting.values()).filter(setting -> setting.getNumberObfuscation() != null
-                && config.containsKey(setting.getName())).forEach(setting -> numberObfuscators.add(setting.getNumberObfuscation()));
+                && config.containsKey(setting.getName()) && (Boolean) config.get(setting.getName()))
+                .forEach(setting -> numberObfuscators.add(setting.getNumberObfuscation()));
 
         setDoubleTamperingEnabled(getValueOrDefault(NumberObfuscationSetting.DOUBLE_TAMPERING.getName(), config, false));
         setFloatTamperingEnabled(getValueOrDefault(NumberObfuscationSetting.FLOAT_TAMPERING.getName(), config, false));

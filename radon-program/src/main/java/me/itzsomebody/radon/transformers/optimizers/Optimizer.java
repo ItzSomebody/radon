@@ -72,8 +72,8 @@ public class Optimizer extends Transformer {
 
     @Override
     public void setConfiguration(Map<String, Object> config) {
-        Stream.of(OptimizerSetting.values()).filter(setting -> config.containsKey(setting.getName()))
-                .forEach(setting -> optimizers.add(setting.getOptimizer()));
+        Stream.of(OptimizerSetting.values()).filter(setting -> config.containsKey(setting.getName())
+                && (Boolean) config.get(setting.getName())).forEach(setting -> optimizers.add(setting.getOptimizer()));
     }
 
     @Override

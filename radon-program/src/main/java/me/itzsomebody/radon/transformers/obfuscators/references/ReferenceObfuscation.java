@@ -81,7 +81,8 @@ public class ReferenceObfuscation extends Transformer {
     @Override
     public void setConfiguration(Map<String, Object> config) {
         Stream.of(ReferenceObfuscationSetting.values()).filter(setting -> setting.getReferenceObfuscation() != null
-                && config.containsKey(setting.getName())).forEach(setting -> referenceObfuscators.add(setting.getReferenceObfuscation()));
+                && config.containsKey(setting.getName()) && (Boolean) config.get(setting.getName()))
+                .forEach(setting -> referenceObfuscators.add(setting.getReferenceObfuscation()));
 
         setIgnoreJava8ClassesForReflectionEnabled(getValueOrDefault(ReferenceObfuscationSetting.IGNORE_JAVA8_CLASSES_FOR_REFLECTION.getName(), config, false));
     }
