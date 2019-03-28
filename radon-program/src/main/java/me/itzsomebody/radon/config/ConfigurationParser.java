@@ -76,7 +76,7 @@ public class ConfigurationParser {
      * @return the input file.
      */
     private File getInput() {
-        return getValue(ConfigurationSetting.INPUT.getName(), config);
+        return new File((String) getValue(ConfigurationSetting.INPUT.getName(), config));
     }
 
     /**
@@ -85,7 +85,7 @@ public class ConfigurationParser {
      * @return the output file.
      */
     private File getOutput() {
-        return getValue(ConfigurationSetting.OUTPUT.getName(), config);
+        return new File((String) getValue(ConfigurationSetting.OUTPUT.getName(), config));
     }
 
     /**
