@@ -18,10 +18,18 @@
 
 package me.itzsomebody.radon.transformers.obfuscators.virtualizer;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Stream;
+import me.itzsomebody.radon.config.ConfigurationSetting;
+import me.itzsomebody.radon.exceptions.InvalidConfigurationValueException;
+import me.itzsomebody.radon.exceptions.RadonException;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
+import me.itzsomebody.radon.transformers.obfuscators.virtualizer.mvm.MVMTransformer;
+
+import static me.itzsomebody.radon.utils.ConfigUtils.getValueOrDefault;
 
 /**
  * Translates Java bytecode instructions into a custom bytecode instruction set which
@@ -30,20 +38,29 @@ import me.itzsomebody.radon.transformers.Transformer;
  * @author ItzSomebody
  */
 public class Virtualizer extends Transformer {
+    private static final Map<String, VirtualizerSetting> KEY_MAP = new HashMap<>();
+    private String vmType;
+
+    static {
+        Stream.of(VirtualizerSetting.values()).forEach(setting -> KEY_MAP.put(setting.getName(), setting));
+    }
+
     @Override
     public void transform() {
-        getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper ->
-                classWrapper.methods.stream().filter(methodWrapper -> !excluded(methodWrapper)
-                        && hasInstructions(methodWrapper)).forEach(methodWrapper -> {
-                    Stream.of(methodWrapper.methodNode.instructions).forEach(insn -> {
-                        // TODO
-                    });
-                }));
+        switch (getVMType()) {
+            case "meme_vm":
+                MVMTransformer transformer = new MVMTransformer();
+                transformer.init(radon);
+                transformer.transform();
+                break;
+            default:
+                throw new RadonException(getVMType() + " is an unknown vm type.");
+        }
     }
 
     @Override
     public ExclusionType getExclusionType() {
-        return ExclusionType.VIRTUALIZER; // FIXME
+        return ExclusionType.VIRTUALIZER;
     }
 
     @Override
@@ -53,16 +70,37 @@ public class Virtualizer extends Transformer {
 
     @Override
     public Map<String, Object> getConfiguration() {
-        return null; // TODO
+        Map<String, Object> config = new LinkedHashMap<>();
+
+        config.put(VirtualizerSetting.VM_TYPE.getName(), getVMType());
+
+        return config;
     }
 
     @Override
     public void setConfiguration(Map<String, Object> config) {
-        // TODO
+        setVMType(getValueOrDefault(VirtualizerSetting.VM_TYPE.getName(), config, "meme_vm"));
     }
 
     @Override
     public void verifyConfiguration(Map<String, Object> config) {
-        // TODO
+        config.forEach((k, v) -> {
+            VirtualizerSetting setting = KEY_MAP.get(k);
+
+            if (setting == null)
+                throw new InvalidConfigurationValueException(ConfigurationSetting.VIRTUALIZER.getName() + '.' + k
+                        + " is an invalid configuration key");
+            if (!setting.getExpectedType().isInstance(v))
+                throw new InvalidConfigurationValueException(ConfigurationSetting.VIRTUALIZER.getName() + '.' + k,
+                        setting.getExpectedType(), v.getClass());
+        });
+    }
+
+    public String getVMType() {
+        return vmType;
+    }
+
+    public void setVMType(String vmType) {
+        this.vmType = vmType;
     }
 }
