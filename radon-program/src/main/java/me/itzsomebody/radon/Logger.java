@@ -52,19 +52,6 @@ public class Logger {
                     log.createNewFile();
 
                 bw = new BufferedWriter(new FileWriter(log));
-                bw.append("##############################################\n");
-                bw.append("# +----------------------------------------+ #\n");
-                bw.append("# |  _____            _____   ____  _   _  | #\n");
-                bw.append("# | |  __ \\     /\\   |  __ \\ / __ \\| \\ | | | #\n");
-                bw.append("# | | |__) |   /  \\  | |  | | |  | |  \\| | | #\n");
-                bw.append("# | |  _  /   / /\\ \\ | |  | | |  | | . ` | | #\n");
-                bw.append("# | | | \\ \\  / ____ \\| |__| | |__| | |\\  | | #\n");
-                bw.append("# | |_|  \\_\\/_/    \\_\\_____/ \\____/|_| \\_| | #\n");
-                bw.append("# |                                        | #\n");
-                bw.append("# +----------------------------------------+ #\n");
-                bw.append("##############################################\n");
-                bw.append("\n");
-                bw.append("\n");
                 bw.append("Version: ").append(Main.VERSION).append('\n');
                 bw.append("Contributors: ").append(Main.CONTRIBUTORS).append('\n');
                 STRINGS.forEach(s -> {

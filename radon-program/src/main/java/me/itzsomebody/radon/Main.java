@@ -36,23 +36,11 @@ import me.itzsomebody.radon.utils.WatermarkUtils;
  * @author ItzSomebody
  */
 public class Main {
-    public static final String PREFIX = "[Radon]";
     public static final String VERSION = "2.0.0";
     public static final String CONTRIBUTORS = "ItzSomebody, x0ark, Col-E, Artel, kazigk, Olexorus and freeasbird";
     public static final String ATTRIBUTION = String.format("Radon is a free and open-source Java obfuscator " +
                     "with contributions from %s.\nVersion: %s\nWebsite: https://github.com/ItzSomebody/Radon",
             Main.CONTRIBUTORS, Main.VERSION);
-    public static final String RADON_ASCII_ART = "##############################################\n" +
-            "# +----------------------------------------+ #\n" +
-            "# |  _____            _____   ____  _   _  | #\n" +
-            "# | |  __ \\     /\\   |  __ \\ / __ \\| \\ | | | #\n" +
-            "# | | |__) |   /  \\  | |  | | |  | |  \\| | | #\n" +
-            "# | |  _  /   / /\\ \\ | |  | | |  | | . ` | | #\n" +
-            "# | | | \\ \\  / ____ \\| |__| | |__| | |\\  | | #\n" +
-            "# | |_|  \\_\\/_/    \\_\\_____/ \\____/|_| \\_| | #\n" +
-            "# |                                        | #\n" +
-            "# +----------------------------------------+ #\n" +
-            "##############################################\n";
 
     /**
      * Main method.
@@ -60,8 +48,6 @@ public class Main {
      * @param args arguments from command line.
      */
     public static void main(String[] args) {
-        // SPAMMING LOTS OF TEXT IS A NECESSITY
-        System.out.println(RADON_ASCII_ART);
         Logger.stdOut("Version: " + VERSION);
         Logger.stdOut("Contributors: " + CONTRIBUTORS + "\n");
 
