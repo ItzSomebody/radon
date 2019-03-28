@@ -100,7 +100,7 @@ public class BitwiseObfuscator extends NumberObfuscation {
                     insns.add(BytecodeUtils.getNumberInsn(operand));
                     insns.add(new InsnNode(IXOR));
 
-                    current &= operand;
+                    current ^= operand;
                     break;
                 case 3:
                     operand = RandomUtils.getRandomInt(1, 5);
@@ -169,7 +169,7 @@ public class BitwiseObfuscator extends NumberObfuscation {
                     insns.add(BytecodeUtils.getNumberInsn(operand));
                     insns.add(new InsnNode(LXOR));
 
-                    current &= operand;
+                    current ^= operand;
                     break;
                 case 3:
                     operand = RandomUtils.getRandomInt(1, 32);

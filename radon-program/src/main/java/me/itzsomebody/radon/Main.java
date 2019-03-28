@@ -61,13 +61,14 @@ public class Main {
         CommandArgumentsParser parser = new CommandArgumentsParser(args);
 
         // Switch handling.
-        if (parser.containsSwitch("help")) {
+        if (parser.containsSwitch("help"))
             showHelpMenu();
-        } else if (parser.containsSwitch("license")) {
+        else if (parser.containsSwitch("license"))
             showLicense();
-        } else if (parser.containsSwitch("config")) {
+        else if (parser.containsSwitch("config")) {
             File file = new File(parser.getSwitchArgs("config")[0]);
             ConfigurationParser config;
+
             try {
                 config = new ConfigurationParser(new FileInputStream(file));
             } catch (FileNotFoundException exc) {
@@ -95,9 +96,8 @@ public class Main {
             } catch (Throwable t) {
                 t.printStackTrace();
             }
-        } else {
+        } else
             showHelpMenu();
-        }
 
         Logger.dumpLog();
     }
