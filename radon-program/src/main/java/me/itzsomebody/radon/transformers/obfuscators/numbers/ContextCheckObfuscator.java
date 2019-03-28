@@ -165,7 +165,7 @@ public class ContextCheckObfuscator extends NumberObfuscation {
         return encodeLong(Double.doubleToLongBits(d), hashCode);
     }
 
-
+    @SuppressWarnings("Duplicates")
     private static ClassNode createConstantDecoder(MemberNames memberNames) {
         ClassNode cw = new ClassNode();
         MethodVisitor mv;
