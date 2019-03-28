@@ -25,6 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 import me.itzsomebody.radon.Logger;
 import me.itzsomebody.radon.asm.ClassWrapper;
+import me.itzsomebody.radon.utils.BytecodeUtils;
 import me.itzsomebody.radon.utils.RandomUtils;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
@@ -70,47 +71,51 @@ public class FakeCatchBlocks extends FlowObfuscation {
             classNode.superName = HANDLER_NAMES[RandomUtils.getRandomInt(HANDLER_NAMES.length)];
             classNode.name = randomString();
             classNode.access = ACC_PUBLIC | ACC_SUPER;
+            classNode.version = V1_5;
 
             fakeHandlers[i] = classNode;
         }
 
         getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper ->
                 classWrapper.methods.stream().filter(methodWrapper -> !excluded(methodWrapper)
-                        && hasInstructions(methodWrapper.methodNode)).forEach(methodWrapper -> {
-                    MethodNode methodNode = methodWrapper.methodNode;
+                        && hasInstructions(methodWrapper.methodNode) && !methodWrapper.originalName.startsWith("<"))
+                        .forEach(methodWrapper -> {
+                            MethodNode methodNode = methodWrapper.methodNode;
 
-                    int leeway = getSizeLeeway(methodNode);
+                            int leeway = getSizeLeeway(methodNode);
 
-                    for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
-                        if (leeway < 10000)
-                            return;
+                            for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
+                                if (leeway < 10000)
+                                    return;
+                                if (!BytecodeUtils.isInstruction(insn))
+                                    continue;
 
-                        if (RandomUtils.getRandomInt(10) > 5) {
-                            LabelNode trapStart = new LabelNode();
-                            LabelNode trapEnd = new LabelNode();
-                            LabelNode catchStart = new LabelNode();
-                            LabelNode catchEnd = new LabelNode();
+                                if (RandomUtils.getRandomInt(10) > 5) {
+                                    LabelNode trapStart = new LabelNode();
+                                    LabelNode trapEnd = new LabelNode();
+                                    LabelNode catchStart = new LabelNode();
+                                    LabelNode catchEnd = new LabelNode();
 
-                            InsnList catchBlock = new InsnList();
-                            catchBlock.add(catchStart);
-                            catchBlock.add(new InsnNode(DUP));
-                            catchBlock.add(new InsnNode(POP));
-                            catchBlock.add(new InsnNode(ATHROW));
-                            catchBlock.add(catchEnd);
+                                    InsnList catchBlock = new InsnList();
+                                    catchBlock.add(catchStart);
+                                    catchBlock.add(new InsnNode(DUP));
+                                    catchBlock.add(new InsnNode(POP));
+                                    catchBlock.add(new InsnNode(ATHROW));
+                                    catchBlock.add(catchEnd);
 
-                            methodNode.instructions.insertBefore(insn, trapStart);
-                            methodNode.instructions.insert(insn, trapEnd);
-                            methodNode.instructions.insert(insn, new JumpInsnNode(GOTO, catchEnd));
-                            methodNode.instructions.insert(insn, catchBlock);
+                                    methodNode.instructions.insertBefore(insn, trapStart);
+                                    methodNode.instructions.insert(insn, catchBlock);
+                                    methodNode.instructions.insert(insn, new JumpInsnNode(GOTO, catchEnd));
+                                    methodNode.instructions.insert(insn, trapEnd);
 
-                            methodNode.tryCatchBlocks.add(new TryCatchBlockNode(trapStart, trapEnd, catchStart,
-                                    fakeHandlers[RandomUtils.getRandomInt(fakeHandlers.length)].name));
+                                    methodNode.tryCatchBlocks.add(new TryCatchBlockNode(trapStart, trapEnd, catchStart,
+                                            fakeHandlers[RandomUtils.getRandomInt(fakeHandlers.length)].name));
 
-                            leeway -= 15;
-                            counter.incrementAndGet();
-                        }
-                    }
-                }));
+                                    leeway -= 15;
+                                    counter.incrementAndGet();
+                                }
+                            }
+                        }));
 
         Stream.of(fakeHandlers).forEach(classNode -> getClasses().put(classNode.name, new ClassWrapper(classNode, false)));
 

@@ -18,6 +18,7 @@
 
 package me.itzsomebody.radon.transformers.shrinkers;
 
+import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 import me.itzsomebody.radon.Logger;
 
@@ -34,7 +35,7 @@ public class InnerClassesRemover extends Shrinker {
         getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)
                 && classWrapper.classNode.innerClasses != null).forEach(classWrapper -> {
             counter.addAndGet(classWrapper.classNode.innerClasses.size());
-            classWrapper.classNode.innerClasses = null;
+            classWrapper.classNode.innerClasses = new ArrayList<>();
         });
 
         Logger.stdOut(String.format("Removed %d inner classes.", counter.get()));

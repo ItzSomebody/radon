@@ -41,7 +41,6 @@ import me.itzsomebody.radon.asm.MemberRemapper;
 import me.itzsomebody.radon.asm.MethodWrapper;
 import me.itzsomebody.radon.config.ConfigurationSetting;
 import me.itzsomebody.radon.exceptions.InvalidConfigurationValueException;
-import me.itzsomebody.radon.exclusions.Exclusion;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
 import me.itzsomebody.radon.utils.AccessUtils;
@@ -84,18 +83,14 @@ public class Renamer extends Transformer {
             classWrapper.methods.stream().filter(Renamer::methodCanBeRenamed).forEach(methodWrapper -> {
                 HashSet<String> visited = new HashSet<>();
 
-                if (cannotRenameMethod(radon.getTree(classWrapper.originalName), methodWrapper, visited))
-                    visited.forEach(this::exclusionHelper);
-                else
+                if (!cannotRenameMethod(radon.getTree(classWrapper.originalName), methodWrapper, visited))
                     genMethodMappings(methodWrapper, methodWrapper.owner.originalName, randomString());
             });
 
             classWrapper.fields.forEach(fieldWrapper -> {
                 HashSet<String> visited = new HashSet<>();
 
-                if (cannotRenameField(radon.getTree(classWrapper.originalName), fieldWrapper, visited))
-                    visited.forEach(this::exclusionHelper);
-                else
+                if (!cannotRenameField(radon.getTree(classWrapper.originalName), fieldWrapper, visited))
                     genFieldMappings(fieldWrapper, fieldWrapper.owner.originalName, randomString());
             });
 
@@ -122,7 +117,7 @@ public class Renamer extends Transformer {
                     .forEach(i -> classWrapper.methods.get(i).methodNode = copy.methods.get(i));
 
             if (copy.fields != null)
-                IntStream.range(0, copy.methods.size())
+                IntStream.range(0, copy.fields.size())
                         .forEach(i -> classWrapper.fields.get(i).fieldNode = copy.fields.get(i));
 
             classWrapper.classNode = copy;
@@ -194,24 +189,27 @@ public class Renamer extends Transformer {
         String check = tree.classWrapper.originalName + '.' + wrapper.originalName + wrapper.originalDescription;
 
         // Don't check these
-        if (visited.contains(check) || (tree.classWrapper == wrapper.owner))
+        if (visited.contains(check))
             return false;
+
+        visited.add(check);
 
         // If excluded, we don't want to rename.
         // If we already mapped the tree, we don't want to waste time doing it again.
         if (excluded(check) || mappings.containsKey(check))
             return true;
 
-        // We can't rename members which inherit methods from external libraries
-        if (tree.classWrapper.libraryNode)
-            if (tree.classWrapper.methods.stream().anyMatch(mw -> mw.originalName.equals(wrapper.originalName)
-                    && mw.originalDescription.equals(wrapper.originalDescription)))
-                return true;
-
         // Methods which are static don't need to be checked for inheritance
-        if (!Modifier.isStatic(wrapper.methodNode.access))
+        if (!Modifier.isStatic(wrapper.methodNode.access)) {
+            // We can't rename members which inherit methods from external libraries
+            if (tree.classWrapper != wrapper.owner && tree.classWrapper.libraryNode)
+                if (tree.classWrapper.methods.stream().anyMatch(mw -> mw.originalName.equals(wrapper.originalName)
+                        && mw.originalDescription.equals(wrapper.originalDescription)))
+                    return true;
+
             return tree.parentClasses.stream().anyMatch(parent -> cannotRenameMethod(radon.getTree(parent), wrapper, visited))
                     || (tree.subClasses.stream().anyMatch(sub -> cannotRenameMethod(radon.getTree(sub), wrapper, visited)));
+        }
 
         return false;
     }
@@ -235,24 +233,27 @@ public class Renamer extends Transformer {
         String check = tree.classWrapper.originalName + '.' + wrapper.originalName + '.' + wrapper.originalDescription;
 
         // Don't check these
-        if (visited.contains(check) || (tree.classWrapper == wrapper.owner))
+        if (visited.contains(check))
             return false;
+
+        visited.add(check);
 
         // If excluded, we don't want to rename.
         // If we already mapped the tree, we don't want to waste time doing it again.
         if (excluded(check) || mappings.containsKey(check))
             return true;
 
-        // We can't rename members which inherit methods from external libraries
-        if (tree.classWrapper.libraryNode)
-            if (tree.classWrapper.fields.stream().anyMatch(fw -> fw.originalName.equals(wrapper.originalName)
-                    && fw.originalDescription.equals(wrapper.originalDescription)))
-                return true;
-
         // Fields which are static don't need to be checked for inheritance
-        if (!Modifier.isStatic(wrapper.fieldNode.access))
+        if (!Modifier.isStatic(wrapper.fieldNode.access)) {
+            // We can't rename members which inherit methods from external libraries
+            if (tree.classWrapper != wrapper.owner && tree.classWrapper.libraryNode)
+                if (tree.classWrapper.fields.stream().anyMatch(fw -> fw.originalName.equals(wrapper.originalName)
+                        && fw.originalDescription.equals(wrapper.originalDescription)))
+                    return true;
+
             return tree.parentClasses.stream().anyMatch(parent -> cannotRenameField(radon.getTree(parent), wrapper, visited))
                     || (tree.subClasses.stream().anyMatch(sub -> cannotRenameField(radon.getTree(sub), wrapper, visited)));
+        }
 
         return false;
     }
@@ -286,10 +287,6 @@ public class Renamer extends Transformer {
         }
     }
 
-    private void exclusionHelper(String pattern) {
-        radon.config.getExclusionManager().addExclusion(new Exclusion(pattern, getExclusionType()));
-    }
-
     @Override
     public ExclusionType getExclusionType() {
         return ExclusionType.RENAMER;
@@ -312,7 +309,7 @@ public class Renamer extends Transformer {
 
     @Override
     public void setConfiguration(Map<String, Object> config) {
-        setAdaptTheseResources(getValueOrDefault(RenamerSetting.ADAPT_THESE_RESOURCES.getName(), config, new String[0]));
+        setAdaptTheseResources(getValueOrDefault(RenamerSetting.ADAPT_THESE_RESOURCES.getName(), config, new ArrayList<String>()).toArray(new String[0]));
         setRepackageName(getValueOrDefault(RenamerSetting.REPACKAGE_NAME.getName(), config, null));
     }
 

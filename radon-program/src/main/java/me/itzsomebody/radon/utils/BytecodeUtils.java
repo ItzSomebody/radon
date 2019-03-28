@@ -41,14 +41,6 @@ public class BytecodeUtils {
         return !(insn instanceof FrameNode) && !(insn instanceof LineNumberNode) && !(insn instanceof LabelNode);
     }
 
-    public static AbstractInsnNode getNext(AbstractInsnNode node) {
-        AbstractInsnNode next = node.getNext();
-        while (!isInstruction(next)) {
-            next = next.getNext();
-        }
-        return next;
-    }
-
     public static boolean isReturn(int opcode) {
         return (opcode >= Opcodes.IRETURN && opcode <= Opcodes.RETURN);
     }

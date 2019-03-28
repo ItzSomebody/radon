@@ -19,6 +19,7 @@
 package me.itzsomebody.radon.transformers.shrinkers;
 
 import java.util.concurrent.atomic.AtomicInteger;
+import me.itzsomebody.radon.Logger;
 import me.itzsomebody.radon.utils.AccessUtils;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldNode;
@@ -60,6 +61,8 @@ public class SyntheticAccessRemover extends Shrinker {
                 }
             });
         });
+
+        Logger.stdOut(String.format("Removed %d synthetic/bridge access flags.", counter.get()));
     }
 
     @Override

@@ -18,11 +18,9 @@
 
 package me.itzsomebody.radon.transformers.obfuscators.flow;
 
-import java.util.ArrayList;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import me.itzsomebody.radon.Logger;
-import me.itzsomebody.radon.asm.ClassWrapper;
 import me.itzsomebody.radon.asm.StackHeightZeroFinder;
 import me.itzsomebody.radon.exceptions.RadonException;
 import me.itzsomebody.radon.exceptions.StackEmulationException;
@@ -30,7 +28,6 @@ import me.itzsomebody.radon.utils.BytecodeUtils;
 import me.itzsomebody.radon.utils.RandomUtils;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
-import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.InsnNode;
@@ -49,81 +46,65 @@ import org.objectweb.asm.tree.VarInsnNode;
  * @author ItzSomebody
  */
 public class BogusJumpInserter extends FlowObfuscation {
-    private static final int PRED_ACCESS = ACC_PUBLIC | ACC_STATIC;
+    private static final int PRED_ACCESS = ACC_PUBLIC | ACC_STATIC | ACC_FINAL;
 
     @Override
     public void transform() {
         AtomicInteger counter = new AtomicInteger();
 
-        int fieldInjections = getClassWrappers().size() / 5;
-        if (fieldInjections == 0)
-            fieldInjections = 1;
+        getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper -> {
+            FieldNode predicate = new FieldNode(PRED_ACCESS, randomString(), "Z", null, null);
 
-        FieldNode[] predicates = new FieldNode[fieldInjections];
-        for (int i = 0; i < fieldInjections; i++)
-            predicates[i] = new FieldNode(PRED_ACCESS, randomString(), "Z", null, null);
+            classWrapper.methods.stream().filter(methodWrapper -> !excluded(methodWrapper)
+                    && hasInstructions(methodWrapper.methodNode)).forEach(methodWrapper -> {
+                MethodNode methodNode = methodWrapper.methodNode;
 
-        ClassNode[] predicateClasses = new ClassNode[fieldInjections];
-        ArrayList<ClassWrapper> wrappers = new ArrayList<>(getClassWrappers());
-        for (int i = 0; i < fieldInjections; i++) {
-            predicateClasses[i] = wrappers.get(RandomUtils.getRandomInt(wrappers.size())).classNode;
+                int leeway = getSizeLeeway(methodNode);
+                int varIndex = methodNode.maxLocals;
+                methodNode.maxLocals++; // Prevents breaking of other transformers which rely on this field.
 
-            if (predicateClasses[i].fields == null)
-                predicateClasses[i].fields = new ArrayList<>(1);
+                AbstractInsnNode[] untouchedList = methodNode.instructions.toArray();
+                LabelNode labelNode = exitLabel(methodNode);
+                boolean calledSuper = false;
 
-            predicateClasses[i].fields.add(predicates[i]);
-        }
+                StackHeightZeroFinder stackHeightZeroFinder = new StackHeightZeroFinder(methodNode, methodNode.instructions.getLast());
+                try {
+                    stackHeightZeroFinder.execute(false);
+                } catch (StackEmulationException e) {
+                    e.printStackTrace();
+                    throw new RadonException(String.format("Error happened while trying to emulate the stack of %s.%s%s",
+                            classWrapper.classNode.name, methodNode.name, methodNode.desc));
+                }
 
-        getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper ->
-                classWrapper.methods.stream().filter(methodWrapper -> !excluded(methodWrapper)
-                        && hasInstructions(methodWrapper.methodNode)).forEach(methodWrapper -> {
-                    MethodNode methodNode = methodWrapper.methodNode;
+                Set<AbstractInsnNode> emptyAt = stackHeightZeroFinder.getEmptyAt();
+                for (AbstractInsnNode insn : untouchedList) {
+                    if (leeway < 10000)
+                        break;
 
-                    int leeway = getSizeLeeway(methodNode);
-                    int varIndex = methodNode.maxLocals;
-                    methodNode.maxLocals++; // Prevents breaking of other transformers which rely on this field.
-
-                    AbstractInsnNode[] untouchedList = methodNode.instructions.toArray();
-                    LabelNode labelNode = exitLabel(methodNode);
-                    boolean calledSuper = false;
-
-                    StackHeightZeroFinder stackHeightZeroFinder = new StackHeightZeroFinder(methodNode, methodNode.instructions.getLast());
-                    try {
-                        stackHeightZeroFinder.execute(false);
-                    } catch (StackEmulationException e) {
-                        e.printStackTrace();
-                        throw new RadonException(String.format("Error happened while trying to emulate the stack of %s.%s%s",
-                                classWrapper.classNode.name, methodNode.name, methodNode.desc));
-                    }
-
-                    Set<AbstractInsnNode> emptyAt = stackHeightZeroFinder.getEmptyAt();
-                    for (AbstractInsnNode insn : untouchedList) {
-                        if (leeway < 10000)
-                            break;
-
-                        // Bad way of detecting if this class was instantiated
-                        if ("<init>".equals(methodNode.name))
-                            calledSuper = (insn instanceof MethodInsnNode && insn.getOpcode() == INVOKESPECIAL
-                                    && insn.getPrevious() instanceof VarInsnNode && ((VarInsnNode) insn.getPrevious()).var == 0);
-                        if (insn != methodNode.instructions.getFirst() && !(insn instanceof LineNumberNode)) {
-                            if ("<init>".equals(methodNode.name) && !calledSuper)
-                                continue;
-                            if (emptyAt.contains(insn)) { // We need to make sure stack is empty before making jumps
-                                methodNode.instructions.insertBefore(insn, new VarInsnNode(ILOAD, varIndex));
-                                methodNode.instructions.insertBefore(insn, new JumpInsnNode(IFNE, labelNode));
-                                leeway -= 4;
-                                counter.incrementAndGet();
-                            }
+                    // Bad way of detecting if this class was instantiated
+                    if ("<init>".equals(methodNode.name))
+                        calledSuper = (insn instanceof MethodInsnNode && insn.getOpcode() == INVOKESPECIAL
+                                && insn.getPrevious() instanceof VarInsnNode && ((VarInsnNode) insn.getPrevious()).var == 0);
+                    if (insn != methodNode.instructions.getFirst() && !(insn instanceof LineNumberNode)) {
+                        if ("<init>".equals(methodNode.name) && !calledSuper)
+                            continue;
+                        if (emptyAt.contains(insn)) { // We need to make sure stack is empty before making jumps
+                            methodNode.instructions.insertBefore(insn, new VarInsnNode(ILOAD, varIndex));
+                            methodNode.instructions.insertBefore(insn, new JumpInsnNode(IFNE, labelNode));
+                            leeway -= 4;
+                            counter.incrementAndGet();
                         }
                     }
+                }
 
-                    int index = RandomUtils.getRandomInt(predicateClasses.length);
+                methodNode.instructions.insertBefore(methodNode.instructions.getFirst(),
+                        new VarInsnNode(ISTORE, varIndex));
+                methodNode.instructions.insertBefore(methodNode.instructions.getFirst(),
+                        new FieldInsnNode(GETSTATIC, classWrapper.classNode.name, predicate.name, "Z"));
+            });
 
-                    methodNode.instructions.insertBefore(methodNode.instructions.getFirst(),
-                            new VarInsnNode(ISTORE, varIndex));
-                    methodNode.instructions.insertBefore(methodNode.instructions.getFirst(),
-                            new FieldInsnNode(GETSTATIC, predicateClasses[index].name, predicates[index].name, "Z"));
-                }));
+            classWrapper.classNode.fields.add(predicate);
+        });
 
         Logger.stdOut("Inserted " + counter.get() + " bogus jumps");
     }
