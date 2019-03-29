@@ -75,7 +75,7 @@ public class HideCode extends Transformer {
                         methodNode.access |= ACC_SYNTHETIC;
                         atLeastOnce = true;
                     }
-                    if (!AccessUtils.isBridge(methodNode.access)) {
+                    if (!methodNode.name.startsWith("<") && !AccessUtils.isBridge(methodNode.access)) {
                         methodNode.access |= ACC_BRIDGE;
                         atLeastOnce = true;
                     }
