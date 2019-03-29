@@ -21,7 +21,6 @@ package me.itzsomebody.radon.config;
 import java.util.List;
 import java.util.Map;
 import me.itzsomebody.radon.transformers.Transformer;
-import me.itzsomebody.radon.transformers.miscellaneous.Crasher;
 import me.itzsomebody.radon.transformers.miscellaneous.expiration.Expiration;
 import me.itzsomebody.radon.transformers.miscellaneous.watermarker.Watermarker;
 import me.itzsomebody.radon.transformers.obfuscators.AntiTamper;
@@ -58,7 +57,7 @@ public enum ConfigurationSetting {
     RESOURCE_RENAMER(Boolean.class, new ResourceRenamer()), // TODO
     //CLASS_ENCRYPTION(Map.class, new ClassEncryption()), // Just kidding, lol
     HIDE_CODE(Map.class, new HideCode()),
-    CRASHER(Boolean.class, new Crasher()),
+    //CRASHER(Boolean.class, new Crasher()),
     EXPIRATION(Map.class, new Expiration()),
     WATERMARK(Map.class, new Watermarker()),
     OPTIMIZER(Map.class, new Optimizer()),
