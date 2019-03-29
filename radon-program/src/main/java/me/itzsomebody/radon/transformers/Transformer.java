@@ -100,7 +100,7 @@ public abstract class Transformer implements Opcodes {
 
         do {
             if (count++ > 20)
-                throw new RadonException("Unable to generate an unused string (try increasing randomised string length)");
+                throw new RadonException("Unable to generate an unused string (try increasing randomized string length)");
 
             str = getRandomString(radon.config.getRandomizedStringLength());
         } while (!usedStrings.add(str));
