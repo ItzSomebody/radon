@@ -22,6 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import me.itzsomebody.radon.Logger;
 import me.itzsomebody.radon.asm.ClassWrapper;
 import me.itzsomebody.radon.utils.BytecodeUtils;
+import me.itzsomebody.radon.utils.RandomUtils;
 import me.itzsomebody.radon.utils.StringUtils;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.Label;
@@ -37,7 +38,6 @@ import org.objectweb.asm.tree.TypeInsnNode;
 /**
  * XORs number constants using stacktrace variables as keys. Be super careful with this because it WILL
  * SLOW STUFF DOWN BY A LOT.
- * FIXME: Breaks stuff
  *
  * @author ItzSomebody
  */
@@ -96,7 +96,7 @@ public class ContextCheckObfuscator extends NumberObfuscation {
                             InsnList insnList = new InsnList();
                             insnList.add(BytecodeUtils.getNumberInsn(encodedFloat));
                             insnList.add(new MethodInsnNode(INVOKESTATIC, "java/lang/Integer", "valueOf", "(I)Ljava/lang/Integer;", false));
-                            insnList.add(new InsnNode(ICONST_0));
+                            insnList.add(BytecodeUtils.getNumberInsn(RandomUtils.getRandomInt()));
                             insnList.add(new MethodInsnNode(INVOKESTATIC, memberNames.className, memberNames.decodeConstantMethodName, "(Ljava/lang/Object;I)Ljava/lang/Object;", false));
                             insnList.add(new TypeInsnNode(CHECKCAST, "java/lang/Float"));
                             insnList.add(new MethodInsnNode(INVOKEVIRTUAL, "java/lang/Float", "floatValue", "()F", false));
@@ -112,7 +112,7 @@ public class ContextCheckObfuscator extends NumberObfuscation {
                             InsnList insnList = new InsnList();
                             insnList.add(BytecodeUtils.getNumberInsn(encodedLong));
                             insnList.add(new MethodInsnNode(INVOKESTATIC, "java/lang/Long", "valueOf", "(J)Ljava/lang/Long;", false));
-                            insnList.add(new InsnNode(ICONST_0));
+                            insnList.add(BytecodeUtils.getNumberInsn(RandomUtils.getRandomInt()));
                             insnList.add(new MethodInsnNode(INVOKESTATIC, memberNames.className, memberNames.decodeConstantMethodName, "(Ljava/lang/Object;I)Ljava/lang/Object;", false));
                             insnList.add(new TypeInsnNode(CHECKCAST, "java/lang/Double"));
                             insnList.add(new MethodInsnNode(INVOKEVIRTUAL, "java/lang/Double", "doubleValue", "()D", false));
