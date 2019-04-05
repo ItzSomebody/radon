@@ -18,9 +18,16 @@
 
 package me.itzsomebody.radon.transformers.obfuscators;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
+import me.itzsomebody.radon.Logger;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
+import org.objectweb.asm.tree.LdcInsnNode;
+import org.objectweb.asm.tree.MethodNode;
 
 /**
  * Renames bundled JAR resources to make their purpose less obvious.
@@ -28,9 +35,49 @@ import me.itzsomebody.radon.transformers.Transformer;
  * @author ItzSomebody
  */
 public class ResourceRenamer extends Transformer {
+    private Map<String, String> mappings;
+
     @Override
     public void transform() {
-        // TODO
+        mappings = new HashMap<>();
+        AtomicInteger counter = new AtomicInteger();
+
+        getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper ->
+                classWrapper.methods.stream().filter(methodWrapper -> !excluded(methodWrapper)
+                        && hasInstructions(methodWrapper)).forEach(methodWrapper -> {
+                    MethodNode methodNode = methodWrapper.methodNode;
+
+                    Stream.of(methodNode.instructions.toArray()).filter(insn -> insn instanceof LdcInsnNode
+                            && ((LdcInsnNode) insn).cst instanceof String).forEach(insn -> {
+                        String s = (String) ((LdcInsnNode) insn).cst;
+                        String resourceName;
+
+                        if (s.startsWith("/"))
+                            resourceName = s.substring(1);
+                        else
+                            resourceName = classWrapper.originalName + '/' + s;
+
+                        if (getResources().containsKey(resourceName))
+                            if (mappings.containsKey(resourceName))
+                                ((LdcInsnNode) insn).cst = mappings.get(resourceName);
+                            else {
+                                String newName = '/' + randomString();
+                                ((LdcInsnNode) insn).cst = newName;
+                                mappings.put(resourceName, newName);
+                            }
+                    });
+                }));
+
+        new HashMap<>(getResources()).forEach((name, b) -> {
+            if (mappings.containsKey(name)) {
+                getResources().remove(name);
+                getResources().put(mappings.get(name).substring(1), b);
+
+                counter.incrementAndGet();
+            }
+        });
+
+        Logger.stdOut("Renamed " + counter.get() + " resources");
     }
 
     @Override
@@ -45,16 +92,16 @@ public class ResourceRenamer extends Transformer {
 
     @Override
     public Map<String, Object> getConfiguration() {
-        return null; // TODO
+        return new LinkedHashMap<>(); // Not needed
     }
 
     @Override
     public void setConfiguration(Map<String, Object> config) {
-        // TODO
+        // Not needed
     }
 
     @Override
     public void verifyConfiguration(Map<String, Object> config) {
-        // TODO
+        // Not needed
     }
 }

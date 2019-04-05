@@ -8,7 +8,9 @@ import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 
 /**
- * Translates Java bytecode into Meme VM (MVM) instructions.
+ * Translates Java bytecode into Meme VM (MVM) instructions. The reason I chose Meme VM as a name is
+ * because the protection is minimal as far as a VM is concerned (1-to-1 instruction conversion and
+ * close to Java bytecode).
  *
  * @author ItzSomebody
  */
