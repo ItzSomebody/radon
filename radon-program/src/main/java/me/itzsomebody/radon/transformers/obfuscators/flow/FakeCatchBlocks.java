@@ -90,7 +90,7 @@ public class FakeCatchBlocks extends FlowObfuscation {
                                 if (!BytecodeUtils.isInstruction(insn))
                                     continue;
 
-                                if (RandomUtils.getRandomInt(10) > 5) {
+                                if (insn instanceof JumpInsnNode) {
                                     LabelNode trapStart = new LabelNode();
                                     LabelNode trapEnd = new LabelNode();
                                     LabelNode catchStart = new LabelNode();
