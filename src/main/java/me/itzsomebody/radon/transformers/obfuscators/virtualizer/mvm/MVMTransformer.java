@@ -45,9 +45,7 @@ public class MVMTransformer extends Virtualizer {
 
                     if (canProtect(methodNode.instructions)) {
                         Stream.of(methodNode.instructions.toArray()).forEach(insn -> {
-                            switch (insn.getOpcode()) {
-                                // TODO
-                            }
+                            // TODO
                         });
                     }
                 }));
