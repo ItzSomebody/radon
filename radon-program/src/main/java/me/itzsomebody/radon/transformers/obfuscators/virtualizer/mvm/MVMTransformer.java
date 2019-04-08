@@ -22,7 +22,7 @@ public class MVMTransformer extends Virtualizer {
                     MethodNode methodNode = methodWrapper.methodNode;
 
                     int leeway = getSizeLeeway(methodNode);
-                    if (leeway <= 52000) // Virtualization of huge method = bad
+                    if (leeway <= 30000) // Virtualization of huge method = bad
                         return;
 
                     if (canProtect(methodNode.instructions)) {

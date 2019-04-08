@@ -46,28 +46,28 @@ public class ArithmeticObfuscator extends NumberObfuscation {
                         if (leeway < 10000)
                             break;
 
-                        if (BytecodeUtils.isIntInsn(insn) && isIntegerTamperingEnabled()) {
+                        if (BytecodeUtils.isIntInsn(insn) && master.isIntegerTamperingEnabled()) {
                             InsnList insns = obfuscateNumber(BytecodeUtils.getIntegerFromInsn(insn));
 
                             methodNode.instructions.insert(insn, insns);
                             methodNode.instructions.remove(insn);
 
                             counter.incrementAndGet();
-                        } else if (BytecodeUtils.isLongInsn(insn) && isLongTamperingEnabled()) {
+                        } else if (BytecodeUtils.isLongInsn(insn) && master.isLongTamperingEnabled()) {
                             InsnList insns = obfuscateNumber(BytecodeUtils.getLongFromInsn(insn));
 
                             methodNode.instructions.insert(insn, insns);
                             methodNode.instructions.remove(insn);
 
                             counter.incrementAndGet();
-                        } else if (BytecodeUtils.isFloatInsn(insn) && isFloatTamperingEnabled()) {
+                        } else if (BytecodeUtils.isFloatInsn(insn) && master.isFloatTamperingEnabled()) {
                             InsnList insns = obfuscateNumber(BytecodeUtils.getFloatFromInsn(insn));
 
                             methodNode.instructions.insert(insn, insns);
                             methodNode.instructions.remove(insn);
 
                             counter.incrementAndGet();
-                        } else if (BytecodeUtils.isDoubleInsn(insn) && isDoubleTamperingEnabled()) {
+                        } else if (BytecodeUtils.isDoubleInsn(insn) && master.isDoubleTamperingEnabled()) {
                             InsnList insns = obfuscateNumber(BytecodeUtils.getDoubleFromInsn(insn));
 
                             methodNode.instructions.insert(insn, insns);

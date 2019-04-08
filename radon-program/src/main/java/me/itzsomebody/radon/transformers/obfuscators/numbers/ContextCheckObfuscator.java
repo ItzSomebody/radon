@@ -57,7 +57,7 @@ public class ContextCheckObfuscator extends NumberObfuscation {
                         if (leeway < 10000)
                             break;
 
-                        if (BytecodeUtils.isIntInsn(insn) && isIntegerTamperingEnabled()) {
+                        if (BytecodeUtils.isIntInsn(insn) && master.isIntegerTamperingEnabled()) {
                             int originalNum = BytecodeUtils.getIntegerFromInsn(insn);
                             int encodedInt = encodeInt(originalNum, methodNode.name.hashCode());
 
@@ -73,7 +73,7 @@ public class ContextCheckObfuscator extends NumberObfuscation {
                             methodNode.instructions.remove(insn);
                             leeway -= 20;
                             counter.incrementAndGet();
-                        } else if (BytecodeUtils.isLongInsn(insn) && isLongTamperingEnabled()) {
+                        } else if (BytecodeUtils.isLongInsn(insn) && master.isLongTamperingEnabled()) {
                             long originalNum = BytecodeUtils.getLongFromInsn(insn);
                             long encodedLong = encodeLong(originalNum, methodNode.name.hashCode());
 
@@ -89,7 +89,7 @@ public class ContextCheckObfuscator extends NumberObfuscation {
                             methodNode.instructions.remove(insn);
                             leeway -= 25;
                             counter.incrementAndGet();
-                        } else if (BytecodeUtils.isFloatInsn(insn) && isFloatTamperingEnabled()) {
+                        } else if (BytecodeUtils.isFloatInsn(insn) && master.isFloatTamperingEnabled()) {
                             float originalNum = BytecodeUtils.getFloatFromInsn(insn);
                             int encodedFloat = encodeFloat(originalNum, methodNode.name.hashCode());
 
@@ -105,7 +105,7 @@ public class ContextCheckObfuscator extends NumberObfuscation {
                             methodNode.instructions.remove(insn);
 
                             leeway -= 20;
-                        } else if (BytecodeUtils.isDoubleInsn(insn) && isDoubleTamperingEnabled()) {
+                        } else if (BytecodeUtils.isDoubleInsn(insn) && master.isDoubleTamperingEnabled()) {
                             double originalNum = BytecodeUtils.getDoubleFromInsn(insn);
                             long encodedLong = encodeDouble(originalNum, methodNode.name.hashCode());
 

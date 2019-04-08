@@ -41,10 +41,12 @@ public class NumberObfuscation extends Transformer {
     private static final Map<String, NumberObfuscationSetting> KEY_MAP = new HashMap<>();
     private static final Map<NumberObfuscation, NumberObfuscationSetting> NUMBEROBF_SETTING_MAP = new HashMap<>();
     private final List<NumberObfuscation> numberObfuscators = new ArrayList<>();
-    private static boolean integerTamperingEnabled;
-    private static boolean longTamperingEnabled;
-    private static boolean floatTamperingEnabled;
-    private static boolean doubleTamperingEnabled;
+    private boolean integerTamperingEnabled;
+    private boolean longTamperingEnabled;
+    private boolean floatTamperingEnabled;
+    private boolean doubleTamperingEnabled;
+
+    protected NumberObfuscation master;
 
     static {
         NumberObfuscationSetting[] values = NumberObfuscationSetting.values();
@@ -57,6 +59,7 @@ public class NumberObfuscation extends Transformer {
     public void transform() {
         numberObfuscators.forEach(numberObfuscation -> {
             numberObfuscation.init(radon);
+            numberObfuscation.initMaster(this);
             numberObfuscation.transform();
         });
     }
@@ -111,6 +114,10 @@ public class NumberObfuscation extends Transformer {
         });
     }
 
+    private void initMaster(NumberObfuscation master) {
+        this.master = master;
+    }
+
     protected static int randomInt(int bounds) {
         if (bounds <= 0)
             return RandomUtils.getRandomInt(Integer.MAX_VALUE);
@@ -139,37 +146,36 @@ public class NumberObfuscation extends Transformer {
         return RandomUtils.getRandomDouble(bounds);
     }
 
-    // Totally not static abuse
-    protected static boolean isIntegerTamperingEnabled() {
+    protected boolean isIntegerTamperingEnabled() {
         return integerTamperingEnabled;
     }
 
-    protected static void setIntegerTamperingEnabled(boolean integerTamperingEnabled) {
-        NumberObfuscation.integerTamperingEnabled = integerTamperingEnabled;
+    protected void setIntegerTamperingEnabled(boolean integerTamperingEnabled) {
+        this.integerTamperingEnabled = integerTamperingEnabled;
     }
 
-    protected static boolean isLongTamperingEnabled() {
+    protected boolean isLongTamperingEnabled() {
         return longTamperingEnabled;
     }
 
-    protected static void setLongTamperingEnabled(boolean longTamperingEnabled) {
-        NumberObfuscation.longTamperingEnabled = longTamperingEnabled;
+    protected void setLongTamperingEnabled(boolean longTamperingEnabled) {
+        this.longTamperingEnabled = longTamperingEnabled;
     }
 
-    protected static boolean isFloatTamperingEnabled() {
+    protected boolean isFloatTamperingEnabled() {
         return floatTamperingEnabled;
     }
 
-    protected static void setFloatTamperingEnabled(boolean floatTamperingEnabled) {
-        NumberObfuscation.floatTamperingEnabled = floatTamperingEnabled;
+    protected void setFloatTamperingEnabled(boolean floatTamperingEnabled) {
+        this.floatTamperingEnabled = floatTamperingEnabled;
     }
 
-    protected static boolean isDoubleTamperingEnabled() {
+    protected boolean isDoubleTamperingEnabled() {
         return doubleTamperingEnabled;
     }
 
-    protected static void setDoubleTamperingEnabled(boolean doubleTamperingEnabled) {
-        NumberObfuscation.doubleTamperingEnabled = doubleTamperingEnabled;
+    protected void setDoubleTamperingEnabled(boolean doubleTamperingEnabled) {
+        this.doubleTamperingEnabled = doubleTamperingEnabled;
     }
 
     private NumberObfuscationSetting getNumberObfuscationSetting() {

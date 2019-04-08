@@ -47,14 +47,14 @@ public class BitwiseObfuscator extends NumberObfuscation {
                         if (leeway < 10000)
                             break;
 
-                        if (BytecodeUtils.isIntInsn(insn) && isIntegerTamperingEnabled()) {
+                        if (BytecodeUtils.isIntInsn(insn) && master.isIntegerTamperingEnabled()) {
                             InsnList insns = obfuscateNumber(BytecodeUtils.getIntegerFromInsn(insn));
 
                             methodNode.instructions.insert(insn, insns);
                             methodNode.instructions.remove(insn);
 
                             counter.incrementAndGet();
-                        } else if (BytecodeUtils.isLongInsn(insn) && isLongTamperingEnabled()) {
+                        } else if (BytecodeUtils.isLongInsn(insn) && master.isLongTamperingEnabled()) {
                             InsnList insns = obfuscateNumber(BytecodeUtils.getLongFromInsn(insn));
 
                             methodNode.instructions.insert(insn, insns);
