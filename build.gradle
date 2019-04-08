@@ -1,0 +1,44 @@
+group 'me.itzsomebody'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+
+sourceCompatibility = 1.8
+
+jar {
+    baseName = project.name
+    
+    manifest {
+        attributes 'Main-Class': 'me.itzsomebody.radon.Main'
+    }
+}
+
+task fatJar(type: Jar) {
+    baseName = project.name + '-shaded'
+    
+    manifest {
+        attributes 'Main-Class': 'me.itzsomebody.radon.Main'
+    }
+    
+    from { configurations.compile.collect { !it.isDirectory() && it.getName().endsWith(".jar") ? zipTree(it) : it } }
+    with jar
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+repositories {
+    mavenCentral()
+	maven { // Needed for SnakeYAML
+        url "http://oss.sonatype.org/content/groups/public/"
+    }
+}
+
+dependencies {
+    compile 'org.ow2.asm:asm:7.0'
+    compile 'org.ow2.asm:asm-tree:7.0'
+    compile 'org.ow2.asm:asm-commons:7.0'
+    compile 'org.ow2.asm:asm-util:7.0'
+	compile 'org.yaml:snakeyaml:1.20-SNAPSHOT'
+}
