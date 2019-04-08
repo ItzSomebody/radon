@@ -114,10 +114,12 @@ public class Radon {
                     try {
                         classWrapper.classNode.accept(cw);
                     } catch (Throwable t) {
-                        Logger.stdErr(String.format("Error writing class %s. Skipping frames.", classWrapper.classNode.name + ".class"));
+                        Logger.stdErr(String.format("Error writing class %s. Skipping frames (might cause runtime errors).", classWrapper.classNode.name + ".class"));
                         t.printStackTrace();
+
                         cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
                         cw.newUTF8("RADON" + Main.VERSION);
+
                         classWrapper.classNode.accept(cw);
                     }
 

@@ -78,7 +78,7 @@ public class FakeCatchBlocks extends FlowObfuscation {
 
         getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper ->
                 classWrapper.methods.stream().filter(methodWrapper -> !excluded(methodWrapper)
-                        && hasInstructions(methodWrapper.methodNode) && !methodWrapper.originalName.startsWith("<"))
+                        && hasInstructions(methodWrapper.methodNode) && !"<init>".equals(methodWrapper.originalName))
                         .forEach(methodWrapper -> {
                             MethodNode methodNode = methodWrapper.methodNode;
 

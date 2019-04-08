@@ -20,6 +20,7 @@ package me.itzsomebody.radon.transformers.obfuscators.flow;
 
 public enum FlowObfuscationSetting {
     REPLACE_GOTO(Boolean.class, new GotoReplacer()),
+    INSERT_BOGUS_SWITCH_JUMPS(Boolean.class, new BogusSwitchJumpInserter()),
     INSERT_BOGUS_JUMPS(Boolean.class, new BogusJumpInserter()),
     REARRANGE_BLOCKS(Boolean.class, new BlockRearranger()),
     FAKE_CATCH_BLOCKS(Boolean.class, new FakeCatchBlocks()),
