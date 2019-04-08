@@ -1,3 +1,12 @@
+---
+name: Bug report
+about: Uh-oh, something went wrong!
+title: ''
+labels: ''
+assignees: ''
+
+---
+
 **Description of Bug:** Describe what went wrong.
 
 **Expected behavior:** Describe what should have happened instead.

@@ -1,3 +1,12 @@
+---
+name: Feature request
+about: Suggest an idea for this project
+title: ''
+labels: ''
+assignees: ''
+
+---
+
 **Description of what requested feature does:** Please provide an in-depth
 description of what the feature should do. If people have to ask questions as
 what the feature does, the description is likely not detailed enough.
