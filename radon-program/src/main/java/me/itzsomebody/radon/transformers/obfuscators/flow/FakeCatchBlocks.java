@@ -22,7 +22,6 @@ import java.io.IOError;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Stream;
 import me.itzsomebody.radon.Logger;
 import me.itzsomebody.radon.asm.ClassWrapper;
 import me.itzsomebody.radon.utils.BytecodeUtils;
@@ -61,20 +60,11 @@ public class FakeCatchBlocks extends FlowObfuscation {
     public void transform() {
         AtomicInteger counter = new AtomicInteger();
 
-        int fakeHandlerClasses = getClassWrappers().size() / 5;
-        if (fakeHandlerClasses == 0)
-            fakeHandlerClasses = 1;
-
-        ClassNode[] fakeHandlers = new ClassNode[fakeHandlerClasses];
-        for (int i = 0; i < fakeHandlerClasses; i++) {
-            ClassNode classNode = new ClassNode();
-            classNode.superName = HANDLER_NAMES[RandomUtils.getRandomInt(HANDLER_NAMES.length)];
-            classNode.name = randomString();
-            classNode.access = ACC_PUBLIC | ACC_SUPER;
-            classNode.version = V1_5;
-
-            fakeHandlers[i] = classNode;
-        }
+        ClassNode fakeHandler = new ClassNode();
+        fakeHandler.superName = HANDLER_NAMES[RandomUtils.getRandomInt(HANDLER_NAMES.length)];
+        fakeHandler.name = randomString();
+        fakeHandler.access = ACC_PUBLIC | ACC_SUPER;
+        fakeHandler.version = V1_5;
 
         getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper ->
                 classWrapper.methods.stream().filter(methodWrapper -> !excluded(methodWrapper)
@@ -108,8 +98,7 @@ public class FakeCatchBlocks extends FlowObfuscation {
                                     methodNode.instructions.insert(insn, new JumpInsnNode(GOTO, catchEnd));
                                     methodNode.instructions.insert(insn, trapEnd);
 
-                                    methodNode.tryCatchBlocks.add(new TryCatchBlockNode(trapStart, trapEnd, catchStart,
-                                            fakeHandlers[RandomUtils.getRandomInt(fakeHandlers.length)].name));
+                                    methodNode.tryCatchBlocks.add(new TryCatchBlockNode(trapStart, trapEnd, catchStart, fakeHandler.name));
 
                                     leeway -= 15;
                                     counter.incrementAndGet();
@@ -117,9 +106,8 @@ public class FakeCatchBlocks extends FlowObfuscation {
                             }
                         }));
 
-        Stream.of(fakeHandlers).forEach(classNode -> getClasses().put(classNode.name, new ClassWrapper(classNode, false)));
+        getClasses().put(fakeHandler.name, new ClassWrapper(fakeHandler, false));
 
-        Logger.stdOut("Created " + fakeHandlerClasses + " fake handler classes");
         Logger.stdOut("Inserted " + counter.get() + " fake try catches");
     }
 }
