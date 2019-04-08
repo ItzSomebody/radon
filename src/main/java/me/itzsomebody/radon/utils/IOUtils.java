@@ -19,7 +19,6 @@
 package me.itzsomebody.radon.utils;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import me.itzsomebody.radon.exceptions.RadonException;

@@ -22,8 +22,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import me.itzsomebody.radon.Logger;
 import me.itzsomebody.radon.utils.AccessUtils;
 import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.FieldNode;
-import org.objectweb.asm.tree.MethodNode;
 
 /**
  * Strips out deprecated access flags.
