@@ -79,10 +79,7 @@ public class Exclusion {
     }
 
     public boolean matches(String other) {
-        if (shouldInclude)
-            return !exclusion.matcher(other).matches();
-        else
-            return exclusion.matcher(other).matches();
+        return (shouldInclude) != exclusion.matcher(other).matches();
     }
 
     public Pattern getPattern() {
