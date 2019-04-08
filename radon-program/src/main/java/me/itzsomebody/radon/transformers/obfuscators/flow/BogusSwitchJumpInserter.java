@@ -97,7 +97,6 @@ public class BogusSwitchJumpInserter extends FlowObfuscation {
 
                 targets.forEach(target -> {
                     AbstractInsnNode here = methodNode.instructions.getLast();
-                    LabelNode ignoreMePlz = new LabelNode();
 
                     InsnList landing = new InsnList();
                     landing.add(target);
@@ -112,6 +111,8 @@ public class BogusSwitchJumpInserter extends FlowObfuscation {
                         new VarInsnNode(ISTORE, varIndex));
                 methodNode.instructions.insertBefore(methodNode.instructions.getFirst(),
                         new FieldInsnNode(GETSTATIC, classWrapper.classNode.name, predicate.name, "I"));
+
+                counter.addAndGet(targets.size());
             });
 
             classWrapper.classNode.fields.add(predicate);
