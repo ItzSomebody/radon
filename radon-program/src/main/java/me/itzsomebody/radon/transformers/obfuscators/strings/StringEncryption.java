@@ -60,6 +60,12 @@ public class StringEncryption extends Transformer {
 
     @Override
     public void transform() {
+        if (isStringPoolingEnabled()) {
+            StringPooler pooler = new StringPooler(this);
+            pooler.init(radon);
+            pooler.transform();
+        }
+
         MemberNames memberNames = new MemberNames();
         AtomicInteger counter = new AtomicInteger();
 

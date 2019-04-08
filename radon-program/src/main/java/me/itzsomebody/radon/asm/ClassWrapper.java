@@ -21,6 +21,7 @@ package me.itzsomebody.radon.asm;
 import java.util.ArrayList;
 import java.util.List;
 import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.MethodNode;
 
 /**
  * Wrapper for ClassNodes.
@@ -70,5 +71,10 @@ public class ClassWrapper {
         if (classNode.fields != null)
             classNode.fields.forEach(fieldNode -> fields.add(new FieldWrapper(fieldNode, instance, fieldNode.name,
                     fieldNode.desc)));
+    }
+
+    public void addMethod(MethodNode methodNode) {
+        methods.add(new MethodWrapper(methodNode, this, methodNode.name, methodNode.desc));
+        classNode.methods.add(methodNode);
     }
 }
