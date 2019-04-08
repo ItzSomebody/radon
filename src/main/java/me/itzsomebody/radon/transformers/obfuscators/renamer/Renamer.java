@@ -202,10 +202,10 @@ public class Renamer extends Transformer {
         // Methods which are static don't need to be checked for inheritance
         if (!Modifier.isStatic(wrapper.methodNode.access)) {
             // We can't rename members which inherit methods from external libraries
-            if (tree.classWrapper != wrapper.owner && tree.classWrapper.libraryNode)
-                if (tree.classWrapper.methods.stream().anyMatch(mw -> mw.originalName.equals(wrapper.originalName)
-                        && mw.originalDescription.equals(wrapper.originalDescription)))
-                    return true;
+            if (tree.classWrapper != wrapper.owner && tree.classWrapper.libraryNode
+                    && tree.classWrapper.methods.stream().anyMatch(mw -> mw.originalName.equals(wrapper.originalName)
+                    && mw.originalDescription.equals(wrapper.originalDescription)))
+                return true;
 
             return tree.parentClasses.stream().anyMatch(parent -> cannotRenameMethod(radon.getTree(parent), wrapper, visited))
                     || (tree.subClasses.stream().anyMatch(sub -> cannotRenameMethod(radon.getTree(sub), wrapper, visited)));
@@ -246,10 +246,10 @@ public class Renamer extends Transformer {
         // Fields which are static don't need to be checked for inheritance
         if (!Modifier.isStatic(wrapper.fieldNode.access)) {
             // We can't rename members which inherit methods from external libraries
-            if (tree.classWrapper != wrapper.owner && tree.classWrapper.libraryNode)
-                if (tree.classWrapper.fields.stream().anyMatch(fw -> fw.originalName.equals(wrapper.originalName)
-                        && fw.originalDescription.equals(wrapper.originalDescription)))
-                    return true;
+            if (tree.classWrapper != wrapper.owner && tree.classWrapper.libraryNode
+                    && tree.classWrapper.fields.stream().anyMatch(fw -> fw.originalName.equals(wrapper.originalName)
+                    && fw.originalDescription.equals(wrapper.originalDescription)))
+                return true;
 
             return tree.parentClasses.stream().anyMatch(parent -> cannotRenameField(radon.getTree(parent), wrapper, visited))
                     || (tree.subClasses.stream().anyMatch(sub -> cannotRenameField(radon.getTree(sub), wrapper, visited)));
