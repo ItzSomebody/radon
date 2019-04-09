@@ -21,7 +21,7 @@ package me.itzsomebody.radon.transformers.obfuscators.flow;
 import java.util.HashSet;
 import java.util.concurrent.atomic.AtomicInteger;
 import me.itzsomebody.radon.Logger;
-import me.itzsomebody.radon.utils.BytecodeUtils;
+import me.itzsomebody.radon.utils.ASMUtils;
 import me.itzsomebody.radon.utils.RandomUtils;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.InsnNode;
@@ -79,7 +79,7 @@ public class TryCatchCombiner extends FlowObfuscation {
                         startCondition.add(new VarInsnNode(ILOAD, index));
                         startCondition.add(new JumpInsnNode(IFNE, handler));
                         startCondition.add(new InsnNode(POP));
-                        startCondition.add(BytecodeUtils.getNumberInsn(RandomUtils.getRandomInt(1, 20)));
+                        startCondition.add(ASMUtils.getNumberInsn(RandomUtils.getRandomInt(1, 20)));
                         startCondition.add(new VarInsnNode(ISTORE, index));
 
                         InsnList resetCondition = new InsnList();

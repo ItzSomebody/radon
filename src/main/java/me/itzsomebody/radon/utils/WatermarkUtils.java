@@ -61,9 +61,9 @@ public class WatermarkUtils {
         for (ClassNode classNode : classes.values()) {
             for (MethodNode methodNode : classNode.methods) {
                 for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
-                    if (BytecodeUtils.isIntInsn(insn) && BytecodeUtils.isIntInsn(insn.getNext())
-                            && BytecodeUtils.isIntInsn(insn.getNext().getNext())
-                            && BytecodeUtils.isIntInsn(insn.getNext().getNext().getNext())
+                    if (ASMUtils.isIntInsn(insn) && ASMUtils.isIntInsn(insn.getNext())
+                            && ASMUtils.isIntInsn(insn.getNext().getNext())
+                            && ASMUtils.isIntInsn(insn.getNext().getNext().getNext())
                             && insn.getNext().getNext().getNext().getNext() != null
                             && insn.getNext().getNext().getNext().getNext().getOpcode() == Opcodes.ISTORE
                             && insn.getNext().getNext().getNext().getNext().getNext() != null
@@ -72,10 +72,10 @@ public class WatermarkUtils {
                             && insn.getNext().getNext().getNext().getNext().getNext().getNext().getOpcode() == Opcodes.ISTORE
                             && insn.getNext().getNext().getNext().getNext().getNext().getNext().getNext() != null
                             && insn.getNext().getNext().getNext().getNext().getNext().getNext().getNext().getOpcode() == Opcodes.ISTORE) {
-                        char character = (char) (BytecodeUtils.getIntegerFromInsn(insn)
-                                ^ BytecodeUtils.getIntegerFromInsn(insn.getNext()));
-                        int index = BytecodeUtils.getIntegerFromInsn(insn.getNext().getNext())
-                                ^ BytecodeUtils.getIntegerFromInsn(insn.getNext().getNext().getNext());
+                        char character = (char) (ASMUtils.getIntegerFromInsn(insn)
+                                ^ ASMUtils.getIntegerFromInsn(insn.getNext()));
+                        int index = ASMUtils.getIntegerFromInsn(insn.getNext().getNext())
+                                ^ ASMUtils.getIntegerFromInsn(insn.getNext().getNext().getNext());
                         embedMap.put(index, character);
                     }
                 }

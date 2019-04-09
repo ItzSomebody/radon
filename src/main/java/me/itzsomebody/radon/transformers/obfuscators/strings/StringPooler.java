@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 import me.itzsomebody.radon.Logger;
-import me.itzsomebody.radon.utils.BytecodeUtils;
+import me.itzsomebody.radon.utils.ASMUtils;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.InsnList;
@@ -61,7 +61,7 @@ public class StringPooler extends StringEncryption {
                         int indexNumber = strList.size() - 1;
 
                         methodNode.instructions.insertBefore(insn, new FieldInsnNode(GETSTATIC, classWrapper.classNode.name, fieldName, "[Ljava/lang/String;"));
-                        methodNode.instructions.insertBefore(insn, BytecodeUtils.getNumberInsn(indexNumber));
+                        methodNode.instructions.insertBefore(insn, ASMUtils.getNumberInsn(indexNumber));
                         methodNode.instructions.set(insn, new InsnNode(AALOAD));
                         counter.incrementAndGet();
                     }

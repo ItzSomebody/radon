@@ -20,6 +20,7 @@ package me.itzsomebody.radon.utils;
 
 import me.itzsomebody.radon.exceptions.RadonException;
 import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldNode;
@@ -36,7 +37,7 @@ import org.objectweb.asm.tree.MethodNode;
  *
  * @author ItzSomebody.
  */
-public class BytecodeUtils {
+public class ASMUtils {
     public static boolean isInstruction(AbstractInsnNode insn) {
         return !(insn instanceof FrameNode) && !(insn instanceof LineNumberNode) && !(insn instanceof LabelNode);
     }
@@ -181,5 +182,18 @@ public class BytecodeUtils {
         }
 
         throw new RadonException("Unexpected instruction");
+    }
+
+    public static String getGenericMethodDesc(String desc) {
+        Type returnType = Type.getReturnType(desc);
+        Type[] args = Type.getArgumentTypes(desc);
+        for (int i = 0; i < args.length; i++) {
+            Type arg = args[i];
+
+            if (arg.getSort() == Type.OBJECT)
+                args[i] = Type.getType("Ljava/lang/Object;");
+        }
+
+        return Type.getMethodDescriptor(returnType, args);
     }
 }

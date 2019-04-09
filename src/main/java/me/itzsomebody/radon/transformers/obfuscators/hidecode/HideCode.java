@@ -29,7 +29,7 @@ import me.itzsomebody.radon.exceptions.InvalidConfigurationValueException;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
 import me.itzsomebody.radon.utils.AccessUtils;
-import me.itzsomebody.radon.utils.BytecodeUtils;
+import me.itzsomebody.radon.utils.ASMUtils;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.MethodNode;
@@ -60,14 +60,14 @@ public class HideCode extends Transformer {
             if (isHideClassesEnabled()) {
                 ClassNode classNode = classWrapper.classNode;
 
-                if (!AccessUtils.isSynthetic(classNode.access) && !BytecodeUtils.hasAnnotations(classNode)) {
+                if (!AccessUtils.isSynthetic(classNode.access) && !ASMUtils.hasAnnotations(classNode)) {
                     classNode.access |= ACC_SYNTHETIC;
                     counter.incrementAndGet();
                 }
             }
             if (isHideMethodsEnabled()) {
                 classWrapper.methods.stream().filter(methodWrapper -> !excluded(methodWrapper)
-                        && !BytecodeUtils.hasAnnotations(methodWrapper.methodNode)).forEach(methodWrapper -> {
+                        && !ASMUtils.hasAnnotations(methodWrapper.methodNode)).forEach(methodWrapper -> {
                     boolean atLeastOnce = false;
                     MethodNode methodNode = methodWrapper.methodNode;
 
@@ -87,7 +87,7 @@ public class HideCode extends Transformer {
             }
             if (isHideFieldsEnabled()) {
                 classWrapper.fields.stream().filter(fieldWrapper -> !excluded(fieldWrapper)
-                        && !BytecodeUtils.hasAnnotations(fieldWrapper.fieldNode)).forEach(fieldWrapper -> {
+                        && !ASMUtils.hasAnnotations(fieldWrapper.fieldNode)).forEach(fieldWrapper -> {
                     FieldNode fieldNode = fieldWrapper.fieldNode;
 
                     if (!AccessUtils.isSynthetic(fieldNode.access)) {

@@ -31,7 +31,7 @@ import me.itzsomebody.radon.config.ConfigurationSetting;
 import me.itzsomebody.radon.exceptions.InvalidConfigurationValueException;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
-import me.itzsomebody.radon.utils.BytecodeUtils;
+import me.itzsomebody.radon.utils.ASMUtils;
 import me.itzsomebody.radon.utils.RandomUtils;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.MethodNode;
@@ -91,10 +91,10 @@ public class Watermarker extends Transformer {
         int watermarkIndex = watermark.size() ^ indexXorKey;
 
         InsnList instructions = new InsnList();
-        instructions.add(BytecodeUtils.getNumberInsn(xorKey));
-        instructions.add(BytecodeUtils.getNumberInsn(watermarkChar));
-        instructions.add(BytecodeUtils.getNumberInsn(indexXorKey));
-        instructions.add(BytecodeUtils.getNumberInsn(watermarkIndex));
+        instructions.add(ASMUtils.getNumberInsn(xorKey));
+        instructions.add(ASMUtils.getNumberInsn(watermarkChar));
+        instructions.add(ASMUtils.getNumberInsn(indexXorKey));
+        instructions.add(ASMUtils.getNumberInsn(watermarkIndex));
 
         // Local variable x where x is the max locals allowed in method can be the top of a long or double so we add 1
         instructions.add(new VarInsnNode(ISTORE, offset + 1));

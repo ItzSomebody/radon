@@ -31,7 +31,7 @@ import me.itzsomebody.radon.config.ConfigurationSetting;
 import me.itzsomebody.radon.exceptions.InvalidConfigurationValueException;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
-import me.itzsomebody.radon.utils.BytecodeUtils;
+import me.itzsomebody.radon.utils.ASMUtils;
 import me.itzsomebody.radon.utils.RandomUtils;
 import me.itzsomebody.radon.utils.StringUtils;
 import org.objectweb.asm.FieldVisitor;
@@ -99,7 +99,7 @@ public class StringEncryption extends Transformer {
                                 "(Ljava/lang/Object;I)Ljava/lang/String;",
                                 false
                         ));
-                        methodWrapper.methodNode.instructions.insert(ldc, BytecodeUtils.getNumberInsn(randomKey));
+                        methodWrapper.methodNode.instructions.insert(ldc, ASMUtils.getNumberInsn(randomKey));
 
                         counter.incrementAndGet();
                     });

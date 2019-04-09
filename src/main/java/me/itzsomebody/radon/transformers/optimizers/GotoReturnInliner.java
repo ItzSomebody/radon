@@ -21,7 +21,7 @@ package me.itzsomebody.radon.transformers.optimizers;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 import me.itzsomebody.radon.Logger;
-import me.itzsomebody.radon.utils.BytecodeUtils;
+import me.itzsomebody.radon.utils.ASMUtils;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.JumpInsnNode;
@@ -48,7 +48,7 @@ public class GotoReturnInliner extends Optimizer {
                                 JumpInsnNode gotoJump = (JumpInsnNode) insn;
                                 AbstractInsnNode insnAfterTarget = gotoJump.label.getNext();
 
-                                if (insnAfterTarget != null && BytecodeUtils.isReturn(insnAfterTarget.getOpcode())) {
+                                if (insnAfterTarget != null && ASMUtils.isReturn(insnAfterTarget.getOpcode())) {
                                     methodNode.instructions.set(insn, new InsnNode(insnAfterTarget.getOpcode()));
                                     count.incrementAndGet();
                                 }

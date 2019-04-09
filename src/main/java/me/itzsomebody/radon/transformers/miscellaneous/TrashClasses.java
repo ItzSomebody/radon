@@ -24,7 +24,7 @@ import me.itzsomebody.radon.Logger;
 import me.itzsomebody.radon.Main;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
-import me.itzsomebody.radon.utils.BytecodeUtils;
+import me.itzsomebody.radon.utils.ASMUtils;
 import me.itzsomebody.radon.utils.RandomUtils;
 import me.itzsomebody.radon.utils.StringUtils;
 import org.objectweb.asm.ClassWriter;
@@ -138,15 +138,15 @@ public class TrashClasses extends Transformer {
                 insns.add(new InsnNode(IRETURN));
                 break;
             case Type.FLOAT:
-                insns.add(BytecodeUtils.getNumberInsn(RandomUtils.getRandomFloat()));
+                insns.add(ASMUtils.getNumberInsn(RandomUtils.getRandomFloat()));
                 insns.add(new InsnNode(FRETURN));
                 break;
             case Type.LONG:
-                insns.add(BytecodeUtils.getNumberInsn(RandomUtils.getRandomLong()));
+                insns.add(ASMUtils.getNumberInsn(RandomUtils.getRandomLong()));
                 insns.add(new InsnNode(LRETURN));
                 break;
             case Type.DOUBLE:
-                insns.add(BytecodeUtils.getNumberInsn(RandomUtils.getRandomDouble()));
+                insns.add(ASMUtils.getNumberInsn(RandomUtils.getRandomDouble()));
                 insns.add(new InsnNode(DRETURN));
                 break;
             default:

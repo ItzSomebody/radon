@@ -22,7 +22,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 import me.itzsomebody.radon.Logger;
 import me.itzsomebody.radon.asm.ClassWrapper;
-import me.itzsomebody.radon.utils.BytecodeUtils;
+import me.itzsomebody.radon.utils.ASMUtils;
 import me.itzsomebody.radon.utils.StringUtils;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.Handle;
@@ -69,26 +69,8 @@ public class InvokedynamicTransformer extends ReferenceObfuscation {
                             if (m.getOpcode() != INVOKESTATIC)
                                 newDesc = newDesc.replace("(", "(Ljava/lang/Object;");
 
-                            Type returnType = Type.getReturnType(m.desc);
-                            Type[] args = Type.getArgumentTypes(newDesc);
-                            for (int i = 0; i < args.length; i++) {
-                                Type arg = args[i];
-
-                                if (arg.getSort() == Type.OBJECT)
-                                    args[i] = Type.getType("Ljava/lang/Object;");
-                            }
-
-                            newDesc = Type.getMethodDescriptor(returnType, args);
-                            String name;
-
-                            switch (insn.getOpcode()) {
-                                case INVOKESTATIC:
-                                    name = "a";
-                                    break;
-                                default:
-                                    name = "b";
-                                    break;
-                            }
+                            newDesc = ASMUtils.getGenericMethodDesc(newDesc);
+                            String name = (insn.getOpcode() == INVOKESTATIC) ? "a" : "b";
 
                             InvokeDynamicInsnNode indy = new InvokeDynamicInsnNode(
                                     name,
@@ -97,7 +79,7 @@ public class InvokedynamicTransformer extends ReferenceObfuscation {
                             );
 
                             methodNode.instructions.insertBefore(m, new LdcInsnNode(m.owner.replace("/", ".")));
-                            methodNode.instructions.insertBefore(m, BytecodeUtils.getNumberInsn(
+                            methodNode.instructions.insertBefore(m, ASMUtils.getNumberInsn(
                                     (((long) hash(m.desc) & 0xffffffffL) | (((long) m.name.hashCode()) << 32))
                             ));
                             methodNode.instructions.set(m, indy);
@@ -137,7 +119,7 @@ public class InvokedynamicTransformer extends ReferenceObfuscation {
                             );
 
                             methodNode.instructions.insertBefore(f, new LdcInsnNode(f.owner.replace("/", ".")));
-                            methodNode.instructions.insertBefore(f, BytecodeUtils.getNumberInsn(
+                            methodNode.instructions.insertBefore(f, ASMUtils.getNumberInsn(
                                     (((long) hashType(f.desc) & 0xffffffffL) | (((long) f.name.hashCode()) << 32))
                             ));
                             methodNode.instructions.set(f, indy);
@@ -150,7 +132,7 @@ public class InvokedynamicTransformer extends ReferenceObfuscation {
         ClassNode decryptor = createBootstrapClass(memberNames);
         getClasses().put(decryptor.name, new ClassWrapper(decryptor, false));
 
-        Logger.stdOut("API " + counter.get() + " references");
+        Logger.stdOut("Hid API " + counter.get() + " references using invokedynamic");
     }
 
     private int hashType(String sType) {

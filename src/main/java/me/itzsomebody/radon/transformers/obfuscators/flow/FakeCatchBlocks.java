@@ -24,7 +24,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.atomic.AtomicInteger;
 import me.itzsomebody.radon.Logger;
 import me.itzsomebody.radon.asm.ClassWrapper;
-import me.itzsomebody.radon.utils.BytecodeUtils;
+import me.itzsomebody.radon.utils.ASMUtils;
 import me.itzsomebody.radon.utils.RandomUtils;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
@@ -77,7 +77,7 @@ public class FakeCatchBlocks extends FlowObfuscation {
                             for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
                                 if (leeway < 10000)
                                     return;
-                                if (!BytecodeUtils.isInstruction(insn))
+                                if (!ASMUtils.isInstruction(insn))
                                     continue;
 
                                 if (insn instanceof JumpInsnNode) {

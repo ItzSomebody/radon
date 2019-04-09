@@ -24,7 +24,7 @@ import me.itzsomebody.radon.Logger;
 import me.itzsomebody.radon.asm.StackHeightZeroFinder;
 import me.itzsomebody.radon.exceptions.RadonException;
 import me.itzsomebody.radon.exceptions.StackEmulationException;
-import me.itzsomebody.radon.utils.BytecodeUtils;
+import me.itzsomebody.radon.utils.ASMUtils;
 import me.itzsomebody.radon.utils.RandomUtils;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
@@ -127,38 +127,38 @@ public class BogusJumpInserter extends FlowObfuscation {
                 methodNode.instructions.insertBefore(target, new InsnNode(RETURN));
                 break;
             case Type.BOOLEAN:
-                methodNode.instructions.insertBefore(target, BytecodeUtils.getNumberInsn(RandomUtils.getRandomInt(2)));
+                methodNode.instructions.insertBefore(target, ASMUtils.getNumberInsn(RandomUtils.getRandomInt(2)));
                 methodNode.instructions.insertBefore(target, new InsnNode(IRETURN));
                 break;
             case Type.CHAR:
-                methodNode.instructions.insertBefore(target, BytecodeUtils.getNumberInsn(RandomUtils
+                methodNode.instructions.insertBefore(target, ASMUtils.getNumberInsn(RandomUtils
                         .getRandomInt(Character.MAX_VALUE + 1)));
                 methodNode.instructions.insertBefore(target, new InsnNode(IRETURN));
                 break;
             case Type.BYTE:
-                methodNode.instructions.insertBefore(target, BytecodeUtils.getNumberInsn(RandomUtils
+                methodNode.instructions.insertBefore(target, ASMUtils.getNumberInsn(RandomUtils
                         .getRandomInt(Byte.MAX_VALUE + 1)));
                 methodNode.instructions.insertBefore(target, new InsnNode(IRETURN));
                 break;
             case Type.SHORT:
-                methodNode.instructions.insertBefore(target, BytecodeUtils.getNumberInsn(RandomUtils
+                methodNode.instructions.insertBefore(target, ASMUtils.getNumberInsn(RandomUtils
                         .getRandomInt(Short.MAX_VALUE + 1)));
                 methodNode.instructions.insertBefore(target, new InsnNode(IRETURN));
                 break;
             case Type.INT:
-                methodNode.instructions.insertBefore(target, BytecodeUtils.getNumberInsn(RandomUtils.getRandomInt()));
+                methodNode.instructions.insertBefore(target, ASMUtils.getNumberInsn(RandomUtils.getRandomInt()));
                 methodNode.instructions.insertBefore(target, new InsnNode(IRETURN));
                 break;
             case Type.LONG:
-                methodNode.instructions.insertBefore(target, BytecodeUtils.getNumberInsn(RandomUtils.getRandomLong()));
+                methodNode.instructions.insertBefore(target, ASMUtils.getNumberInsn(RandomUtils.getRandomLong()));
                 methodNode.instructions.insertBefore(target, new InsnNode(LRETURN));
                 break;
             case Type.FLOAT:
-                methodNode.instructions.insertBefore(target, BytecodeUtils.getNumberInsn(RandomUtils.getRandomFloat()));
+                methodNode.instructions.insertBefore(target, ASMUtils.getNumberInsn(RandomUtils.getRandomFloat()));
                 methodNode.instructions.insertBefore(target, new InsnNode(FRETURN));
                 break;
             case Type.DOUBLE:
-                methodNode.instructions.insertBefore(target, BytecodeUtils.getNumberInsn(RandomUtils.getRandomDouble()));
+                methodNode.instructions.insertBefore(target, ASMUtils.getNumberInsn(RandomUtils.getRandomDouble()));
                 methodNode.instructions.insertBefore(target, new InsnNode(DRETURN));
                 break;
             default:

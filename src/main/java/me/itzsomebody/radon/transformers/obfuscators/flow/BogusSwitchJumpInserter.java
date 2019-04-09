@@ -25,7 +25,7 @@ import me.itzsomebody.radon.Logger;
 import me.itzsomebody.radon.asm.StackHeightZeroFinder;
 import me.itzsomebody.radon.exceptions.RadonException;
 import me.itzsomebody.radon.exceptions.StackEmulationException;
-import me.itzsomebody.radon.utils.BytecodeUtils;
+import me.itzsomebody.radon.utils.ASMUtils;
 import me.itzsomebody.radon.utils.RandomUtils;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.FieldInsnNode;
@@ -118,7 +118,7 @@ public class BogusSwitchJumpInserter extends FlowObfuscation {
 
                     InsnList landing = new InsnList();
                     landing.add(target);
-                    landing.add(BytecodeUtils.getNumberInsn(RandomUtils.getRandomInt(nTargets)));
+                    landing.add(ASMUtils.getNumberInsn(RandomUtils.getRandomInt(nTargets)));
                     landing.add(new VarInsnNode(ISTORE, varIndex));
                     landing.add(new JumpInsnNode(GOTO, targets.get(RandomUtils.getRandomInt(targets.size()))));
 
