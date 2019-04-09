@@ -51,7 +51,7 @@ public enum ConfigurationSetting {
     FLOW_OBFUSCATION(Map.class, new FlowObfuscation()),
     REFERENCE_OBFUSCATION(Map.class, new ReferenceObfuscation()),
     NUMBER_OBFUSCATION(Map.class, new NumberObfuscation()),
-    ANTI_TAMPER(String.class, new AntiTamper()), // TODO
+    ANTI_TAMPER(Boolean.class, new AntiTamper()), // TODO
     VIRTUALIZER(Boolean.class, new Virtualizer()), // TODO: ;)
     RESOURCE_ENCRYPTION(Boolean.class, new ResourceEncryption()), // TODO
     RESOURCE_RENAMER(Boolean.class, new ResourceRenamer()), // TODO

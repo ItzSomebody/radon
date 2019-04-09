@@ -110,6 +110,7 @@ public class Radon {
 
                     ClassWriter cw = new CustomClassWriter(ClassWriter.COMPUTE_FRAMES);
                     cw.newUTF8("RADON" + Main.VERSION);
+                    classWrapper.strConsts.forEach(cw::newUTF8);
 
                     try {
                         classWrapper.classNode.accept(cw);
@@ -119,6 +120,7 @@ public class Radon {
 
                         cw = new ClassWriter(ClassWriter.COMPUTE_MAXS);
                         cw.newUTF8("RADON" + Main.VERSION);
+                        classWrapper.strConsts.forEach(cw::newUTF8);
 
                         classWrapper.classNode.accept(cw);
                     }
@@ -241,6 +243,15 @@ public class Radon {
             Logger.stdErr(String.format("Unable to find \"%s\".", input.getAbsolutePath()));
             throw new RadonException();
         }
+    }
+
+    public byte[] class2Bytes(ClassWrapper wrapper) {
+        ClassWriter cw = new CustomClassWriter(ClassWriter.COMPUTE_FRAMES);
+        cw.newUTF8("RADON" + Main.VERSION);
+        wrapper.classNode.accept(cw);
+        wrapper.strConsts.forEach(cw::newUTF8);
+
+        return cw.toByteArray();
     }
 
     public ClassTree getTree(String ref) {

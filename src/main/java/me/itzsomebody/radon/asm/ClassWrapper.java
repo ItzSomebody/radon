@@ -53,6 +53,7 @@ public class ClassWrapper {
      * Fields.
      */
     public final List<FieldWrapper> fields = new ArrayList<>();
+    public final List<String> strConsts = new ArrayList<>();
 
     /**
      * Creates a ClassWrapper object.
@@ -76,5 +77,9 @@ public class ClassWrapper {
     public void addMethod(MethodNode methodNode) {
         methods.add(new MethodWrapper(methodNode, this, methodNode.name, methodNode.desc));
         classNode.methods.add(methodNode);
+    }
+
+    public void addStringConst(String s) {
+        strConsts.add(s);
     }
 }

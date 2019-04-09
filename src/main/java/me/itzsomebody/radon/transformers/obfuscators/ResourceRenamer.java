@@ -94,7 +94,7 @@ public class ResourceRenamer extends Transformer {
 
     @Override
     public Object getConfiguration() {
-        return new LinkedHashMap<>(); // Not needed
+        return true;
     }
 
     @Override
