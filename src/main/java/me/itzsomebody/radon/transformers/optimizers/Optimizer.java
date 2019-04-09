@@ -62,7 +62,7 @@ public class Optimizer extends Transformer {
     }
 
     @Override
-    public Map<String, Object> getConfiguration() {
+    public Object getConfiguration() {
         Map<String, Object> config = new LinkedHashMap<>();
 
         optimizers.forEach(optimizer -> config.put(optimizer.getOptimizerSetting().getName(), true));

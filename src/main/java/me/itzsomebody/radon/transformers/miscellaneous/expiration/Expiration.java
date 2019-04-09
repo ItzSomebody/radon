@@ -117,7 +117,7 @@ public class Expiration extends Transformer {
     }
 
     @Override
-    public Map<String, Object> getConfiguration() {
+    public Object getConfiguration() {
         Map<String, Object> config = new LinkedHashMap<>();
 
         config.put(ExpirationSetting.EXPIRATION_DATE.getName(), getExpires());

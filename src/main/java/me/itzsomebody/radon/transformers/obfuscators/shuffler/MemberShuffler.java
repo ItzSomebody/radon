@@ -76,7 +76,7 @@ public class MemberShuffler extends Transformer {
     }
 
     @Override
-    public Map<String, Object> getConfiguration() {
+    public Object getConfiguration() {
         Map<String, Object> config = new LinkedHashMap<>();
 
         config.put(MemberShufflerSetting.SHUFFLE_FIELDS.getName(), isShuffleFieldsEnabled());

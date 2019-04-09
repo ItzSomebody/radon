@@ -24,6 +24,8 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 import me.itzsomebody.radon.Logger;
+import me.itzsomebody.radon.config.ConfigurationSetting;
+import me.itzsomebody.radon.exceptions.InvalidConfigurationValueException;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
 import org.objectweb.asm.tree.LdcInsnNode;
@@ -91,7 +93,7 @@ public class ResourceRenamer extends Transformer {
     }
 
     @Override
-    public Map<String, Object> getConfiguration() {
+    public Object getConfiguration() {
         return new LinkedHashMap<>(); // Not needed
     }
 
@@ -102,6 +104,6 @@ public class ResourceRenamer extends Transformer {
 
     @Override
     public void verifyConfiguration(Map<String, Object> config) {
-        // Not needed
+        throw new InvalidConfigurationValueException(ConfigurationSetting.RESOURCE_RENAMER + " expects a boolean");
     }
 }

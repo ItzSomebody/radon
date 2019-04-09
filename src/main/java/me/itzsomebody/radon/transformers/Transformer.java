@@ -146,7 +146,8 @@ public abstract class Transformer implements Opcodes {
 
     public abstract ExclusionType getExclusionType();
 
-    public abstract Map<String, Object> getConfiguration();
+    // Might return a boolean / integer / string / whatever instead of Map.
+    public abstract Object getConfiguration();
 
     public abstract void setConfiguration(Map<String, Object> config);
 

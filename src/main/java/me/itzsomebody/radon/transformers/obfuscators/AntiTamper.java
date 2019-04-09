@@ -55,7 +55,7 @@ public class AntiTamper extends Transformer {
     }
 
     @Override
-    public Map<String, Object> getConfiguration() {
+    public Object getConfiguration() {
         Map<String, Object> config = new LinkedHashMap<>();
 
         config.put("mode", ((type == PASSIVE) ? "passive" : "active"));

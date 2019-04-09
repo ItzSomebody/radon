@@ -75,7 +75,7 @@ public class NumberObfuscation extends Transformer {
     }
 
     @Override
-    public Map<String, Object> getConfiguration() {
+    public Object getConfiguration() {
         Map<String, Object> config = new LinkedHashMap<>();
 
         numberObfuscators.forEach(obfuscator -> config.put(obfuscator.getNumberObfuscationSetting().getName(), true));

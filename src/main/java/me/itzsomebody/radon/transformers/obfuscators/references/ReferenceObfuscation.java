@@ -68,7 +68,7 @@ public class ReferenceObfuscation extends Transformer {
     }
 
     @Override
-    public Map<String, Object> getConfiguration() {
+    public Object getConfiguration() {
         Map<String, Object> config = new LinkedHashMap<>();
 
         referenceObfuscators.forEach(obfuscator -> config.put(obfuscator.getReferenceObfuscationSetting().getName(), true));

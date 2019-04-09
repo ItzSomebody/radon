@@ -19,9 +19,12 @@
 package me.itzsomebody.radon.transformers.miscellaneous;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import me.itzsomebody.radon.Logger;
 import me.itzsomebody.radon.Main;
+import me.itzsomebody.radon.config.ConfigurationSetting;
+import me.itzsomebody.radon.exceptions.InvalidConfigurationValueException;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
 import me.itzsomebody.radon.utils.ASMUtils;
@@ -228,8 +231,8 @@ public class TrashClasses extends Transformer {
     }
 
     @Override
-    public Map<String, Object> getConfiguration() {
-        return null;
+    public Object getConfiguration() {
+        return new LinkedHashMap<>();
     }
 
     @Override
@@ -239,6 +242,6 @@ public class TrashClasses extends Transformer {
 
     @Override
     public void verifyConfiguration(Map<String, Object> config) {
-        // Not needed
+        throw new InvalidConfigurationValueException(ConfigurationSetting.TRASH_CLASSES + " you should never see this");
     }
 }

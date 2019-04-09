@@ -64,7 +64,7 @@ public class FlowObfuscation extends Transformer {
     }
 
     @Override
-    public Map<String, Object> getConfiguration() {
+    public Object getConfiguration() {
         Map<String, Object> config = new LinkedHashMap<>();
 
         flowObfuscators.forEach(obfuscator -> config.put(obfuscator.getFlowObfuscationSetting().getName(), true));

@@ -18,7 +18,10 @@
 
 package me.itzsomebody.radon.transformers.obfuscators;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
+import me.itzsomebody.radon.config.ConfigurationSetting;
+import me.itzsomebody.radon.exceptions.InvalidConfigurationValueException;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
 
@@ -44,8 +47,8 @@ public class ResourceEncryption extends Transformer {
     }
 
     @Override
-    public Map<String, Object> getConfiguration() {
-        return null; // TODO
+    public Object getConfiguration() {
+        return new LinkedHashMap<>(); // TODO
     }
 
     @Override
@@ -55,6 +58,6 @@ public class ResourceEncryption extends Transformer {
 
     @Override
     public void verifyConfiguration(Map<String, Object> config) {
-        // TODO
+        throw new InvalidConfigurationValueException(ConfigurationSetting.RESOURCE_ENCRYPTION + " expects a boolean");
     }
 }

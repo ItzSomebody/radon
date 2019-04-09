@@ -122,7 +122,7 @@ public class StringEncryption extends Transformer {
     }
 
     @Override
-    public Map<String, Object> getConfiguration() {
+    public Object getConfiguration() {
         Map<String, Object> config = new LinkedHashMap<>();
 
         config.put(StringEncryptionSetting.EXEMPTED_STRINGS.getName(), getExemptedStrings());

@@ -69,7 +69,7 @@ public class Virtualizer extends Transformer {
     }
 
     @Override
-    public Map<String, Object> getConfiguration() {
+    public Object getConfiguration() {
         Map<String, Object> config = new LinkedHashMap<>();
 
         config.put(VirtualizerSetting.VM_TYPE.getName(), getVMType());

@@ -124,7 +124,7 @@ public class Watermarker extends Transformer {
     }
 
     @Override
-    public Map<String, Object> getConfiguration() {
+    public Object getConfiguration() {
         Map<String, Object> config = new LinkedHashMap<>();
 
         setMessage(getValueOrDefault(WatermarkerSetting.MESSAGE.getName(), config, null));

@@ -64,7 +64,7 @@ public class Shrinker extends Transformer {
     }
 
     @Override
-    public Map<String, Object> getConfiguration() {
+    public Object getConfiguration() {
         Map<String, Object> config = new LinkedHashMap<>();
 
         shrinkers.forEach(shrinker -> config.put(shrinker.getShrinkerSetting().getName(), true));
