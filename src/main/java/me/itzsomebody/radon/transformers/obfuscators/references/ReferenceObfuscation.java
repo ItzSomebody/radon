@@ -29,8 +29,6 @@ import me.itzsomebody.radon.exceptions.InvalidConfigurationValueException;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
 
-import static me.itzsomebody.radon.utils.ConfigUtils.getValueOrDefault;
-
 /**
  * Abstract class for reference obfuscation transformers.
  *
@@ -40,7 +38,6 @@ public class ReferenceObfuscation extends Transformer {
     private static final Map<String, ReferenceObfuscationSetting> KEY_MAP = new HashMap<>();
     private static final Map<ReferenceObfuscation, ReferenceObfuscationSetting> REFERENCEOBF_SETTING_MAP = new HashMap<>();
     private final List<ReferenceObfuscation> referenceObfuscators = new ArrayList<>();
-    private boolean ignoreJava8ClassesForReflectionEnabled;
 
     static {
         ReferenceObfuscationSetting[] values = ReferenceObfuscationSetting.values();
@@ -73,8 +70,6 @@ public class ReferenceObfuscation extends Transformer {
 
         referenceObfuscators.forEach(obfuscator -> config.put(obfuscator.getReferenceObfuscationSetting().getName(), true));
 
-        config.put(ReferenceObfuscationSetting.IGNORE_JAVA8_CLASSES_FOR_REFLECTION.getName(), isIgnoreJava8ClassesForReflectionEnabled());
-
         return config;
     }
 
@@ -83,8 +78,6 @@ public class ReferenceObfuscation extends Transformer {
         Stream.of(ReferenceObfuscationSetting.values()).filter(setting -> setting.getReferenceObfuscation() != null
                 && config.containsKey(setting.getName()) && (Boolean) config.get(setting.getName()))
                 .forEach(setting -> referenceObfuscators.add(setting.getReferenceObfuscation()));
-
-        setIgnoreJava8ClassesForReflectionEnabled(getValueOrDefault(ReferenceObfuscationSetting.IGNORE_JAVA8_CLASSES_FOR_REFLECTION.getName(), config, false));
     }
 
     @Override
@@ -99,14 +92,6 @@ public class ReferenceObfuscation extends Transformer {
                 throw new InvalidConfigurationValueException(ConfigurationSetting.REFERENCE_OBFUSCATION.getName() + '.' + k,
                         setting.getExpectedType(), v.getClass());
         });
-    }
-
-    protected boolean isIgnoreJava8ClassesForReflectionEnabled() {
-        return ignoreJava8ClassesForReflectionEnabled;
-    }
-
-    protected void setIgnoreJava8ClassesForReflectionEnabled(boolean ignoreJava8ClassesForReflectionEnabled) {
-        this.ignoreJava8ClassesForReflectionEnabled = ignoreJava8ClassesForReflectionEnabled;
     }
 
     private ReferenceObfuscationSetting getReferenceObfuscationSetting() {

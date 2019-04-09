@@ -20,9 +20,7 @@ package me.itzsomebody.radon.transformers.obfuscators.references;
 
 public enum ReferenceObfuscationSetting {
     HIDE_WITH_INDY(Boolean.class, new InvokedynamicTransformer()),
-    HIDE_WITH_FAST_INDY(Boolean.class, new FastInvokedynamicTransformer()),
-    HIDE_WITH_REFLECTION(Boolean.class, new ReflectionTransformer()),
-    IGNORE_JAVA8_CLASSES_FOR_REFLECTION(Boolean.class, null);
+    HIDE_WITH_FAST_INDY(Boolean.class, new FastInvokedynamicTransformer());
 
     private final Class expectedType;
     private ReferenceObfuscation referenceObfuscation;

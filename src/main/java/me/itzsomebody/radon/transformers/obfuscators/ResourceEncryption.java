@@ -26,7 +26,7 @@ import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
 
 /**
- * Encrypts bundled resources to prevent viewing.
+ * Encrypts bundled resources to prevent viewing / modification of the data.
  *
  * @author ItzSomebody
  */
