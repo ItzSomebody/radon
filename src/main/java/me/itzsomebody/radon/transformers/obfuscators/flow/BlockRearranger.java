@@ -56,7 +56,8 @@ public class BlockRearranger extends FlowObfuscation {
 
                         // We can't have trap ranges mutilated by block splitting
                         if (methodNode.tryCatchBlocks.stream().anyMatch(tcbn ->
-                                methodNode.instructions.indexOf(tcbn.end) >= methodNode.instructions.indexOf(p2Start)))
+                                methodNode.instructions.indexOf(tcbn.end) >= methodNode.instructions.indexOf(p2Start)
+                                        && methodNode.instructions.indexOf(tcbn.start) <= methodNode.instructions.indexOf(p2Start)))
                             return;
 
                         ArrayList<AbstractInsnNode> insnNodes = new ArrayList<>();
@@ -85,7 +86,7 @@ public class BlockRearranger extends FlowObfuscation {
                         // We might have messed up variable ranges when rearranging the block order.
                         if (methodNode.localVariables != null)
                             new ArrayList<>(methodNode.localVariables).stream().filter(lvn ->
-                                methodNode.instructions.indexOf(lvn.end) < methodNode.instructions.indexOf(lvn.start)
+                                    methodNode.instructions.indexOf(lvn.end) < methodNode.instructions.indexOf(lvn.start)
                             ).forEach(methodNode.localVariables::remove);
                     }
                 }));
