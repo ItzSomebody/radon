@@ -82,7 +82,7 @@ public class Packer extends Transformer {
                 }
             });
 
-            out.writeShort(getResources().size());
+            out.writeShort(getResources().size() - 1);
             getResources().forEach((name, bytes) -> {
                 if (excluded(name))
                     return;
