@@ -21,10 +21,10 @@ package me.itzsomebody.radon.config;
 import java.util.List;
 import java.util.Map;
 import me.itzsomebody.radon.transformers.Transformer;
+import me.itzsomebody.radon.transformers.miscellaneous.Packer;
 import me.itzsomebody.radon.transformers.miscellaneous.expiration.Expiration;
 import me.itzsomebody.radon.transformers.miscellaneous.watermarker.Watermarker;
 import me.itzsomebody.radon.transformers.obfuscators.AntiTamper;
-import me.itzsomebody.radon.transformers.obfuscators.ResourceEncryption;
 import me.itzsomebody.radon.transformers.obfuscators.ResourceRenamer;
 import me.itzsomebody.radon.transformers.obfuscators.flow.FlowObfuscation;
 import me.itzsomebody.radon.transformers.obfuscators.hidecode.HideCode;
@@ -51,10 +51,10 @@ public enum ConfigurationSetting {
     FLOW_OBFUSCATION(Map.class, new FlowObfuscation()),
     REFERENCE_OBFUSCATION(Map.class, new ReferenceObfuscation()),
     NUMBER_OBFUSCATION(Map.class, new NumberObfuscation()),
-    ANTI_TAMPER(Boolean.class, new AntiTamper()), // TODO
+    ANTI_TAMPER(Boolean.class, new AntiTamper()),
     VIRTUALIZER(Boolean.class, new Virtualizer()), // TODO: ;)
-    RESOURCE_ENCRYPTION(Boolean.class, new ResourceEncryption()), // TODO
     RESOURCE_RENAMER(Boolean.class, new ResourceRenamer()), // TODO
+    PACKER(Boolean.class, new Packer()),
     //CLASS_ENCRYPTION(Map.class, new ClassEncryption()), // Just kidding, lol
     HIDE_CODE(Map.class, new HideCode()),
     //CRASHER(Boolean.class, new Crasher()),

@@ -38,10 +38,10 @@ public enum ExclusionType {
     CRASHER,
     EXPIRATION,
     SHUFFLER,
-    RESOURCE_ENCRYPTION,
     RESOURCE_RENAMER,
     VIRTUALIZER,
-    ANTI_TAMPER;
+    ANTI_TAMPER,
+    PACKER;
 
     public String getName() {
         return name().toLowerCase();
