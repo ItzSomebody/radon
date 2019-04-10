@@ -36,11 +36,6 @@ import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TableSwitchInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
-import org.objectweb.asm.tree.analysis.Analyzer;
-import org.objectweb.asm.tree.analysis.AnalyzerException;
-import org.objectweb.asm.tree.analysis.BasicInterpreter;
-import org.objectweb.asm.tree.analysis.BasicValue;
-import org.objectweb.asm.tree.analysis.Frame;
 
 public class BogusSwitchJumpInserter extends FlowObfuscation {
     private static final int PRED_ACCESS = ACC_PUBLIC | ACC_STATIC | ACC_FINAL;
@@ -58,7 +53,7 @@ public class BogusSwitchJumpInserter extends FlowObfuscation {
 
                 int leeway = getSizeLeeway(methodNode);
                 int varIndex = methodNode.maxLocals;
-                methodNode.maxLocals += 2; // Prevents breaking of other transformers which rely on this field.
+                methodNode.maxLocals++; // Prevents breaking of other transformers which rely on this field.
 
                 StackHeightZeroFinder stackHeightZeroFinder = new StackHeightZeroFinder(methodNode, methodNode.instructions.getLast());
                 try {
@@ -70,22 +65,6 @@ public class BogusSwitchJumpInserter extends FlowObfuscation {
                 }
 
                 Set<AbstractInsnNode> check = stackHeightZeroFinder.getEmptyAt();
-
-                Frame<BasicValue>[] frames;
-                try {
-                    frames = new Analyzer<>(new BasicInterpreter()).analyze(classWrapper.classNode.name, methodNode);
-                } catch (AnalyzerException e) {
-                    e.printStackTrace();
-                    throw new RadonException(String.format("Error happened while trying to analyze %s.%s%s",
-                            classWrapper.classNode.name, methodNode.name, methodNode.desc));
-                }
-
-                for (int i = 0; i < methodNode.instructions.size(); i++) {
-                    AbstractInsnNode insn = methodNode.instructions.get(i);
-                    if (check.contains(insn) && frames[i] == null)
-                        check.remove(insn); // Dead code should not be jumped to
-                }
-
                 ArrayList<AbstractInsnNode> emptyAt = new ArrayList<>(check);
 
                 if (emptyAt.size() <= 5 || leeway <= 30000)
