@@ -19,7 +19,6 @@
 package me.itzsomebody.radon.transformers.obfuscators;
 
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
@@ -57,7 +56,7 @@ public class ResourceRenamer extends Transformer {
                         if (s.startsWith("/"))
                             resourceName = s.substring(1);
                         else
-                            resourceName = classWrapper.originalName + '/' + s;
+                            resourceName = classWrapper.originalName.substring(0, classWrapper.originalName.lastIndexOf('/') + 1) + s;
 
                         if (getResources().containsKey(resourceName))
                             if (mappings.containsKey(resourceName))
