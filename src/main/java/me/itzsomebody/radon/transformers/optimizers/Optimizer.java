@@ -48,7 +48,10 @@ public class Optimizer extends Transformer {
 
     @Override
     public void transform() {
-        // TODO
+        optimizers.forEach(optimizer -> {
+            optimizer.init(radon);
+            optimizer.transform();
+        });
     }
 
     @Override
