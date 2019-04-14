@@ -4,11 +4,15 @@ Radon is a Java bytecode obfuscator that I conceptualized in my freshman year
 of high school. I use Radon to experiment with obfuscation and to learn various
 parts of Java bytecode.
 
+Check the [wiki for usage](https://github.com/ItzSomebody/Radon/wiki) or maybe
+even the [Discord](https://discord.gg/RfuxTea);
+
 This project is **not** likely to be production-safe nor bug free. If you would
 like some pointers to production-safe (more or less) and less buggy Java
 bytecode obfuscators, I would suggest one of these:
-* [Obzcure](https://obzcu.re/)
-* [Paramorphism](https://paramorphism.serenity.enterprises/)
+* [Obzcure](https://obzcu.re/) - [Discord](https://discordapp.com/invite/fUCPxq8)
+* [Paramorphism](https://paramorphism.serenity.enterprises/) -
+[Discord](https://discordapp.com/invite/k9DPvEy)
 * [Zelix KlassMaster](http://www.zelix.com/)
 * [Proguard](https://www.guardsquare.com/en/products/proguard)
 
@@ -22,8 +26,6 @@ for fun:
 * [JBCO](http://www.sable.mcgill.ca/JBCO/)
 * [Sandmark](http://sandmark.cs.arizona.edu)
 * [yGuard](https://www.yworks.com/products/yguard)
-
-Check the [wiki for usage](https://github.com/ItzSomebody/Radon/wiki).
 
 ## License
 
