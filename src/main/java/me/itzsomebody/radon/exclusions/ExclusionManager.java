@@ -20,7 +20,6 @@ package me.itzsomebody.radon.exclusions;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Class containing a {@link List<Exclusion>} of all the created exclusions.
@@ -39,9 +38,8 @@ public class ExclusionManager {
     }
 
     public boolean isExcluded(String pattern, ExclusionType type) {
-        Optional<Exclusion> result = exclusions.stream().filter(exclusion -> exclusion.getExclusionType() == type
-                || exclusion.getExclusionType() == ExclusionType.GLOBAL).findFirst();
-
-        return result.isPresent() && result.get().matches(pattern);
+        return exclusions.stream().anyMatch(exclusion ->
+                (exclusion.getExclusionType() == type || exclusion.getExclusionType() == ExclusionType.GLOBAL)
+                        && exclusion.matches(pattern));
     }
 }
