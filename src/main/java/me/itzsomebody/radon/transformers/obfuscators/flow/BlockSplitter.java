@@ -36,7 +36,7 @@ import org.objectweb.asm.tree.MethodNode;
  *
  * @author ItzSomebody
  */
-public class BlockRearranger extends FlowObfuscation {
+public class BlockSplitter extends FlowObfuscation {
     @Override
     public void transform() {
         AtomicInteger counter = new AtomicInteger();
@@ -82,6 +82,8 @@ public class BlockRearranger extends FlowObfuscation {
                         methodNode.instructions.insert(p2End, p1Block);
                         methodNode.instructions.insertBefore(p2Start, new JumpInsnNode(GOTO, p1));
                         methodNode.instructions.insertBefore(p2Start, p2);
+
+                        counter.incrementAndGet();
 
                         // We might have messed up variable ranges when rearranging the block order.
                         if (methodNode.localVariables != null)
