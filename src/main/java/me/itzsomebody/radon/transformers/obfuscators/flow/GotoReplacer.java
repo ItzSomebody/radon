@@ -64,6 +64,8 @@ public class GotoReplacer extends FlowObfuscation {
                         methodNode.instructions.remove(insn);
 
                         leeway -= 10;
+
+                        counter.incrementAndGet();
                     }
                 }
 
