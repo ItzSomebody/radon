@@ -5,7 +5,7 @@ of high school. I use Radon to experiment with obfuscation and to learn various
 parts of Java bytecode.
 
 Check the [wiki for usage](https://github.com/ItzSomebody/Radon/wiki) or maybe
-even the [Discord](https://discord.gg/RfuxTea);
+even the [Discord](https://discord.gg/RfuxTea).
 
 This project is **not** likely to be production-safe nor bug free. If you would
 like some pointers to production-safe (more or less) and less buggy Java

@@ -29,7 +29,6 @@ import me.itzsomebody.radon.asm.ClassWrapper;
 import me.itzsomebody.radon.asm.MethodWrapper;
 import me.itzsomebody.radon.config.ConfigurationSetting;
 import me.itzsomebody.radon.exceptions.InvalidConfigurationValueException;
-import me.itzsomebody.radon.exceptions.RadonException;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
 import me.itzsomebody.radon.utils.RandomUtils;
@@ -39,14 +38,13 @@ import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.InsnList;
-import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 
 /**
  * This applies passive integrity checking to the application with a special
  * type of string encryption.
+ * FIXME: kinda broken
  *
  * @author ItzSomebody
  */
@@ -75,23 +73,16 @@ public class AntiTamper extends Transformer {
                         counter.incrementAndGet();
                     }));
 
-            if (toProcess.size() > 0) {
+            if (counter.get() > 0) {
                 IntStream.range(0, 120).forEach(i -> classWrapper.addStringConst(StringUtils.randomAlphaString(RandomUtils.getRandomInt(0, 32))));
 
-                MethodWrapper wrapper = toProcess.stream().filter(this::hasInstructions).findAny().orElse(null);
-                if (wrapper == null)
-                    throw new RadonException();
-
                 int cpSize = new ClassReader(radon.class2Bytes(classWrapper)).getItemCount();
-                InsnList methodInstructions = wrapper.methodNode.instructions;
 
-                toProcess.forEach(methodWrapper -> Stream.of(methodInstructions.toArray()).filter(insn -> insn instanceof LdcInsnNode
+                toProcess.forEach(methodWrapper -> Stream.of(methodWrapper.methodNode.instructions.toArray()).filter(insn -> insn instanceof LdcInsnNode
                         && ((LdcInsnNode) insn).cst instanceof String).forEach(insn -> {
                     LdcInsnNode ldc = (LdcInsnNode) insn;
                     String s = (String) ldc.cst;
-                    String encrypted = encrypt(s, memberNames, classWrapper.classNode.name.replace('/', '.'), methodWrapper.methodNode.name, cpSize);
-
-                    methodInstructions.set(ldc, new LdcInsnNode(encrypted));
+                    ldc.cst = encrypt(s, memberNames, classWrapper.classNode.name.replace('/', '.'), methodWrapper.methodNode.name, cpSize);
                 }));
             }
         });
