@@ -144,7 +144,7 @@ public class ConfigurationParser {
                 Transformer transformer = setting.getTransformer();
 
                 if (transformer != null) {
-                    if (v instanceof Boolean)
+                    if (v instanceof Boolean && (Boolean) v)
                         transformers.add(transformer);
                     else if (v instanceof Map) {
                         transformer.verifyConfiguration((Map<String, Object>) v);
