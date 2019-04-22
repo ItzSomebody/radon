@@ -63,7 +63,15 @@ public class MethodCallEjector implements IEjectPhase, Opcodes {
 
         Type returnType = Type.getReturnType(methodCallInfo.desc);
 
-        MethodNode methodNode = new MethodNode(ACC_PRIVATE + ACC_STATIC, name, Type.getMethodDescriptor(returnType, arguments.toArray(new Type[0])),
+        int access = ACC_STATIC;
+        if (RandomUtils.getRandomBoolean())
+            access += ACC_PRIVATE;
+        if (RandomUtils.getRandomBoolean())
+            access += ACC_SYNTHETIC;
+        if (RandomUtils.getRandomBoolean())
+            access += ACC_BRIDGE;
+
+        MethodNode methodNode = new MethodNode(access, name, Type.getMethodDescriptor(returnType, arguments.toArray(new Type[0])),
                 null, null);
         InsnList insnList = new InsnList();
 

@@ -39,6 +39,10 @@ public class RandomUtils {
         return ThreadLocalRandom.current().nextInt(origin, bounds);
     }
 
+    public static boolean getRandomBoolean() {
+        return getRandomFloat() > 0.5;
+    }
+
     public static long getRandomLong() {
         return ThreadLocalRandom.current().nextLong();
     }
