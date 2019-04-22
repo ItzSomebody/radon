@@ -26,6 +26,7 @@ import me.itzsomebody.radon.transformers.miscellaneous.expiration.Expiration;
 import me.itzsomebody.radon.transformers.miscellaneous.watermarker.Watermarker;
 import me.itzsomebody.radon.transformers.obfuscators.AntiTamper;
 import me.itzsomebody.radon.transformers.obfuscators.ResourceRenamer;
+import me.itzsomebody.radon.transformers.obfuscators.ejector.Ejector;
 import me.itzsomebody.radon.transformers.obfuscators.flow.FlowObfuscation;
 import me.itzsomebody.radon.transformers.obfuscators.hidecode.HideCode;
 import me.itzsomebody.radon.transformers.obfuscators.numbers.NumberObfuscation;
@@ -63,6 +64,7 @@ public enum ConfigurationSetting {
     OPTIMIZER(Map.class, new Optimizer()),
     SHRINKER(Map.class, new Shrinker()),
     MEMBER_SHUFFLER(Boolean.class, new MemberShuffler()),
+    EJECTOR(Map.class, new Ejector()),
     RENAMER(Map.class, new Renamer()),
     DICTIONARY(String.class, null),
     RANDOMIZED_STRING_LENGTH(Integer.class, null),

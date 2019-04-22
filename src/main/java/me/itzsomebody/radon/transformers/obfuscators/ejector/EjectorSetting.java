@@ -16,33 +16,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package me.itzsomebody.radon.exclusions;
+package me.itzsomebody.radon.transformers.obfuscators.ejector;
 
-/**
- * All the valid exclusion types in an {@link Enum} representation.
- *
- * @author ItzSomebody
- */
-public enum ExclusionType {
-    GLOBAL,
-    EXTENDS, // TODO
-    IMPLEMENTS, // TODO
-    OPTIMIZER,
-    SHRINKER,
-    RENAMER,
-    REFERENCE_OBFUSCATION,
-    NUMBER_OBFUSCATION,
-    STRING_ENCRYPTION,
-    FLOW_OBFUSCATION,
-    HIDE_CODE,
-    CRASHER,
-    EXPIRATION,
-    SHUFFLER,
-    EJECTOR,
-    RESOURCE_RENAMER,
-    VIRTUALIZER,
-    ANTI_TAMPER,
-    PACKER;
+public enum EjectorSetting {
+    EJECT_CALL(Boolean.class);
+
+    private final Class expectedType;
+
+    EjectorSetting(Class expectedType) {
+        this.expectedType = expectedType;
+    }
+
+    public Class getExpectedType() {
+        return expectedType;
+    }
 
     public String getName() {
         return name().toLowerCase();
