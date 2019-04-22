@@ -96,14 +96,11 @@ public class MethodCallEjector implements IEjectPhase, Opcodes {
         MethodNode methodNode = ejectorContext.getMethodWrapper().methodNode;
         Frame<AbstractValue>[] frames = ejectorContext.getFrames();
 
-
         Map<MethodCallInfo, List<MethodInsnNode>> methodCalls = analyzeMethodCalls(methodNode, frames);
         if (methodCalls.isEmpty())
             return;
 
-
         Map<AbstractInsnNode, List<AbstractInsnNode>> patches = new HashMap<>();
-
         methodCalls.forEach((key, value) -> {
             MethodNode proxyMethod = createProxyMethod("_" + RandomUtils.getRandomInt(1, Integer.MAX_VALUE), key);
             int offset = key.opcode == INVOKESTATIC ? 0 : 1;
@@ -149,9 +146,13 @@ public class MethodCallEjector implements IEjectPhase, Opcodes {
             Collections.shuffle(keys);
 
             keys.forEach(id -> {
+                int xorKey = RandomUtils.getRandomInt();
+
                 InsnList insnList = proxyFixes.get(id);
                 proxyFix.add(new VarInsnNode(Opcodes.ILOAD, idVariable));
-                proxyFix.add(new LdcInsnNode(id));
+                proxyFix.add(new LdcInsnNode(xorKey));
+                proxyFix.add(new InsnNode(IXOR));
+                proxyFix.add(new LdcInsnNode(id ^ xorKey));
                 LabelNode labelNode = new LabelNode();
                 proxyFix.add(new JumpInsnNode(Opcodes.IF_ICMPNE, labelNode));
 
