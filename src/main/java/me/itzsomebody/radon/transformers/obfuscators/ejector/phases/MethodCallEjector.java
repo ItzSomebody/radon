@@ -93,10 +93,15 @@ public class MethodCallEjector implements IEjectPhase, Opcodes {
         if (methodCalls.isEmpty())
             return;
 
+
         Map<AbstractInsnNode, List<AbstractInsnNode>> patches = new HashMap<>();
 
         methodCalls.forEach((key, value) -> {
             MethodNode proxyMethod = createProxyMethod("_" + RandomUtils.getRandomInt(1, Integer.MAX_VALUE), key);
+            int offset = key.opcode == INVOKESTATIC ? 0 : 1;
+
+            Map<Integer, InsnList> proxyFixes = new HashMap<>();
+
             classWrapper.addMethod(proxyMethod);
 
             for (MethodInsnNode methodInsnNode : value) {
@@ -107,15 +112,10 @@ public class MethodCallEjector implements IEjectPhase, Opcodes {
                         new MethodInsnNode(Opcodes.INVOKESTATIC, classWrapper.classNode.name, proxyMethod.name, proxyMethod.desc, false)
                 ));
 
+                InsnList proxyArgumentFix = new InsnList();
                 Frame<AbstractValue> frame = frames[methodNode.instructions.indexOf(methodInsnNode)];
 
                 Type[] argumentTypes = Type.getArgumentTypes(methodInsnNode.desc);
-
-                int offset = methodInsnNode.getOpcode() == INVOKESTATIC ? 0 : 1;
-                int idVariable = 0;
-                for (Type argumentType : argumentTypes) {
-                    idVariable += argumentType.getSize();
-                }
 
                 int variable = 0;
                 for (int i = 0; i < argumentTypes.length; i++) {
@@ -123,27 +123,37 @@ public class MethodCallEjector implements IEjectPhase, Opcodes {
                     if (argumentValue.isConstant() && argumentValue.getUsages().size() == 1) {
                         patches.put(argumentValue.getInsnNode(), Collections.singletonList(ASMUtils.getDefaultValue(argumentValue.getType())));
 
-                        InsnList proxyArgumentFix = new InsnList();
-
-
-                        proxyArgumentFix.add(new VarInsnNode(Opcodes.ILOAD, offset + idVariable));
-                        proxyArgumentFix.add(new LdcInsnNode(id));
-
-                        LabelNode labelNode = new LabelNode();
-                        proxyArgumentFix.add(new JumpInsnNode(Opcodes.IF_ICMPNE, labelNode));
-
                         proxyArgumentFix.add(argumentValue.getInsnNode().clone(null));
                         proxyArgumentFix.add(new VarInsnNode(ASMUtils.getVarOpcode(argumentValue.getType(), true), offset + variable));
-
-                        proxyArgumentFix.add(labelNode);
-
-                        proxyMethod.instructions.insert(proxyArgumentFix);
                     }
                     variable += argumentTypes[i].getSize();
                 }
-
+                proxyFixes.put(id, proxyArgumentFix);
                 ejectorContext.getCounter().incrementAndGet();
             }
+
+            int idVariable = getLastArgumentVar(proxyMethod);
+
+            InsnList proxyFix = new InsnList();
+            LabelNode end = new LabelNode();
+
+            ArrayList<Integer> keys = new ArrayList<>(proxyFixes.keySet());
+            Collections.shuffle(keys);
+
+            keys.forEach(id -> {
+                InsnList insnList = proxyFixes.get(id);
+                proxyFix.add(new VarInsnNode(Opcodes.ILOAD, idVariable));
+                proxyFix.add(new LdcInsnNode(id));
+                LabelNode labelNode = new LabelNode();
+                proxyFix.add(new JumpInsnNode(Opcodes.IF_ICMPNE, labelNode));
+
+                proxyFix.add(insnList);
+                proxyFix.add(new JumpInsnNode(Opcodes.GOTO, end));
+                proxyFix.add(labelNode);
+            });
+
+            proxyFix.add(end);
+            proxyMethod.instructions.insert(proxyFix);
         });
 
         patches.forEach((abstractInsnNode, abstractInsnNodes) -> {
@@ -153,6 +163,15 @@ public class MethodCallEjector implements IEjectPhase, Opcodes {
             methodNode.instructions.insertBefore(abstractInsnNode, insnList);
             methodNode.instructions.remove(abstractInsnNode);
         });
+    }
+
+    private int getLastArgumentVar(MethodNode methodNode) {
+        Type[] argumentTypes = Type.getArgumentTypes(methodNode.desc);
+        int var = 0;
+        for (int i = 0; i < argumentTypes.length - 1; i++) {
+            var += argumentTypes[i].getSize();
+        }
+        return var;
     }
 
     private static class MethodCallInfo {
