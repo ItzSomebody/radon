@@ -1,6 +1,5 @@
 package me.itzsomebody.radon.transformers.obfuscators.ejector.phases;
 
-import me.itzsomebody.radon.Logger;
 import me.itzsomebody.radon.analysis.constant.values.AbstractValue;
 import me.itzsomebody.radon.asm.ClassWrapper;
 import me.itzsomebody.radon.transformers.obfuscators.ejector.EjectorContext;
