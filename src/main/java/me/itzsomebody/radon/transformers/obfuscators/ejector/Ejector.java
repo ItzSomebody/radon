@@ -26,7 +26,7 @@ import me.itzsomebody.radon.config.ConfigurationSetting;
 import me.itzsomebody.radon.exceptions.InvalidConfigurationValueException;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
-import me.itzsomebody.radon.transformers.obfuscators.ejector.phases.IEjectPhase;
+import me.itzsomebody.radon.transformers.obfuscators.ejector.phases.AbstractEjectPhase;
 import me.itzsomebody.radon.transformers.obfuscators.ejector.phases.MethodCallEjector;
 import org.objectweb.asm.tree.analysis.AnalyzerException;
 import org.objectweb.asm.tree.analysis.Frame;
@@ -56,18 +56,22 @@ public class Ejector extends Transformer {
     public void transform() {
         AtomicInteger counter = new AtomicInteger();
 
-        List<IEjectPhase> phases = new ArrayList<>();
-        if (isEjectMethodCalls())
-            phases.add(new MethodCallEjector(isJunkArguments()));
-
         getClassWrappers().stream()
                 .filter(classWrapper -> !excluded(classWrapper))
-                .forEach(classWrapper -> processClass(phases, classWrapper, counter));
+                .forEach(classWrapper -> processClass(classWrapper, counter));
 
         Logger.stdOut(String.format("Ejected %d regions.", counter.get()));
     }
 
-    private void processClass(List<IEjectPhase> phases, ClassWrapper classWrapper, AtomicInteger counter) {
+    private List<AbstractEjectPhase> getPhases(EjectorContext ejectorContext) {
+        List<AbstractEjectPhase> phases = new ArrayList<>();
+        if (isEjectMethodCalls())
+            phases.add(new MethodCallEjector(ejectorContext));
+
+        return phases;
+    }
+
+    private void processClass(ClassWrapper classWrapper, AtomicInteger counter) {
         new ArrayList<>(classWrapper.methods).stream()
                 .filter(methodWrapper -> !excluded(methodWrapper))
                 .filter(methodWrapper -> !"<init>".equals(methodWrapper.methodNode.name))
@@ -76,8 +80,9 @@ public class Ejector extends Transformer {
                     try {
                         Logger.stdOut("Analyze: " + classWrapper.originalName + "::" + methodWrapper.originalName + methodWrapper.originalDescription);
                         Frame<AbstractValue>[] frames = constantAnalyzer.analyze(classWrapper.classNode.name, methodWrapper.methodNode);
-                        phases
-                                .forEach(phase -> phase.process(new EjectorContext(counter, classWrapper, methodWrapper, frames)));
+
+                        EjectorContext ejectorContext = new EjectorContext(counter, classWrapper, methodWrapper, frames, junkArguments);
+                        getPhases(ejectorContext).forEach(AbstractEjectPhase::process);
                     } catch (AnalyzerException e) {
                         Logger.stdErr("Can't analyze method: " + classWrapper.originalName + "::" + methodWrapper.originalName + methodWrapper.originalDescription);
                         Logger.stdErr(e.toString());
@@ -128,15 +133,15 @@ public class Ejector extends Transformer {
         return ejectMethodCalls;
     }
 
+    private void setEjectMethodCalls(boolean shuffleFieldsEnabled) {
+        this.ejectMethodCalls = shuffleFieldsEnabled;
+    }
+
     public boolean isJunkArguments() {
         return junkArguments;
     }
 
     public void setJunkArguments(boolean junkArguments) {
         this.junkArguments = junkArguments;
-    }
-
-    private void setEjectMethodCalls(boolean shuffleFieldsEnabled) {
-        this.ejectMethodCalls = shuffleFieldsEnabled;
     }
 }

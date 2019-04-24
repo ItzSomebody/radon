@@ -34,6 +34,29 @@ public class ConstantInterpreter extends Interpreter<AbstractValue> implements O
         return new UnknownValue(insnNode, Type.DOUBLE_TYPE);
     }
 
+    private static AbstractValue valueFromArrayInsn(IntInsnNode iinsn) {
+        switch (iinsn.operand) {
+            case T_BOOLEAN:
+                return new UnknownValue(iinsn, Type.getType("[Z"));
+            case T_CHAR:
+                return new UnknownValue(iinsn, Type.getType("[C"));
+            case T_BYTE:
+                return new UnknownValue(iinsn, Type.getType("[B"));
+            case T_SHORT:
+                return new UnknownValue(iinsn, Type.getType("[S"));
+            case T_INT:
+                return new UnknownValue(iinsn, Type.getType("[I"));
+            case T_FLOAT:
+                return new UnknownValue(iinsn, Type.getType("[F"));
+            case T_DOUBLE:
+                return new UnknownValue(iinsn, Type.getType("[D"));
+            case T_LONG:
+                return new UnknownValue(iinsn, Type.getType("[J"));
+            default:
+                throw new IllegalArgumentException("Invalid array type");
+        }
+    }
+
     public AbstractValue newValue(Type type) {
         if (type == null)
             return UnknownValue.UNINITIALIZED_VALUE;
@@ -185,26 +208,7 @@ public class ConstantInterpreter extends Interpreter<AbstractValue> implements O
             }
             case NEWARRAY: {
                 final IntInsnNode iinsn = (IntInsnNode) insnNode;
-                switch (iinsn.operand) {
-                    case T_BOOLEAN:
-                        return new UnknownValue(iinsn, Type.getType("[Z"));
-                    case T_CHAR:
-                        return new UnknownValue(iinsn, Type.getType("[C"));
-                    case T_BYTE:
-                        return new UnknownValue(iinsn, Type.getType("[B"));
-                    case T_SHORT:
-                        return new UnknownValue(iinsn, Type.getType("[S"));
-                    case T_INT:
-                        return new UnknownValue(iinsn, Type.getType("[I"));
-                    case T_FLOAT:
-                        return new UnknownValue(iinsn, Type.getType("[F"));
-                    case T_DOUBLE:
-                        return new UnknownValue(iinsn, Type.getType("[D"));
-                    case T_LONG:
-                        return new UnknownValue(iinsn, Type.getType("[J"));
-                    default:
-                        throw new IllegalArgumentException("Invalid array type");
-                }
+                return valueFromArrayInsn(iinsn);
             }
             case ANEWARRAY: {
                 final TypeInsnNode tinsn = (TypeInsnNode) insnNode;

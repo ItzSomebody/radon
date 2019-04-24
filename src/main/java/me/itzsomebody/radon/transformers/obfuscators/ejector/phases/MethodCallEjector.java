@@ -12,11 +12,10 @@ import org.objectweb.asm.tree.analysis.Frame;
 
 import java.util.*;
 
-public class MethodCallEjector implements IEjectPhase, Opcodes {
-    private final boolean junkArguments;
+public class MethodCallEjector extends AbstractEjectPhase implements Opcodes {
 
-    public MethodCallEjector(boolean junkArguments) {
-        this.junkArguments = junkArguments;
+    public MethodCallEjector(EjectorContext ejectorContext) {
+        super(ejectorContext);
     }
 
     private static Map<MethodCallInfo, List<MethodInsnNode>> analyzeMethodCalls(MethodNode methodNode, Frame<AbstractValue>[] frames) {
@@ -96,8 +95,26 @@ public class MethodCallEjector implements IEjectPhase, Opcodes {
         return methodNode;
     }
 
+    private Map<Integer, InsnList> createJunkArguments(Type[] argumentTypes, int offset) {
+        Map<Integer, InsnList> junkArguments = new HashMap<>();
+
+        for (int k = 0; k < RandomUtils.getRandomInt(1, 5); k++) {
+            InsnList junkProxyArgumentFix = new InsnList();
+            int junkVariable = 0;
+            for (Type argumentType : argumentTypes) {
+                if (RandomUtils.getRandomBoolean()) {
+                    junkProxyArgumentFix.add(ASMUtils.getRandomValue(argumentType));
+                    junkProxyArgumentFix.add(new VarInsnNode(ASMUtils.getVarOpcode(argumentType, true), offset + junkVariable));
+                }
+                junkVariable += argumentType.getSize();
+            }
+            junkArguments.put(ejectorContext.getNextId(), junkProxyArgumentFix);
+        }
+        return junkArguments;
+    }
+
     @Override
-    public void process(EjectorContext ejectorContext) {
+    public void process() {
         ClassWrapper classWrapper = ejectorContext.getClassWrapper();
         MethodNode methodNode = ejectorContext.getMethodWrapper().methodNode;
         Frame<AbstractValue>[] frames = ejectorContext.getFrames();
@@ -133,7 +150,7 @@ public class MethodCallEjector implements IEjectPhase, Opcodes {
                 for (int i = 0; i < argumentTypes.length; i++) {
                     AbstractValue argumentValue = frame.getStack(frame.getStackSize() - argumentTypes.length + i);
                     if (argumentValue.isConstant() && argumentValue.getUsages().size() == 1) {
-                        AbstractInsnNode valueInsn = junkArguments ? ASMUtils.getRandomValue(argumentValue.getType()) : ASMUtils.getDefaultValue(argumentValue.getType());
+                        AbstractInsnNode valueInsn = ejectorContext.isJunkArguments() ? ASMUtils.getRandomValue(argumentValue.getType()) : ASMUtils.getDefaultValue(argumentValue.getType());
                         patches.put(argumentValue.getInsnNode(), ASMUtils.singletonList(valueInsn));
 
                         proxyArgumentFix.add(argumentValue.getInsnNode().clone(null));
@@ -144,20 +161,8 @@ public class MethodCallEjector implements IEjectPhase, Opcodes {
                 proxyFixes.put(id, proxyArgumentFix);
                 ejectorContext.getCounter().incrementAndGet();
 
-                if (!junkArguments)
-                    continue;
-
-                for (int k = 0; k < RandomUtils.getRandomInt(1, 5); k++) {
-                    InsnList junkProxyArgumentFix = new InsnList();
-                    int junkVariable = 0;
-                    for (Type argumentType : argumentTypes) {
-                        if (RandomUtils.getRandomBoolean()) {
-                            junkProxyArgumentFix.add(ASMUtils.getRandomValue(argumentType));
-                            junkProxyArgumentFix.add(new VarInsnNode(ASMUtils.getVarOpcode(argumentType, true), offset + junkVariable));
-                        }
-                        junkVariable += argumentType.getSize();
-                    }
-                    proxyFixes.put(ejectorContext.getNextId(), junkProxyArgumentFix);
+                if (ejectorContext.isJunkArguments()) {
+                    proxyFixes.putAll(createJunkArguments(argumentTypes, offset));
                 }
             }
 
@@ -195,7 +200,7 @@ public class MethodCallEjector implements IEjectPhase, Opcodes {
         });
     }
 
-    private int getLastArgumentVar(MethodNode methodNode) {
+    private static int getLastArgumentVar(MethodNode methodNode) {
         Type[] argumentTypes = Type.getArgumentTypes(methodNode.desc);
         int var = 0;
         for (int i = 0; i < argumentTypes.length - 1; i++) {
