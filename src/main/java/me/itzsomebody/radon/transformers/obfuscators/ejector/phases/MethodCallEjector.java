@@ -13,6 +13,12 @@ import org.objectweb.asm.tree.analysis.Frame;
 import java.util.*;
 
 public class MethodCallEjector implements IEjectPhase, Opcodes {
+    private final boolean junkArguments;
+
+    public MethodCallEjector(boolean junkArguments) {
+        this.junkArguments = junkArguments;
+    }
+
     private static Map<MethodCallInfo, List<MethodInsnNode>> analyzeMethodCalls(MethodNode methodNode, Frame<AbstractValue>[] frames) {
         Map<MethodCallInfo, List<MethodInsnNode>> result = new HashMap<>();
         InsnList insnList = methodNode.instructions;
@@ -100,7 +106,7 @@ public class MethodCallEjector implements IEjectPhase, Opcodes {
         if (methodCalls.isEmpty())
             return;
 
-        Map<AbstractInsnNode, List<AbstractInsnNode>> patches = new HashMap<>();
+        Map<AbstractInsnNode, InsnList> patches = new HashMap<>();
         methodCalls.forEach((key, value) -> {
             MethodNode proxyMethod = createProxyMethod("_" + RandomUtils.getRandomInt(1, Integer.MAX_VALUE), key);
             int offset = key.opcode == INVOKESTATIC ? 0 : 1;
@@ -112,10 +118,11 @@ public class MethodCallEjector implements IEjectPhase, Opcodes {
             for (MethodInsnNode methodInsnNode : value) {
                 int id = ejectorContext.getNextId();
 
-                patches.put(methodInsnNode, Arrays.asList(
+                patches.put(methodInsnNode, ASMUtils.asList(
                         new LdcInsnNode(id),
                         new MethodInsnNode(Opcodes.INVOKESTATIC, classWrapper.classNode.name, proxyMethod.name, proxyMethod.desc, false)
                 ));
+
 
                 InsnList proxyArgumentFix = new InsnList();
                 Frame<AbstractValue> frame = frames[methodNode.instructions.indexOf(methodInsnNode)];
@@ -126,7 +133,8 @@ public class MethodCallEjector implements IEjectPhase, Opcodes {
                 for (int i = 0; i < argumentTypes.length; i++) {
                     AbstractValue argumentValue = frame.getStack(frame.getStackSize() - argumentTypes.length + i);
                     if (argumentValue.isConstant() && argumentValue.getUsages().size() == 1) {
-                        patches.put(argumentValue.getInsnNode(), Collections.singletonList(ASMUtils.getDefaultValue(argumentValue.getType())));
+                        AbstractInsnNode valueInsn = junkArguments ? ASMUtils.getRandomValue(argumentValue.getType()) : ASMUtils.getDefaultValue(argumentValue.getType());
+                        patches.put(argumentValue.getInsnNode(), ASMUtils.singletonList(valueInsn));
 
                         proxyArgumentFix.add(argumentValue.getInsnNode().clone(null));
                         proxyArgumentFix.add(new VarInsnNode(ASMUtils.getVarOpcode(argumentValue.getType(), true), offset + variable));
@@ -135,6 +143,22 @@ public class MethodCallEjector implements IEjectPhase, Opcodes {
                 }
                 proxyFixes.put(id, proxyArgumentFix);
                 ejectorContext.getCounter().incrementAndGet();
+
+                if (!junkArguments)
+                    continue;
+
+                for (int k = 0; k < RandomUtils.getRandomInt(1, 5); k++) {
+                    InsnList junkProxyArgumentFix = new InsnList();
+                    int junkVariable = 0;
+                    for (Type argumentType : argumentTypes) {
+                        if (RandomUtils.getRandomBoolean()) {
+                            junkProxyArgumentFix.add(ASMUtils.getRandomValue(argumentType));
+                            junkProxyArgumentFix.add(new VarInsnNode(ASMUtils.getVarOpcode(argumentType, true), offset + junkVariable));
+                        }
+                        junkVariable += argumentType.getSize();
+                    }
+                    proxyFixes.put(ejectorContext.getNextId(), junkProxyArgumentFix);
+                }
             }
 
             int idVariable = getLastArgumentVar(proxyMethod);
@@ -165,10 +189,7 @@ public class MethodCallEjector implements IEjectPhase, Opcodes {
             proxyMethod.instructions.insert(proxyFix);
         });
 
-        patches.forEach((abstractInsnNode, abstractInsnNodes) -> {
-            InsnList insnList = new InsnList();
-            abstractInsnNodes.forEach(insnList::add);
-
+        patches.forEach((abstractInsnNode, insnList) -> {
             methodNode.instructions.insertBefore(abstractInsnNode, insnList);
             methodNode.instructions.remove(abstractInsnNode);
         });

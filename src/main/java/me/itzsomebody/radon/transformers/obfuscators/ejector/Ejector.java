@@ -50,6 +50,7 @@ public class Ejector extends Transformer {
     }
 
     private boolean ejectMethodCalls;
+    private boolean junkArguments;
 
     @Override
     public void transform() {
@@ -57,7 +58,7 @@ public class Ejector extends Transformer {
 
         List<IEjectPhase> phases = new ArrayList<>();
         if (isEjectMethodCalls())
-            phases.add(new MethodCallEjector());
+            phases.add(new MethodCallEjector(isJunkArguments()));
 
         getClassWrappers().stream()
                 .filter(classWrapper -> !excluded(classWrapper))
@@ -99,12 +100,14 @@ public class Ejector extends Transformer {
         Map<String, Object> config = new LinkedHashMap<>();
 
         config.put(EjectorSetting.EJECT_CALL.getName(), isEjectMethodCalls());
+        config.put(EjectorSetting.JUNK_ARGUMENT.getName(), isJunkArguments());
         return config;
     }
 
     @Override
     public void setConfiguration(Map<String, Object> config) {
         setEjectMethodCalls(getValueOrDefault(EjectorSetting.EJECT_CALL.getName(), config, false));
+        setJunkArguments(getValueOrDefault(EjectorSetting.JUNK_ARGUMENT.getName(), config, false));
     }
 
     @Override
@@ -123,6 +126,14 @@ public class Ejector extends Transformer {
 
     private boolean isEjectMethodCalls() {
         return ejectMethodCalls;
+    }
+
+    public boolean isJunkArguments() {
+        return junkArguments;
+    }
+
+    public void setJunkArguments(boolean junkArguments) {
+        this.junkArguments = junkArguments;
     }
 
     private void setEjectMethodCalls(boolean shuffleFieldsEnabled) {

@@ -29,6 +29,8 @@ import org.objectweb.asm.tree.*;
  * @author ItzSomebody.
  */
 public class ASMUtils {
+    private static final Type STRING_TYPE = Type.getType(String.class);
+
     public static boolean isInstruction(AbstractInsnNode insn) {
         return !(insn instanceof FrameNode) && !(insn instanceof LineNumberNode) && !(insn instanceof LabelNode);
     }
@@ -234,6 +236,22 @@ public class ASMUtils {
         }
     }
 
+    public static InsnList asList(AbstractInsnNode abstractInsnNode, AbstractInsnNode... abstractInsnNodes) {
+        InsnList insnList = new InsnList();
+        insnList.add(abstractInsnNode);
+        if (abstractInsnNodes != null)
+            for (AbstractInsnNode insnNode : abstractInsnNodes) {
+                insnList.add(insnNode);
+            }
+        return insnList;
+    }
+
+    public static InsnList singletonList(AbstractInsnNode abstractInsnNode) {
+        InsnList insnList = new InsnList();
+        insnList.add(abstractInsnNode);
+        return insnList;
+    }
+
     public static AbstractInsnNode getDefaultValue(Type type) {
         switch (type.getSort()) {
             case Type.BOOLEAN:
@@ -241,14 +259,39 @@ public class ASMUtils {
             case Type.BYTE:
             case Type.SHORT:
             case Type.INT:
-                return new InsnNode(Opcodes.ICONST_0);
+                return ASMUtils.getNumberInsn(0);
             case Type.FLOAT:
-                return new InsnNode(Opcodes.FCONST_0);
+                return ASMUtils.getNumberInsn(0f);
             case Type.LONG:
-                return new InsnNode(Opcodes.LCONST_0);
+                return ASMUtils.getNumberInsn(0L);
             case Type.DOUBLE:
-                return new InsnNode(Opcodes.DCONST_0);
+                return ASMUtils.getNumberInsn(0d);
             case Type.OBJECT:
+                return new InsnNode(Opcodes.ACONST_NULL);
+            default:
+                throw new AssertionError();
+        }
+    }
+
+    public static AbstractInsnNode getRandomValue(Type type) {
+        switch (type.getSort()) {
+            case Type.BOOLEAN:
+            case Type.CHAR:
+            case Type.BYTE:
+            case Type.SHORT:
+            case Type.INT:
+                return ASMUtils.getNumberInsn(RandomUtils.getRandomInt());
+            case Type.FLOAT:
+                return ASMUtils.getNumberInsn(RandomUtils.getRandomFloat());
+            case Type.LONG:
+                return ASMUtils.getNumberInsn(RandomUtils.getRandomLong());
+            case Type.DOUBLE:
+                return ASMUtils.getNumberInsn(RandomUtils.getRandomDouble());
+            case Type.ARRAY:
+            case Type.OBJECT:
+                if (STRING_TYPE.equals(type) && RandomUtils.getRandomBoolean()) {
+                    return new LdcInsnNode(StringUtils.randomUnrecognizedString(RandomUtils.getRandomInt(3, 10)));
+                }
                 return new InsnNode(Opcodes.ACONST_NULL);
             default:
                 throw new AssertionError();
