@@ -10,21 +10,22 @@ even the [Discord](https://discord.gg/RfuxTea).
 This project is **not** likely to be production-safe nor bug free. If you would
 like some pointers to production-safe (more or less) and less buggy Java
 bytecode obfuscators, I would suggest one of these:
-* [Obzcure](https://obzcu.re/) - [Discord](https://discordapp.com/invite/fUCPxq8)
 * [Paramorphism](https://paramorphism.serenity.enterprises/) -
 [Discord](https://discordapp.com/invite/k9DPvEy)
-* [Zelix KlassMaster](http://www.zelix.com/)
 * [Proguard](https://www.guardsquare.com/en/products/proguard)
+* [Zelix KlassMaster](http://www.zelix.com/)
 
 Additionally, here are some other obfuscators for Java that you could check out
 for fun:
+* [Allatori](http://www.allatori.com/)
+* [DashO](https://www.preemptive.com/products/dasho/overview)
+* [JBCO](http://www.sable.mcgill.ca/JBCO/)
 * [JObf](https://github.com/superblaubeere27/obfuscator)
 * [NeonObf](https://github.com/MoofMonkey/NeonObf)
-* [Stringer](https://jfxstore.com/stringer/)
-* [DashO](https://www.preemptive.com/products/dasho/overview)
-* [Allatori](http://www.allatori.com/)
-* [JBCO](http://www.sable.mcgill.ca/JBCO/)
+* [Obzcure](https://obzcu.re/) -
+[Discord](https://discordapp.com/invite/fUCPxq8) (Dev is away for a few months)
 * [Sandmark](http://sandmark.cs.arizona.edu)
+* [Stringer](https://jfxstore.com/stringer/)
 * [yGuard](https://www.yworks.com/products/yguard)
 
 ## License
