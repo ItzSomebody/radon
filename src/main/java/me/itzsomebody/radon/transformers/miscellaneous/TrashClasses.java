@@ -222,7 +222,7 @@ public class TrashClasses extends Transformer {
 
     @Override
     public ExclusionType getExclusionType() {
-        return null;
+        return ExclusionType.TRASH_CLASSES;
     }
 
     @Override

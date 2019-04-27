@@ -62,7 +62,7 @@ public enum ConfigurationSetting {
     WATERMARK(Map.class, new Watermarker()),
     OPTIMIZER(Map.class, new Optimizer()),
     SHRINKER(Map.class, new Shrinker()),
-    MEMBER_SHUFFLER(Boolean.class, new MemberShuffler()),
+    MEMBER_SHUFFLER(Map.class, new MemberShuffler()),
     RENAMER(Map.class, new Renamer()),
     DICTIONARY(String.class, null),
     RANDOMIZED_STRING_LENGTH(Integer.class, null),
