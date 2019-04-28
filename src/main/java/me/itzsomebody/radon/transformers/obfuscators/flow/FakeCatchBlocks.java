@@ -32,6 +32,7 @@ import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.LabelNode;
+import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TryCatchBlockNode;
 
@@ -66,6 +67,8 @@ public class FakeCatchBlocks extends FlowObfuscation {
         fakeHandler.access = ACC_PUBLIC | ACC_SUPER;
         fakeHandler.version = V1_5;
 
+        String methodName = randomString();
+
         getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper ->
                 classWrapper.methods.stream().filter(methodWrapper -> !excluded(methodWrapper)
                         && hasInstructions(methodWrapper.methodNode) && !"<init>".equals(methodWrapper.originalName))
@@ -80,7 +83,7 @@ public class FakeCatchBlocks extends FlowObfuscation {
                                 if (!ASMUtils.isInstruction(insn))
                                     continue;
 
-                                if (insn instanceof JumpInsnNode) {
+                                if (RandomUtils.getRandomInt(10) > 6) {
                                     LabelNode trapStart = new LabelNode();
                                     LabelNode trapEnd = new LabelNode();
                                     LabelNode catchStart = new LabelNode();
@@ -89,7 +92,7 @@ public class FakeCatchBlocks extends FlowObfuscation {
                                     InsnList catchBlock = new InsnList();
                                     catchBlock.add(catchStart);
                                     catchBlock.add(new InsnNode(DUP));
-                                    catchBlock.add(new InsnNode(POP));
+                                    catchBlock.add(new MethodInsnNode(INVOKEVIRTUAL, fakeHandler.name, methodName, "()V", false));
                                     catchBlock.add(new InsnNode(ATHROW));
                                     catchBlock.add(catchEnd);
 
@@ -105,8 +108,9 @@ public class FakeCatchBlocks extends FlowObfuscation {
                                 }
                             }
                         }));
-
-        getClasses().put(fakeHandler.name, new ClassWrapper(fakeHandler, false));
+        ClassWrapper newWrapper = new ClassWrapper(fakeHandler, false);
+        getClasses().put(fakeHandler.name, newWrapper);
+        getClassPath().put(fakeHandler.name, newWrapper);
 
         Logger.stdOut("Inserted " + counter.get() + " fake try catches");
     }

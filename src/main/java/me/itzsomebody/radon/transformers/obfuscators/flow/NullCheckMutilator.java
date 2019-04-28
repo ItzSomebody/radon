@@ -33,7 +33,7 @@ import org.objectweb.asm.tree.TryCatchBlockNode;
 /**
  * Replaces IFNONNULL and IFNULL with a semantically equivalent try-catch block. This relies on the fact that
  * {@link NullPointerException} is thrown when a method is invoked upon null.
- * FIXME: breaks some stuff.
+ * FIXME: broken
  *
  * @author ItzSomebody
  */
@@ -83,22 +83,24 @@ public class NullCheckMutilator extends FlowObfuscation {
                             insns.add(new InsnNode(POP));
                             insns.add(trapEnd);
 
-                            if (insn.getOpcode() == IFNONNULL)
+                            if (insn.getOpcode() == IFNONNULL) {
                                 insns.add(new JumpInsnNode(GOTO, jump.label));
-                            else
+                                insns.add(catchStart);
+                                insns.add(new InsnNode(POP));
+                                insns.add(catchEnd);
+                            } else {
                                 insns.add(new JumpInsnNode(GOTO, catchEnd));
-
-                            insns.add(catchStart);
-                            insns.add(new InsnNode(POP));
-
-                            if (insn.getOpcode() == IFNULL)
+                                insns.add(catchStart);
+                                insns.add(new InsnNode(POP));
                                 insns.add(new JumpInsnNode(GOTO, jump.label));
-
-                            insns.add(catchEnd);
+                                insns.add(catchEnd);
+                            }
 
                             methodNode.instructions.insert(insn, insns);
                             methodNode.instructions.remove(insn);
-                            methodNode.tryCatchBlocks.add(new TryCatchBlockNode(trapStart, trapEnd, catchStart, "java/lang/NullPointerException"));
+                            methodNode.tryCatchBlocks.add(0, new TryCatchBlockNode(trapStart, trapEnd, catchStart, "java/lang/NullPointerException"));
+
+                            counter.incrementAndGet();
                         }
                     }
                 }));

@@ -42,6 +42,7 @@ public enum ExclusionType {
     RESOURCE_RENAMER,
     VIRTUALIZER,
     ANTI_TAMPER,
+    TRASH_CLASSES,
     PACKER;
 
     public String getName() {
