@@ -53,24 +53,24 @@ public class StaticCall extends Handler {
         }
 
         try {
-            if (!returnType.equals("void")) {
-                if (returnType.equals("int"))
+            if (!"void".equals(returnType)) {
+                if ("int".equals(returnType))
                     vm.push(new JInteger((Integer) method.invoke(null, args)));
-                else if (returnType.equals("long")) {
+                else if ("long".equals(returnType)) {
                     vm.push(new JLong((Long) method.invoke(null, args)));
                     vm.push(JTop.getTop());
-                } else if (returnType.equals("float"))
+                } else if ("float".equals(returnType))
                     vm.push(new JFloat((Float) method.invoke(null, args)));
-                else if (returnType.equals("double")) {
+                else if ("double".equals(returnType)) {
                     vm.push(new JDouble((Double) method.invoke(null, args)));
                     vm.push(JTop.getTop());
-                } else if (returnType.equals("byte"))
+                } else if ("byte".equals(returnType))
                     vm.push(new JInteger((Byte) method.invoke(null, args)));
-                else if (returnType.equals("char"))
+                else if ("char".equals(returnType))
                     vm.push(new JInteger((Character) method.invoke(null, args)));
-                else if (returnType.equals("short"))
+                else if ("short".equals(returnType))
                     vm.push(new JInteger((Short) method.invoke(null, args)));
-                else if (returnType.equals("boolean"))
+                else if ("boolean".equals(returnType))
                     vm.push(new JInteger((Boolean) method.invoke(null, args)));
                 else
                     vm.push(new JObject(method.invoke(null, args)));

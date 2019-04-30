@@ -6,20 +6,18 @@ import me.itzsomebody.vm.datatypes.JInteger;
 public class Dcmpg extends Handler {
     @Override
     public void handle(VM vm, Object[] operands) {
-        double first, second, result;
+        vm.pop();
+        double second = vm.pop().asLong();
 
         vm.pop();
-        second = vm.pop().asLong();
-
-        vm.pop();
-        first = vm.pop().asLong();
+        double first = vm.pop().asLong();
 
         if (Double.isNaN(first) || Double.isNaN(second)) {
             vm.push(new JInteger(1));
             return;
         }
 
-        result = first - second;
+        double result = first - second;
 
         if (result == 0)
             vm.push(new JInteger(0));

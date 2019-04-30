@@ -36,6 +36,7 @@ public class PrimCast extends Handler {
                 vm.pop();
                 vm.push(new JDouble((double) vm.pop().asLong()));
                 vm.push(JTop.getTop());
+                break;
             case 6: // F2I
                 vm.push(new JInteger((int) vm.pop().asFloat()));
                 break;

@@ -25,21 +25,21 @@ public class StaticSet extends Handler {
         if (value instanceof JTop)
             value = vm.pop();
 
-        if (ownerName.equals("int"))
+        if ("int".equals(ownerName))
             field.setInt(null, value.asInt());
-        else if (ownerName.equals("long"))
+        else if ("long".equals(ownerName))
             field.setLong(null, value.asLong());
-        else if (ownerName.equals("float"))
+        else if ("float".equals(ownerName))
             field.setFloat(null, value.asFloat());
-        else if (ownerName.equals("double"))
+        else if ("double".equals(ownerName))
             field.setDouble(null, value.asDouble());
-        else if (ownerName.equals("byte"))
+        else if ("byte".equals(ownerName))
             field.setByte(null, value.asByte());
-        else if (ownerName.equals("short"))
+        else if ("short".equals(ownerName))
             field.setShort(null, value.asShort());
-        else if (ownerName.equals("char"))
+        else if ("char".equals(ownerName))
             field.setChar(null, value.asChar());
-        else if (ownerName.equals("boolean"))
+        else if ("boolean".equals(ownerName))
             field.setBoolean(null, value.asBool());
         else
             field.set(null, value.asObj());

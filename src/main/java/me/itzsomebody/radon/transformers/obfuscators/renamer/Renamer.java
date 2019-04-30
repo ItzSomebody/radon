@@ -168,11 +168,6 @@ public class Renamer extends Transformer {
         dumpMappings();
     }
 
-    private String getNewClassName(String current) {
-
-        return null;
-    }
-
     private void genMethodMappings(MethodWrapper methodWrapper, String owner, String newName) {
         String key = owner + '.' + methodWrapper.originalName + methodWrapper.originalDescription;
 

@@ -77,7 +77,7 @@ public class VM {
     private static final Map<String, Field> FIELD_CACHE;
     private static final Map<String, Constructor> CONSTRUCTOR_CACHE;
     private static final Handler[] HANDLERS;
-    private static Stub stub;
+    private static final Stub STUB;
     private final VMStack stack;
     private final JWrapper[] registers;
     private final Instruction[] instructions;
@@ -89,6 +89,11 @@ public class VM {
         METHOD_CACHE = new HashMap<>();
         FIELD_CACHE = new HashMap<>();
         CONSTRUCTOR_CACHE = new HashMap<>();
+        try {
+            STUB = new Stub();
+        } catch (Exception e) {
+            throw new VMException();
+        }
 
         HANDLERS = new Handler[61];
         HANDLERS[0] = new NullPush();
@@ -155,12 +160,9 @@ public class VM {
     }
 
     public VM(VMContext context) throws Exception {
-        if (stub == null)
-            stub = new Stub();
-
         this.stack = context.getStack();
         this.registers = context.getRegisters();
-        this.instructions = stub.instructions[context.getOffset()];
+        this.instructions = STUB.instructions[context.getOffset()];
         this.catches = context.getCatches();
         this.pc = 0;
         this.executing = true;
@@ -249,23 +251,23 @@ public class VM {
     }
 
     public static Class getClazz(String name) throws ClassNotFoundException {
-        if (name.equals("int"))
+        if ("int".equals(name))
             return int.class;
-        if (name.equals("long"))
+        if ("long".equals(name))
             return long.class;
-        if (name.equals("float"))
+        if ("float".equals(name))
             return float.class;
-        if (name.equals("double"))
+        if ("double".equals(name))
             return double.class;
-        if (name.equals("char"))
+        if ("char".equals(name))
             return char.class;
-        if (name.equals("short"))
+        if ("short".equals(name))
             return short.class;
-        if (name.equals("byte"))
+        if ("byte".equals(name))
             return byte.class;
-        if (name.equals("boolean"))
+        if ("boolean".equals(name))
             return boolean.class;
-        if (name.equals("void"))
+        if ("void".equals(name))
             return void.class;
 
         return Class.forName(name);
@@ -292,6 +294,7 @@ public class VM {
             Method method = getMethod(superClass, name, params);
 
             if (method != null) {
+                method.setAccessible(true);
                 METHOD_CACHE.put(clazz.getName() + '.' + name + '(' + parametersToString(params) + ')', method);
                 return method;
             }
@@ -304,6 +307,7 @@ public class VM {
                 Method method = getMethod(interfaces[i], name, params);
 
                 if (method != null) {
+                    method.setAccessible(true);
                     METHOD_CACHE.put(clazz.getName() + '.' + name + '(' + parametersToString(params) + ')', method);
                     return method;
                 }
@@ -334,6 +338,7 @@ public class VM {
             Constructor constructor = getConstructor(superClass, params);
 
             if (constructor != null) {
+                constructor.setAccessible(true);
                 CONSTRUCTOR_CACHE.put(clazz.getName() + '(' + parametersToString(params) + ')', constructor);
                 return constructor;
             }
@@ -346,6 +351,7 @@ public class VM {
                 Constructor constructor = getConstructor(interfaces[i], params);
 
                 if (constructor != null) {
+                    constructor.setAccessible(true);
                     CONSTRUCTOR_CACHE.put(clazz.getName() + '(' + parametersToString(params) + ')', constructor);
                     return constructor;
                 }
@@ -373,11 +379,11 @@ public class VM {
         if (clazz.getSuperclass() != null) {
             Class superClass = clazz.getSuperclass();
 
-            Field method = getField(superClass, name, type);
+            Field field = getField(superClass, name, type);
 
-            if (method != null) {
-                FIELD_CACHE.put(clazz.getName() + '.' + name + '(' + type.getName() + ')', method);
-                return method;
+            if (field != null) {
+                FIELD_CACHE.put(clazz.getName() + '.' + name + '(' + type.getName() + ')', field);
+                return field;
             }
         }
 

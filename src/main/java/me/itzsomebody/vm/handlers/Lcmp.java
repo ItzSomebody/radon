@@ -6,15 +6,13 @@ import me.itzsomebody.vm.datatypes.JInteger;
 public class Lcmp extends Handler {
     @Override
     public void handle(VM vm, Object[] operands) {
-        long first, second, result;
+        vm.pop();
+        long second = vm.pop().asLong();
 
         vm.pop();
-        second = vm.pop().asLong();
+        long first = vm.pop().asLong();
 
-        vm.pop();
-        first = vm.pop().asLong();
-
-        result = first - second;
+        long result = first - second;
 
         if (result == 0)
             vm.push(new JInteger(0));

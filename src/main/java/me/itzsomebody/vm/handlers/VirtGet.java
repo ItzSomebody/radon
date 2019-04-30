@@ -26,25 +26,25 @@ public class VirtGet extends Handler {
 
         Object ref = vm.pop().asObj();
 
-        if (type.getName().equals("int"))
+        if ("int".equals(type.getName()))
             vm.push(new JInteger(field.getInt(ref)));
-        else if (type.getName().equals("long")) {
+        else if ("long".equals(type.getName())) {
             vm.push(new JLong(field.getLong(ref)));
             vm.push(JTop.getTop());
         }
-        else if (type.getName().equals("float"))
+        else if ("float".equals(type.getName()))
             vm.push(new JFloat(field.getFloat(ref)));
-        else if (type.getName().equals("double")) {
+        else if ("double".equals(type.getName())) {
             vm.push(new JDouble(field.getDouble(ref)));
             vm.push(JTop.getTop());
         }
-        else if (type.getName().equals("byte"))
+        else if ("byte".equals(type.getName()))
             vm.push(new JInteger(field.getByte(ref)));
-        else if (type.getName().equals("short"))
+        else if ("short".equals(type.getName()))
             vm.push(new JInteger(field.getShort(ref)));
-        else if (type.getName().equals("char"))
+        else if ("char".equals(type.getName()))
             vm.push(new JInteger(field.getChar(ref)));
-        else if (type.getName().equals("boolean"))
+        else if ("boolean".equals(type.getName()))
             vm.push(new JInteger(field.getBoolean(ref)));
         else
             vm.push(new JObject(field.get(ref)));

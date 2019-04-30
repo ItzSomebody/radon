@@ -24,25 +24,23 @@ public class StaticGet extends Handler {
         if (field == null)
             throw new VMException();
 
-        if (type.getName().equals("int"))
+        if ("int".equals(type.getName()))
             vm.push(new JInteger(field.getInt(null)));
-        else if (type.getName().equals("long")) {
+        else if ("long".equals(type.getName())) {
             vm.push(new JLong(field.getLong(null)));
             vm.push(JTop.getTop());
-        }
-        else if (type.getName().equals("float"))
+        } else if ("float".equals(type.getName()))
             vm.push(new JFloat(field.getFloat(null)));
-        else if (type.getName().equals("double")) {
+        else if ("double".equals(type.getName())) {
             vm.push(new JDouble(field.getDouble(null)));
             vm.push(JTop.getTop());
-        }
-        else if (type.getName().equals("byte"))
+        } else if ("byte".equals(type.getName()))
             vm.push(new JInteger(field.getByte(null)));
-        else if (type.getName().equals("short"))
+        else if ("short".equals(type.getName()))
             vm.push(new JInteger(field.getShort(null)));
-        else if (type.getName().equals("char"))
+        else if ("char".equals(type.getName()))
             vm.push(new JInteger(field.getChar(null)));
-        else if (type.getName().equals("boolean"))
+        else if ("boolean".equals(type.getName()))
             vm.push(new JInteger(field.getBoolean(null)));
         else
             vm.push(new JObject(field.get(null)));

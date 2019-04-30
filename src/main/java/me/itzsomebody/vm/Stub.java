@@ -1,9 +1,6 @@
 package me.itzsomebody.vm;
 
-import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
-import java.io.IOException;
-import java.io.InputStream;
 
 public class Stub {
     public Instruction[][] instructions;

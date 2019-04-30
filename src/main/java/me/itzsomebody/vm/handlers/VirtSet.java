@@ -27,21 +27,21 @@ public class VirtSet extends Handler {
 
         Object ref = vm.pop().asObj();
 
-        if (ownerName.equals("int"))
+        if ("int".equals(ownerName))
             field.setInt(ref, value.asInt());
-        else if (ownerName.equals("long"))
+        else if ("long".equals(ownerName))
             field.setLong(ref, value.asLong());
-        else if (ownerName.equals("float"))
+        else if ("float".equals(ownerName))
             field.setFloat(ref, value.asFloat());
-        else if (ownerName.equals("double"))
+        else if ("double".equals(ownerName))
             field.setDouble(ref, value.asDouble());
-        else if (ownerName.equals("byte"))
+        else if ("byte".equals(ownerName))
             field.setByte(ref, value.asByte());
-        else if (ownerName.equals("short"))
+        else if ("short".equals(ownerName))
             field.setShort(ref, value.asShort());
-        else if (ownerName.equals("char"))
+        else if ("char".equals(ownerName))
             field.setChar(ref, value.asChar());
-        else if (ownerName.equals("boolean"))
+        else if ("boolean".equals(ownerName))
             field.setBoolean(ref, value.asBool());
         else
             field.set(ref, value.asObj());

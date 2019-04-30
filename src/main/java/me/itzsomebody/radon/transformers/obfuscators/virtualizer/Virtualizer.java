@@ -468,6 +468,7 @@ public class Virtualizer extends Transformer implements VMOpcodes {
                             break;
                         default:
                             mOpcode = VM_VIRT_CALL;
+                            break;
                     }
 
                     if (mOpcode == VM_INSTANTIATE)

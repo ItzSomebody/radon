@@ -6,17 +6,15 @@ import me.itzsomebody.vm.datatypes.JInteger;
 public class Fcmpg extends Handler {
     @Override
     public void handle(VM vm, Object[] operands) {
-        float first, second, result;
-
-        second = vm.pop().asFloat();
-        first = vm.pop().asFloat();
+        float second = vm.pop().asFloat();
+        float first = vm.pop().asFloat();
 
         if (Float.isNaN(first) || Float.isNaN(second)) {
             vm.push(new JInteger(1));
             return;
         }
 
-        result = first - second;
+        float result = first - second;
 
         if (result == 0)
             vm.push(new JInteger(0));

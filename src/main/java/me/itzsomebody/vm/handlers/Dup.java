@@ -1,6 +1,7 @@
 package me.itzsomebody.vm.handlers;
 
 import me.itzsomebody.vm.VM;
+import me.itzsomebody.vm.VMException;
 import me.itzsomebody.vm.datatypes.JWrapper;
 
 public class Dup extends Handler {
@@ -64,6 +65,8 @@ public class Dup extends Handler {
                 vm.push(first);
                 break;
             }
+            default:
+                throw new VMException();
         }
     }
 }
