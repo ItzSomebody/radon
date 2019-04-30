@@ -108,7 +108,7 @@ public class ObfuscationConfiguration {
     }
 
     public boolean isVerify() {
-        return verify;
+        return verify; // TODO
     }
 
     public void setVerify(boolean verify) {
