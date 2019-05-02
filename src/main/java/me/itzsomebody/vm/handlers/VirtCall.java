@@ -17,7 +17,7 @@ public class VirtCall extends Handler {
     public void handle(VM vm, Object[] operands) throws Throwable {
         String ownerName = (String) operands[0];
         String name = (String) operands[1];
-        String[] paramsAsStrings = ((String) operands[2]).split(";");
+        String[] paramsAsStrings = ((String) operands[2]).split("\u0001\u0001");
         Class[] params;
         if (paramsAsStrings[0].equals("\u0000\u0000\u0000"))
             params = new Class[0];

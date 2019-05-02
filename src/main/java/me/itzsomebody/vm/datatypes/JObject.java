@@ -59,8 +59,8 @@ public class JObject extends JWrapper {
             return new JObject(val);
     }
 
-    public void set(JWrapper value, int index) {
-        Array.set(value.asObj(), index, value.asObj());
+    public void set(JWrapper wrapper, int index) {
+        Array.set(value, index, wrapper.asObj());
     }
 
     @Override

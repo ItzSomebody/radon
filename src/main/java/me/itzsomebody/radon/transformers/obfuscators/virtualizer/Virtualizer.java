@@ -430,7 +430,6 @@ public class Virtualizer extends Transformer implements VMOpcodes {
                 case GETFIELD:
                 case PUTFIELD:
                     FieldInsnNode fin = (FieldInsnNode) insn;
-                    Type type = Type.getType(fin.desc);
                     int opcode;
                     switch (insn.getOpcode()) {
                         case GETSTATIC:
@@ -444,13 +443,16 @@ public class Virtualizer extends Transformer implements VMOpcodes {
                             break;
                         default:
                             opcode = VM_VIRT_SET;
+                            break;
                     }
+
+                    Type fieldType = Type.getType(fin.desc);
 
                     instructions.add(new Instruction(opcode, new Object[]
                             {
                                     fin.owner.replace('/', '.'),
                                     fin.name,
-                                    (type.getSort() == Type.ARRAY) ? (type.getInternalName() + ";") : type.getClassName()
+                                    (fieldType.getSort() == Type.ARRAY) ? fieldType.getInternalName().replace('/', '.') : fieldType.getClassName()
                             }));
                     break;
                 case INVOKEVIRTUAL:
@@ -521,10 +523,7 @@ public class Virtualizer extends Transformer implements VMOpcodes {
                     instructions.add(new Instruction(VM_NEW_ARR, new Object[]{arrayType}));
                     break;
                 case ANEWARRAY:
-                    String anewarrayDesc = ((TypeInsnNode) insn).desc;
-                    Type anewarrayType = Type.getType((anewarrayDesc.startsWith("[") ? anewarrayDesc + ";" : "L" + anewarrayDesc + ";"));
-                    String anewarrayName = (anewarrayType.getSort() == Type.ARRAY) ? anewarrayType.getInternalName() + ";" : anewarrayType.getClassName();
-                    instructions.add(new Instruction(VM_NEW_ARR, new Object[]{anewarrayName}));
+                    instructions.add(new Instruction(VM_NEW_ARR, new Object[]{((TypeInsnNode) insn).desc.replace('/', '.')}));
                     break;
                 case ARRAYLENGTH:
                     instructions.add(new Instruction(VM_ARR_LENGTH, new Object[0]));
@@ -533,14 +532,10 @@ public class Virtualizer extends Transformer implements VMOpcodes {
                     instructions.add(new Instruction(VM_THROW, new Object[0]));
                     break;
                 case CHECKCAST:
-                    String checkcastDesc = ((TypeInsnNode) insn).desc;
-                    Type checkcastType = Type.getType((checkcastDesc.startsWith("[") ? checkcastDesc + ";" : "L" + checkcastDesc + ";"));
-                    instructions.add(new Instruction(VM_CHECKCAST, new Object[]{checkcastType.getClassName()}));
+                    instructions.add(new Instruction(VM_CHECKCAST, new Object[]{((TypeInsnNode) insn).desc.replace('/', '.')}));
                     break;
                 case INSTANCEOF:
-                    String instanceDesc = ((TypeInsnNode) insn).desc;
-                    Type instanceType = Type.getType((instanceDesc.startsWith("[") ? instanceDesc + ";" : "L" + instanceDesc + ";"));
-                    instructions.add(new Instruction(VM_INSTANCE_OF, new Object[]{instanceType.getClassName()}));
+                    instructions.add(new Instruction(VM_INSTANCE_OF, new Object[]{((TypeInsnNode) insn).desc.replace('/', '.')}));
                     break;
                 case MONITORENTER:
                     instructions.add(new Instruction(VM_MONITOR, new Object[]{0}));
@@ -584,7 +579,7 @@ public class Virtualizer extends Transformer implements VMOpcodes {
         vmCall.add(new TypeInsnNode(NEW, Type.getType(VMContext.class).getInternalName()));
         vmCall.add(new InsnNode(DUP));
         vmCall.add(ASMUtils.getNumberInsn((methodNode.maxStack + 1) << 1));
-        vmCall.add(ASMUtils.getNumberInsn(methodNode.maxLocals));
+        vmCall.add(ASMUtils.getNumberInsn((methodNode.maxLocals + 1) << 1));
         vmCall.add(ASMUtils.getNumberInsn(offset));
         if (methodNode.tryCatchBlocks != null && !methodNode.tryCatchBlocks.isEmpty()) {
             vmCall.add(ASMUtils.getNumberInsn(methodNode.tryCatchBlocks.size()));
@@ -722,9 +717,11 @@ public class Virtualizer extends Transformer implements VMOpcodes {
         else
             Arrays.stream(types).forEach(type -> {
                 if (type.getSort() == Type.ARRAY)
-                    sb.append(type.getInternalName()).append(';');
+                    sb.append(type.getInternalName().replace('/', '.'));
                 else
-                    sb.append(type.getClassName()).append(';');
+                    sb.append(type.getClassName());
+
+                sb.append("\u0001\u0001");
             });
 
         return sb.toString();
