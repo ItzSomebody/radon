@@ -118,6 +118,8 @@ public abstract class Transformer implements Opcodes {
                 return StringUtils.randomAlphaString(length);
             case ALPHANUMERIC:
                 return StringUtils.randomAlphaNumericString(length);
+            case UNICODE:
+                return StringUtils.randomUnicodeString(length);
             default: {
                 throw new RadonException("Illegal dictionary type: " + radon.config.getDictionaryType());
             }

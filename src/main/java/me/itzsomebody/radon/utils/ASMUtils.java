@@ -42,6 +42,15 @@ public class ASMUtils {
         return !(insn instanceof FrameNode) && !(insn instanceof LineNumberNode) && !(insn instanceof LabelNode);
     }
 
+    public static MethodNode getMethod(ClassNode classNode, String name, String desc) {
+        for (MethodNode methodNode : classNode.methods) {
+            if (name.equals(methodNode.name) && desc.equals(methodNode.desc)) {
+                return methodNode;
+            }
+        }
+        return null;
+    }
+
     public static boolean isReturn(int opcode) {
         return (opcode >= Opcodes.IRETURN && opcode <= Opcodes.RETURN);
     }

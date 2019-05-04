@@ -20,6 +20,8 @@ package me.itzsomebody.radon.config;
 
 import java.util.List;
 import java.util.Map;
+
+import me.itzsomebody.radon.transformers.StaticInitialization;
 import me.itzsomebody.radon.transformers.Transformer;
 import me.itzsomebody.radon.transformers.miscellaneous.Packer;
 import me.itzsomebody.radon.transformers.miscellaneous.expiration.Expiration;
@@ -51,6 +53,7 @@ public enum ConfigurationSetting {
     STRING_ENCRYPTION(Map.class, new StringEncryption()),
     FLOW_OBFUSCATION(Map.class, new FlowObfuscation()),
     REFERENCE_OBFUSCATION(Map.class, new ReferenceObfuscation()),
+    STATIC_INITIALIZATION(Boolean.class, new StaticInitialization()),
     NUMBER_OBFUSCATION(Map.class, new NumberObfuscation()),
     ANTI_TAMPER(Boolean.class, new AntiTamper()),
     VIRTUALIZER(Boolean.class, new Virtualizer()), // TODO: ;)
