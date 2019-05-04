@@ -1,9 +1,10 @@
-package me.itzsomebody.radon.transformers;
+package me.itzsomebody.radon.transformers.obfuscators;
 
 import me.itzsomebody.radon.asm.FieldWrapper;
 import me.itzsomebody.radon.config.ConfigurationSetting;
 import me.itzsomebody.radon.exceptions.InvalidConfigurationValueException;
 import me.itzsomebody.radon.exclusions.ExclusionType;
+import me.itzsomebody.radon.transformers.Transformer;
 import me.itzsomebody.radon.utils.ASMUtils;
 import org.objectweb.asm.tree.*;
 
@@ -22,12 +23,10 @@ public class StaticInitialization extends Transformer {
             Map<FieldWrapper, Object> map = new HashMap<>();
             for (FieldWrapper field : classWrapper.fields) {
                 FieldNode node = field.fieldNode;
-                if (node.value != null) {
-                    if ((node.access & ACC_STATIC) != 0 && (node.value instanceof String
-                            || node.value instanceof Integer)) {
-                        map.put(field, node.value);
-                        node.value = null;
-                    }
+                if ((node.access & ACC_STATIC) != 0 && (node.value instanceof String
+                        || node.value instanceof Integer)) {
+                    map.put(field, node.value);
+                    node.value = null;
                 }
             }
             if (!map.isEmpty()) {
@@ -76,6 +75,7 @@ public class StaticInitialization extends Transformer {
 
     @Override
     public void setConfiguration(Map<String, Object> config) {
+        // Not needed
     }
 
     @Override

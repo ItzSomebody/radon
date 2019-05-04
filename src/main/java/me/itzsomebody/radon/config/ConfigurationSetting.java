@@ -21,7 +21,7 @@ package me.itzsomebody.radon.config;
 import java.util.List;
 import java.util.Map;
 
-import me.itzsomebody.radon.transformers.StaticInitialization;
+import me.itzsomebody.radon.transformers.obfuscators.StaticInitialization;
 import me.itzsomebody.radon.transformers.Transformer;
 import me.itzsomebody.radon.transformers.miscellaneous.Packer;
 import me.itzsomebody.radon.transformers.miscellaneous.expiration.Expiration;
