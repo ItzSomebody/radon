@@ -62,7 +62,7 @@ public class StubCreator {
                         Type type = (Type) operand;
 
                         if (type.getSort() == Type.ARRAY)
-                            dos.writeUTF(type.getInternalName() + ";");
+                            dos.writeUTF(type.getInternalName());
                         else
                             dos.writeUTF(type.getClassName());
                     }
