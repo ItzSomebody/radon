@@ -95,6 +95,21 @@ public class MethodCallEjector extends AbstractEjectPhase implements Opcodes {
         return methodNode;
     }
 
+    private static int getLastArgumentVar(MethodNode methodNode) {
+        Type[] argumentTypes = Type.getArgumentTypes(methodNode.desc);
+        int var = 0;
+        for (int i = 0; i < argumentTypes.length - 1; i++) {
+            var += argumentTypes[i].getSize();
+        }
+        return var;
+    }
+
+    // TODO: Improve name generation logic
+    private static String getProxyMethodName(MethodNode methodNode) {
+        String name = methodNode.name.replace('<', '_').replace('>', '_');
+        return name + "$" + Math.abs(RandomUtils.getRandomInt());
+    }
+
     private Map<Integer, InsnList> createJunkArguments(Type[] argumentTypes, int offset) {
         Map<Integer, InsnList> junkArguments = new HashMap<>();
 
@@ -125,7 +140,7 @@ public class MethodCallEjector extends AbstractEjectPhase implements Opcodes {
 
         Map<AbstractInsnNode, InsnList> patches = new HashMap<>();
         methodCalls.forEach((key, value) -> {
-            MethodNode proxyMethod = createProxyMethod("_" + RandomUtils.getRandomInt(1, Integer.MAX_VALUE), key);
+            MethodNode proxyMethod = createProxyMethod(getProxyMethodName(methodNode), key);
             int offset = key.opcode == INVOKESTATIC ? 0 : 1;
 
             Map<Integer, InsnList> proxyFixes = new HashMap<>();
@@ -198,15 +213,6 @@ public class MethodCallEjector extends AbstractEjectPhase implements Opcodes {
             methodNode.instructions.insertBefore(abstractInsnNode, insnList);
             methodNode.instructions.remove(abstractInsnNode);
         });
-    }
-
-    private static int getLastArgumentVar(MethodNode methodNode) {
-        Type[] argumentTypes = Type.getArgumentTypes(methodNode.desc);
-        int var = 0;
-        for (int i = 0; i < argumentTypes.length - 1; i++) {
-            var += argumentTypes[i].getSize();
-        }
-        return var;
     }
 
     private static class MethodCallInfo {
