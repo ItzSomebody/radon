@@ -27,7 +27,6 @@ import me.itzsomebody.radon.cli.CommandArgumentsParser;
 import me.itzsomebody.radon.config.ConfigurationParser;
 import me.itzsomebody.radon.utils.IOUtils;
 import me.itzsomebody.radon.utils.WatermarkUtils;
-import sun.rmi.runtime.Log;
 
 /**
  * Main class of obfuscator. \o/
