@@ -68,6 +68,7 @@ public enum ConfigurationSetting {
     RANDOMIZED_STRING_LENGTH(Integer.class, null),
     COMPRESSION_LEVEL(Integer.class, null),
     VERIFY(Boolean.class, null),
+    CORRUPT_CRC(Boolean.class, null),
     TRASH_CLASSES(Integer.class, null);
 
     private final Class expectedType;

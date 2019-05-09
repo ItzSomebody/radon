@@ -34,6 +34,7 @@ public class ObfuscationConfiguration {
     private DictionaryType dictionaryType;
     private int compressionLevel;
     private boolean verify;
+    private boolean corruptCrc;
 
     public File getInput() {
         return input;
@@ -113,5 +114,13 @@ public class ObfuscationConfiguration {
 
     public void setVerify(boolean verify) {
         this.verify = verify;
+    }
+
+    public boolean isCorruptCrc() {
+        return corruptCrc;
+    }
+
+    public void setCorruptCrc(boolean corruptCrc) {
+        this.corruptCrc = corruptCrc;
     }
 }
