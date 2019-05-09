@@ -43,12 +43,8 @@ public class ASMUtils {
     }
 
     public static MethodNode getMethod(ClassNode classNode, String name, String desc) {
-        for (MethodNode methodNode : classNode.methods) {
-            if (name.equals(methodNode.name) && desc.equals(methodNode.desc)) {
-                return methodNode;
-            }
-        }
-        return null;
+        return classNode.methods.stream().filter(methodNode -> name.equals(methodNode.name) && desc.equals(methodNode.desc))
+                .findAny().orElse(null);
     }
 
     public static boolean isReturn(int opcode) {

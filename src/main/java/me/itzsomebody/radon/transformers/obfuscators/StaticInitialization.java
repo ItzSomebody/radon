@@ -1,15 +1,20 @@
 package me.itzsomebody.radon.transformers.obfuscators;
 
+import java.lang.reflect.Modifier;
+import java.util.HashMap;
+import java.util.Map;
 import me.itzsomebody.radon.asm.FieldWrapper;
 import me.itzsomebody.radon.config.ConfigurationSetting;
 import me.itzsomebody.radon.exceptions.InvalidConfigurationValueException;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
 import me.itzsomebody.radon.utils.ASMUtils;
-import org.objectweb.asm.tree.*;
-
-import java.util.HashMap;
-import java.util.Map;
+import org.objectweb.asm.tree.FieldInsnNode;
+import org.objectweb.asm.tree.FieldNode;
+import org.objectweb.asm.tree.InsnList;
+import org.objectweb.asm.tree.InsnNode;
+import org.objectweb.asm.tree.LdcInsnNode;
+import org.objectweb.asm.tree.MethodNode;
 
 /**
  * Moves initialization of all static fields into {@code <clinit>} of the class
@@ -23,7 +28,7 @@ public class StaticInitialization extends Transformer {
             Map<FieldWrapper, Object> map = new HashMap<>();
             for (FieldWrapper field : classWrapper.fields) {
                 FieldNode node = field.fieldNode;
-                if ((node.access & ACC_STATIC) != 0 && (node.value instanceof String
+                if (Modifier.isStatic(node.access) && (node.value instanceof String
                         || node.value instanceof Integer)) {
                     map.put(field, node.value);
                     node.value = null;
@@ -32,12 +37,10 @@ public class StaticInitialization extends Transformer {
             if (!map.isEmpty()) {
                 InsnList toAdd = new InsnList();
                 for (Map.Entry<FieldWrapper, Object> fieldNodeObjectEntry : map.entrySet()) {
-                    if (fieldNodeObjectEntry.getValue() instanceof String) {
+                    if (fieldNodeObjectEntry.getValue() instanceof String)
                         toAdd.add(new LdcInsnNode(fieldNodeObjectEntry.getValue()));
-                    }
-                    if (fieldNodeObjectEntry.getValue() instanceof Integer) {
+                    if (fieldNodeObjectEntry.getValue() instanceof Integer)
                         toAdd.add(ASMUtils.getNumberInsn((Integer) fieldNodeObjectEntry.getValue()));
-                    }
                     toAdd.add(
                             new FieldInsnNode(PUTSTATIC, classWrapper.originalName, fieldNodeObjectEntry.getKey().originalName,
                                     fieldNodeObjectEntry.getKey().originalDescription));
@@ -60,12 +63,12 @@ public class StaticInitialization extends Transformer {
 
     @Override
     public String getName() {
-        return "StaticInitialization";
+        return "Static Initialization";
     }
 
     @Override
     public ExclusionType getExclusionType() {
-        return ExclusionType.REFERENCE_OBFUSCATION;
+        return ExclusionType.STATIC_INITIALIZATION;
     }
 
     @Override

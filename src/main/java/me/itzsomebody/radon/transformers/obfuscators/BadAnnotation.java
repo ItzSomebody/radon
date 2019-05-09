@@ -1,14 +1,13 @@
 package me.itzsomebody.radon.transformers.obfuscators;
 
+import java.util.ArrayList;
+import java.util.Map;
 import me.itzsomebody.radon.config.ConfigurationSetting;
 import me.itzsomebody.radon.exceptions.InvalidConfigurationValueException;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
 import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.MethodNode;
-
-import java.util.ArrayList;
-import java.util.Map;
 
 /**
  * Adds {@code @} annotation to all methods
@@ -22,25 +21,25 @@ public class BadAnnotation extends Transformer {
     public void transform() {
         getClassWrappers().parallelStream().forEach(cn -> cn.methods.parallelStream().forEach(mn -> {
             MethodNode methodNode = mn.methodNode;
-            if (methodNode.visibleAnnotations == null) {
+
+            if (methodNode.visibleAnnotations == null)
                 methodNode.visibleAnnotations = new ArrayList<>();
-            }
-            methodNode.visibleAnnotations.add(new AnnotationNode("@"));
-            if (methodNode.invisibleAnnotations == null) {
+            if (methodNode.invisibleAnnotations == null)
                 methodNode.invisibleAnnotations = new ArrayList<>();
-            }
+
+            methodNode.visibleAnnotations.add(new AnnotationNode("@"));
             methodNode.invisibleAnnotations.add(new AnnotationNode("@"));
         }));
     }
 
     @Override
     public String getName() {
-        return "BadAnnotation";
+        return "Bad Annotations";
     }
 
     @Override
     public ExclusionType getExclusionType() {
-        return ExclusionType.CRASHER;
+        return ExclusionType.BAD_ANNOTATIONS;
     }
 
     @Override
