@@ -74,4 +74,13 @@ public class StringUtils {
 
         return first + '$' + second.substring(second.lastIndexOf("/") + 1);
     }
+
+    public static String randomUnicodeString(int length) {
+        StringBuilder sb = new StringBuilder();
+        for ( int i = 0; i < length; i++ ) {
+            sb.append("\u009A\u009C\u0000\u0003\u2421\r\0\f\t\b\u0001\u2000\u0000\u2421\u2420\u2411\u0002\n\u0003\n\u0004\u0005\u0006\n\u0007\u0020\u0011\u0012\u0010\n\u0008\r\u0009\u2418");
+        }
+        String str = sb.toString();
+        return str.replace(Character.toString(str.charAt(RandomUtils.getRandomInt(str.length()))), "\u2421");
+    }
 }
