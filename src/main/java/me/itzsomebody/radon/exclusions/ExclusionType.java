@@ -37,6 +37,7 @@ public enum ExclusionType {
     HIDE_CODE,
     EXPIRATION,
     SHUFFLER,
+    INSTRUCTION_SET_REDUCER,
     RESOURCE_RENAMER,
     VIRTUALIZER,
     ANTI_TAMPER,
