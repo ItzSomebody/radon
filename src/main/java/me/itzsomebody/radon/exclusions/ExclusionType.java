@@ -35,7 +35,6 @@ public enum ExclusionType {
     STRING_ENCRYPTION,
     FLOW_OBFUSCATION,
     HIDE_CODE,
-    CRASHER,
     EXPIRATION,
     SHUFFLER,
     RESOURCE_RENAMER,
