@@ -12,7 +12,7 @@ import org.objectweb.asm.tree.analysis.Frame;
 
 import java.util.*;
 
-public class MethodCallEjector extends AbstractEjectPhase implements Opcodes {
+public final class MethodCallEjector extends AbstractEjectPhase implements Opcodes {
 
     public MethodCallEjector(EjectorContext ejectorContext) {
         super(ejectorContext);
