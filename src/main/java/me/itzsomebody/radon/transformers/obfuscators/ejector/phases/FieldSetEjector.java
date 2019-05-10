@@ -82,6 +82,26 @@ public final class FieldSetEjector extends AbstractEjectPhase {
         return junkArguments;
     }
 
+    private InsnList processFieldSet(MethodNode methodNode, Frame<AbstractValue>[] frames, Map<AbstractInsnNode, InsnList> patches, FieldInsnNode fieldInsnNode) {
+        InsnList proxyArgumentFix = new InsnList();
+        Frame<AbstractValue> frame = frames[methodNode.instructions.indexOf(fieldInsnNode)];
+
+        Type type = Type.getType(fieldInsnNode.desc);
+        AbstractValue argumentValue = frame.getStack(frame.getStackSize() - 1);
+        if (argumentValue.isConstant() && argumentValue.getUsages().size() == 1) {
+            AbstractInsnNode valueInsn = ejectorContext.isJunkArguments() ? ASMUtils.getRandomValue(type) : ASMUtils.getDefaultValue(type);
+            patches.put(argumentValue.getInsnNode(), ASMUtils.singletonList(valueInsn));
+            if (fieldInsnNode.getOpcode() != PUTSTATIC) {
+                proxyArgumentFix.add(new VarInsnNode(ALOAD, 0));
+                proxyArgumentFix.add(new TypeInsnNode(CHECKCAST, fieldInsnNode.owner));
+            }
+            proxyArgumentFix.add(argumentValue.getInsnNode().clone(null));
+            proxyArgumentFix.add(fieldInsnNode.clone(null));
+        }
+
+        return proxyArgumentFix;
+    }
+
     @Override
     public void process(MethodWrapper methodWrapper, Frame<AbstractValue>[] frames) {
         ClassWrapper classWrapper = ejectorContext.getClassWrapper();
@@ -111,21 +131,7 @@ public final class FieldSetEjector extends AbstractEjectPhase {
                 ));
 
 
-                InsnList proxyArgumentFix = new InsnList();
-                Frame<AbstractValue> frame = frames[methodNode.instructions.indexOf(fieldInsnNode)];
-
-                Type type = Type.getType(fieldInsnNode.desc);
-                AbstractValue argumentValue = frame.getStack(frame.getStackSize() - 1);
-                if (argumentValue.isConstant() && argumentValue.getUsages().size() == 1) {
-                    AbstractInsnNode valueInsn = ejectorContext.isJunkArguments() ? ASMUtils.getRandomValue(type) : ASMUtils.getDefaultValue(type);
-                    patches.put(argumentValue.getInsnNode(), ASMUtils.singletonList(valueInsn));
-                    if (!isStatic) {
-                        proxyArgumentFix.add(new VarInsnNode(ALOAD, 0));
-                        proxyArgumentFix.add(new TypeInsnNode(CHECKCAST, fieldInsnNode.owner));
-                    }
-                    proxyArgumentFix.add(argumentValue.getInsnNode().clone(null));
-                    proxyArgumentFix.add(fieldInsnNode.clone(null));
-                }
+                InsnList proxyArgumentFix = processFieldSet(methodNode, frames, patches, fieldInsnNode);
 
                 proxyFixes.put(id, proxyArgumentFix);
                 ejectorContext.getCounter().incrementAndGet();
