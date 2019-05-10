@@ -141,7 +141,7 @@ public class ConstantInterpreter extends Interpreter<AbstractValue> implements O
 
     public AbstractValue copyOperation(AbstractInsnNode insnNode, AbstractValue symbolicValue) {
         symbolicValue.addUsage(insnNode);
-        return symbolicValue;
+        return new UnknownValue(symbolicValue.getInsnNode(), symbolicValue.getType());
     }
 
     public AbstractValue unaryOperation(AbstractInsnNode insnNode, AbstractValue symbolicValue) {

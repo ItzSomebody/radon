@@ -3,6 +3,8 @@ package me.itzsomebody.radon.analysis.constant.values;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
 
+import java.util.Objects;
+
 
 public final class ConstantValue extends AbstractValue {
     private final Object value;
@@ -59,5 +61,19 @@ public final class ConstantValue extends AbstractValue {
     @Override
     public boolean isConstant() {
         return true;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ConstantValue)) return false;
+        if (!super.equals(o)) return false;
+        ConstantValue that = (ConstantValue) o;
+        return Objects.equals(value, that.value);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), value);
     }
 }

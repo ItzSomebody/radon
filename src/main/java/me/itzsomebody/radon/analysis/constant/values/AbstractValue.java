@@ -6,6 +6,7 @@ import org.objectweb.asm.tree.analysis.Value;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 public abstract class AbstractValue implements Value {
@@ -17,6 +18,13 @@ public abstract class AbstractValue implements Value {
         this.insnNode = insnNode;
         this.type = type;
         usages = new HashSet<>();
+    }
+
+    private static <E> boolean containsAll(final Set<E> self, final Set<E> other) {
+        if (self.size() < other.size()) {
+            return false;
+        }
+        return self.containsAll(other);
     }
 
     public final Set<AbstractInsnNode> getUsages() {
@@ -39,5 +47,20 @@ public abstract class AbstractValue implements Value {
 
     public Type getType() {
         return type;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof AbstractValue)) return false;
+        AbstractValue that = (AbstractValue) o;
+        return Objects.equals(insnNode, that.insnNode) &&
+                Objects.equals(type, that.type) &&
+                containsAll(usages, that.usages);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(insnNode, type, usages);
     }
 }
