@@ -276,9 +276,13 @@ public class ASMUtils {
     public static AbstractInsnNode getRandomValue(Type type) {
         switch (type.getSort()) {
             case Type.BOOLEAN:
+                return ASMUtils.getNumberInsn(RandomUtils.getRandomInt(0, 2));
             case Type.CHAR:
+                return ASMUtils.getNumberInsn(RandomUtils.getRandomInt(Character.MIN_VALUE, Character.MAX_VALUE));
             case Type.BYTE:
+                return ASMUtils.getNumberInsn(RandomUtils.getRandomInt(Byte.MIN_VALUE, Byte.MAX_VALUE));
             case Type.SHORT:
+                return ASMUtils.getNumberInsn(RandomUtils.getRandomInt(Short.MIN_VALUE, Short.MAX_VALUE));
             case Type.INT:
                 return ASMUtils.getNumberInsn(RandomUtils.getRandomInt());
             case Type.FLOAT:

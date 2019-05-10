@@ -163,13 +163,14 @@ public class MethodCallEjector extends AbstractEjectPhase implements Opcodes {
 
                 int variable = 0;
                 for (int i = 0; i < argumentTypes.length; i++) {
+                    Type argumentType = argumentTypes[i];
                     AbstractValue argumentValue = frame.getStack(frame.getStackSize() - argumentTypes.length + i);
                     if (argumentValue.isConstant() && argumentValue.getUsages().size() == 1) {
-                        AbstractInsnNode valueInsn = ejectorContext.isJunkArguments() ? ASMUtils.getRandomValue(argumentValue.getType()) : ASMUtils.getDefaultValue(argumentValue.getType());
+                        AbstractInsnNode valueInsn = ejectorContext.isJunkArguments() ? ASMUtils.getRandomValue(argumentType) : ASMUtils.getDefaultValue(argumentType);
                         patches.put(argumentValue.getInsnNode(), ASMUtils.singletonList(valueInsn));
 
                         proxyArgumentFix.add(argumentValue.getInsnNode().clone(null));
-                        proxyArgumentFix.add(new VarInsnNode(ASMUtils.getVarOpcode(argumentValue.getType(), true), offset + variable));
+                        proxyArgumentFix.add(new VarInsnNode(ASMUtils.getVarOpcode(argumentType, true), offset + variable));
                     }
                     variable += argumentTypes[i].getSize();
                 }
