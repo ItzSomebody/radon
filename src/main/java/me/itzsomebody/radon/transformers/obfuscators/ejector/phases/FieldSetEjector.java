@@ -76,6 +76,8 @@ public final class FieldSetEjector extends AbstractEjectPhase {
             }
             junkProxyArgumentFix.add(ASMUtils.getRandomValue(type));
             junkProxyArgumentFix.add(fieldInsnNode.clone(null));
+
+            junkArguments.put(ejectorContext.getNextId(), junkProxyArgumentFix);
         }
         return junkArguments;
     }
@@ -88,6 +90,8 @@ public final class FieldSetEjector extends AbstractEjectPhase {
         Map<FieldSetInfo, List<FieldInsnNode>> fieldSets = analyzeFieldSets(methodNode, frames);
         if (fieldSets.isEmpty())
             return;
+        methodWrapper.methodNode.maxStack++;
+
         Map<AbstractInsnNode, InsnList> patches = new HashMap<>();
         fieldSets.forEach((key, value) -> {
             MethodNode proxyMethod = createProxyMethod(getProxyMethodName(methodNode), key);

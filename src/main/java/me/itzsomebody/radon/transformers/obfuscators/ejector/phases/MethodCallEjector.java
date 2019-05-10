@@ -123,6 +123,7 @@ public final class MethodCallEjector extends AbstractEjectPhase {
         Map<MethodCallInfo, List<MethodInsnNode>> methodCalls = analyzeMethodCalls(methodNode, frames);
         if (methodCalls.isEmpty())
             return;
+        methodWrapper.methodNode.maxStack++;
 
         Map<AbstractInsnNode, InsnList> patches = new HashMap<>();
         methodCalls.forEach((key, value) -> {
