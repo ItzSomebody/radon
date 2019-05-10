@@ -99,7 +99,7 @@ public final class MethodCallEjector extends AbstractEjectPhase {
     private Map<Integer, InsnList> createJunkArguments(Type[] argumentTypes, int offset) {
         Map<Integer, InsnList> junkArguments = new HashMap<>();
 
-        for (int k = 0; k < RandomUtils.getRandomInt(1, 5); k++) {
+        for (int k = 0; k < getJunkArgumentCount(); k++) {
             InsnList junkProxyArgumentFix = new InsnList();
             int junkVariable = 0;
             for (Type argumentType : argumentTypes) {

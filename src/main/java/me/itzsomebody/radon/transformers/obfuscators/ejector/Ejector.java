@@ -53,6 +53,7 @@ public class Ejector extends Transformer {
     private boolean ejectMethodCalls;
     private boolean ejectFieldSet;
     private boolean junkArguments;
+    private int junkArgumentStrength;
 
     @Override
     public void transform() {
@@ -84,7 +85,7 @@ public class Ejector extends Transformer {
                         Logger.stdOut("Analyze: " + classWrapper.originalName + "::" + methodWrapper.originalName + methodWrapper.originalDescription);
                         Frame<AbstractValue>[] frames = constantAnalyzer.analyze(classWrapper.classNode.name, methodWrapper.methodNode);
 
-                        EjectorContext ejectorContext = new EjectorContext(counter, classWrapper, methodWrapper, frames, junkArguments);
+                        EjectorContext ejectorContext = new EjectorContext(counter, classWrapper, methodWrapper, frames, junkArguments, junkArgumentStrength);
                         getPhases(ejectorContext).forEach(AbstractEjectPhase::process);
                     } catch (AnalyzerException e) {
                         Logger.stdErr("Can't analyze method: " + classWrapper.originalName + "::" + methodWrapper.originalName + methodWrapper.originalDescription);
@@ -108,8 +109,9 @@ public class Ejector extends Transformer {
         Map<String, Object> config = new LinkedHashMap<>();
 
         config.put(EjectorSetting.EJECT_CALL.getName(), isEjectMethodCalls());
-        config.put(EjectorSetting.JUNK_ARGUMENT.getName(), isJunkArguments());
         config.put(EjectorSetting.EJECT_FIELD_SET.getName(), isEjectFieldSet());
+        config.put(EjectorSetting.JUNK_ARGUMENT.getName(), isJunkArguments());
+        config.put(EjectorSetting.JUNK_ARGUMENT_STRENGTH.getName(), getJunkArgumentStrength());
 
         return config;
     }
@@ -117,8 +119,9 @@ public class Ejector extends Transformer {
     @Override
     public void setConfiguration(Map<String, Object> config) {
         setEjectMethodCalls(getValueOrDefault(EjectorSetting.EJECT_CALL.getName(), config, false));
-        setJunkArguments(getValueOrDefault(EjectorSetting.JUNK_ARGUMENT.getName(), config, false));
         setEjectFieldSet(getValueOrDefault(EjectorSetting.EJECT_FIELD_SET.getName(), config, false));
+        setJunkArguments(getValueOrDefault(EjectorSetting.JUNK_ARGUMENT.getName(), config, false));
+        setJunkArgumentStrength(getValueOrDefault(EjectorSetting.JUNK_ARGUMENT_STRENGTH.getName(), config, 5));
     }
 
     @Override
@@ -158,5 +161,13 @@ public class Ejector extends Transformer {
 
     private void setJunkArguments(boolean junkArguments) {
         this.junkArguments = junkArguments;
+    }
+
+    private int getJunkArgumentStrength() {
+        return junkArgumentStrength;
+    }
+
+    private void setJunkArgumentStrength(int junkArgumentStrength) {
+        this.junkArgumentStrength = Math.min(junkArgumentStrength, 50);
     }
 }

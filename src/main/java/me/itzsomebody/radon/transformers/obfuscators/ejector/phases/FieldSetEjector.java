@@ -64,7 +64,7 @@ public final class FieldSetEjector extends AbstractEjectPhase {
     private Map<Integer, InsnList> createJunkArguments(List<FieldInsnNode> fieldInsnNodes, boolean isStatic) {
         Map<Integer, InsnList> junkArguments = new HashMap<>();
 
-        for (int k = 0; k < RandomUtils.getRandomInt(1, 5); k++) {
+        for (int k = 0; k < getJunkArgumentCount(); k++) {
             FieldInsnNode fieldInsnNode = RandomUtils.getRandomElement(fieldInsnNodes);
             Type type = Type.getType(fieldInsnNode.desc);
 

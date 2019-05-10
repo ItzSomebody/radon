@@ -17,14 +17,20 @@ public final class EjectorContext {
     private final Set<Integer> ids;
     private final Frame<AbstractValue>[] frames;
     private final boolean junkArguments;
+    private final int junkArgumentStrength;
 
-    EjectorContext(AtomicInteger counter, ClassWrapper classWrapper, MethodWrapper methodWrapper, Frame<AbstractValue>[] frames, boolean junkArguments) {
+    EjectorContext(AtomicInteger counter, ClassWrapper classWrapper, MethodWrapper methodWrapper, Frame<AbstractValue>[] frames, boolean junkArguments, int junkArgumentStrength) {
         this.counter = counter;
         this.classWrapper = classWrapper;
         this.methodWrapper = methodWrapper;
         this.frames = frames;
         this.junkArguments = junkArguments;
+        this.junkArgumentStrength = junkArgumentStrength;
         this.ids = new HashSet<>();
+    }
+
+    public int getJunkArgumentStrength() {
+        return junkArgumentStrength;
     }
 
     public boolean isJunkArguments() {

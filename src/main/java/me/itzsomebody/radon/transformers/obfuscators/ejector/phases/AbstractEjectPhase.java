@@ -61,4 +61,10 @@ public abstract class AbstractEjectPhase implements Opcodes {
     }
 
     public abstract void process();
+
+    protected int getJunkArgumentCount() {
+        if (ejectorContext.getJunkArgumentStrength() == 0)
+            return 0;
+        return RandomUtils.getRandomInt(ejectorContext.getJunkArgumentStrength() / 2, ejectorContext.getJunkArgumentStrength());
+    }
 }
