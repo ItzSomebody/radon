@@ -1,0 +1,91 @@
+package me.itzsomebody.vm.handlers;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import me.itzsomebody.vm.VM;
+import me.itzsomebody.vm.VMException;
+import me.itzsomebody.vm.datatypes.JDouble;
+import me.itzsomebody.vm.datatypes.JFloat;
+import me.itzsomebody.vm.datatypes.JInteger;
+import me.itzsomebody.vm.datatypes.JLong;
+import me.itzsomebody.vm.datatypes.JObject;
+import me.itzsomebody.vm.datatypes.JTop;
+import me.itzsomebody.vm.datatypes.JWrapper;
+
+public class StaticCall extends Handler {
+    @Override
+    public void handle(VM vm, Object[] operands) throws Throwable {
+        String ownerName = (String) operands[0];
+        String name = (String) operands[1];
+        String[] paramsAsStrings = ((String) operands[2]).split("\u0001\u0001");
+        Class[] params;
+        if (paramsAsStrings[0].equals("\u0000\u0000\u0000"))
+            params = new Class[0];
+        else
+            params = stringsToParams(paramsAsStrings);
+        Object[] args = new Object[params.length];
+
+        Class clazz = VM.getClazz(ownerName);
+        Method method = VM.getMethod(clazz, name, params);
+
+        if (method == null)
+            throw new VMException();
+
+        String returnType = method.getReturnType().getName();
+
+        for (int i = params.length - 1; i >= 0; i--) {
+            Class param = params[i];
+            JWrapper arg = vm.pop();
+
+            if (arg instanceof JTop)
+                arg = vm.pop();
+
+            if (param == boolean.class)
+                args[i] = arg.asBool();
+            else if (param == char.class)
+                args[i] = arg.asChar();
+            else if (param == short.class)
+                args[i] = arg.asShort();
+            else if (param == byte.class)
+                args[i] = arg.asByte();
+            else
+                args[i] = arg.asObj();
+        }
+
+        try {
+            if (!"void".equals(returnType)) {
+                if ("int".equals(returnType))
+                    vm.push(new JInteger((Integer) method.invoke(null, args)));
+                else if ("long".equals(returnType)) {
+                    vm.push(new JLong((Long) method.invoke(null, args)));
+                    vm.push(JTop.getTop());
+                } else if ("float".equals(returnType))
+                    vm.push(new JFloat((Float) method.invoke(null, args)));
+                else if ("double".equals(returnType)) {
+                    vm.push(new JDouble((Double) method.invoke(null, args)));
+                    vm.push(JTop.getTop());
+                } else if ("byte".equals(returnType))
+                    vm.push(new JInteger((Byte) method.invoke(null, args)));
+                else if ("char".equals(returnType))
+                    vm.push(new JInteger((Character) method.invoke(null, args)));
+                else if ("short".equals(returnType))
+                    vm.push(new JInteger((Short) method.invoke(null, args)));
+                else if ("boolean".equals(returnType))
+                    vm.push(new JInteger((Boolean) method.invoke(null, args)));
+                else
+                    vm.push(new JObject(method.invoke(null, args)));
+            } else
+                method.invoke(null, args);
+        } catch (InvocationTargetException e) {
+            throw e.getTargetException();
+        }
+    }
+
+    private static Class[] stringsToParams(String[] s) throws ClassNotFoundException {
+        Class[] classes = new Class[s.length];
+        for (int i = 0; i < s.length; i++)
+            classes[i] = VM.getClazz(s[i]);
+
+        return classes;
+    }
+}

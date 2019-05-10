@@ -25,8 +25,11 @@ import me.itzsomebody.radon.transformers.miscellaneous.Packer;
 import me.itzsomebody.radon.transformers.miscellaneous.expiration.Expiration;
 import me.itzsomebody.radon.transformers.miscellaneous.watermarker.Watermarker;
 import me.itzsomebody.radon.transformers.obfuscators.AntiTamper;
+import me.itzsomebody.radon.transformers.obfuscators.BadAnnotation;
+import me.itzsomebody.radon.transformers.obfuscators.InstructionSetReducer;
 import me.itzsomebody.radon.transformers.obfuscators.ResourceRenamer;
 import me.itzsomebody.radon.transformers.obfuscators.ejector.Ejector;
+import me.itzsomebody.radon.transformers.obfuscators.StaticInitialization;
 import me.itzsomebody.radon.transformers.obfuscators.flow.FlowObfuscation;
 import me.itzsomebody.radon.transformers.obfuscators.hidecode.HideCode;
 import me.itzsomebody.radon.transformers.obfuscators.numbers.NumberObfuscation;
@@ -51,10 +54,12 @@ public enum ConfigurationSetting {
     STRING_ENCRYPTION(Map.class, new StringEncryption()),
     FLOW_OBFUSCATION(Map.class, new FlowObfuscation()),
     REFERENCE_OBFUSCATION(Map.class, new ReferenceObfuscation()),
+    STATIC_INITIALIZATION(Boolean.class, new StaticInitialization()),
     NUMBER_OBFUSCATION(Map.class, new NumberObfuscation()),
     ANTI_TAMPER(Boolean.class, new AntiTamper()),
-    VIRTUALIZER(Boolean.class, new Virtualizer()), // TODO: ;)
-    RESOURCE_RENAMER(Boolean.class, new ResourceRenamer()), // TODO
+    INSTRUCTION_SET_REDUCER(Boolean.class, new InstructionSetReducer()),
+    VIRTUALIZER(Boolean.class, new Virtualizer()),
+    RESOURCE_RENAMER(Boolean.class, new ResourceRenamer()),
     PACKER(Boolean.class, new Packer()),
     //CLASS_ENCRYPTION(Map.class, new ClassEncryption()), // Just kidding, lol
     HIDE_CODE(Map.class, new HideCode()),
@@ -70,7 +75,9 @@ public enum ConfigurationSetting {
     RANDOMIZED_STRING_LENGTH(Integer.class, null),
     COMPRESSION_LEVEL(Integer.class, null),
     VERIFY(Boolean.class, null),
-    TRASH_CLASSES(Integer.class, null);
+    CORRUPT_CRC(Boolean.class, null),
+    TRASH_CLASSES(Integer.class, null),
+    BAD_ANNOTATION(Boolean.class, new BadAnnotation());
 
     private final Class expectedType;
     private final Transformer transformer;
