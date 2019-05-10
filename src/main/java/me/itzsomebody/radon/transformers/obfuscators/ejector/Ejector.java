@@ -80,17 +80,19 @@ public class Ejector extends Transformer {
                 .filter(methodWrapper -> !excluded(methodWrapper))
                 .filter(methodWrapper -> !"<init>".equals(methodWrapper.methodNode.name))
                 .forEach(methodWrapper -> {
-                    ConstantAnalyzer constantAnalyzer = new ConstantAnalyzer();
-                    try {
-                        Logger.stdOut("Analyze: " + classWrapper.originalName + "::" + methodWrapper.originalName + methodWrapper.originalDescription);
-                        Frame<AbstractValue>[] frames = constantAnalyzer.analyze(classWrapper.classNode.name, methodWrapper.methodNode);
+                    EjectorContext ejectorContext = new EjectorContext(counter, classWrapper, junkArguments, junkArgumentStrength);
+                    getPhases(ejectorContext).forEach(ejectPhase -> {
+                        ConstantAnalyzer constantAnalyzer = new ConstantAnalyzer();
+                        try {
+                            Logger.stdOut("Analyze: " + classWrapper.originalName + "::" + methodWrapper.originalName + methodWrapper.originalDescription);
+                            Frame<AbstractValue>[] frames = constantAnalyzer.analyze(classWrapper.classNode.name, methodWrapper.methodNode);
 
-                        EjectorContext ejectorContext = new EjectorContext(counter, classWrapper, methodWrapper, frames, junkArguments, junkArgumentStrength);
-                        getPhases(ejectorContext).forEach(AbstractEjectPhase::process);
-                    } catch (AnalyzerException e) {
-                        Logger.stdErr("Can't analyze method: " + classWrapper.originalName + "::" + methodWrapper.originalName + methodWrapper.originalDescription);
-                        Logger.stdErr(e.toString());
-                    }
+                            ejectPhase.process(methodWrapper, frames);
+                        } catch (AnalyzerException e) {
+                            Logger.stdErr("Can't analyze method: " + classWrapper.originalName + "::" + methodWrapper.originalName + methodWrapper.originalDescription);
+                            Logger.stdErr(e.toString());
+                        }
+                    });
                 });
     }
 

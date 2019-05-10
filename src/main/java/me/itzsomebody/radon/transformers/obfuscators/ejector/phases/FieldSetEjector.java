@@ -2,6 +2,7 @@ package me.itzsomebody.radon.transformers.obfuscators.ejector.phases;
 
 import me.itzsomebody.radon.analysis.constant.values.AbstractValue;
 import me.itzsomebody.radon.asm.ClassWrapper;
+import me.itzsomebody.radon.asm.MethodWrapper;
 import me.itzsomebody.radon.transformers.obfuscators.ejector.EjectorContext;
 import me.itzsomebody.radon.utils.ASMUtils;
 import me.itzsomebody.radon.utils.RandomUtils;
@@ -80,10 +81,9 @@ public final class FieldSetEjector extends AbstractEjectPhase {
     }
 
     @Override
-    public void process() {
+    public void process(MethodWrapper methodWrapper, Frame<AbstractValue>[] frames) {
         ClassWrapper classWrapper = ejectorContext.getClassWrapper();
-        MethodNode methodNode = ejectorContext.getMethodWrapper().methodNode;
-        Frame<AbstractValue>[] frames = ejectorContext.getFrames();
+        MethodNode methodNode = methodWrapper.methodNode;
 
         Map<FieldSetInfo, List<FieldInsnNode>> fieldSets = analyzeFieldSets(methodNode, frames);
         if (fieldSets.isEmpty())

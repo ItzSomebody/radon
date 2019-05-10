@@ -1,9 +1,12 @@
 package me.itzsomebody.radon.transformers.obfuscators.ejector.phases;
 
+import me.itzsomebody.radon.analysis.constant.values.AbstractValue;
+import me.itzsomebody.radon.asm.MethodWrapper;
 import me.itzsomebody.radon.transformers.obfuscators.ejector.EjectorContext;
 import me.itzsomebody.radon.utils.RandomUtils;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.*;
+import org.objectweb.asm.tree.analysis.Frame;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -60,7 +63,7 @@ public abstract class AbstractEjectPhase implements Opcodes {
         methodNode.instructions.insert(proxyFix);
     }
 
-    public abstract void process();
+    public abstract void process(MethodWrapper methodWrapper, Frame<AbstractValue>[] frames);
 
     protected int getJunkArgumentCount() {
         if (ejectorContext.getJunkArgumentStrength() == 0)
