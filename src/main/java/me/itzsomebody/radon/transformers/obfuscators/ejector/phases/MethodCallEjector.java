@@ -12,7 +12,7 @@ import org.objectweb.asm.tree.analysis.Frame;
 
 import java.util.*;
 
-public final class MethodCallEjector extends AbstractEjectPhase implements Opcodes {
+public final class MethodCallEjector extends AbstractEjectPhase {
 
     public MethodCallEjector(EjectorContext ejectorContext) {
         super(ejectorContext);
@@ -68,15 +68,7 @@ public final class MethodCallEjector extends AbstractEjectPhase implements Opcod
 
         Type returnType = Type.getReturnType(methodCallInfo.desc);
 
-        int access = ACC_STATIC;
-        if (RandomUtils.getRandomBoolean())
-            access += ACC_PRIVATE;
-        if (RandomUtils.getRandomBoolean())
-            access += ACC_SYNTHETIC;
-        if (RandomUtils.getRandomBoolean())
-            access += ACC_BRIDGE;
-
-        MethodNode methodNode = new MethodNode(access, name, Type.getMethodDescriptor(returnType, arguments.toArray(new Type[0])),
+        MethodNode methodNode = new MethodNode(getRandomAccess(), name, Type.getMethodDescriptor(returnType, arguments.toArray(new Type[0])),
                 null, null);
         InsnList insnList = new InsnList();
 
@@ -102,12 +94,6 @@ public final class MethodCallEjector extends AbstractEjectPhase implements Opcod
             var += argumentTypes[i].getSize();
         }
         return var;
-    }
-
-    // TODO: Improve name generation logic
-    private static String getProxyMethodName(MethodNode methodNode) {
-        String name = methodNode.name.replace('<', '_').replace('>', '_');
-        return name + "$" + Math.abs(RandomUtils.getRandomInt());
     }
 
     private Map<Integer, InsnList> createJunkArguments(Type[] argumentTypes, int offset) {
@@ -183,31 +169,7 @@ public final class MethodCallEjector extends AbstractEjectPhase implements Opcod
             }
 
             int idVariable = getLastArgumentVar(proxyMethod);
-
-            InsnList proxyFix = new InsnList();
-            LabelNode end = new LabelNode();
-
-            ArrayList<Integer> keys = new ArrayList<>(proxyFixes.keySet());
-            Collections.shuffle(keys);
-
-            keys.forEach(id -> {
-                int xorKey = RandomUtils.getRandomInt();
-
-                InsnList insnList = proxyFixes.get(id);
-                proxyFix.add(new VarInsnNode(Opcodes.ILOAD, idVariable));
-                proxyFix.add(new LdcInsnNode(xorKey));
-                proxyFix.add(new InsnNode(IXOR));
-                proxyFix.add(new LdcInsnNode(id ^ xorKey));
-                LabelNode labelNode = new LabelNode();
-                proxyFix.add(new JumpInsnNode(Opcodes.IF_ICMPNE, labelNode));
-
-                proxyFix.add(insnList);
-                proxyFix.add(new JumpInsnNode(Opcodes.GOTO, end));
-                proxyFix.add(labelNode);
-            });
-
-            proxyFix.add(end);
-            proxyMethod.instructions.insert(proxyFix);
+            insertFixes(proxyMethod, proxyFixes, idVariable);
         });
 
         patches.forEach((abstractInsnNode, insnList) -> {

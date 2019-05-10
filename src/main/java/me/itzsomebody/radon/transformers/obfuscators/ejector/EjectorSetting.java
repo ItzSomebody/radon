@@ -20,6 +20,7 @@ package me.itzsomebody.radon.transformers.obfuscators.ejector;
 
 public enum EjectorSetting {
     EJECT_CALL(Boolean.class),
+    EJECT_FIELD_SET(Boolean.class),
     JUNK_ARGUMENT(Boolean.class);
 
     private final Class expectedType;

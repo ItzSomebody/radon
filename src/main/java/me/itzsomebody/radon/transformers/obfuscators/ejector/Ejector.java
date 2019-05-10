@@ -27,6 +27,7 @@ import me.itzsomebody.radon.exceptions.InvalidConfigurationValueException;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
 import me.itzsomebody.radon.transformers.obfuscators.ejector.phases.AbstractEjectPhase;
+import me.itzsomebody.radon.transformers.obfuscators.ejector.phases.FieldSetEjector;
 import me.itzsomebody.radon.transformers.obfuscators.ejector.phases.MethodCallEjector;
 import org.objectweb.asm.tree.analysis.AnalyzerException;
 import org.objectweb.asm.tree.analysis.Frame;
@@ -50,6 +51,7 @@ public class Ejector extends Transformer {
     }
 
     private boolean ejectMethodCalls;
+    private boolean ejectFieldSet;
     private boolean junkArguments;
 
     @Override
@@ -67,7 +69,8 @@ public class Ejector extends Transformer {
         List<AbstractEjectPhase> phases = new ArrayList<>();
         if (isEjectMethodCalls())
             phases.add(new MethodCallEjector(ejectorContext));
-
+        if (isEjectFieldSet())
+            phases.add(new FieldSetEjector(ejectorContext));
         return phases;
     }
 
@@ -106,6 +109,8 @@ public class Ejector extends Transformer {
 
         config.put(EjectorSetting.EJECT_CALL.getName(), isEjectMethodCalls());
         config.put(EjectorSetting.JUNK_ARGUMENT.getName(), isJunkArguments());
+        config.put(EjectorSetting.EJECT_FIELD_SET.getName(), isEjectFieldSet());
+
         return config;
     }
 
@@ -113,6 +118,7 @@ public class Ejector extends Transformer {
     public void setConfiguration(Map<String, Object> config) {
         setEjectMethodCalls(getValueOrDefault(EjectorSetting.EJECT_CALL.getName(), config, false));
         setJunkArguments(getValueOrDefault(EjectorSetting.JUNK_ARGUMENT.getName(), config, false));
+        setEjectFieldSet(getValueOrDefault(EjectorSetting.EJECT_FIELD_SET.getName(), config, false));
     }
 
     @Override
@@ -133,15 +139,24 @@ public class Ejector extends Transformer {
         return ejectMethodCalls;
     }
 
-    private void setEjectMethodCalls(boolean shuffleFieldsEnabled) {
-        this.ejectMethodCalls = shuffleFieldsEnabled;
+    private void setEjectMethodCalls(boolean ejectMethodCalls) {
+        this.ejectMethodCalls = ejectMethodCalls;
     }
 
-    public boolean isJunkArguments() {
+
+    private boolean isEjectFieldSet() {
+        return ejectFieldSet;
+    }
+
+    private void setEjectFieldSet(boolean ejectFieldSet) {
+        this.ejectFieldSet = ejectFieldSet;
+    }
+
+    private boolean isJunkArguments() {
         return junkArguments;
     }
 
-    public void setJunkArguments(boolean junkArguments) {
+    private void setJunkArguments(boolean junkArguments) {
         this.junkArguments = junkArguments;
     }
 }
