@@ -40,7 +40,7 @@ public class Main {
     public static final String VERSION = "2.0.0";
     public static final String[] CONTRIBUTORS = {
             "ItzSomebody", "x0ark", "Col-E", "Artel", "kazigk", "Olexorus",
-            "freeasbird", "CertainLach", "xxDark"
+            "freeasbird", "CertainLach", "xxDark", "vovanre"
     };
     public static final String ATTRIBUTION = String.format("Radon is a free and open-source Java obfuscator " +
                     "with contributions from %s.\nVersion: %s\nWebsite: https://github.com/ItzSomebody/Radon",

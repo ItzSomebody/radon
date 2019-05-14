@@ -109,46 +109,26 @@ public class InstructionSetReducer extends Transformer {
                         } else {
                             switch (abstractInsnNode.getOpcode()) {
                                 case Opcodes.ICONST_M1:
-                                    newInsns.add(new LdcInsnNode(-1));
-                                    continue insn;
                                 case Opcodes.ICONST_0:
-                                    newInsns.add(new LdcInsnNode(0));
-                                    continue insn;
                                 case Opcodes.ICONST_1:
-                                    newInsns.add(new LdcInsnNode(1));
-                                    continue insn;
                                 case Opcodes.ICONST_2:
-                                    newInsns.add(new LdcInsnNode(2));
-                                    continue insn;
                                 case Opcodes.ICONST_3:
-                                    newInsns.add(new LdcInsnNode(3));
-                                    continue insn;
                                 case Opcodes.ICONST_4:
-                                    newInsns.add(new LdcInsnNode(4));
-                                    continue insn;
                                 case Opcodes.ICONST_5:
-                                    newInsns.add(new LdcInsnNode(5));
+                                    newInsns.add(new LdcInsnNode(abstractInsnNode.getOpcode() - 3));
                                     continue insn;
                                 case Opcodes.LCONST_0:
-                                    newInsns.add(new LdcInsnNode(0L));
-                                    continue insn;
                                 case Opcodes.LCONST_1:
-                                    newInsns.add(new LdcInsnNode(1L));
+                                    newInsns.add(new LdcInsnNode(abstractInsnNode.getOpcode() - 9L));
                                     continue insn;
                                 case Opcodes.FCONST_0:
-                                    newInsns.add(new LdcInsnNode(0F));
-                                    continue insn;
                                 case Opcodes.FCONST_1:
-                                    newInsns.add(new LdcInsnNode(1F));
-                                    continue insn;
                                 case Opcodes.FCONST_2:
-                                    newInsns.add(new LdcInsnNode(2F));
+                                    newInsns.add(new LdcInsnNode(abstractInsnNode.getOpcode() - 11F));
                                     continue insn;
                                 case Opcodes.DCONST_0:
-                                    newInsns.add(new LdcInsnNode(0D));
-                                    continue insn;
                                 case Opcodes.DCONST_1:
-                                    newInsns.add(new LdcInsnNode(1D));
+                                    newInsns.add(new LdcInsnNode(abstractInsnNode.getOpcode() - 14D));
                                     continue insn;
                             }
                         }
