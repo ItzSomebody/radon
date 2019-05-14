@@ -28,6 +28,7 @@ import me.itzsomebody.radon.transformers.obfuscators.AntiTamper;
 import me.itzsomebody.radon.transformers.obfuscators.BadAnnotation;
 import me.itzsomebody.radon.transformers.obfuscators.InstructionSetReducer;
 import me.itzsomebody.radon.transformers.obfuscators.ResourceRenamer;
+import me.itzsomebody.radon.transformers.obfuscators.ejector.Ejector;
 import me.itzsomebody.radon.transformers.obfuscators.StaticInitialization;
 import me.itzsomebody.radon.transformers.obfuscators.flow.FlowObfuscation;
 import me.itzsomebody.radon.transformers.obfuscators.hidecode.HideCode;
@@ -68,6 +69,7 @@ public enum ConfigurationSetting {
     OPTIMIZER(Map.class, new Optimizer()),
     SHRINKER(Map.class, new Shrinker()),
     MEMBER_SHUFFLER(Map.class, new MemberShuffler()),
+    EJECTOR(Map.class, new Ejector()),
     RENAMER(Map.class, new Renamer()),
     DICTIONARY(String.class, null),
     RANDOMIZED_STRING_LENGTH(Integer.class, null),
