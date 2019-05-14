@@ -18,6 +18,7 @@
 
 package me.itzsomebody.radon.utils;
 
+import me.itzsomebody.radon.asm.ClassWrapper;
 import me.itzsomebody.radon.exceptions.RadonException;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
@@ -40,11 +41,6 @@ import org.objectweb.asm.tree.MethodNode;
 public class ASMUtils {
     public static boolean isInstruction(AbstractInsnNode insn) {
         return !(insn instanceof FrameNode) && !(insn instanceof LineNumberNode) && !(insn instanceof LabelNode);
-    }
-
-    public static MethodNode getMethod(ClassNode classNode, String name, String desc) {
-        return classNode.methods.stream().filter(methodNode -> name.equals(methodNode.name) && desc.equals(methodNode.desc))
-                .findAny().orElse(null);
     }
 
     public static boolean isReturn(int opcode) {
