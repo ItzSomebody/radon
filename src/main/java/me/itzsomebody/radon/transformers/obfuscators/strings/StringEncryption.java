@@ -37,9 +37,7 @@ import me.itzsomebody.radon.utils.StringUtils;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
-import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.LdcInsnNode;
-import org.objectweb.asm.tree.MethodInsnNode;
+import org.objectweb.asm.tree.*;
 
 import static me.itzsomebody.radon.utils.ConfigUtils.getValueOrDefault;
 
@@ -56,6 +54,27 @@ public class StringEncryption extends Transformer {
 
     static {
         Stream.of(StringEncryptionSetting.values()).forEach(setting -> KEY_MAP.put(setting.getName(), setting));
+    }
+
+    private static InsnList getSafeStringInsnList(String string) {
+        InsnList insnList = new InsnList();
+        if (StringUtils.getUtf8StringSize(string) < StringUtils.MAX_SAFE_BYTE_COUNT) {
+            insnList.add(new LdcInsnNode(string));
+            return insnList;
+        }
+
+        insnList.add(new TypeInsnNode(NEW, "java/lang/StringBuilder"));
+        insnList.add(new InsnNode(DUP));
+        insnList.add(new MethodInsnNode(INVOKESPECIAL, "java/lang/StringBuilder", "<init>", "()V", false));
+
+        String[] chunks = StringUtils.splitUtf8ToChunks(string, StringUtils.MAX_SAFE_BYTE_COUNT);
+        for (String chunk : chunks) {
+            insnList.add(new LdcInsnNode(chunk));
+            insnList.add(new MethodInsnNode(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/String;)Ljava/lang/StringBuilder;", false));
+        }
+        insnList.add(new MethodInsnNode(INVOKEVIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;", false));
+
+        return insnList;
     }
 
     @Override
@@ -90,7 +109,6 @@ public class StringEncryption extends Transformer {
                         int key4 = ((isContextCheckingEnabled()) ? decryptorMethodHC + callerClassHC + decryptorClassHC : 0) ^ randomKey;
 
                         LdcInsnNode ldc = (LdcInsnNode) insn;
-                        ldc.cst = encrypt((String) ldc.cst, key1, key2, key3, key4);
 
                         methodWrapper.methodNode.instructions.insert(ldc, new MethodInsnNode(
                                 INVOKESTATIC,
@@ -100,6 +118,10 @@ public class StringEncryption extends Transformer {
                                 false
                         ));
                         methodWrapper.methodNode.instructions.insert(ldc, ASMUtils.getNumberInsn(randomKey));
+
+                        String encryptedString = encrypt((String) ldc.cst, key1, key2, key3, key4);
+                        methodWrapper.methodNode.instructions.insertBefore(ldc, getSafeStringInsnList(encryptedString));
+                        methodWrapper.methodNode.instructions.remove(ldc);
 
                         counter.incrementAndGet();
                     });
