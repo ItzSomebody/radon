@@ -162,7 +162,7 @@ public class Packer extends Transformer {
         FieldVisitor fv;
         MethodVisitor mv;
 
-        cw.visit(49, ACC_PUBLIC + ACC_SUPER, memberNames.className, null, "java/lang/ClassLoader", null);
+        cw.visit(V1_5, ACC_PUBLIC + ACC_SUPER, memberNames.className, null, "java/lang/ClassLoader", null);
 
         {
             fv = cw.visitField(ACC_PRIVATE + ACC_FINAL + ACC_STATIC, memberNames.resourcesFieldName, "Ljava/util/Map;", "Ljava/util/Map<Ljava/lang/String;[B>;", null);

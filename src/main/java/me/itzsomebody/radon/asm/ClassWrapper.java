@@ -20,7 +20,9 @@ package me.itzsomebody.radon.asm;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.MethodNode;
 
 /**
@@ -81,5 +83,22 @@ public class ClassWrapper {
 
     public void addStringConst(String s) {
         strConsts.add(s);
+    }
+
+    public MethodNode getMethod(String name, String desc) {
+        return classNode.methods.stream().filter(methodNode -> name.equals(methodNode.name) && desc.equals(methodNode.desc))
+                .findAny().orElse(null);
+    }
+
+    public MethodNode getOrCreateClinit() {
+        MethodNode clinit = getMethod("<clinit>", "()V");
+
+        if (clinit == null) {
+            clinit = new MethodNode(Opcodes.ACC_STATIC, "<clinit>", "()V", null, null);
+            clinit.instructions.add(new InsnNode(Opcodes.RETURN));
+            addMethod(clinit);
+        }
+
+        return clinit;
     }
 }

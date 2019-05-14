@@ -196,7 +196,7 @@ public class StringEncryption extends Transformer {
                 case 2:
                     sb.append((char) (chars[i] ^ key3));
                     break;
-                case 3:
+                default:
                     sb.append((char) (chars[i] ^ key4));
                     break;
             }

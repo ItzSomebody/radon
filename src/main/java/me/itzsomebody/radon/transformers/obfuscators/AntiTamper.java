@@ -138,7 +138,7 @@ public class AntiTamper extends Transformer {
                 case 2:
                     encrypted[i] = (char) (chars[i] ^ keyThree);
                     break;
-                case 3:
+                default:
                     encrypted[i] = (char) (chars[i] ^ keyFour);
                     break;
             }

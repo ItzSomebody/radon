@@ -37,7 +37,8 @@ public enum DictionaryType {
     SPACES,
     UNRECOGNIZED,
     ALPHABETICAL,
-    ALPHANUMERIC;
+    ALPHANUMERIC,
+    UNICODE;
 
     public static DictionaryType intToDictionary(int type) {
         if (type >= values().length)

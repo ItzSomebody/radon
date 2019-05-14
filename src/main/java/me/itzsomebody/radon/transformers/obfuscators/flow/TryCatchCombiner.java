@@ -37,7 +37,7 @@ import org.objectweb.asm.tree.VarInsnNode;
  * To achieve this, we first change the handler start to the trap start then we insert a condition at the start of the
  * trap which indicates if execution should move into the trap or catch region.
  * <p>
- * FIXME: breaks almost everything
+ * FIXME: really broken
  *
  * @author ItzSombody
  */
@@ -54,10 +54,9 @@ public class TryCatchCombiner extends FlowObfuscation {
                     if (methodNode.tryCatchBlocks.stream().anyMatch(tcbn -> !starts.add(tcbn.start)))
                         return;
 
-                    methodNode.tryCatchBlocks.stream().filter(tcbn -> tcbn.start != tcbn.handler).forEach(tcbn -> {
-                        int index = methodNode.maxLocals;
-                        methodNode.maxLocals++;
+                    int index = methodNode.maxLocals++;
 
+                    methodNode.tryCatchBlocks.stream().filter(tcbn -> tcbn.start != tcbn.handler).forEach(tcbn -> {
                         LabelNode handler = tcbn.handler;
                         LabelNode init = new LabelNode();
                         LabelNode back = new LabelNode();

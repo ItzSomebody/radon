@@ -99,8 +99,11 @@ public abstract class Transformer implements Opcodes {
         int count = 0;
 
         do {
-            if (count++ > 20)
-                throw new RadonException("Unable to generate an unused string (try increasing randomized string length)");
+            if (count++ > 20) {
+                //throw new RadonException("Unable to generate an unused string (try increasing randomized string length)");
+                radon.config.setRandomizedStringLength(radon.config.getRandomizedStringLength() + 1);
+                count = 0;
+            }
 
             str = getRandomString(radon.config.getRandomizedStringLength());
         } while (!usedStrings.add(str));
@@ -118,6 +121,8 @@ public abstract class Transformer implements Opcodes {
                 return StringUtils.randomAlphaString(length);
             case ALPHANUMERIC:
                 return StringUtils.randomAlphaNumericString(length);
+            case UNICODE:
+                return StringUtils.randomUnicodeString(length);
             default: {
                 throw new RadonException("Illegal dictionary type: " + radon.config.getDictionaryType());
             }

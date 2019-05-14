@@ -18,6 +18,7 @@
 
 package me.itzsomebody.radon.utils;
 
+import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -37,6 +38,14 @@ public class RandomUtils {
 
     public static int getRandomInt(int origin, int bounds) {
         return ThreadLocalRandom.current().nextInt(origin, bounds);
+    }
+
+    public static boolean getRandomBoolean() {
+        return getRandomFloat() > 0.5;
+    }
+
+    public static <T> T getRandomElement(List<T> list) {
+        return list.get(getRandomInt(list.size()));
     }
 
     public static long getRandomLong() {

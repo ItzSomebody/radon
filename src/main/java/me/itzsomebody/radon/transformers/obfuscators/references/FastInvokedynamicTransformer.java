@@ -100,7 +100,7 @@ public class FastInvokedynamicTransformer extends ReferenceObfuscation {
                 case 1:
                     decryptedChars[i] = (char) (encryptedChars[i] ^ memberNames.bootstrapMethodName.hashCode());
                     break;
-                case 2:
+                default:
                     decryptedChars[i] = (char) (encryptedChars[i] ^ memberNames.decryptMethodName.hashCode());
                     break;
             }

@@ -21,6 +21,7 @@ package me.itzsomebody.radon;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.util.Arrays;
 import java.util.zip.ZipFile;
 import me.itzsomebody.radon.cli.CommandArgumentsParser;
 import me.itzsomebody.radon.config.ConfigurationParser;
@@ -37,10 +38,21 @@ import me.itzsomebody.radon.utils.WatermarkUtils;
  */
 public class Main {
     public static final String VERSION = "2.0.0";
-    public static final String CONTRIBUTORS = "ItzSomebody, x0ark, Col-E, Artel, kazigk, Olexorus and freeasbird";
+    public static final String[] CONTRIBUTORS = {
+            "ItzSomebody", "x0ark", "Col-E", "Artel", "kazigk", "Olexorus",
+            "freeasbird", "CertainLach", "xxDark"
+    };
     public static final String ATTRIBUTION = String.format("Radon is a free and open-source Java obfuscator " +
                     "with contributions from %s.\nVersion: %s\nWebsite: https://github.com/ItzSomebody/Radon",
-            Main.CONTRIBUTORS, Main.VERSION);
+            formatContributorList(), Main.VERSION);
+
+    private static String formatContributorList() {
+        StringBuilder sb = new StringBuilder();
+
+        Arrays.stream(CONTRIBUTORS).forEach(s -> sb.append("\n* ").append(s));
+
+        return sb.toString();
+    }
 
     /**
      * Main method.
@@ -48,8 +60,7 @@ public class Main {
      * @param args arguments from command line.
      */
     public static void main(String[] args) {
-        Logger.stdOut("Version: " + VERSION);
-        Logger.stdOut("Contributors: " + CONTRIBUTORS + "\n");
+        System.out.println(ATTRIBUTION); // Don't use Logger otherwise duplicated messages
 
         // Registers the switches.
         CommandArgumentsParser.registerCommandSwitch("help", 0);

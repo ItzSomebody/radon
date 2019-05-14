@@ -16,22 +16,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package me.itzsomebody.radon.transformers.obfuscators.virtualizer;
+package me.itzsomebody.vm.handlers;
 
-public enum VirtualizerSetting {
-    VM_TYPE(String.class);
+import me.itzsomebody.vm.VM;
+import me.itzsomebody.vm.datatypes.JWrapper;
 
-    private final Class expectedType;
+public class Checkcast extends Handler {
+    @Override
+    public void handle(VM vm, Object[] operands) throws Throwable {
+        Class clazz = VM.getClazz((String) operands[0]);
+        JWrapper wrapper = vm.pop();
+        Object ref = wrapper.asObj();
+        stuff:
+        {
+            if (ref == null) // Null can be casted to anything
+                break stuff;
 
-    VirtualizerSetting(Class expectedType) {
-        this.expectedType = expectedType;
-    }
-
-    public Class getExpectedType() {
-        return expectedType;
-    }
-
-    public String getName() {
-        return name().toLowerCase();
+            clazz.cast(ref);
+        }
+        vm.push(wrapper);
     }
 }

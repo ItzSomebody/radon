@@ -71,24 +71,6 @@ public class ConfigurationParser {
     }
 
     /**
-     * Return the input file.
-     *
-     * @return the input file.
-     */
-    private File getInput() {
-        return new File((String) getValue(ConfigurationSetting.INPUT.getName(), config));
-    }
-
-    /**
-     * Returns the output file.
-     *
-     * @return the output file.
-     */
-    private File getOutput() {
-        return new File((String) getValue(ConfigurationSetting.OUTPUT.getName(), config));
-    }
-
-    /**
      * Returns the library files.
      *
      * @return the library files.
@@ -159,53 +141,6 @@ public class ConfigurationParser {
     }
 
     /**
-     * Returns the number of trash classes Radon should generate.
-     *
-     * @return the number of trash classes Radon should generate.
-     */
-    private int getnTrashClasses() {
-        return getValueOrDefault(ConfigurationSetting.TRASH_CLASSES.getName(), config, 0);
-    }
-
-    /**
-     * Returns the number of characters Radon should generate in random strings.
-     *
-     * @return the number of characters Radon should generate in random strings.
-     */
-    private int getRandomizedStringLength() {
-        return getValueOrDefault(ConfigurationSetting.RANDOMIZED_STRING_LENGTH.getName(), config, 8);
-    }
-
-    /**
-     * Returns the {@link DictionaryType}.
-     *
-     * @return the {@link DictionaryType}.
-     */
-    private DictionaryType getDictionaryType() {
-        String type = getValueOrDefault(ConfigurationSetting.DICTIONARY.getName(), config, "spaces");
-
-        return DictionaryType.valueOf(type.toUpperCase());
-    }
-
-    /**
-     * Returns the level of compression Radon should apply to the output.
-     *
-     * @return the level of compression Radon should apply to the output.
-     */
-    private int getCompressionLevel() {
-        return getValueOrDefault(ConfigurationSetting.COMPRESSION_LEVEL.getName(), config, 9);
-    }
-
-    /**
-     * Returns true if Radon should verify the output.
-     *
-     * @return true if Radon should verify the output.
-     */
-    private boolean isVerify() {
-        return getValueOrDefault(ConfigurationSetting.VERIFY.getName(), config, false);
-    }
-
-    /**
      * Creates a new {@link ObfuscationConfiguration} from the provided configuration.
      *
      * @return a new {@link ObfuscationConfiguration} from the provided configuration.
@@ -213,16 +148,17 @@ public class ConfigurationParser {
     public ObfuscationConfiguration createObfuscatorConfiguration() {
         ObfuscationConfiguration configuration = new ObfuscationConfiguration();
 
-        configuration.setInput(getInput());
-        configuration.setOutput(getOutput());
+        configuration.setInput(new File((String) getValue(ConfigurationSetting.INPUT.getName(), config)));
+        configuration.setOutput(new File((String) getValue(ConfigurationSetting.OUTPUT.getName(), config)));
         configuration.setLibraries(getLibraries());
         configuration.setTransformers(getTransformers());
         configuration.setExclusionManager(getExclusionManager());
-        configuration.setnTrashClasses(getnTrashClasses());
-        configuration.setRandomizedStringLength(getRandomizedStringLength());
-        configuration.setDictionaryType(getDictionaryType());
-        configuration.setCompressionLevel(getCompressionLevel());
-        configuration.setVerify(isVerify());
+        configuration.setnTrashClasses(getValueOrDefault(ConfigurationSetting.TRASH_CLASSES.getName(), config, 0));
+        configuration.setRandomizedStringLength(getValueOrDefault(ConfigurationSetting.RANDOMIZED_STRING_LENGTH.getName(), config, 1));
+        configuration.setDictionaryType(DictionaryType.valueOf(getValueOrDefault(ConfigurationSetting.DICTIONARY.getName(), config, "alphanumeric").toUpperCase()));
+        configuration.setCompressionLevel(getValueOrDefault(ConfigurationSetting.COMPRESSION_LEVEL.getName(), config, 9));
+        configuration.setVerify(getValueOrDefault(ConfigurationSetting.VERIFY.getName(), config, false));
+        configuration.setCorruptCrc(getValueOrDefault(ConfigurationSetting.CORRUPT_CRC.getName(), config, false));
 
         return configuration;
     }

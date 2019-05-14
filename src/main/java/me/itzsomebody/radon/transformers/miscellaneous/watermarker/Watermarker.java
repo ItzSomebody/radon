@@ -69,14 +69,11 @@ public class Watermarker extends Transformer {
 
                     if (counter > 20)
                         throw new IllegalStateException("Radon couldn't find any methods to embed a watermark in after " + counter + " tries.");
-                } while (classWrapper.classNode.methods.size() != 0);
+                } while (classWrapper.classNode.methods.size() == 0);
 
-                MethodNode methodNode = classWrapper.classNode.methods.get(RandomUtils.getRandomInt(0,
-                        classWrapper.classNode.methods.size()));
-                if (hasInstructions(methodNode)) {
-                    methodNode.instructions.insertBefore(methodNode.instructions.getFirst(),
-                            createInstructions(watermark, methodNode));
-                }
+                MethodNode methodNode = classWrapper.classNode.methods.get(RandomUtils.getRandomInt(0, classWrapper.classNode.methods.size()));
+                if (hasInstructions(methodNode))
+                    methodNode.instructions.insertBefore(methodNode.instructions.getFirst(), createInstructions(watermark, methodNode));
             }
         }
 
@@ -127,16 +124,16 @@ public class Watermarker extends Transformer {
     public Object getConfiguration() {
         Map<String, Object> config = new LinkedHashMap<>();
 
-        setMessage(getValueOrDefault(WatermarkerSetting.MESSAGE.getName(), config, null));
-        setKey(getValueOrDefault(WatermarkerSetting.KEY.getName(), config, null));
+        config.put(WatermarkerSetting.MESSAGE.getName(), getMessage());
+        config.put(WatermarkerSetting.KEY.getName(), getKey());
 
         return config;
     }
 
     @Override
     public void setConfiguration(Map<String, Object> config) {
-        config.put(WatermarkerSetting.MESSAGE.getName(), getMessage());
-        config.put(WatermarkerSetting.KEY.getName(), getKey());
+        setMessage(getValueOrDefault(WatermarkerSetting.MESSAGE.getName(), config, null));
+        setKey(getValueOrDefault(WatermarkerSetting.KEY.getName(), config, null));
     }
 
     @Override

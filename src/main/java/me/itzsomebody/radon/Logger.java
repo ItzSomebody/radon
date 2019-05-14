@@ -52,8 +52,7 @@ public class Logger {
                     log.createNewFile();
 
                 bw = new BufferedWriter(new FileWriter(log));
-                bw.append("Version: ").append(Main.VERSION).append('\n');
-                bw.append("Contributors: ").append(Main.CONTRIBUTORS).append('\n');
+                bw.append(Main.ATTRIBUTION).append('\n');
                 STRINGS.forEach(s -> {
                     try {
                         bw.append(s);

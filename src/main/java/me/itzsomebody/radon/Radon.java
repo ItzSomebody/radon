@@ -21,6 +21,7 @@ package me.itzsomebody.radon;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -30,6 +31,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
@@ -42,6 +44,7 @@ import me.itzsomebody.radon.transformers.Transformer;
 import me.itzsomebody.radon.transformers.miscellaneous.TrashClasses;
 import me.itzsomebody.radon.utils.FileUtils;
 import me.itzsomebody.radon.utils.IOUtils;
+import me.itzsomebody.radon.utils.RandomUtils;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
@@ -103,6 +106,29 @@ public class Radon {
         try {
             ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(output));
             zos.setLevel(config.getCompressionLevel());
+
+            if (config.isCorruptCrc())
+                try {
+                    Field field = ZipOutputStream.class.getDeclaredField("crc");
+                    field.setAccessible(true);
+                    field.set(zos, new CRC32() {
+                        @Override
+                        public void update(byte[] b, int off, int len) {
+                            // Don't update the CRC
+                        }
+
+                        @Override
+                        public long getValue() {
+                            return RandomUtils.getRandomLong(0xFFFFFFFFL);
+                        }
+                    });
+
+                    Logger.stdOut("Injected CRC corrupter.");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Logger.stdErr("Failed to inject CRC field.");
+                }
+
 
             this.classes.values().forEach(classWrapper -> {
                 try {
