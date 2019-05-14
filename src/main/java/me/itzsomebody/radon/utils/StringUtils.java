@@ -68,15 +68,6 @@ public class StringUtils {
         return 3;
     }
 
-    public static int getUtf8StringSize(String string) {
-        int byteLength = 0;
-        for (int i = 0; i < string.length(); ++i) {
-            char charValue = string.charAt(i);
-            byteLength += getUtf8CharSize(charValue);
-        }
-        return byteLength;
-    }
-
     public static String randomSpacesString(int length) {
         StringBuilder sb = new StringBuilder();
 

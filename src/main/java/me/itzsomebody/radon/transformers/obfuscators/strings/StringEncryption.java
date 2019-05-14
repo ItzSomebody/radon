@@ -18,6 +18,7 @@
 
 package me.itzsomebody.radon.transformers.obfuscators.strings;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -58,7 +59,7 @@ public class StringEncryption extends Transformer {
 
     private static InsnList getSafeStringInsnList(String string) {
         InsnList insnList = new InsnList();
-        if (StringUtils.getUtf8StringSize(string) < StringUtils.MAX_SAFE_BYTE_COUNT) {
+        if (string.getBytes(StandardCharsets.UTF_8).length < StringUtils.MAX_SAFE_BYTE_COUNT) {
             insnList.add(new LdcInsnNode(string));
             return insnList;
         }
