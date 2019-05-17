@@ -47,8 +47,8 @@ public class TryCatchCombiner extends FlowObfuscation {
         AtomicInteger counter = new AtomicInteger();
 
         getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper ->
-                classWrapper.methods.stream().filter(methodWrapper -> !excluded(methodWrapper)).forEach(methodWrapper -> {
-                    MethodNode methodNode = methodWrapper.methodNode;
+                classWrapper.getMethods().stream().filter(methodWrapper -> !excluded(methodWrapper)).forEach(methodWrapper -> {
+                    MethodNode methodNode = methodWrapper.getMethodNode();
 
                     HashSet<LabelNode> starts = new HashSet<>();
                     if (methodNode.tryCatchBlocks.stream().anyMatch(tcbn -> !starts.add(tcbn.start)))

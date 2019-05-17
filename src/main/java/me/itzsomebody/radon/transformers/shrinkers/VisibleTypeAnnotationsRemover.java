@@ -33,23 +33,23 @@ public class VisibleTypeAnnotationsRemover extends Shrinker {
         AtomicInteger counter = new AtomicInteger();
 
         getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper -> {
-            ClassNode classNode = classWrapper.classNode;
+            ClassNode classNode = classWrapper.getClassNode();
 
             if (classNode.visibleTypeAnnotations != null) {
                 counter.addAndGet(classNode.visibleTypeAnnotations.size());
                 classNode.visibleTypeAnnotations = null;
             }
 
-            classWrapper.fields.stream().filter(fieldWrapper -> !excluded(fieldWrapper)
-                    && fieldWrapper.fieldNode.visibleTypeAnnotations != null).forEach(fieldWrapper -> {
-                counter.addAndGet(fieldWrapper.fieldNode.visibleTypeAnnotations.size());
-                fieldWrapper.fieldNode.visibleTypeAnnotations = null;
+            classWrapper.getFields().stream().filter(fieldWrapper -> !excluded(fieldWrapper)
+                    && fieldWrapper.getFieldNode().visibleTypeAnnotations != null).forEach(fieldWrapper -> {
+                counter.addAndGet(fieldWrapper.getFieldNode().visibleTypeAnnotations.size());
+                fieldWrapper.getFieldNode().visibleTypeAnnotations = null;
             });
 
-            classWrapper.methods.stream().filter(methodWrapper -> !excluded(methodWrapper)
-                    && methodWrapper.methodNode.visibleTypeAnnotations != null).forEach(methodWrapper -> {
-                counter.addAndGet(methodWrapper.methodNode.visibleTypeAnnotations.size());
-                methodWrapper.methodNode.visibleTypeAnnotations = null;
+            classWrapper.getMethods().stream().filter(methodWrapper -> !excluded(methodWrapper)
+                    && methodWrapper.getMethodNode().visibleTypeAnnotations != null).forEach(methodWrapper -> {
+                counter.addAndGet(methodWrapper.getMethodNode().visibleTypeAnnotations.size());
+                methodWrapper.getMethodNode().visibleTypeAnnotations = null;
             });
         });
 

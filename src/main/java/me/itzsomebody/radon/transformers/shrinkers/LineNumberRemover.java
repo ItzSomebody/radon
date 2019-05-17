@@ -35,9 +35,9 @@ public class LineNumberRemover extends Shrinker {
         AtomicInteger counter = new AtomicInteger();
 
         this.getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper ->
-                classWrapper.methods.stream().filter(methodWrapper -> !excluded(methodWrapper)
+                classWrapper.getMethods().stream().filter(methodWrapper -> !excluded(methodWrapper)
                         && hasInstructions(methodWrapper)).forEach(methodWrapper -> {
-                    MethodNode methodNode = methodWrapper.methodNode;
+                    MethodNode methodNode = methodWrapper.getMethodNode();
 
                     Stream.of(methodNode.instructions.toArray()).filter(insn -> insn instanceof LineNumberNode)
                             .forEach(insn -> {

@@ -33,23 +33,23 @@ public class InvisibleAnnotationsRemover extends Shrinker {
         AtomicInteger counter = new AtomicInteger();
 
         getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper -> {
-            ClassNode classNode = classWrapper.classNode;
+            ClassNode classNode = classWrapper.getClassNode();
 
             if (classNode.invisibleAnnotations != null) {
                 counter.addAndGet(classNode.invisibleAnnotations.size());
                 classNode.invisibleAnnotations = null;
             }
 
-            classWrapper.fields.stream().filter(fieldWrapper -> !excluded(fieldWrapper)
-                    && fieldWrapper.fieldNode.invisibleAnnotations != null).forEach(fieldWrapper -> {
-                counter.addAndGet(fieldWrapper.fieldNode.invisibleAnnotations.size());
-                fieldWrapper.fieldNode.invisibleAnnotations = null;
+            classWrapper.getFields().stream().filter(fieldWrapper -> !excluded(fieldWrapper)
+                    && fieldWrapper.getFieldNode().invisibleAnnotations != null).forEach(fieldWrapper -> {
+                counter.addAndGet(fieldWrapper.getFieldNode().invisibleAnnotations.size());
+                fieldWrapper.getFieldNode().invisibleAnnotations = null;
             });
 
-            classWrapper.methods.stream().filter(methodWrapper -> !excluded(methodWrapper)
-                    && methodWrapper.methodNode.invisibleAnnotations != null).forEach(methodWrapper -> {
-                counter.addAndGet(methodWrapper.methodNode.invisibleAnnotations.size());
-                methodWrapper.methodNode.invisibleAnnotations = null;
+            classWrapper.getMethods().stream().filter(methodWrapper -> !excluded(methodWrapper)
+                    && methodWrapper.getMethodNode().invisibleAnnotations != null).forEach(methodWrapper -> {
+                counter.addAndGet(methodWrapper.getMethodNode().invisibleAnnotations.size());
+                methodWrapper.getMethodNode().invisibleAnnotations = null;
             });
         });
 

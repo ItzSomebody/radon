@@ -32,10 +32,10 @@ public class OuterMethodRemover extends Shrinker {
         AtomicInteger counter = new AtomicInteger();
 
         getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)
-                && classWrapper.classNode.outerClass != null).forEach(classWrapper -> {
-            classWrapper.classNode.outerClass = null;
-            classWrapper.classNode.outerMethod = null;
-            classWrapper.classNode.outerMethodDesc = null;
+                && classWrapper.getClassNode().outerClass != null).forEach(classWrapper -> {
+            classWrapper.getClassNode().outerClass = null;
+            classWrapper.getClassNode().outerMethod = null;
+            classWrapper.getClassNode().outerMethodDesc = null;
 
             counter.incrementAndGet();
         });

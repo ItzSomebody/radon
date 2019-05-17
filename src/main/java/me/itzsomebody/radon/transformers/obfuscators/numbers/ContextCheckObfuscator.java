@@ -32,7 +32,6 @@ import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
-import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 
 /**
@@ -48,18 +47,18 @@ public class ContextCheckObfuscator extends NumberObfuscation {
         AtomicInteger counter = new AtomicInteger();
 
         getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper ->
-                classWrapper.methods.stream().filter(methodWrapper -> !excluded(methodWrapper)
+                classWrapper.getMethods().stream().filter(methodWrapper -> !excluded(methodWrapper)
                         && hasInstructions(methodWrapper)).forEach(methodWrapper -> {
-                    MethodNode methodNode = methodWrapper.methodNode;
-                    int leeway = getSizeLeeway(methodNode);
+                    int leeway = getSizeLeeway(methodWrapper);
+                    InsnList methodInstructions = methodWrapper.getInstructions();
 
-                    for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
+                    for (AbstractInsnNode insn : methodInstructions.toArray()) {
                         if (leeway < 10000)
                             break;
 
                         if (ASMUtils.isIntInsn(insn) && master.isIntegerTamperingEnabled()) {
                             int originalNum = ASMUtils.getIntegerFromInsn(insn);
-                            int encodedInt = encodeInt(originalNum, methodNode.name.hashCode());
+                            int encodedInt = encodeInt(originalNum, methodWrapper.getName().hashCode());
 
                             InsnList insnList = new InsnList();
                             insnList.add(ASMUtils.getNumberInsn(encodedInt));
@@ -69,13 +68,13 @@ public class ContextCheckObfuscator extends NumberObfuscation {
                             insnList.add(new TypeInsnNode(CHECKCAST, "java/lang/Integer"));
                             insnList.add(new MethodInsnNode(INVOKEVIRTUAL, "java/lang/Integer", "intValue", "()I", false));
 
-                            methodNode.instructions.insertBefore(insn, insnList);
-                            methodNode.instructions.remove(insn);
+                            methodInstructions.insertBefore(insn, insnList);
+                            methodInstructions.remove(insn);
                             leeway -= 20;
                             counter.incrementAndGet();
                         } else if (ASMUtils.isLongInsn(insn) && master.isLongTamperingEnabled()) {
                             long originalNum = ASMUtils.getLongFromInsn(insn);
-                            long encodedLong = encodeLong(originalNum, methodNode.name.hashCode());
+                            long encodedLong = encodeLong(originalNum, methodWrapper.getName().hashCode());
 
                             InsnList insnList = new InsnList();
                             insnList.add(ASMUtils.getNumberInsn(encodedLong));
@@ -85,13 +84,13 @@ public class ContextCheckObfuscator extends NumberObfuscation {
                             insnList.add(new TypeInsnNode(CHECKCAST, "java/lang/Long"));
                             insnList.add(new MethodInsnNode(INVOKEVIRTUAL, "java/lang/Long", "longValue", "()J", false));
 
-                            methodNode.instructions.insertBefore(insn, insnList);
-                            methodNode.instructions.remove(insn);
+                            methodInstructions.insertBefore(insn, insnList);
+                            methodInstructions.remove(insn);
                             leeway -= 25;
                             counter.incrementAndGet();
                         } else if (ASMUtils.isFloatInsn(insn) && master.isFloatTamperingEnabled()) {
                             float originalNum = ASMUtils.getFloatFromInsn(insn);
-                            int encodedFloat = encodeFloat(originalNum, methodNode.name.hashCode());
+                            int encodedFloat = encodeFloat(originalNum, methodWrapper.getName().hashCode());
 
                             InsnList insnList = new InsnList();
                             insnList.add(ASMUtils.getNumberInsn(encodedFloat));
@@ -101,13 +100,13 @@ public class ContextCheckObfuscator extends NumberObfuscation {
                             insnList.add(new TypeInsnNode(CHECKCAST, "java/lang/Float"));
                             insnList.add(new MethodInsnNode(INVOKEVIRTUAL, "java/lang/Float", "floatValue", "()F", false));
 
-                            methodNode.instructions.insertBefore(insn, insnList);
-                            methodNode.instructions.remove(insn);
+                            methodInstructions.insertBefore(insn, insnList);
+                            methodInstructions.remove(insn);
 
                             leeway -= 20;
                         } else if (ASMUtils.isDoubleInsn(insn) && master.isDoubleTamperingEnabled()) {
                             double originalNum = ASMUtils.getDoubleFromInsn(insn);
-                            long encodedLong = encodeDouble(originalNum, methodNode.name.hashCode());
+                            long encodedLong = encodeDouble(originalNum, methodWrapper.getName().hashCode());
 
                             InsnList insnList = new InsnList();
                             insnList.add(ASMUtils.getNumberInsn(encodedLong));
@@ -117,8 +116,8 @@ public class ContextCheckObfuscator extends NumberObfuscation {
                             insnList.add(new TypeInsnNode(CHECKCAST, "java/lang/Double"));
                             insnList.add(new MethodInsnNode(INVOKEVIRTUAL, "java/lang/Double", "doubleValue", "()D", false));
 
-                            methodNode.instructions.insertBefore(insn, insnList);
-                            methodNode.instructions.remove(insn);
+                            methodInstructions.insertBefore(insn, insnList);
+                            methodInstructions.remove(insn);
                             leeway -= 25;
                         }
                     }
@@ -595,14 +594,14 @@ public class ContextCheckObfuscator extends NumberObfuscation {
 
         private MemberNames() {
             this.className = StringUtils.randomClassName(getClasses().keySet());
-            this.constantFieldName = randomString();
-            this.indicatorFieldName = randomString();
-            this.elementFieldName = randomString();
-            this.indexFieldName = randomString();
-            this.threadStarterMethodName = randomString();
-            this.decodeWordMethodName = randomString();
-            this.decodeDwordMethodName = randomString();
-            this.decodeConstantMethodName = randomString();
+            this.constantFieldName = uniqueRandomString();
+            this.indicatorFieldName = uniqueRandomString();
+            this.elementFieldName = uniqueRandomString();
+            this.indexFieldName = uniqueRandomString();
+            this.threadStarterMethodName = uniqueRandomString();
+            this.decodeWordMethodName = uniqueRandomString();
+            this.decodeDwordMethodName = uniqueRandomString();
+            this.decodeConstantMethodName = uniqueRandomString();
         }
     }
 }

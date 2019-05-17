@@ -36,9 +36,9 @@ public class NopRemover extends Optimizer {
         long current = System.currentTimeMillis();
 
         getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper ->
-                classWrapper.methods.stream().filter(methodWrapper -> !excluded(methodWrapper)
-                        && hasInstructions(methodWrapper.methodNode)).forEach(methodWrapper -> {
-                    MethodNode methodNode = methodWrapper.methodNode;
+                classWrapper.getMethods().stream().filter(methodWrapper -> !excluded(methodWrapper)
+                        && hasInstructions(methodWrapper.getMethodNode())).forEach(methodWrapper -> {
+                    MethodNode methodNode = methodWrapper.getMethodNode();
 
                     Stream.of(methodNode.instructions.toArray()).filter(insn -> insn.getOpcode() == NOP)
                             .forEach(insn -> methodNode.instructions.remove(insn));

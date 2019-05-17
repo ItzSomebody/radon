@@ -28,11 +28,7 @@ import me.itzsomebody.radon.config.ConfigurationSetting;
 import me.itzsomebody.radon.exceptions.InvalidConfigurationValueException;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
-import me.itzsomebody.radon.utils.AccessUtils;
 import me.itzsomebody.radon.utils.ASMUtils;
-import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.FieldNode;
-import org.objectweb.asm.tree.MethodNode;
 
 import static me.itzsomebody.radon.utils.ConfigUtils.getValueOrDefault;
 
@@ -56,27 +52,23 @@ public class HideCode extends Transformer {
     public void transform() {
         AtomicInteger counter = new AtomicInteger();
 
-        getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper -> {
+        getClassWrappers().stream().filter(cw -> !excluded(cw)).forEach(cw -> {
             if (isHideClassesEnabled()) {
-                ClassNode classNode = classWrapper.classNode;
-
-                if (!AccessUtils.isSynthetic(classNode.access) && !ASMUtils.hasAnnotations(classNode)) {
-                    classNode.access |= ACC_SYNTHETIC;
+                if (!cw.getAccess().isSynthetic() && !ASMUtils.hasAnnotations(cw.getClassNode())) {
+                    cw.setAccessFlags(cw.getAccessFlags() | ACC_SYNTHETIC);
                     counter.incrementAndGet();
                 }
             }
             if (isHideMethodsEnabled()) {
-                classWrapper.methods.stream().filter(methodWrapper -> !excluded(methodWrapper)
-                        && !ASMUtils.hasAnnotations(methodWrapper.methodNode)).forEach(methodWrapper -> {
+                cw.getMethods().stream().filter(mw -> !excluded(mw) && !ASMUtils.hasAnnotations(mw.getMethodNode())).forEach(mw -> {
                     boolean atLeastOnce = false;
-                    MethodNode methodNode = methodWrapper.methodNode;
 
-                    if (!AccessUtils.isSynthetic(methodNode.access)) {
-                        methodNode.access |= ACC_SYNTHETIC;
+                    if (!mw.getAccess().isSynthetic()) {
+                        mw.setAccessFlags(mw.getAccessFlags() | ACC_SYNTHETIC);
                         atLeastOnce = true;
                     }
-                    if (!methodNode.name.startsWith("<") && !AccessUtils.isBridge(methodNode.access)) {
-                        methodNode.access |= ACC_BRIDGE;
+                    if (!mw.getName().startsWith("<") && !mw.getAccess().isBridge()) {
+                        mw.setAccessFlags(mw.getAccessFlags() | ACC_BRIDGE);
                         atLeastOnce = true;
                     }
 
@@ -86,12 +78,9 @@ public class HideCode extends Transformer {
                 });
             }
             if (isHideFieldsEnabled()) {
-                classWrapper.fields.stream().filter(fieldWrapper -> !excluded(fieldWrapper)
-                        && !ASMUtils.hasAnnotations(fieldWrapper.fieldNode)).forEach(fieldWrapper -> {
-                    FieldNode fieldNode = fieldWrapper.fieldNode;
-
-                    if (!AccessUtils.isSynthetic(fieldNode.access)) {
-                        fieldNode.access |= ACC_SYNTHETIC;
+                cw.getFields().stream().filter(fw -> !excluded(fw) && !ASMUtils.hasAnnotations(fw.getFieldNode())).forEach(fw -> {
+                    if (!fw.getAccess().isSynthetic()) {
+                        fw.setAccessFlags(fw.getAccessFlags() | ACC_SYNTHETIC);
                         counter.incrementAndGet();
                     }
                 });

@@ -33,23 +33,23 @@ public class InvisibleTypeAnnotationsRemover extends Shrinker {
         AtomicInteger counter = new AtomicInteger();
 
         getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper -> {
-            ClassNode classNode = classWrapper.classNode;
+            ClassNode classNode = classWrapper.getClassNode();
 
             if (classNode.invisibleTypeAnnotations != null) {
                 counter.addAndGet(classNode.invisibleTypeAnnotations.size());
                 classNode.invisibleTypeAnnotations = null;
             }
 
-            classWrapper.fields.stream().filter(fieldWrapper -> !excluded(fieldWrapper)
-                    && fieldWrapper.fieldNode.invisibleTypeAnnotations != null).forEach(fieldWrapper -> {
-                counter.addAndGet(fieldWrapper.fieldNode.invisibleTypeAnnotations.size());
-                fieldWrapper.fieldNode.invisibleTypeAnnotations = null;
+            classWrapper.getFields().stream().filter(fieldWrapper -> !excluded(fieldWrapper)
+                    && fieldWrapper.getFieldNode().invisibleTypeAnnotations != null).forEach(fieldWrapper -> {
+                counter.addAndGet(fieldWrapper.getFieldNode().invisibleTypeAnnotations.size());
+                fieldWrapper.getFieldNode().invisibleTypeAnnotations = null;
             });
 
-            classWrapper.methods.stream().filter(methodWrapper -> !excluded(methodWrapper)
-                    && methodWrapper.methodNode.invisibleTypeAnnotations != null).forEach(methodWrapper -> {
-                counter.addAndGet(methodWrapper.methodNode.invisibleTypeAnnotations.size());
-                methodWrapper.methodNode.invisibleTypeAnnotations = null;
+            classWrapper.getMethods().stream().filter(methodWrapper -> !excluded(methodWrapper)
+                    && methodWrapper.getMethodNode().invisibleTypeAnnotations != null).forEach(methodWrapper -> {
+                counter.addAndGet(methodWrapper.getMethodNode().invisibleTypeAnnotations.size());
+                methodWrapper.getMethodNode().invisibleTypeAnnotations = null;
             });
         });
 

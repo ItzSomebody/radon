@@ -70,16 +70,16 @@ public class StringEncryption extends Transformer {
         AtomicInteger counter = new AtomicInteger();
 
         getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper ->
-                classWrapper.methods.stream().filter(methodWrapper -> !excluded(methodWrapper)).forEach(methodWrapper -> {
+                classWrapper.getMethods().stream().filter(methodWrapper -> !excluded(methodWrapper)).forEach(methodWrapper -> {
                     // TODO: leeway safeguard
 
-                    Stream.of(methodWrapper.methodNode.instructions.toArray()).filter(insn -> insn instanceof LdcInsnNode
+                    Stream.of(methodWrapper.getMethodNode().instructions.toArray()).filter(insn -> insn instanceof LdcInsnNode
                             && ((LdcInsnNode) insn).cst instanceof String).forEach(insn -> {
                         if (excludedString((String) ((LdcInsnNode) insn).cst))
                             return;
 
-                        int callerClassHC = classWrapper.classNode.name.replace("/", ".").hashCode();
-                        int callerMethodHC = methodWrapper.methodNode.name.replace("/", ".").hashCode();
+                        int callerClassHC = classWrapper.getName().replace("/", ".").hashCode();
+                        int callerMethodHC = methodWrapper.getMethodNode().name.replace("/", ".").hashCode();
                         int decryptorClassHC = memberNames.className.replace("/", ".").hashCode();
                         int decryptorMethodHC = memberNames.decryptMethodName.replace("/", ".").hashCode();
 
@@ -92,14 +92,14 @@ public class StringEncryption extends Transformer {
                         LdcInsnNode ldc = (LdcInsnNode) insn;
                         ldc.cst = encrypt((String) ldc.cst, key1, key2, key3, key4);
 
-                        methodWrapper.methodNode.instructions.insert(ldc, new MethodInsnNode(
+                        methodWrapper.getMethodNode().instructions.insert(ldc, new MethodInsnNode(
                                 INVOKESTATIC,
                                 memberNames.className,
                                 memberNames.decryptMethodName,
                                 "(Ljava/lang/Object;I)Ljava/lang/String;",
                                 false
                         ));
-                        methodWrapper.methodNode.instructions.insert(ldc, ASMUtils.getNumberInsn(randomKey));
+                        methodWrapper.getMethodNode().instructions.insert(ldc, ASMUtils.getNumberInsn(randomKey));
 
                         counter.incrementAndGet();
                     });
@@ -1183,8 +1183,8 @@ public class StringEncryption extends Transformer {
 
     private class MemberNames {
         private String className = StringUtils.randomClassName(getClasses().keySet());
-        private String cacheFieldName = randomString();
-        private String bigBoizFieldName = randomString();
-        private String decryptMethodName = randomString();
+        private String cacheFieldName = uniqueRandomString();
+        private String bigBoizFieldName = uniqueRandomString();
+        private String decryptMethodName = uniqueRandomString();
     }
 }

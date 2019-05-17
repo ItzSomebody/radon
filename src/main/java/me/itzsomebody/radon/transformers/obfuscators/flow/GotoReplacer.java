@@ -42,11 +42,11 @@ public class GotoReplacer extends FlowObfuscation {
         AtomicInteger counter = new AtomicInteger();
 
         getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper -> {
-            FieldNode predicate = new FieldNode(PRED_ACCESS, randomString(), "Z", null, null);
+            FieldNode predicate = new FieldNode(PRED_ACCESS, uniqueRandomString(), "Z", null, null);
 
-            classWrapper.methods.stream().filter(methodWrapper -> !excluded(methodWrapper)
-                    && hasInstructions(methodWrapper.methodNode)).forEach(methodWrapper -> {
-                MethodNode methodNode = methodWrapper.methodNode;
+            classWrapper.getMethods().stream().filter(methodWrapper -> !excluded(methodWrapper)
+                    && hasInstructions(methodWrapper.getMethodNode())).forEach(methodWrapper -> {
+                MethodNode methodNode = methodWrapper.getMethodNode();
 
                 int leeway = getSizeLeeway(methodNode);
                 int varIndex = methodNode.maxLocals;
@@ -72,10 +72,10 @@ public class GotoReplacer extends FlowObfuscation {
                 methodNode.instructions.insertBefore(methodNode.instructions.getFirst(),
                         new VarInsnNode(ISTORE, varIndex));
                 methodNode.instructions.insertBefore(methodNode.instructions.getFirst(),
-                        new FieldInsnNode(GETSTATIC, classWrapper.classNode.name, predicate.name, "Z"));
+                        new FieldInsnNode(GETSTATIC, classWrapper.getName(), predicate.name, "Z"));
             });
 
-            classWrapper.classNode.fields.add(predicate);
+            classWrapper.getClassNode().fields.add(predicate);
         });
 
         Logger.stdOut("Swapped " + counter.get() + " GOTO instructions");

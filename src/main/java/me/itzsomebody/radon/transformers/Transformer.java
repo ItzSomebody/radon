@@ -51,21 +51,21 @@ public abstract class Transformer implements Opcodes {
     }
 
     protected final boolean excluded(String str) {
-        return this.radon.config.getExclusionManager().isExcluded(str, getExclusionType());
+        return this.radon.getConfig().getExclusionManager().isExcluded(str, getExclusionType());
     }
 
     protected final boolean excluded(ClassWrapper classWrapper) {
-        return this.excluded(classWrapper.originalName);
+        return this.excluded(classWrapper.getOriginalName());
     }
 
     protected final boolean excluded(MethodWrapper methodWrapper) {
-        return this.excluded(methodWrapper.owner.originalName + '.' + methodWrapper.originalName
-                + methodWrapper.originalDescription);
+        return this.excluded(methodWrapper.getOwner().getOriginalName() + '.' + methodWrapper.getOriginalName()
+                + methodWrapper.getOriginalDescription());
     }
 
     protected final boolean excluded(FieldWrapper fieldWrapper) {
-        return this.excluded(fieldWrapper.owner.originalName + '.' + fieldWrapper.originalName + '.'
-                + fieldWrapper.originalDescription);
+        return this.excluded(fieldWrapper.getOwner().getOriginalName() + '.' + fieldWrapper.getOriginalName() + '.'
+                + fieldWrapper.getOriginalDescription());
     }
 
     /**
@@ -82,12 +82,16 @@ public abstract class Transformer implements Opcodes {
         return (65535 - cse.getMaxSize());
     }
 
+    protected int getSizeLeeway(MethodWrapper wrapper) {
+        return getSizeLeeway(wrapper.getMethodNode());
+    }
+
     protected final boolean hasInstructions(MethodNode methodNode) {
         return methodNode.instructions != null && methodNode.instructions.size() > 0;
     }
 
     protected final boolean hasInstructions(MethodWrapper methodWrapper) {
-        return hasInstructions(methodWrapper.methodNode);
+        return hasInstructions(methodWrapper.getMethodNode());
     }
 
     protected final long tookThisLong(long from) {
@@ -95,24 +99,28 @@ public abstract class Transformer implements Opcodes {
     }
 
     protected String randomString() {
+        return getRandomString(radon.getConfig().getRandomizedStringLength());
+    }
+
+    protected String uniqueRandomString() {
         String str;
         int count = 0;
 
         do {
             if (count++ > 20) {
                 //throw new RadonException("Unable to generate an unused string (try increasing randomized string length)");
-                radon.config.setRandomizedStringLength(radon.config.getRandomizedStringLength() + 1);
+                radon.getConfig().setRandomizedStringLength(radon.getConfig().getRandomizedStringLength() + 1);
                 count = 0;
             }
 
-            str = getRandomString(radon.config.getRandomizedStringLength());
+            str = getRandomString(radon.getConfig().getRandomizedStringLength());
         } while (!usedStrings.add(str));
 
         return str;
     }
 
     private String getRandomString(int length) {
-        switch (radon.config.getDictionaryType()) {
+        switch (radon.getConfig().getDictionaryType()) {
             case SPACES:
                 return StringUtils.randomSpacesString(length);
             case UNRECOGNIZED:
@@ -124,7 +132,7 @@ public abstract class Transformer implements Opcodes {
             case UNICODE:
                 return StringUtils.randomUnicodeString(length);
             default: {
-                throw new RadonException("Illegal dictionary type: " + radon.config.getDictionaryType());
+                throw new RadonException("Illegal dictionary type: " + radon.getConfig().getDictionaryType());
             }
         }
     }

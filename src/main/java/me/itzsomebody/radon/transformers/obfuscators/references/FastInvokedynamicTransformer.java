@@ -29,9 +29,9 @@ import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.InvokeDynamicInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
-import org.objectweb.asm.tree.MethodNode;
 
 /**
  * Hides method invocations with invokedynamic instructions.
@@ -47,14 +47,12 @@ public class FastInvokedynamicTransformer extends ReferenceObfuscation {
         Handle bootstrapHandle = new Handle(H_INVOKESTATIC, memberNames.className, memberNames.bootstrapMethodName,
                 "(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;", false);
 
-        getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)
-                && !"java/lang/Enum".equals(classWrapper.classNode.superName)
-                && classWrapper.classNode.version >= V1_7).forEach(classWrapper ->
-                classWrapper.methods.stream().filter(methodWrapper -> !excluded(methodWrapper)
-                        && hasInstructions(methodWrapper)).forEach(methodWrapper -> {
-                    MethodNode methodNode = methodWrapper.methodNode;
+        getClassWrappers().stream().filter(cw -> !excluded(cw) && !"java/lang/Enum".equals(cw.getSuperName())
+                && cw.allowsIndy()).forEach(classWrapper ->
+                classWrapper.getMethods().stream().filter(mw -> !excluded(mw) && hasInstructions(mw)).forEach(mw -> {
+                    InsnList insns = mw.getInstructions();
 
-                    Stream.of(methodNode.instructions.toArray()).forEach(insn -> {
+                    Stream.of(insns.toArray()).forEach(insn -> {
                         if (insn instanceof MethodInsnNode) {
                             MethodInsnNode m = (MethodInsnNode) insn;
 
@@ -75,7 +73,7 @@ public class FastInvokedynamicTransformer extends ReferenceObfuscation {
                                     bootstrapHandle
                             );
 
-                            methodNode.instructions.set(m, indy);
+                            insns.set(m, indy);
 
                             counter.incrementAndGet();
                         }
@@ -335,8 +333,8 @@ public class FastInvokedynamicTransformer extends ReferenceObfuscation {
 
     private class MemberNames {
         private String className = StringUtils.randomClassName(getClasses().keySet());
-        private String decryptMethodName = randomString();
-        private String getMethodHandleMethodName = randomString();
-        private String bootstrapMethodName = randomString();
+        private String decryptMethodName = uniqueRandomString();
+        private String getMethodHandleMethodName = uniqueRandomString();
+        private String bootstrapMethodName = uniqueRandomString();
     }
 }

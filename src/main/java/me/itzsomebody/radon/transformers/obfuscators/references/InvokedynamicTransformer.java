@@ -31,10 +31,10 @@ import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldInsnNode;
+import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.InvokeDynamicInsnNode;
 import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
-import org.objectweb.asm.tree.MethodNode;
 
 /**
  * Hides method invocations and field accesses by swapping them out with an invokedynamic instruction.
@@ -50,15 +50,12 @@ public class InvokedynamicTransformer extends ReferenceObfuscation {
         Handle bootstrapHandle = new Handle(H_INVOKESTATIC, memberNames.className, memberNames.bootstrapMethodName,
                 "(Ljava/lang/Object;Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", false);
 
-        getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)
-                && !"java/lang/Enum".equals(classWrapper.classNode.superName)
-                && classWrapper.classNode.version >= V1_7).forEach(classWrapper ->
-                classWrapper.methods.stream().filter(methodWrapper -> !excluded(methodWrapper)
-                        && hasInstructions(methodWrapper)).forEach(methodWrapper -> {
-                    MethodNode methodNode = methodWrapper.methodNode;
-                    // TODO: leeway safeguard
+        getClassWrappers().stream().filter(cw -> !excluded(cw) && !"java/lang/Enum".equals(cw.getSuperName())
+                && cw.allowsIndy()).forEach(classWrapper ->
+                classWrapper.getMethods().stream().filter(mw -> !excluded(mw) && hasInstructions(mw)).forEach(mw -> {
+                    InsnList insns = mw.getInstructions();
 
-                    Stream.of(methodNode.instructions.toArray()).forEach(insn -> {
+                    Stream.of(insns.toArray()).forEach(insn -> {
                         if (insn instanceof MethodInsnNode) {
                             MethodInsnNode m = (MethodInsnNode) insn;
 
@@ -78,14 +75,14 @@ public class InvokedynamicTransformer extends ReferenceObfuscation {
                                     bootstrapHandle
                             );
 
-                            methodNode.instructions.insertBefore(m, new LdcInsnNode(m.owner.replace("/", ".")));
-                            methodNode.instructions.insertBefore(m, ASMUtils.getNumberInsn(
+                            insns.insertBefore(m, new LdcInsnNode(m.owner.replace("/", ".")));
+                            insns.insertBefore(m, ASMUtils.getNumberInsn(
                                     (((long) hash(m.desc) & 0xffffffffL) | (((long) m.name.hashCode()) << 32))
                             ));
-                            methodNode.instructions.set(m, indy);
+                            insns.set(m, indy);
 
                             counter.incrementAndGet();
-                        } else if (insn instanceof FieldInsnNode && !"<init>".equals(methodNode.name)) {
+                        } else if (insn instanceof FieldInsnNode && !"<init>".equals(mw.getName())) {
                             FieldInsnNode f = (FieldInsnNode) insn;
 
                             boolean isStatic = (f.getOpcode() == GETSTATIC || f.getOpcode() == PUTSTATIC);
@@ -118,11 +115,11 @@ public class InvokedynamicTransformer extends ReferenceObfuscation {
                                     bootstrapHandle
                             );
 
-                            methodNode.instructions.insertBefore(f, new LdcInsnNode(f.owner.replace("/", ".")));
-                            methodNode.instructions.insertBefore(f, ASMUtils.getNumberInsn(
+                            insns.insertBefore(f, new LdcInsnNode(f.owner.replace("/", ".")));
+                            insns.insertBefore(f, ASMUtils.getNumberInsn(
                                     (((long) hashType(f.desc) & 0xffffffffL) | (((long) f.name.hashCode()) << 32))
                             ));
-                            methodNode.instructions.set(f, indy);
+                            insns.set(f, indy);
 
                             counter.incrementAndGet();
                         }
@@ -922,12 +919,12 @@ public class InvokedynamicTransformer extends ReferenceObfuscation {
 
     private class MemberNames {
         private String className = StringUtils.randomClassName(getClasses().keySet());
-        private String methodCacheFieldName = randomString();
-        private String fieldCacheFieldName = randomString();
-        private String hashMethodName = randomString();
-        private String findMethodMethodName = randomString();
-        private String findFieldMethodName = randomString();
-        private String resolveMethodHandleMethodName = randomString();
-        private String bootstrapMethodName = randomString();
+        private String methodCacheFieldName = uniqueRandomString();
+        private String fieldCacheFieldName = uniqueRandomString();
+        private String hashMethodName = uniqueRandomString();
+        private String findMethodMethodName = uniqueRandomString();
+        private String findFieldMethodName = uniqueRandomString();
+        private String resolveMethodHandleMethodName = uniqueRandomString();
+        private String bootstrapMethodName = uniqueRandomString();
     }
 }

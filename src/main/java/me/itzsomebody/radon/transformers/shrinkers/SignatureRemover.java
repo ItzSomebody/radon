@@ -33,22 +33,22 @@ public class SignatureRemover extends Shrinker {
         AtomicInteger counter = new AtomicInteger();
 
         getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper -> {
-            ClassNode classNode = classWrapper.classNode;
+            ClassNode classNode = classWrapper.getClassNode();
 
             if (classNode.signature != null) {
                 classNode.signature = null;
                 counter.incrementAndGet();
             }
 
-            classWrapper.methods.stream().filter(methodWrapper -> !excluded(methodWrapper)
-                    && methodWrapper.methodNode.signature != null).forEach(methodWrapper -> {
-                methodWrapper.methodNode.signature = null;
+            classWrapper.getMethods().stream().filter(methodWrapper -> !excluded(methodWrapper)
+                    && methodWrapper.getMethodNode().signature != null).forEach(methodWrapper -> {
+                methodWrapper.getMethodNode().signature = null;
                 counter.incrementAndGet();
             });
 
-            classWrapper.fields.stream().filter(fieldWrapper -> !excluded(fieldWrapper)
-                    && fieldWrapper.fieldNode.signature != null).forEach(fieldWrapper -> {
-                fieldWrapper.fieldNode.signature = null;
+            classWrapper.getFields().stream().filter(fieldWrapper -> !excluded(fieldWrapper)
+                    && fieldWrapper.getFieldNode().signature != null).forEach(fieldWrapper -> {
+                fieldWrapper.getFieldNode().signature = null;
                 counter.incrementAndGet();
             });
         });

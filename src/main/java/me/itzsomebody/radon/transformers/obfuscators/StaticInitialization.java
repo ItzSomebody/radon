@@ -47,10 +47,10 @@ public class StaticInitialization extends Transformer {
         getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper -> {
             MethodNode clinit = classWrapper.getOrCreateClinit();
 
-            classWrapper.fields.stream().filter(fieldWrapper -> !excluded(fieldWrapper)
-                    && Modifier.isStatic(fieldWrapper.fieldNode.access)
-                    && fieldWrapper.fieldNode.value != null).forEach(fieldWrapper -> {
-                FieldNode fieldNode = fieldWrapper.fieldNode;
+            classWrapper.getFields().stream().filter(fieldWrapper -> !excluded(fieldWrapper)
+                    && Modifier.isStatic(fieldWrapper.getFieldNode().access)
+                    && fieldWrapper.getFieldNode().value != null).forEach(fieldWrapper -> {
+                FieldNode fieldNode = fieldWrapper.getFieldNode();
                 Object val = fieldNode.value;
 
                 exit:
@@ -70,7 +70,7 @@ public class StaticInitialization extends Transformer {
                     else
                         break exit;
 
-                    toAdd.add(new FieldInsnNode(PUTSTATIC, classWrapper.classNode.name, fieldNode.name, fieldNode.desc));
+                    toAdd.add(new FieldInsnNode(PUTSTATIC, classWrapper.getName(), fieldNode.name, fieldNode.desc));
                     clinit.instructions.insert(toAdd);
                     fieldNode.value = null;
 

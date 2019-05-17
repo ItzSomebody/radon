@@ -76,20 +76,20 @@ public class Ejector extends Transformer {
     }
 
     private void processClass(ClassWrapper classWrapper, AtomicInteger counter) {
-        new ArrayList<>(classWrapper.methods).stream()
+        new ArrayList<>(classWrapper.getMethods()).stream()
                 .filter(methodWrapper -> !excluded(methodWrapper))
-                .filter(methodWrapper -> !"<init>".equals(methodWrapper.methodNode.name))
+                .filter(methodWrapper -> !"<init>".equals(methodWrapper.getMethodNode().name))
                 .forEach(methodWrapper -> {
                     EjectorContext ejectorContext = new EjectorContext(counter, classWrapper, junkArguments, junkArgumentStrength);
                     getPhases(ejectorContext).forEach(ejectPhase -> {
                         ConstantAnalyzer constantAnalyzer = new ConstantAnalyzer();
                         try {
-                            Logger.stdOut("Analyze: " + classWrapper.originalName + "::" + methodWrapper.originalName + methodWrapper.originalDescription);
-                            Frame<AbstractValue>[] frames = constantAnalyzer.analyze(classWrapper.classNode.name, methodWrapper.methodNode);
+                            Logger.stdOut("Analyze: " + classWrapper.getOriginalName() + "::" + methodWrapper.getOriginalName() + methodWrapper.getOriginalDescription());
+                            Frame<AbstractValue>[] frames = constantAnalyzer.analyze(classWrapper.getName(), methodWrapper.getMethodNode());
 
                             ejectPhase.process(methodWrapper, frames);
                         } catch (AnalyzerException e) {
-                            Logger.stdErr("Can't analyze method: " + classWrapper.originalName + "::" + methodWrapper.originalName + methodWrapper.originalDescription);
+                            Logger.stdErr("Can't analyze method: " + classWrapper.getOriginalName() + "::" + methodWrapper.getOriginalName() + methodWrapper.getOriginalDescription());
                             Logger.stdErr(e.toString());
                         }
                     });

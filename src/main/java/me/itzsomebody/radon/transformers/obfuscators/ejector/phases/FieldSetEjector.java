@@ -105,12 +105,12 @@ public final class FieldSetEjector extends AbstractEjectPhase {
     @Override
     public void process(MethodWrapper methodWrapper, Frame<AbstractValue>[] frames) {
         ClassWrapper classWrapper = ejectorContext.getClassWrapper();
-        MethodNode methodNode = methodWrapper.methodNode;
+        MethodNode methodNode = methodWrapper.getMethodNode();
 
         Map<FieldSetInfo, List<FieldInsnNode>> fieldSets = analyzeFieldSets(methodNode, frames);
         if (fieldSets.isEmpty())
             return;
-        methodWrapper.methodNode.maxStack++;
+        methodWrapper.getMethodNode().maxStack++;
 
         Map<AbstractInsnNode, InsnList> patches = new HashMap<>();
         fieldSets.forEach((key, value) -> {
@@ -127,7 +127,7 @@ public final class FieldSetEjector extends AbstractEjectPhase {
 
                 patches.put(fieldInsnNode, ASMUtils.asList(
                         new LdcInsnNode(id),
-                        new MethodInsnNode(Opcodes.INVOKESTATIC, classWrapper.classNode.name, proxyMethod.name, proxyMethod.desc, false)
+                        new MethodInsnNode(Opcodes.INVOKESTATIC, classWrapper.getName(), proxyMethod.name, proxyMethod.desc, false)
                 ));
 
 

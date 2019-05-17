@@ -33,7 +33,6 @@ import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.MethodInsnNode;
-import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TryCatchBlockNode;
 
 /**
@@ -63,51 +62,49 @@ public class FakeCatchBlocks extends FlowObfuscation {
 
         ClassNode fakeHandler = new ClassNode();
         fakeHandler.superName = HANDLER_NAMES[RandomUtils.getRandomInt(HANDLER_NAMES.length)];
-        fakeHandler.name = randomString();
+        fakeHandler.name = uniqueRandomString();
         fakeHandler.access = ACC_PUBLIC | ACC_SUPER;
         fakeHandler.version = V1_5;
 
-        String methodName = randomString();
+        String methodName = uniqueRandomString();
 
         getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper ->
-                classWrapper.methods.stream().filter(methodWrapper -> !excluded(methodWrapper)
-                        && hasInstructions(methodWrapper.methodNode) && !"<init>".equals(methodWrapper.originalName))
-                        .forEach(methodWrapper -> {
-                            MethodNode methodNode = methodWrapper.methodNode;
+                classWrapper.getMethods().stream().filter(mw -> !excluded(mw) && hasInstructions(mw.getMethodNode())
+                        && !"<init>".equals(mw.getOriginalName())).forEach(methodWrapper -> {
+                    int leeway = getSizeLeeway(methodWrapper);
+                    InsnList insns = methodWrapper.getInstructions();
 
-                            int leeway = getSizeLeeway(methodNode);
+                    for (AbstractInsnNode insn : insns.toArray()) {
+                        if (leeway < 10000)
+                            return;
+                        if (!ASMUtils.isInstruction(insn))
+                            continue;
 
-                            for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
-                                if (leeway < 10000)
-                                    return;
-                                if (!ASMUtils.isInstruction(insn))
-                                    continue;
+                        if (RandomUtils.getRandomInt(10) > 6) {
+                            LabelNode trapStart = new LabelNode();
+                            LabelNode trapEnd = new LabelNode();
+                            LabelNode catchStart = new LabelNode();
+                            LabelNode catchEnd = new LabelNode();
 
-                                if (RandomUtils.getRandomInt(10) > 6) {
-                                    LabelNode trapStart = new LabelNode();
-                                    LabelNode trapEnd = new LabelNode();
-                                    LabelNode catchStart = new LabelNode();
-                                    LabelNode catchEnd = new LabelNode();
+                            InsnList catchBlock = new InsnList();
+                            catchBlock.add(catchStart);
+                            catchBlock.add(new InsnNode(DUP));
+                            catchBlock.add(new MethodInsnNode(INVOKEVIRTUAL, fakeHandler.name, methodName, "()V", false));
+                            catchBlock.add(new InsnNode(ATHROW));
+                            catchBlock.add(catchEnd);
 
-                                    InsnList catchBlock = new InsnList();
-                                    catchBlock.add(catchStart);
-                                    catchBlock.add(new InsnNode(DUP));
-                                    catchBlock.add(new MethodInsnNode(INVOKEVIRTUAL, fakeHandler.name, methodName, "()V", false));
-                                    catchBlock.add(new InsnNode(ATHROW));
-                                    catchBlock.add(catchEnd);
+                            insns.insertBefore(insn, trapStart);
+                            insns.insert(insn, catchBlock);
+                            insns.insert(insn, new JumpInsnNode(GOTO, catchEnd));
+                            insns.insert(insn, trapEnd);
 
-                                    methodNode.instructions.insertBefore(insn, trapStart);
-                                    methodNode.instructions.insert(insn, catchBlock);
-                                    methodNode.instructions.insert(insn, new JumpInsnNode(GOTO, catchEnd));
-                                    methodNode.instructions.insert(insn, trapEnd);
+                            methodWrapper.getTryCatchBlocks().add(new TryCatchBlockNode(trapStart, trapEnd, catchStart, fakeHandler.name));
 
-                                    methodNode.tryCatchBlocks.add(new TryCatchBlockNode(trapStart, trapEnd, catchStart, fakeHandler.name));
-
-                                    leeway -= 15;
-                                    counter.incrementAndGet();
-                                }
-                            }
-                        }));
+                            leeway -= 15;
+                            counter.incrementAndGet();
+                        }
+                    }
+                }));
         ClassWrapper newWrapper = new ClassWrapper(fakeHandler, false);
         getClasses().put(fakeHandler.name, newWrapper);
         getClassPath().put(fakeHandler.name, newWrapper);

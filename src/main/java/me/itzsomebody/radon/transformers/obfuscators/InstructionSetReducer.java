@@ -38,11 +38,11 @@ import org.objectweb.asm.tree.TableSwitchInsnNode;
 public class InstructionSetReducer extends Transformer {
     @Override
     public void transform() {
-        getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper ->
-                classWrapper.methods.stream().filter(methodWrapper -> !excluded(methodWrapper)).forEach(methodWrapper -> {
+        getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(cw ->
+                cw.getMethods().stream().filter(mw -> !excluded(mw)).forEach(mw -> {
                     InsnList newInsns = new InsnList();
                     insn:
-                    for (AbstractInsnNode abstractInsnNode : methodWrapper.methodNode.instructions.toArray()) {
+                    for (AbstractInsnNode abstractInsnNode : mw.getInstructions().toArray()) {
                         if (abstractInsnNode instanceof TableSwitchInsnNode) {
                             LabelNode trampolineStart = new LabelNode();
                             InsnNode cleanStack = new InsnNode(Opcodes.POP);
@@ -132,9 +132,11 @@ public class InstructionSetReducer extends Transformer {
                                     continue insn;
                             }
                         }
+
                         newInsns.add(abstractInsnNode);
                     }
-                    methodWrapper.methodNode.instructions = newInsns;
+
+                    mw.setInstructions(newInsns);
                 }));
     }
 

@@ -37,17 +37,18 @@ import org.objectweb.asm.tree.MethodNode;
 public class BadAnnotation extends Transformer {
     @Override
     public void transform() {
-        getClassWrappers().parallelStream().forEach(cn -> cn.methods.parallelStream().forEach(mn -> {
-            MethodNode methodNode = mn.methodNode;
+        getClassWrappers().stream().filter(cw -> !excluded(cw)).forEach(cw ->
+                cw.getMethods().stream().filter(mw -> !excluded(mw)).forEach(mw -> {
+                    MethodNode methodNode = mw.getMethodNode();
 
-            if (methodNode.visibleAnnotations == null)
-                methodNode.visibleAnnotations = new ArrayList<>();
-            if (methodNode.invisibleAnnotations == null)
-                methodNode.invisibleAnnotations = new ArrayList<>();
+                    if (methodNode.visibleAnnotations == null)
+                        methodNode.visibleAnnotations = new ArrayList<>();
+                    if (methodNode.invisibleAnnotations == null)
+                        methodNode.invisibleAnnotations = new ArrayList<>();
 
-            methodNode.visibleAnnotations.add(new AnnotationNode("@"));
-            methodNode.invisibleAnnotations.add(new AnnotationNode("@"));
-        }));
+                    methodNode.visibleAnnotations.add(new AnnotationNode("@"));
+                    methodNode.invisibleAnnotations.add(new AnnotationNode("@"));
+                }));
     }
 
     @Override

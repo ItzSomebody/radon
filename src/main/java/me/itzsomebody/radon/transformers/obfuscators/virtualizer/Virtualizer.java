@@ -80,9 +80,9 @@ public class Virtualizer extends Transformer implements VMOpcodes {
         StubCreator stubCreator = new StubCreator();
 
         getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper ->
-                classWrapper.methods.stream().filter(methodWrapper -> !"<init>".equals(methodWrapper.originalName)
+                classWrapper.getMethods().stream().filter(methodWrapper -> !"<init>".equals(methodWrapper.getOriginalName())
                         && !excluded(methodWrapper)).forEach(methodWrapper -> {
-                    MethodNode methodNode = methodWrapper.methodNode;
+                    MethodNode methodNode = methodWrapper.getMethodNode();
 
                     int leeway = getSizeLeeway(methodNode);
                     if (leeway <= 30000 || !canProtect(methodNode.instructions)) // Virtualization of big method = mega bad

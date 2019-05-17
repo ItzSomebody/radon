@@ -32,11 +32,11 @@ public class InvisibleParameterAnnotationsRemover extends Shrinker {
         AtomicInteger counter = new AtomicInteger();
 
         getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper ->
-                classWrapper.methods.stream().filter(methodWrapper -> !excluded(methodWrapper)
-                        && methodWrapper.methodNode.invisibleParameterAnnotations != null).forEach(methodWrapper -> {
+                classWrapper.getMethods().stream().filter(methodWrapper -> !excluded(methodWrapper)
+                        && methodWrapper.getMethodNode().invisibleParameterAnnotations != null).forEach(methodWrapper -> {
 
-                    counter.addAndGet(methodWrapper.methodNode.invisibleAnnotableParameterCount);
-                    methodWrapper.methodNode.invisibleParameterAnnotations = null;
+                    counter.addAndGet(methodWrapper.getMethodNode().invisibleAnnotableParameterCount);
+                    methodWrapper.getMethodNode().invisibleParameterAnnotations = null;
                 }));
 
         Logger.stdOut(String.format("Removed %d invisible parameter annotations.", counter.get()));

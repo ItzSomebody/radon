@@ -52,13 +52,13 @@ public class MemberShuffler extends Transformer {
 
         getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper -> {
             if (isShuffleMethodsEnabled()) {
-                Collections.shuffle(classWrapper.classNode.methods);
-                counter.addAndGet(classWrapper.classNode.methods.size());
+                Collections.shuffle(classWrapper.getClassNode().methods);
+                counter.addAndGet(classWrapper.getClassNode().methods.size());
             }
 
-            if (isShuffleFieldsEnabled() && classWrapper.classNode.fields != null) {
-                Collections.shuffle(classWrapper.classNode.fields);
-                counter.addAndGet(classWrapper.classNode.fields.size());
+            if (isShuffleFieldsEnabled() && classWrapper.getClassNode().fields != null) {
+                Collections.shuffle(classWrapper.getClassNode().fields);
+                counter.addAndGet(classWrapper.getClassNode().fields.size());
             }
         });
 

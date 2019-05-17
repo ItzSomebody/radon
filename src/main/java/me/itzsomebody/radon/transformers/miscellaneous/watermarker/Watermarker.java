@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 import me.itzsomebody.radon.Logger;
 import me.itzsomebody.radon.asm.ClassWrapper;
+import me.itzsomebody.radon.asm.MethodWrapper;
 import me.itzsomebody.radon.config.ConfigurationSetting;
 import me.itzsomebody.radon.exceptions.InvalidConfigurationValueException;
 import me.itzsomebody.radon.exclusions.ExclusionType;
@@ -34,7 +35,6 @@ import me.itzsomebody.radon.transformers.Transformer;
 import me.itzsomebody.radon.utils.ASMUtils;
 import me.itzsomebody.radon.utils.RandomUtils;
 import org.objectweb.asm.tree.InsnList;
-import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
 import static me.itzsomebody.radon.utils.ConfigUtils.getValueOrDefault;
@@ -69,19 +69,20 @@ public class Watermarker extends Transformer {
 
                     if (counter > 20)
                         throw new IllegalStateException("Radon couldn't find any methods to embed a watermark in after " + counter + " tries.");
-                } while (classWrapper.classNode.methods.size() == 0);
+                } while (classWrapper.getMethods().size() == 0);
 
-                MethodNode methodNode = classWrapper.classNode.methods.get(RandomUtils.getRandomInt(0, classWrapper.classNode.methods.size()));
-                if (hasInstructions(methodNode))
-                    methodNode.instructions.insertBefore(methodNode.instructions.getFirst(), createInstructions(watermark, methodNode));
+                MethodWrapper mw = classWrapper.getMethods().get(RandomUtils.getRandomInt(0, classWrapper.getClassNode().methods.size()));
+                if (hasInstructions(mw)) {
+                    mw.getInstructions().insert(createInstructions(watermark, mw.getMaxLocals()));
+                    mw.setMaxLocals(mw.getMaxLocals());
+                }
             }
         }
 
         Logger.stdOut("Successfully embedded watermark.");
     }
 
-    private static InsnList createInstructions(Deque<Character> watermark, MethodNode methodNode) {
-        int offset = methodNode.maxLocals;
+    private static InsnList createInstructions(Deque<Character> watermark, int offset) {
         int xorKey = RandomUtils.getRandomInt();
         int watermarkChar = watermark.pop() ^ xorKey;
         int indexXorKey = RandomUtils.getRandomInt();
@@ -108,16 +109,15 @@ public class Watermarker extends Transformer {
         char[] keyChars = getKey().toCharArray();
         Deque<Character> returnThis = new ArrayDeque<>();
 
-        for (int i = 0; i < messageChars.length; i++) {
+        for (int i = 0; i < messageChars.length; i++)
             returnThis.push((char) (messageChars[i] ^ keyChars[i % keyChars.length]));
-        }
 
         return returnThis;
     }
 
     @Override
     public ExclusionType getExclusionType() {
-        return null;
+        return ExclusionType.WATERMARKER;
     }
 
     @Override

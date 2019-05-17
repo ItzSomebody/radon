@@ -20,8 +20,6 @@ package me.itzsomebody.radon.transformers.shrinkers;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import me.itzsomebody.radon.Logger;
-import me.itzsomebody.radon.utils.AccessUtils;
-import org.objectweb.asm.tree.ClassNode;
 
 /**
  * Strips out deprecated access flags.
@@ -33,23 +31,19 @@ public class DeprecatedAccessRemover extends Shrinker {
     public void transform() {
         AtomicInteger counter = new AtomicInteger();
 
-        getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper -> {
-            ClassNode classNode = classWrapper.classNode;
-
-            if (AccessUtils.isDeprecated(classNode.access)) {
-                classNode.access &= ~ACC_DEPRECATED;
+        getClassWrappers().stream().filter(cw -> !excluded(cw)).forEach(cw -> {
+            if (cw.getAccess().isDeprecated()) {
+                cw.setAccessFlags(cw.getAccessFlags() & ~ACC_DEPRECATED);
                 counter.incrementAndGet();
             }
 
-            classWrapper.methods.stream().filter(methodWrapper -> !excluded(methodWrapper)
-                    && AccessUtils.isDeprecated(methodWrapper.methodNode.access)).forEach(methodWrapper -> {
-                methodWrapper.methodNode.access &= ~ACC_DEPRECATED;
+            cw.getMethods().stream().filter(mw -> !excluded(mw) && mw.getAccess().isDeprecated()).forEach(mw -> {
+                mw.setAccessFlags(mw.getAccessFlags() & ~ACC_DEPRECATED);
                 counter.incrementAndGet();
             });
 
-            classWrapper.fields.stream().filter(fieldWrapper -> !excluded(fieldWrapper)
-                    && AccessUtils.isDeprecated(fieldWrapper.fieldNode.access)).forEach(fieldWrapper -> {
-                fieldWrapper.fieldNode.access &= ~ACC_DEPRECATED;
+            cw.getFields().stream().filter(fw -> !excluded(fw) && fw.getAccess().isDeprecated()).forEach(fw -> {
+                fw.setAccessFlags(fw.getAccessFlags() & ~ACC_DEPRECATED);
                 counter.incrementAndGet();
             });
         });

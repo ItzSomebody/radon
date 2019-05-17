@@ -33,9 +33,9 @@ public class InnerClassesRemover extends Shrinker {
         AtomicInteger counter = new AtomicInteger();
 
         getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)
-                && classWrapper.classNode.innerClasses != null).forEach(classWrapper -> {
-            counter.addAndGet(classWrapper.classNode.innerClasses.size());
-            classWrapper.classNode.innerClasses = new ArrayList<>();
+                && classWrapper.getClassNode().innerClasses != null).forEach(classWrapper -> {
+            counter.addAndGet(classWrapper.getClassNode().innerClasses.size());
+            classWrapper.getClassNode().innerClasses = new ArrayList<>();
         });
 
         Logger.stdOut(String.format("Removed %d inner classes.", counter.get()));

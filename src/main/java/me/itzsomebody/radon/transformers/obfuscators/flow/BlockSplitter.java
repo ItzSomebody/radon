@@ -32,7 +32,6 @@ import org.objectweb.asm.tree.MethodNode;
  * <p>
  * P1->P2 becomes GOTO_P1->P2->P1->GOTO_P2
  * <p>
- * FIXME: breaks stuff.
  *
  * @author ItzSomebody
  */
@@ -41,9 +40,9 @@ public class BlockSplitter extends FlowObfuscation {
     public void transform() {
         AtomicInteger counter = new AtomicInteger();
 
-        getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper ->
-                classWrapper.methods.stream().filter(methodWrapper -> !excluded(methodWrapper)).forEach(methodWrapper -> {
-                    MethodNode methodNode = methodWrapper.methodNode;
+        getClassWrappers().stream().filter(cw -> !excluded(cw)).forEach(cw ->
+                cw.getMethods().stream().filter(mw -> !excluded(mw)).forEach(mw -> {
+                    MethodNode methodNode = mw.getMethodNode();
 
                     if (methodNode.instructions.size() > 10) {
                         LabelNode p1 = new LabelNode();

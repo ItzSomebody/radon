@@ -74,7 +74,7 @@ public class TrashClasses extends Transformer {
         for (int i = 0; i < classNames.size() % 20; i++)
             DESCRIPTORS.add("L" + classNames.get(RandomUtils.getRandomInt(classNames.size())) + ";");
 
-        for (int i = 0; i < radon.config.getnTrashClasses(); i++) {
+        for (int i = 0; i < radon.getConfig().getnTrashClasses(); i++) {
             ClassNode classNode = generateClass();
             ClassWriter cw = new ClassWriter(0);
             cw.newUTF8("RADON" + Main.VERSION);
@@ -83,7 +83,7 @@ public class TrashClasses extends Transformer {
             this.getResources().put(classNode.name + ".class", cw.toByteArray());
         }
 
-        Logger.stdOut(String.format("Generated %d trash classes.", radon.config.getnTrashClasses()));
+        Logger.stdOut(String.format("Generated %d trash classes.", radon.getConfig().getnTrashClasses()));
     }
 
     private ClassNode generateClass() {
@@ -115,7 +115,7 @@ public class TrashClasses extends Transformer {
 
     private MethodNode methodGen() {
         String randDesc = descGen();
-        MethodNode method = new MethodNode(ACC_STATIC + ACC_PRIVATE, randomString(), randDesc, null, null);
+        MethodNode method = new MethodNode(ACC_STATIC + ACC_PRIVATE, uniqueRandomString(), randDesc, null, null);
         int instructions = RandomUtils.getRandomInt(30) + 30;
 
         InsnList insns = new InsnList();
@@ -178,9 +178,9 @@ public class TrashClasses extends Transformer {
         int index = RandomUtils.getRandomInt(20);
         switch (index) {
             case 0:
-                return new MethodInsnNode(INVOKESTATIC, randomString(), randomString(), "(Ljava/lang/String;)V", false);
+                return new MethodInsnNode(INVOKESTATIC, uniqueRandomString(), uniqueRandomString(), "(Ljava/lang/String;)V", false);
             case 1:
-                return new FieldInsnNode(GETFIELD, randomString(), randomString(), "I");
+                return new FieldInsnNode(GETFIELD, uniqueRandomString(), uniqueRandomString(), "I");
             case 2:
                 return new InsnNode(RandomUtils.getRandomInt(16));
             case 3:
@@ -194,22 +194,22 @@ public class TrashClasses extends Transformer {
             case 8:
                 return new InsnNode(RandomUtils.getRandomInt(5));
             case 9:
-                return new LdcInsnNode(randomString());
+                return new LdcInsnNode(uniqueRandomString());
             case 10:
                 return new IincInsnNode(RandomUtils.getRandomInt(16), RandomUtils.getRandomInt(16));
             case 11:
-                return new MethodInsnNode(INVOKESPECIAL, randomString(), randomString(), "()V", false);
+                return new MethodInsnNode(INVOKESPECIAL, uniqueRandomString(), uniqueRandomString(), "()V", false);
             case 12:
-                return new MethodInsnNode(INVOKEVIRTUAL, randomString(), randomString(), "(Ljava/lang/Object;)Ljava/lang/Object;", false);
+                return new MethodInsnNode(INVOKEVIRTUAL, uniqueRandomString(), uniqueRandomString(), "(Ljava/lang/Object;)Ljava/lang/Object;", false);
             case 13:
                 return new VarInsnNode(ILOAD, RandomUtils.getRandomInt(30));
             case 14:
                 return new InsnNode(ATHROW);
             case 15:
-                return new MethodInsnNode(INVOKEINTERFACE, randomString(), randomString(), "(I)I", false);
+                return new MethodInsnNode(INVOKEINTERFACE, uniqueRandomString(), uniqueRandomString(), "(I)I", false);
             case 16:
-                Handle handle = new Handle(6, randomString(), randomString(), randomString(), false);
-                return new InvokeDynamicInsnNode(randomString(), randomString(), handle, RandomUtils.getRandomInt(5), RandomUtils.getRandomInt(5), RandomUtils.getRandomInt(5), RandomUtils.getRandomInt(5), RandomUtils.getRandomInt(5));
+                Handle handle = new Handle(6, uniqueRandomString(), uniqueRandomString(), uniqueRandomString(), false);
+                return new InvokeDynamicInsnNode(uniqueRandomString(), uniqueRandomString(), handle, RandomUtils.getRandomInt(5), RandomUtils.getRandomInt(5), RandomUtils.getRandomInt(5), RandomUtils.getRandomInt(5), RandomUtils.getRandomInt(5));
             case 17:
                 return new IntInsnNode(ANEWARRAY, RandomUtils.getRandomInt(30));
             case 18:

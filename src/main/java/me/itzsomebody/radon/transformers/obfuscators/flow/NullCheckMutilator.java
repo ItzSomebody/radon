@@ -43,9 +43,9 @@ public class NullCheckMutilator extends FlowObfuscation {
         AtomicInteger counter = new AtomicInteger();
 
         getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper ->
-                classWrapper.methods.stream().filter(methodWrapper -> !excluded(methodWrapper)
-                        && hasInstructions(methodWrapper.methodNode)).forEach(methodWrapper -> {
-                    MethodNode methodNode = methodWrapper.methodNode;
+                classWrapper.getMethods().stream().filter(methodWrapper -> !excluded(methodWrapper)
+                        && hasInstructions(methodWrapper.getMethodNode())).forEach(methodWrapper -> {
+                    MethodNode methodNode = methodWrapper.getMethodNode();
 
                     int leeway = getSizeLeeway(methodNode);
 

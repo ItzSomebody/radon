@@ -118,12 +118,12 @@ public final class MethodCallEjector extends AbstractEjectPhase {
     @Override
     public void process(MethodWrapper methodWrapper, Frame<AbstractValue>[] frames) {
         ClassWrapper classWrapper = ejectorContext.getClassWrapper();
-        MethodNode methodNode = methodWrapper.methodNode;
+        MethodNode methodNode = methodWrapper.getMethodNode();
 
         Map<MethodCallInfo, List<MethodInsnNode>> methodCalls = analyzeMethodCalls(methodNode, frames);
         if (methodCalls.isEmpty())
             return;
-        methodWrapper.methodNode.maxStack++;
+        methodWrapper.getMethodNode().maxStack++;
 
         Map<AbstractInsnNode, InsnList> patches = new HashMap<>();
         methodCalls.forEach((key, value) -> {
@@ -139,7 +139,7 @@ public final class MethodCallEjector extends AbstractEjectPhase {
 
                 patches.put(methodInsnNode, ASMUtils.asList(
                         new LdcInsnNode(id),
-                        new MethodInsnNode(Opcodes.INVOKESTATIC, classWrapper.classNode.name, proxyMethod.name, proxyMethod.desc, false)
+                        new MethodInsnNode(Opcodes.INVOKESTATIC, classWrapper.getName(), proxyMethod.name, proxyMethod.desc, false)
                 ));
 
 

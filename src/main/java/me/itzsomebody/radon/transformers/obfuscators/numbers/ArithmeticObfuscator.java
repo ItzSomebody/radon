@@ -25,7 +25,6 @@ import me.itzsomebody.radon.utils.RandomUtils;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.InsnNode;
-import org.objectweb.asm.tree.MethodNode;
 
 /**
  * Splits number constants into arithmetic operations.
@@ -38,40 +37,40 @@ public class ArithmeticObfuscator extends NumberObfuscation {
         AtomicInteger counter = new AtomicInteger();
 
         getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper ->
-                classWrapper.methods.stream().filter(methodWrapper -> !excluded(methodWrapper)).forEach(methodWrapper -> {
-                    MethodNode methodNode = methodWrapper.methodNode;
-                    int leeway = getSizeLeeway(methodNode);
+                classWrapper.getMethods().stream().filter(methodWrapper -> !excluded(methodWrapper)).forEach(methodWrapper -> {
+                    int leeway = getSizeLeeway(methodWrapper);
+                    InsnList methodInstructions = methodWrapper.getInstructions();
 
-                    for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
+                    for (AbstractInsnNode insn : methodInstructions.toArray()) {
                         if (leeway < 10000)
                             break;
 
                         if (ASMUtils.isIntInsn(insn) && master.isIntegerTamperingEnabled()) {
                             InsnList insns = obfuscateNumber(ASMUtils.getIntegerFromInsn(insn));
 
-                            methodNode.instructions.insert(insn, insns);
-                            methodNode.instructions.remove(insn);
+                            methodInstructions.insert(insn, insns);
+                            methodInstructions.remove(insn);
 
                             counter.incrementAndGet();
                         } else if (ASMUtils.isLongInsn(insn) && master.isLongTamperingEnabled()) {
                             InsnList insns = obfuscateNumber(ASMUtils.getLongFromInsn(insn));
 
-                            methodNode.instructions.insert(insn, insns);
-                            methodNode.instructions.remove(insn);
+                            methodInstructions.insert(insn, insns);
+                            methodInstructions.remove(insn);
 
                             counter.incrementAndGet();
                         } else if (ASMUtils.isFloatInsn(insn) && master.isFloatTamperingEnabled()) {
                             InsnList insns = obfuscateNumber(ASMUtils.getFloatFromInsn(insn));
 
-                            methodNode.instructions.insert(insn, insns);
-                            methodNode.instructions.remove(insn);
+                            methodInstructions.insert(insn, insns);
+                            methodInstructions.remove(insn);
 
                             counter.incrementAndGet();
                         } else if (ASMUtils.isDoubleInsn(insn) && master.isDoubleTamperingEnabled()) {
                             InsnList insns = obfuscateNumber(ASMUtils.getDoubleFromInsn(insn));
 
-                            methodNode.instructions.insert(insn, insns);
-                            methodNode.instructions.remove(insn);
+                            methodInstructions.insert(insn, insns);
+                            methodInstructions.remove(insn);
 
                             counter.incrementAndGet();
                         }

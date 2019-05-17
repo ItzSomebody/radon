@@ -27,20 +27,9 @@ import java.util.Set;
  * @author ItzSomebody
  */
 public class ClassTree {
-    /**
-     * Attached ClassWrapper.
-     */
-    public final ClassWrapper classWrapper;
-
-    /**
-     * Names of classes this represented class inherits from.
-     */
-    public final Set<String> parentClasses = new HashSet<>();
-
-    /**
-     * Names of classes this represented class is inherited by.
-     */
-    public final Set<String> subClasses = new HashSet<>();
+    private final ClassWrapper classWrapper;
+    private final Set<String> parentClasses = new HashSet<>();
+    private final Set<String> subClasses = new HashSet<>();
 
     /**
      * Creates a ClassTree object.
@@ -49,5 +38,26 @@ public class ClassTree {
      */
     public ClassTree(ClassWrapper classWrapper) {
         this.classWrapper = classWrapper;
+    }
+
+    /**
+     * Attached ClassWrapper.
+     */
+    public ClassWrapper getClassWrapper() {
+        return classWrapper;
+    }
+
+    /**
+     * Names of classes this represented class inherits from.
+     */
+    public Set<String> getParentClasses() {
+        return parentClasses;
+    }
+
+    /**
+     * Names of classes this represented class is inherited by.
+     */
+    public Set<String> getSubClasses() {
+        return subClasses;
     }
 }

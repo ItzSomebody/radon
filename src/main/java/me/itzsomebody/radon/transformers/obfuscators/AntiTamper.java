@@ -54,15 +54,15 @@ public class AntiTamper extends Transformer {
         MemberNames memberNames = new MemberNames();
         AtomicInteger counter = new AtomicInteger();
 
-        getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper -> {
+        getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(cw -> {
             Set<MethodWrapper> toProcess = new HashSet<>();
 
-            classWrapper.methods.stream().filter(methodWrapper -> !excluded(methodWrapper)).forEach(methodWrapper ->
-                    Stream.of(methodWrapper.methodNode.instructions.toArray()).filter(insn -> insn instanceof LdcInsnNode
+            cw.getMethods().stream().filter(mw -> !excluded(mw)).forEach(mw ->
+                    Stream.of(mw.getInstructions().toArray()).filter(insn -> insn instanceof LdcInsnNode
                             && ((LdcInsnNode) insn).cst instanceof String).forEach(insn -> {
-                        toProcess.add(methodWrapper);
+                        toProcess.add(mw);
 
-                        methodWrapper.methodNode.instructions.insert(insn, new MethodInsnNode(
+                        mw.getMethodNode().instructions.insert(insn, new MethodInsnNode(
                                 INVOKESTATIC,
                                 memberNames.className,
                                 memberNames.decryptMethodName,
@@ -74,15 +74,15 @@ public class AntiTamper extends Transformer {
                     }));
 
             if (counter.get() > 0) {
-                IntStream.range(0, 120).forEach(i -> classWrapper.addStringConst(StringUtils.randomAlphaString(RandomUtils.getRandomInt(0, 32))));
+                IntStream.range(0, 120).forEach(i -> cw.addStringConst(StringUtils.randomAlphaString(RandomUtils.getRandomInt(0, 32))));
 
-                int cpSize = new ClassReader(radon.class2Bytes(classWrapper)).getItemCount();
+                int cpSize = new ClassReader(cw.toByteArray()).getItemCount();
 
-                toProcess.forEach(methodWrapper -> Stream.of(methodWrapper.methodNode.instructions.toArray()).filter(insn -> insn instanceof LdcInsnNode
+                toProcess.forEach(methodWrapper -> Stream.of(methodWrapper.getMethodNode().instructions.toArray()).filter(insn -> insn instanceof LdcInsnNode
                         && ((LdcInsnNode) insn).cst instanceof String).forEach(insn -> {
                     LdcInsnNode ldc = (LdcInsnNode) insn;
                     String s = (String) ldc.cst;
-                    ldc.cst = encrypt(s, memberNames, classWrapper.classNode.name.replace('/', '.'), methodWrapper.methodNode.name, cpSize);
+                    ldc.cst = encrypt(s, memberNames, cw.getName().replace('/', '.'), methodWrapper.getMethodNode().name, cpSize);
                 }));
             }
         });
@@ -460,6 +460,6 @@ public class AntiTamper extends Transformer {
 
     private class MemberNames {
         private String className = StringUtils.randomClassName(getClasses().keySet());
-        private String decryptMethodName = randomString();
+        private String decryptMethodName = uniqueRandomString();
     }
 }

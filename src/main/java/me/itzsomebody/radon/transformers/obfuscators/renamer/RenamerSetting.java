@@ -22,6 +22,7 @@ import java.util.List;
 
 public enum RenamerSetting {
     ADAPT_THESE_RESOURCES(List.class),
+    DUMP_MAPPINGS(Boolean.class),
     REPACKAGE_NAME(String.class);
 
     private final Class expectedType;

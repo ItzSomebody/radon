@@ -33,9 +33,9 @@ public class LocalVariableRemover extends Shrinker {
         AtomicInteger counter = new AtomicInteger();
 
         getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper ->
-                classWrapper.methods.stream().filter(methodWrapper -> !excluded(methodWrapper)
-                        && methodWrapper.methodNode.localVariables != null).forEach(methodWrapper -> {
-                    MethodNode methodNode = methodWrapper.methodNode;
+                classWrapper.getMethods().stream().filter(methodWrapper -> !excluded(methodWrapper)
+                        && methodWrapper.getMethodNode().localVariables != null).forEach(methodWrapper -> {
+                    MethodNode methodNode = methodWrapper.getMethodNode();
 
                     counter.addAndGet(methodNode.localVariables.size());
                     methodNode.localVariables = null;

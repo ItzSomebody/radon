@@ -42,16 +42,16 @@ public class StringPooler extends StringEncryption {
     public void transform() {
         AtomicInteger counter = new AtomicInteger();
 
-        getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper -> {
+        getClassWrappers().stream().filter(cw -> !excluded(cw)).forEach(cw -> {
             ArrayList<String> strList = new ArrayList<>();
-            String methodName = randomString();
-            String fieldName = randomString();
+            String methodName = uniqueRandomString();
+            String fieldName = uniqueRandomString();
 
-            classWrapper.methods.stream().filter(methodWrapper -> !excluded(methodWrapper)
-                    && hasInstructions(methodWrapper.methodNode)).forEach(methodWrapper -> {
-                MethodNode methodNode = methodWrapper.methodNode;
+            cw.getMethods().stream().filter(methodWrapper -> !excluded(methodWrapper)
+                    && hasInstructions(methodWrapper.getMethodNode())).forEach(methodWrapper -> {
+                InsnList insns = methodWrapper.getInstructions();
 
-                Stream.of(methodNode.instructions.toArray()).filter(insn -> insn instanceof LdcInsnNode
+                Stream.of(insns.toArray()).filter(insn -> insn instanceof LdcInsnNode
                         && ((LdcInsnNode) insn).cst instanceof String).forEach(insn -> {
                     String str = (String) ((LdcInsnNode) insn).cst;
 
@@ -60,35 +60,31 @@ public class StringPooler extends StringEncryption {
 
                         int indexNumber = strList.size() - 1;
 
-                        methodNode.instructions.insertBefore(insn, new FieldInsnNode(GETSTATIC, classWrapper.classNode.name, fieldName, "[Ljava/lang/String;"));
-                        methodNode.instructions.insertBefore(insn, ASMUtils.getNumberInsn(indexNumber));
-                        methodNode.instructions.set(insn, new InsnNode(AALOAD));
+                        insns.insertBefore(insn, new FieldInsnNode(GETSTATIC, cw.getName(), fieldName, "[Ljava/lang/String;"));
+                        insns.insertBefore(insn, ASMUtils.getNumberInsn(indexNumber));
+                        insns.set(insn, new InsnNode(AALOAD));
                         counter.incrementAndGet();
                     }
                 });
             });
 
             if (strList.size() != 0) {
-                classWrapper.addMethod(stringPool(classWrapper.classNode.name, methodName, fieldName,
-                        strList));
+                cw.addMethod(stringPool(cw.getName(), methodName, fieldName, strList));
 
-                MethodNode clinit = classWrapper.classNode.methods.stream().filter(methodNode ->
+                MethodNode clinit = cw.getClassNode().methods.stream().filter(methodNode ->
                         "<clinit>".equals(methodNode.name)).findFirst().orElse(null);
                 if (clinit == null) {
                     clinit = new MethodNode(ACC_PRIVATE + ACC_STATIC + ACC_SYNTHETIC, "<clinit>", "()V", null, null);
                     InsnList insns = new InsnList();
-                    insns.add(new MethodInsnNode(INVOKESTATIC, classWrapper.classNode.name, methodName, "()V", false));
+                    insns.add(new MethodInsnNode(INVOKESTATIC, cw.getName(), methodName, "()V", false));
                     insns.add(new InsnNode(RETURN));
                     clinit.instructions = insns;
-                    classWrapper.classNode.methods.add(clinit);
+                    cw.getClassNode().methods.add(clinit);
                 } else
                     clinit.instructions.insertBefore(clinit.instructions.getFirst(), new MethodInsnNode(INVOKESTATIC,
-                            classWrapper.classNode.name, methodName, "()V", false));
-                FieldNode fieldNode = new FieldNode(ACC_PRIVATE + ACC_STATIC + ACC_SYNTHETIC, fieldName,
-                        "[Ljava/lang/String;", null, null);
-                if (classWrapper.classNode.fields == null)
-                    classWrapper.classNode.fields = new ArrayList<>();
-                classWrapper.classNode.fields.add(fieldNode);
+                            cw.getName(), methodName, "()V", false));
+                FieldNode fieldNode = new FieldNode(ACC_PRIVATE + ACC_STATIC + ACC_SYNTHETIC, fieldName, "[Ljava/lang/String;", null, null);
+                cw.getClassNode().fields.add(fieldNode);
             }
         });
         Logger.stdOut(String.format("Pooled %d strings.", counter.get()));

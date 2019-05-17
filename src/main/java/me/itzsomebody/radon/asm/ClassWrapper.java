@@ -20,8 +20,15 @@ package me.itzsomebody.radon.asm;
 
 import java.util.ArrayList;
 import java.util.List;
+import me.itzsomebody.radon.Logger;
+import me.itzsomebody.radon.Main;
+import me.itzsomebody.radon.asm.accesses.Access;
+import me.itzsomebody.radon.asm.accesses.ClassAccess;
+import org.objectweb.asm.ClassReader;
+import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.MethodNode;
 
@@ -31,54 +38,49 @@ import org.objectweb.asm.tree.MethodNode;
  * @author ItzSomebody
  */
 public class ClassWrapper {
-    /**
-     * Attached class node.
-     */
-    public ClassNode classNode;
+    private static final int LIB_FLAGS = ClassReader.SKIP_DEBUG | ClassReader.SKIP_FRAMES | ClassReader.SKIP_CODE;
+    private static final int INPUT_FLAGS = ClassReader.SKIP_FRAMES;
 
-    /**
-     * Original name of ClassNode. Really useful when class got renamed.
-     */
-    public final String originalName;
+    private ClassNode classNode;
+    private final String originalName;
+    private final boolean libraryNode;
 
-    /**
-     * Quick way of figuring out if this is represents library class or not.
-     */
-    public final boolean libraryNode;
+    private final Access access;
+    private final List<MethodWrapper> methods = new ArrayList<>();
+    private final List<FieldWrapper> fields = new ArrayList<>();
+    private final List<String> strConsts = new ArrayList<>();
 
-    /**
-     * Methods.
-     */
-    public final List<MethodWrapper> methods = new ArrayList<>();
+    public ClassWrapper(ClassReader cr, boolean libraryNode) {
+        ClassNode classNode = new ClassNode();
+        cr.accept(classNode, libraryNode ? LIB_FLAGS : INPUT_FLAGS);
 
-    /**
-     * Fields.
-     */
-    public final List<FieldWrapper> fields = new ArrayList<>();
-    public final List<String> strConsts = new ArrayList<>();
+        this.classNode = classNode;
+        this.originalName = classNode.name;
+        this.libraryNode = libraryNode;
 
-    /**
-     * Creates a ClassWrapper object.
-     *
-     * @param classNode   the attached {@link ClassNode}.
-     * @param libraryNode is this a library class?
-     */
+        this.access = new ClassAccess(this);
+        classNode.methods.forEach(methodNode -> methods.add(new MethodWrapper(methodNode, this)));
+        classNode.fields.forEach(fieldNode -> fields.add(new FieldWrapper(fieldNode, this)));
+    }
+
     public ClassWrapper(ClassNode classNode, boolean libraryNode) {
         this.classNode = classNode;
         this.originalName = classNode.name;
         this.libraryNode = libraryNode;
 
-        ClassWrapper instance = this;
-        classNode.methods.forEach(methodNode -> methods.add(new MethodWrapper(methodNode, instance, methodNode.name,
-                methodNode.desc)));
-        if (classNode.fields != null)
-            classNode.fields.forEach(fieldNode -> fields.add(new FieldWrapper(fieldNode, instance, fieldNode.name,
-                    fieldNode.desc)));
+        this.access = new ClassAccess(this);
+        classNode.methods.forEach(methodNode -> methods.add(new MethodWrapper(methodNode, this)));
+        classNode.fields.forEach(fieldNode -> fields.add(new FieldWrapper(fieldNode, this)));
     }
 
     public void addMethod(MethodNode methodNode) {
-        methods.add(new MethodWrapper(methodNode, this, methodNode.name, methodNode.desc));
         classNode.methods.add(methodNode);
+        methods.add(new MethodWrapper(methodNode, this));
+    }
+
+    public void addField(FieldNode fieldNode) {
+        classNode.fields.add(fieldNode);
+        fields.add(new FieldWrapper(fieldNode, this));
     }
 
     public void addStringConst(String s) {
@@ -86,8 +88,8 @@ public class ClassWrapper {
     }
 
     public MethodNode getMethod(String name, String desc) {
-        return classNode.methods.stream().filter(methodNode -> name.equals(methodNode.name) && desc.equals(methodNode.desc))
-                .findAny().orElse(null);
+        return getClassNode().methods.stream().filter(methodNode -> name.equals(methodNode.name)
+                && desc.equals(methodNode.desc)).findAny().orElse(null);
     }
 
     public MethodNode getOrCreateClinit() {
@@ -100,5 +102,115 @@ public class ClassWrapper {
         }
 
         return clinit;
+    }
+
+    /**
+     * Attached class node.
+     */
+    public ClassNode getClassNode() {
+        return classNode;
+    }
+
+    public void setClassNode(ClassNode classNode) {
+        this.classNode = classNode;
+    }
+
+    /**
+     * Original name of ClassNode. Really useful when class got renamed.
+     */
+    public String getOriginalName() {
+        return originalName;
+    }
+
+    /**
+     * Quick way of figuring out if this is represents library class or not.
+     */
+    public boolean isLibraryNode() {
+        return libraryNode;
+    }
+
+    /**
+     * Methods.
+     */
+    public List<MethodWrapper> getMethods() {
+        return methods;
+    }
+
+    /**
+     * Fields.
+     */
+    public List<FieldWrapper> getFields() {
+        return fields;
+    }
+
+    public List<String> getStrConsts() {
+        return strConsts;
+    }
+
+    public String getName() {
+        return classNode.name;
+    }
+
+    public String getPackageName() {
+        return classNode.name.substring(0, classNode.name.lastIndexOf('/') + 1);
+    }
+
+    public String getSuperName() {
+        return classNode.superName;
+    }
+
+    public List<String> getInterfaces() {
+        return classNode.interfaces;
+    }
+
+    public Access getAccess() {
+        return access;
+    }
+
+    public int getAccessFlags() {
+        return classNode.access;
+    }
+
+    public void setAccessFlags(int access) {
+        classNode.access = access;
+    }
+
+    public int getVersion() {
+        return classNode.version;
+    }
+
+    public boolean allowsJSR() {
+        return classNode.version <= Opcodes.V1_5 || classNode.version == Opcodes.V1_1;
+    }
+
+    public boolean allowsIndy() {
+        return classNode.version >= Opcodes.V1_7 && classNode.version != Opcodes.V1_1;
+    }
+
+    public byte[] toByteArray() {
+        // Construct byte writer
+        ClassWriter writer = new CustomClassWriter(ClassWriter.COMPUTE_FRAMES);
+
+        // Insert manually-specified constant pool strings
+        writer.newUTF8("RADON" + Main.VERSION);
+        strConsts.forEach(writer::newUTF8);
+
+        // Populate writer with class info
+        classNode.accept(writer);
+
+        try {
+            return writer.toByteArray();
+        } catch (Throwable t) {
+            Logger.stdErr(String.format("Error writing class %s. Skipping frames (might cause runtime errors).", getName() + ".class"));
+            t.printStackTrace();
+
+            writer = new ClassWriter(ClassWriter.COMPUTE_MAXS);
+            writer.newUTF8("RADON" + Main.VERSION);
+            strConsts.forEach(writer::newUTF8);
+
+            classNode.accept(writer);
+
+            return writer.toByteArray();
+        }
     }
 }

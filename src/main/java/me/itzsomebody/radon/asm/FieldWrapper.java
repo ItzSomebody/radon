@@ -18,6 +18,8 @@
 
 package me.itzsomebody.radon.asm;
 
+import me.itzsomebody.radon.asm.accesses.Access;
+import me.itzsomebody.radon.asm.accesses.FieldAccess;
 import org.objectweb.asm.tree.FieldNode;
 
 /**
@@ -26,38 +28,76 @@ import org.objectweb.asm.tree.FieldNode;
  * @author ItzSomebody.
  */
 public class FieldWrapper {
-    /**
-     * Attached FieldNode.
-     */
-    public FieldNode fieldNode;
+    private FieldNode fieldNode;
+    private final String originalName;
+    private final String originalDescription;
 
-    /**
-     * Owner of this represented field.
-     */
-    public final ClassWrapper owner;
-
-    /**
-     * Original field name.
-     */
-    public final String originalName;
-
-    /**
-     * Original field description.
-     */
-    public final String originalDescription;
+    private final Access access;
+    private final ClassWrapper owner;
 
     /**
      * Creates a FieldWrapper object.
      *
-     * @param fieldNode           the {@link FieldNode} attached to this FieldWrapper.
-     * @param owner               the owner of this represented field.
-     * @param originalName        the original name of the field represented.
-     * @param originalDescription the original description of the field represented.
+     * @param fieldNode the {@link FieldNode} attached to this FieldWrapper.
+     * @param owner     the owner of this represented field.
      */
-    public FieldWrapper(FieldNode fieldNode, ClassWrapper owner, String originalName, String originalDescription) {
+    public FieldWrapper(FieldNode fieldNode, ClassWrapper owner) {
         this.fieldNode = fieldNode;
+        this.originalName = fieldNode.name;
+        this.originalDescription = fieldNode.desc;
+        this.access = new FieldAccess(this);
         this.owner = owner;
-        this.originalName = originalName;
-        this.originalDescription = originalDescription;
+    }
+
+    /**
+     * Attached FieldNode.
+     */
+    public FieldNode getFieldNode() {
+        return fieldNode;
+    }
+
+    public void setFieldNode(FieldNode fieldNode) {
+        this.fieldNode = fieldNode;
+    }
+
+    /**
+     * Owner of this represented field.
+     */
+    public ClassWrapper getOwner() {
+        return owner;
+    }
+
+    /**
+     * Original field name.
+     */
+    public String getOriginalName() {
+        return originalName;
+    }
+
+    /**
+     * Original field description.
+     */
+    public String getOriginalDescription() {
+        return originalDescription;
+    }
+
+    public String getName() {
+        return fieldNode.name;
+    }
+
+    public String getDescription() {
+        return fieldNode.desc;
+    }
+
+    public Access getAccess() {
+        return access;
+    }
+
+    public int getAccessFlags() {
+        return fieldNode.access;
+    }
+
+    public void setAccessFlags(int access) {
+        fieldNode.access = access;
     }
 }

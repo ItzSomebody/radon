@@ -35,8 +35,8 @@ public class UnknownAttributesRemover extends Shrinker {
         AtomicInteger counter = new AtomicInteger();
 
         getClassWrappers().stream().filter(classWrapper -> excluded(classWrapper)
-                && classWrapper.classNode.attrs != null).forEach(classWrapper -> {
-            ClassNode classNode = classWrapper.classNode;
+                && classWrapper.getClassNode().attrs != null).forEach(classWrapper -> {
+            ClassNode classNode = classWrapper.getClassNode();
 
             Stream.of(classNode.attrs.toArray(new Attribute[0])).filter(Attribute::isUnknown).forEach(attr -> {
                 classNode.attrs.remove(attr);

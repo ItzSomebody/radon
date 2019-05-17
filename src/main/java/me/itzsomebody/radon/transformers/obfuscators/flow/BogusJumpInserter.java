@@ -53,11 +53,11 @@ public class BogusJumpInserter extends FlowObfuscation {
         AtomicInteger counter = new AtomicInteger();
 
         getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper -> {
-            FieldNode predicate = new FieldNode(PRED_ACCESS, randomString(), "Z", null, null);
+            FieldNode predicate = new FieldNode(PRED_ACCESS, uniqueRandomString(), "Z", null, null);
 
-            classWrapper.methods.stream().filter(methodWrapper -> !excluded(methodWrapper)
-                    && hasInstructions(methodWrapper.methodNode)).forEach(methodWrapper -> {
-                MethodNode methodNode = methodWrapper.methodNode;
+            classWrapper.getMethods().stream().filter(methodWrapper -> !excluded(methodWrapper)
+                    && hasInstructions(methodWrapper.getMethodNode())).forEach(methodWrapper -> {
+                MethodNode methodNode = methodWrapper.getMethodNode();
 
                 int leeway = getSizeLeeway(methodNode);
                 int varIndex = methodNode.maxLocals;
@@ -73,7 +73,7 @@ public class BogusJumpInserter extends FlowObfuscation {
                 } catch (StackEmulationException e) {
                     e.printStackTrace();
                     throw new RadonException(String.format("Error happened while trying to emulate the stack of %s.%s%s",
-                            classWrapper.classNode.name, methodNode.name, methodNode.desc));
+                            classWrapper.getName(), methodNode.name, methodNode.desc));
                 }
 
                 Set<AbstractInsnNode> emptyAt = stackHeightZeroFinder.getEmptyAt();
@@ -100,10 +100,10 @@ public class BogusJumpInserter extends FlowObfuscation {
                 methodNode.instructions.insertBefore(methodNode.instructions.getFirst(),
                         new VarInsnNode(ISTORE, varIndex));
                 methodNode.instructions.insertBefore(methodNode.instructions.getFirst(),
-                        new FieldInsnNode(GETSTATIC, classWrapper.classNode.name, predicate.name, "Z"));
+                        new FieldInsnNode(GETSTATIC, classWrapper.getName(), predicate.name, "Z"));
             });
 
-            classWrapper.classNode.fields.add(predicate);
+            classWrapper.getClassNode().fields.add(predicate);
         });
 
         Logger.stdOut("Inserted " + counter.get() + " bogus jumps");
