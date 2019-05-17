@@ -21,7 +21,7 @@ package me.itzsomebody.radon.transformers.obfuscators;
 import java.lang.reflect.Modifier;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-import me.itzsomebody.radon.Logger;
+import me.itzsomebody.radon.Main;
 import me.itzsomebody.radon.config.ConfigurationSetting;
 import me.itzsomebody.radon.exceptions.InvalidConfigurationValueException;
 import me.itzsomebody.radon.exclusions.ExclusionType;
@@ -79,7 +79,7 @@ public class StaticInitialization extends Transformer {
             });
         });
 
-        Logger.stdOut("Moved " + counter.get() + " field values into static block.");
+        Main.info("Moved " + counter.get() + " field values into static block.");
     }
 
     @Override

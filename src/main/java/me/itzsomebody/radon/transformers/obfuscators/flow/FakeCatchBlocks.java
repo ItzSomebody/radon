@@ -22,7 +22,7 @@ import java.io.IOError;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.atomic.AtomicInteger;
-import me.itzsomebody.radon.Logger;
+import me.itzsomebody.radon.Main;
 import me.itzsomebody.radon.asm.ClassWrapper;
 import me.itzsomebody.radon.utils.ASMUtils;
 import me.itzsomebody.radon.utils.RandomUtils;
@@ -109,6 +109,6 @@ public class FakeCatchBlocks extends FlowObfuscation {
         getClasses().put(fakeHandler.name, newWrapper);
         getClassPath().put(fakeHandler.name, newWrapper);
 
-        Logger.stdOut("Inserted " + counter.get() + " fake try catches");
+        Main.info("Inserted " + counter.get() + " fake try catches");
     }
 }

@@ -34,7 +34,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-import me.itzsomebody.radon.Logger;
+import me.itzsomebody.radon.Main;
 import me.itzsomebody.radon.asm.ClassTree;
 import me.itzsomebody.radon.asm.FieldWrapper;
 import me.itzsomebody.radon.asm.MemberRemapper;
@@ -77,7 +77,7 @@ public class Renamer extends Transformer {
         mappings = new HashMap<>();
         Map<String, String> packageMappings = new HashMap<>();
 
-        Logger.stdOut("Generating mappings.");
+        Main.info("Generating mappings.");
         long current = System.currentTimeMillis();
 
         getClassWrappers().forEach(classWrapper -> {
@@ -115,8 +115,8 @@ public class Renamer extends Transformer {
             }
         });
 
-        Logger.stdOut(String.format("Finished generated mappings. [%dms]", tookThisLong(current)));
-        Logger.stdOut("Applying mappings.");
+        Main.info(String.format("Finished generated mappings. [%dms]", tookThisLong(current)));
+        Main.info("Applying mappings.");
         current = System.currentTimeMillis();
 
         // Apply mappings
@@ -143,11 +143,11 @@ public class Renamer extends Transformer {
             getClassPath().put(classWrapper.getName(), classWrapper);
         });
 
-        Logger.stdOut(String.format("Mapped %d members. [%dms]", mappings.size(), tookThisLong(current)));
+        Main.info(String.format("Mapped %d members. [%dms]", mappings.size(), tookThisLong(current)));
         current = System.currentTimeMillis();
 
         // Now we gotta fix those resources because we probably screwed up random files.
-        Logger.stdOut("Attempting to map class names in resources");
+        Main.info("Attempting to map class names in resources");
         AtomicInteger fixed = new AtomicInteger();
         getResources().forEach((name, byteArray) -> {
             if (getAdaptTheseResources() != null)
@@ -179,7 +179,7 @@ public class Renamer extends Transformer {
                 });
         });
 
-        Logger.stdOut(String.format("Mapped %d names in resources. [%dms]", fixed.get(), tookThisLong(current)));
+        Main.info(String.format("Mapped %d names in resources. [%dms]", fixed.get(), tookThisLong(current)));
 
         if (isDumpMappings())
             dumpMappings();
@@ -277,7 +277,7 @@ public class Renamer extends Transformer {
 
     private void dumpMappings() {
         long current = System.currentTimeMillis();
-        Logger.stdOut("Dumping mappings.");
+        Main.info("Dumping mappings.");
         File file = new File("mappings.txt");
         if (file.exists())
             FileUtils.renameExistingFile(file);
@@ -290,16 +290,16 @@ public class Renamer extends Transformer {
                 try {
                     bw.append(oldName).append(" -> ").append(newName).append('\n');
                 } catch (IOException ioe) {
-                    Logger.stdErr(String.format("Ran into an error trying to append \"%s -> %s\"", oldName, newName));
+                    Main.severe(String.format("Ran into an error trying to append \"%s -> %s\"", oldName, newName));
                     ioe.printStackTrace();
                 }
             });
 
             bw.close();
-            Logger.stdOut(String.format("Finished dumping mappings at %s. [%dms]", file.getAbsolutePath(),
+            Main.info(String.format("Finished dumping mappings at %s. [%dms]", file.getAbsolutePath(),
                     tookThisLong(current)));
         } catch (Throwable t) {
-            Logger.stdErr("Ran into an error trying to create the mappings file.");
+            Main.severe("Ran into an error trying to create the mappings file.");
             t.printStackTrace();
         }
     }

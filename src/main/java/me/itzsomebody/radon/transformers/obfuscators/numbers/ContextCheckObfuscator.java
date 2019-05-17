@@ -19,7 +19,7 @@
 package me.itzsomebody.radon.transformers.obfuscators.numbers;
 
 import java.util.concurrent.atomic.AtomicInteger;
-import me.itzsomebody.radon.Logger;
+import me.itzsomebody.radon.Main;
 import me.itzsomebody.radon.asm.ClassWrapper;
 import me.itzsomebody.radon.utils.ASMUtils;
 import me.itzsomebody.radon.utils.RandomUtils;
@@ -104,6 +104,7 @@ public class ContextCheckObfuscator extends NumberObfuscation {
                             methodInstructions.remove(insn);
 
                             leeway -= 20;
+                            counter.incrementAndGet();
                         } else if (ASMUtils.isDoubleInsn(insn) && master.isDoubleTamperingEnabled()) {
                             double originalNum = ASMUtils.getDoubleFromInsn(insn);
                             long encodedLong = encodeDouble(originalNum, methodWrapper.getName().hashCode());
@@ -119,6 +120,7 @@ public class ContextCheckObfuscator extends NumberObfuscation {
                             methodInstructions.insertBefore(insn, insnList);
                             methodInstructions.remove(insn);
                             leeway -= 25;
+                            counter.incrementAndGet();
                         }
                     }
                 }));
@@ -126,7 +128,7 @@ public class ContextCheckObfuscator extends NumberObfuscation {
         ClassNode decoder = createConstantDecoder(memberNames);
         getClasses().put(decoder.name, new ClassWrapper(decoder, false));
 
-        Logger.stdOut("Enabled " + counter.get() + " number context checks");
+        Main.info("Enabled " + counter.get() + " number context checks");
     }
 
     private static int encodeInt(int n, int hashCode) {

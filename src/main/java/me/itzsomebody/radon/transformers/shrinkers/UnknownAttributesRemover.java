@@ -20,7 +20,7 @@ package me.itzsomebody.radon.transformers.shrinkers;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
-import me.itzsomebody.radon.Logger;
+import me.itzsomebody.radon.Main;
 import org.objectweb.asm.Attribute;
 import org.objectweb.asm.tree.ClassNode;
 
@@ -44,7 +44,7 @@ public class UnknownAttributesRemover extends Shrinker {
             });
         });
 
-        Logger.stdOut(String.format("Removed %d attributes.", counter.get()));
+        Main.info(String.format("Removed %d attributes.", counter.get()));
     }
 
     @Override

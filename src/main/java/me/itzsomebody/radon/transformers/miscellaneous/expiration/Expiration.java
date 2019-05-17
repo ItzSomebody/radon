@@ -25,7 +25,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
-import me.itzsomebody.radon.Logger;
+import me.itzsomebody.radon.Main;
 import me.itzsomebody.radon.config.ConfigurationSetting;
 import me.itzsomebody.radon.exceptions.InvalidConfigurationValueException;
 import me.itzsomebody.radon.exceptions.RadonException;
@@ -73,7 +73,7 @@ public class Expiration extends Transformer {
             });
         });
 
-        Logger.stdOut(String.format("Added %d expiration code blocks.", counter.get()));
+        Main.info(String.format("Added %d expiration code blocks.", counter.get()));
     }
 
     private InsnList createExpirationInstructions() {
@@ -164,7 +164,7 @@ public class Expiration extends Transformer {
         try {
             this.expires = new SimpleDateFormat("MM/dd/yyyy").parse(expires).getTime();
         } catch (ParseException e) {
-            Logger.stdErr("Error while parsing time.");
+            Main.severe("Error while parsing time.");
             e.printStackTrace();
             throw new RadonException();
         }

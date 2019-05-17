@@ -20,7 +20,7 @@ package me.itzsomebody.radon.transformers.obfuscators.references;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
-import me.itzsomebody.radon.Logger;
+import me.itzsomebody.radon.Main;
 import me.itzsomebody.radon.asm.ClassWrapper;
 import me.itzsomebody.radon.utils.ASMUtils;
 import me.itzsomebody.radon.utils.StringUtils;
@@ -83,7 +83,7 @@ public class FastInvokedynamicTransformer extends ReferenceObfuscation {
         ClassNode decryptor = createBootstrap(memberNames);
         getClasses().put(decryptor.name, new ClassWrapper(decryptor, false));
 
-        Logger.stdOut("Hid API " + counter.get() + " references using fast invokedynamic");
+        Main.info("Hid API " + counter.get() + " references using fast invokedynamic");
     }
 
     private static String encrypt(String encrypted, MemberNames memberNames) {

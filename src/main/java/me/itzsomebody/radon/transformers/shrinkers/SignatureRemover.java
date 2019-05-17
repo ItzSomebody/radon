@@ -19,7 +19,7 @@
 package me.itzsomebody.radon.transformers.shrinkers;
 
 import java.util.concurrent.atomic.AtomicInteger;
-import me.itzsomebody.radon.Logger;
+import me.itzsomebody.radon.Main;
 import org.objectweb.asm.tree.ClassNode;
 
 /**
@@ -53,7 +53,7 @@ public class SignatureRemover extends Shrinker {
             });
         });
 
-        Logger.stdOut(String.format("Removed %d signatures.", counter.get()));
+        Main.info(String.format("Removed %d signatures.", counter.get()));
     }
 
     @Override

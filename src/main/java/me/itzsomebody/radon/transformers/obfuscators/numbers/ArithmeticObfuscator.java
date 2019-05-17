@@ -19,7 +19,7 @@
 package me.itzsomebody.radon.transformers.obfuscators.numbers;
 
 import java.util.concurrent.atomic.AtomicInteger;
-import me.itzsomebody.radon.Logger;
+import me.itzsomebody.radon.Main;
 import me.itzsomebody.radon.utils.ASMUtils;
 import me.itzsomebody.radon.utils.RandomUtils;
 import org.objectweb.asm.tree.AbstractInsnNode;
@@ -77,7 +77,7 @@ public class ArithmeticObfuscator extends NumberObfuscation {
                     }
                 }));
 
-        Logger.stdOut("Split " + counter.get() + " number constants into arithmetic instructions");
+        Main.info("Split " + counter.get() + " number constants into arithmetic instructions");
     }
 
     private InsnList obfuscateNumber(int originalNum) {

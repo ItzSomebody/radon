@@ -31,7 +31,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-import me.itzsomebody.radon.Logger;
+import me.itzsomebody.radon.Main;
 import me.itzsomebody.radon.asm.ClassWrapper;
 import me.itzsomebody.radon.config.ConfigurationSetting;
 import me.itzsomebody.radon.exceptions.InvalidConfigurationValueException;
@@ -48,7 +48,6 @@ import me.itzsomebody.vm.datatypes.JWrapper;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.Handle;
 import org.objectweb.asm.Type;
-import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.IincInsnNode;
 import org.objectweb.asm.tree.InsnList;
@@ -69,7 +68,7 @@ import org.objectweb.asm.tree.VarInsnNode;
 /**
  * Translates Java bytecode into a custom bytecode instruction set. Piece of trash and hackiest thing ever.
  * TODO: clean everything up
- * FIXME: completely broken
+ * FIXME: sorta broken
  *
  * @author ItzSomebody
  */
@@ -105,7 +104,7 @@ public class Virtualizer extends Transformer implements VMOpcodes {
             throw new RadonException();
         }
 
-        Logger.stdOut("Virtualized " + counter.get() + " methods");
+        Main.info("Virtualized " + counter.get() + " methods");
     }
 
     private static boolean canProtect(InsnList insnList) {
@@ -122,16 +121,14 @@ public class Virtualizer extends Transformer implements VMOpcodes {
         Enumeration<? extends ZipEntry> entries = zip.entries();
         while (entries.hasMoreElements()) {
             ZipEntry zipEntry = entries.nextElement();
-            if (zipEntry.getName().startsWith("me/itzsomebody/vm") && zipEntry.getName().endsWith(".class")) {
+
+            if (zipEntry.getName().startsWith("me/itzsomebody/vm") && zipEntry.getName().endsWith(".class"))
                 try (InputStream in = zip.getInputStream(zipEntry)) {
                     ClassReader cr = new ClassReader(in);
-                    ClassNode cn = new ClassNode();
-                    cr.accept(cn, 0);
-                    ClassWrapper cw = new ClassWrapper(cn, false);
-                    getClasses().put(cn.name, cw);
-                    getClassPath().put(cn.name, cw);
+                    ClassWrapper cw = new ClassWrapper(cr, false);
+                    getClasses().put(cw.getName(), cw);
+                    getClassPath().put(cw.getName(), cw);
                 }
-            }
         }
     }
 

@@ -21,10 +21,20 @@ package me.itzsomebody.radon;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Formatter;
+import java.util.logging.Handler;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 import java.util.zip.ZipFile;
 import me.itzsomebody.radon.cli.CommandArgumentsParser;
 import me.itzsomebody.radon.config.ConfigurationParser;
+import me.itzsomebody.radon.utils.CustomOutputStream;
 import me.itzsomebody.radon.utils.IOUtils;
 import me.itzsomebody.radon.utils.WatermarkUtils;
 
@@ -37,6 +47,7 @@ import me.itzsomebody.radon.utils.WatermarkUtils;
  * @author ItzSomebody
  */
 public class Main {
+    private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
     public static final String VERSION = "2.0.0";
     public static final String[] CONTRIBUTORS = {
             "ItzSomebody", "x0ark", "Col-E", "Artel", "kazigk", "Olexorus",
@@ -59,8 +70,24 @@ public class Main {
      *
      * @param args arguments from command line.
      */
-    public static void main(String[] args) {
-        System.out.println(ATTRIBUTION); // Don't use Logger otherwise duplicated messages
+    public static void main(String[] args) throws IOException {
+        CustomOutputStream cos = new CustomOutputStream(System.err);
+        System.setErr(new PrintStream(cos));
+
+        LOGGER.setUseParentHandlers(false);
+        Handler handler = new ConsoleHandler();
+        handler.setFormatter(new Formatter() {
+            @Override
+            public String format(LogRecord record) {
+                return String.format("[%s] %s: %s\n",
+                        new SimpleDateFormat("dd/MM/yyyy-hh:mm:ss").format(new Date(record.getMillis())),
+                        record.getLevel().getName(),
+                        formatMessage(record));
+            }
+        });
+        LOGGER.addHandler(handler);
+
+        System.err.println(Main.ATTRIBUTION);
 
         // Registers the switches.
         CommandArgumentsParser.registerCommandSwitch("help", 0);
@@ -83,13 +110,17 @@ public class Main {
             try {
                 config = new ConfigurationParser(new FileInputStream(file));
             } catch (FileNotFoundException exc) {
-                Logger.stdErr(String.format("Configuration \"%s\" file not found", file.getName()));
+                severe(String.format("Configuration \"%s\" file not found", file.getName()));
                 return;
             }
 
-            // Parse the config and let's run Radon.
-            Radon radon = new Radon(config.createObfuscatorConfiguration());
-            radon.run();
+            try {
+                // Parse the config and let's run Radon.
+                Radon radon = new Radon(config.createObfuscatorConfiguration());
+                radon.run();
+            } catch (Throwable t) {
+                t.printStackTrace();
+            }
         } else if (parser.containsSwitch("extract")) {
             // Watermark extraction.
             String[] switchArgs = parser.getSwitchArgs("extract");
@@ -97,20 +128,32 @@ public class Main {
             // Input file.
             File leaked = new File(switchArgs[0]);
             if (!leaked.exists()) {
-                Logger.stdErr("Input file not found");
+                severe("Input file not found");
                 return;
             }
 
             try {
                 // Extract the ids and stick them into the console.
-                Logger.stdOut(WatermarkUtils.extractIds(new ZipFile(leaked), switchArgs[1]));
+                info(WatermarkUtils.extractIds(new ZipFile(leaked), switchArgs[1]));
             } catch (Throwable t) {
                 t.printStackTrace();
             }
         } else
             showHelpMenu();
 
-        Logger.dumpLog();
+        cos.close();
+    }
+
+    public static void info(String msg) {
+        LOGGER.info(msg);
+    }
+
+    public static void warning(String msg) {
+        LOGGER.warning(msg);
+    }
+
+    public static void severe(String msg) {
+        LOGGER.severe(msg);
     }
 
     private static String getProgramName() {
@@ -122,10 +165,10 @@ public class Main {
      */
     private static void showHelpMenu() {
         String name = getProgramName();
-        Logger.stdOut(String.format("CLI Usage:\t\t\tjava -jar %s --config example.config", name));
-        Logger.stdOut(String.format("Help Menu:\t\t\tjava -jar %s --help", name));
-        Logger.stdOut(String.format("License:\t\t\tjava -jar %s --license", name));
-        Logger.stdOut(String.format("Watermark Extraction:\tjava -jar %s --extract Input.jar exampleKey", name));
+        info(String.format("CLI Usage:\t\t\tjava -jar %s --config example.config", name));
+        info(String.format("Help Menu:\t\t\tjava -jar %s --help", name));
+        info(String.format("License:\t\t\tjava -jar %s --license", name));
+        info(String.format("Watermark Extraction:\tjava -jar %s --extract Input.jar exampleKey", name));
     }
 
     /**

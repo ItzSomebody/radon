@@ -84,14 +84,14 @@ public class Radon {
 
         Transformer.sort(getConfig().getTransformers());
 
-        Logger.stdOut("------------------------------------------------");
+        Main.info("------------------------------------------------");
         getConfig().getTransformers().stream().filter(Objects::nonNull).forEach(transformer -> {
             long current = System.currentTimeMillis();
-            Logger.stdOut(String.format("Running %s transformer.", transformer.getName()));
+            Main.info(String.format("Running %s transformer.", transformer.getName()));
             transformer.init(this);
             transformer.transform();
-            Logger.stdOut(String.format("Finished running %s transformer. [%dms]", transformer.getName(), (System.currentTimeMillis() - current)));
-            Logger.stdOut("------------------------------------------------");
+            Main.info(String.format("Finished running %s transformer. [%dms]", transformer.getName(), (System.currentTimeMillis() - current)));
+            Main.info("------------------------------------------------");
         });
 
         writeOutput();
@@ -99,10 +99,10 @@ public class Radon {
 
     private void writeOutput() {
         File output = getConfig().getOutput();
-        Logger.stdOut(String.format("Writing output to \"%s\".", output.getAbsolutePath()));
+        Main.info(String.format("Writing output to \"%s\".", output.getAbsolutePath()));
 
         if (output.exists())
-            Logger.stdOut(String.format("Output file already exists, renamed to %s.", FileUtils.renameExistingFile(output)));
+            Main.info(String.format("Output file already exists, renamed to %s.", FileUtils.renameExistingFile(output)));
 
         try {
             ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(output));
@@ -124,10 +124,10 @@ public class Radon {
                         }
                     });
 
-                    Logger.stdOut("Injected CRC corrupter.");
+                    Main.info("Injected CRC corrupter.");
                 } catch (Exception e) {
                     e.printStackTrace();
-                    Logger.stdErr("Failed to inject CRC field.");
+                    Main.severe("Failed to inject CRC field.");
                 }
 
 
@@ -139,7 +139,7 @@ public class Radon {
                     zos.write(classWrapper.toByteArray());
                     zos.closeEntry();
                 } catch (Throwable t) {
-                    Logger.stdErr(String.format("Error writing class %s. Skipping.", classWrapper.getName() + ".class"));
+                    Main.severe(String.format("Error writing class %s. Skipping.", classWrapper.getName() + ".class"));
                     t.printStackTrace();
                 }
             });
@@ -152,7 +152,7 @@ public class Radon {
                     zos.write(bytes);
                     zos.closeEntry();
                 } catch (IOException ioe) {
-                    Logger.stdErr(String.format("Error writing resource %s. Skipping.", name));
+                    Main.severe(String.format("Error writing resource %s. Skipping.", name));
                     ioe.printStackTrace();
                 }
             });
@@ -168,7 +168,7 @@ public class Radon {
     private void loadClassPath() {
         getConfig().getLibraries().forEach(file -> {
             if (file.exists()) {
-                Logger.stdOut(String.format("Loading library \"%s\".", file.getAbsolutePath()));
+                Main.info(String.format("Loading library \"%s\".", file.getAbsolutePath()));
 
                 try {
                     ZipFile zipFile = new ZipFile(file);
@@ -182,19 +182,19 @@ public class Radon {
                                 ClassWrapper cw = new ClassWrapper(new ClassReader(zipFile.getInputStream(entry)), true);
                                 classPath.put(cw.getName(), cw);
                             } catch (Throwable t) {
-                                Logger.stdErr(String.format("Error while loading library class \"%s\".", entry.getName().replace(".class", "")));
+                                Main.severe(String.format("Error while loading library class \"%s\".", entry.getName().replace(".class", "")));
                                 t.printStackTrace();
                             }
                     }
                 } catch (ZipException e) {
-                    Logger.stdErr(String.format("Library \"%s\" could not be opened as a zip file.", file.getAbsolutePath()));
+                    Main.severe(String.format("Library \"%s\" could not be opened as a zip file.", file.getAbsolutePath()));
                     e.printStackTrace();
                 } catch (IOException e) {
-                    Logger.stdErr(String.format("IOException happened while trying to load classes from \"%s\".", file.getAbsolutePath()));
+                    Main.severe(String.format("IOException happened while trying to load classes from \"%s\".", file.getAbsolutePath()));
                     e.printStackTrace();
                 }
             } else
-                Logger.stdWarn(String.format("Library \"%s\" could not be found and will be ignored.", file.getAbsolutePath()));
+                Main.warning(String.format("Library \"%s\" could not be found and will be ignored.", file.getAbsolutePath()));
         });
     }
 
@@ -202,7 +202,7 @@ public class Radon {
         File input = this.getConfig().getInput();
 
         if (input.exists()) {
-            Logger.stdOut(String.format("Loading input \"%s\".", input.getAbsolutePath()));
+            Main.info(String.format("Loading input \"%s\".", input.getAbsolutePath()));
 
             try {
                 ZipFile zipFile = new ZipFile(input);
@@ -228,23 +228,23 @@ public class Radon {
                                 classPath.put(cw.getName(), cw);
                                 classes.put(cw.getName(), cw);
                             } catch (Throwable t) {
-                                Logger.stdWarn(String.format("Could not load %s as a class.", entry.getName()));
+                                Main.warning(String.format("Could not load %s as a class.", entry.getName()));
                                 this.resources.put(entry.getName(), IOUtils.toByteArray(in));
                             }
                         else
                             this.resources.put(entry.getName(), IOUtils.toByteArray(in));
                 }
             } catch (ZipException e) {
-                Logger.stdErr(String.format("Input file \"%s\" could not be opened as a zip file.", input.getAbsolutePath()));
+                Main.severe(String.format("Input file \"%s\" could not be opened as a zip file.", input.getAbsolutePath()));
                 e.printStackTrace();
                 throw new RadonException(e);
             } catch (IOException e) {
-                Logger.stdErr(String.format("IOException happened while trying to load classes from \"%s\".", input.getAbsolutePath()));
+                Main.severe(String.format("IOException happened while trying to load classes from \"%s\".", input.getAbsolutePath()));
                 e.printStackTrace();
                 throw new RadonException(e);
             }
         } else {
-            Logger.stdErr(String.format("Unable to find \"%s\".", input.getAbsolutePath()));
+            Main.severe(String.format("Unable to find \"%s\".", input.getAbsolutePath()));
             throw new RadonException();
         }
     }

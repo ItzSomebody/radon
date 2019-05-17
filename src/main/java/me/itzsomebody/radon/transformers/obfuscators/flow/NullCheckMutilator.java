@@ -19,7 +19,7 @@
 package me.itzsomebody.radon.transformers.obfuscators.flow;
 
 import java.util.concurrent.atomic.AtomicInteger;
-import me.itzsomebody.radon.Logger;
+import me.itzsomebody.radon.Main;
 import me.itzsomebody.radon.utils.RandomUtils;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.InsnList;
@@ -105,6 +105,6 @@ public class NullCheckMutilator extends FlowObfuscation {
                     }
                 }));
 
-        Logger.stdOut("Mutilated " + counter.get() + " null checks");
+        Main.info("Mutilated " + counter.get() + " null checks");
     }
 }

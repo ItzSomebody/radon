@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.jar.Manifest;
-import me.itzsomebody.radon.Logger;
+import me.itzsomebody.radon.Main;
 import me.itzsomebody.radon.asm.ClassWrapper;
 import me.itzsomebody.radon.config.ConfigurationSetting;
 import me.itzsomebody.radon.exceptions.InvalidConfigurationValueException;
@@ -75,7 +75,7 @@ public class Packer extends Transformer {
                     toRemove.add(name);
                 } catch (Throwable t) {
                     t.printStackTrace();
-                    throw new RuntimeException();
+                    throw new RadonException();
                 }
             });
 
@@ -106,7 +106,7 @@ public class Packer extends Transformer {
                     toRemove.add(name);
                 } catch (Throwable t) {
                     t.printStackTrace();
-                    throw new RuntimeException();
+                    throw new RadonException();
                 }
             });
 
@@ -128,7 +128,7 @@ public class Packer extends Transformer {
             throw new RadonException(e);
         }
 
-        Logger.stdOut("Packed " + counter.get() + " files");
+        Main.info("Packed " + counter.get() + " files");
     }
 
     @Override

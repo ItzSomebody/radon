@@ -19,7 +19,7 @@
 package me.itzsomebody.radon.transformers.obfuscators.flow;
 
 import java.util.concurrent.atomic.AtomicInteger;
-import me.itzsomebody.radon.Logger;
+import me.itzsomebody.radon.Main;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.FieldNode;
@@ -78,6 +78,6 @@ public class GotoReplacer extends FlowObfuscation {
             classWrapper.getClassNode().fields.add(predicate);
         });
 
-        Logger.stdOut("Swapped " + counter.get() + " GOTO instructions");
+        Main.info("Swapped " + counter.get() + " GOTO instructions");
     }
 }

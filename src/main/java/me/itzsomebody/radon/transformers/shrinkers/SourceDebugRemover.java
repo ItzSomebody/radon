@@ -19,7 +19,7 @@
 package me.itzsomebody.radon.transformers.shrinkers;
 
 import java.util.concurrent.atomic.AtomicInteger;
-import me.itzsomebody.radon.Logger;
+import me.itzsomebody.radon.Main;
 
 /**
  * Removes the sourcedebugextension attribute.
@@ -37,7 +37,7 @@ public class SourceDebugRemover extends Shrinker {
             counter.incrementAndGet();
         });
 
-        Logger.stdOut(String.format("Remove %d source debug attributes.", counter.get()));
+        Main.info(String.format("Remove %d source debug attributes.", counter.get()));
     }
 
     @Override

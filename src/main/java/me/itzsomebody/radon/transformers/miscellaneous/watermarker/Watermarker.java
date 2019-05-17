@@ -25,7 +25,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Stream;
-import me.itzsomebody.radon.Logger;
+import me.itzsomebody.radon.Main;
 import me.itzsomebody.radon.asm.ClassWrapper;
 import me.itzsomebody.radon.asm.MethodWrapper;
 import me.itzsomebody.radon.config.ConfigurationSetting;
@@ -79,7 +79,7 @@ public class Watermarker extends Transformer {
             }
         }
 
-        Logger.stdOut("Successfully embedded watermark.");
+        Main.info("Successfully embedded watermark.");
     }
 
     private static InsnList createInstructions(Deque<Character> watermark, int offset) {

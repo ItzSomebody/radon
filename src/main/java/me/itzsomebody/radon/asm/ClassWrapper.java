@@ -20,7 +20,6 @@ package me.itzsomebody.radon.asm;
 
 import java.util.ArrayList;
 import java.util.List;
-import me.itzsomebody.radon.Logger;
 import me.itzsomebody.radon.Main;
 import me.itzsomebody.radon.asm.accesses.Access;
 import me.itzsomebody.radon.asm.accesses.ClassAccess;
@@ -201,7 +200,7 @@ public class ClassWrapper {
         try {
             return writer.toByteArray();
         } catch (Throwable t) {
-            Logger.stdErr(String.format("Error writing class %s. Skipping frames (might cause runtime errors).", getName() + ".class"));
+            Main.info(String.format("Error writing class %s. Skipping frames (might cause runtime errors).", getName() + ".class"));
             t.printStackTrace();
 
             writer = new ClassWriter(ClassWriter.COMPUTE_MAXS);

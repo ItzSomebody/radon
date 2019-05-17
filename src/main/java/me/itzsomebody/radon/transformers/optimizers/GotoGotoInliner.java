@@ -20,7 +20,7 @@ package me.itzsomebody.radon.transformers.optimizers;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
-import me.itzsomebody.radon.Logger;
+import me.itzsomebody.radon.Main;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.MethodNode;
@@ -54,7 +54,7 @@ public class GotoGotoInliner extends Optimizer {
                             });
                 }));
 
-        Logger.stdOut(String.format("Inlined %d GOTO->GOTO sequences. [%dms]", count.get(), tookThisLong(current)));
+        Main.info(String.format("Inlined %d GOTO->GOTO sequences. [%dms]", count.get(), tookThisLong(current)));
     }
 
     @Override

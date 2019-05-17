@@ -21,7 +21,7 @@ package me.itzsomebody.radon.transformers.obfuscators.strings;
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
-import me.itzsomebody.radon.Logger;
+import me.itzsomebody.radon.Main;
 import me.itzsomebody.radon.utils.ASMUtils;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.FieldNode;
@@ -87,7 +87,8 @@ public class StringPooler extends StringEncryption {
                 cw.getClassNode().fields.add(fieldNode);
             }
         });
-        Logger.stdOut(String.format("Pooled %d strings.", counter.get()));
+
+        Main.info(String.format("Pooled %d strings.", counter.get()));
     }
 
     private MethodNode stringPool(String className, String methodName, String fieldName, ArrayList<String> strings) {

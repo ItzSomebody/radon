@@ -21,7 +21,7 @@ package me.itzsomebody.radon.transformers.obfuscators.flow;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
-import me.itzsomebody.radon.Logger;
+import me.itzsomebody.radon.Main;
 import me.itzsomebody.radon.asm.StackHeightZeroFinder;
 import me.itzsomebody.radon.exceptions.RadonException;
 import me.itzsomebody.radon.exceptions.StackEmulationException;
@@ -115,6 +115,6 @@ public class BogusSwitchJumpInserter extends FlowObfuscation {
             classWrapper.getClassNode().fields.add(predicate);
         });
 
-        Logger.stdOut("Inserted " + counter.get() + " bogus switch jumps");
+        Main.info("Inserted " + counter.get() + " bogus switch jumps");
     }
 }

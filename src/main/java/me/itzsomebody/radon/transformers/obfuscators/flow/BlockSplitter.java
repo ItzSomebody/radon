@@ -20,7 +20,7 @@ package me.itzsomebody.radon.transformers.obfuscators.flow;
 
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
-import me.itzsomebody.radon.Logger;
+import me.itzsomebody.radon.Main;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.JumpInsnNode;
@@ -92,6 +92,6 @@ public class BlockSplitter extends FlowObfuscation {
                     }
                 }));
 
-        Logger.stdOut("Rearranged " + counter.get() + " blocks");
+        Main.info("Rearranged " + counter.get() + " blocks");
     }
 }

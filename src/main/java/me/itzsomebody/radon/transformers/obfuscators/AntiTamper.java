@@ -24,7 +24,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
-import me.itzsomebody.radon.Logger;
+import me.itzsomebody.radon.Main;
 import me.itzsomebody.radon.asm.ClassWrapper;
 import me.itzsomebody.radon.asm.MethodWrapper;
 import me.itzsomebody.radon.config.ConfigurationSetting;
@@ -90,7 +90,7 @@ public class AntiTamper extends Transformer {
         ClassNode decryptor = createDecryptor(memberNames);
         getClasses().put(decryptor.name, new ClassWrapper(decryptor, false));
 
-        Logger.stdOut("Encrypted " + counter.get() + " strings with anti-tamper algorithm");
+        Main.info("Encrypted " + counter.get() + " strings with anti-tamper algorithm");
     }
 
     @Override

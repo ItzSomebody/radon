@@ -20,7 +20,7 @@ package me.itzsomebody.radon.transformers.optimizers;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
-import me.itzsomebody.radon.Logger;
+import me.itzsomebody.radon.Main;
 import org.objectweb.asm.tree.MethodNode;
 
 /**
@@ -45,7 +45,7 @@ public class NopRemover extends Optimizer {
                 })
         );
 
-        Logger.stdOut(String.format("Removed %d NOP instructions. [%dms]", count.get(), tookThisLong(current)));
+        Main.info(String.format("Removed %d NOP instructions. [%dms]", count.get(), tookThisLong(current)));
     }
 
     @Override

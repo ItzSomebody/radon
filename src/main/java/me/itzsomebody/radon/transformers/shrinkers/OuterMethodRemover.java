@@ -19,7 +19,7 @@
 package me.itzsomebody.radon.transformers.shrinkers;
 
 import java.util.concurrent.atomic.AtomicInteger;
-import me.itzsomebody.radon.Logger;
+import me.itzsomebody.radon.Main;
 
 /**
  * Removes outer methods.
@@ -40,7 +40,7 @@ public class OuterMethodRemover extends Shrinker {
             counter.incrementAndGet();
         });
 
-        Logger.stdOut(String.format("Removed %d outer methods.", counter.get()));
+        Main.info(String.format("Removed %d outer methods.", counter.get()));
     }
 
     @Override
