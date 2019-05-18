@@ -62,7 +62,7 @@ public class Packer extends Transformer {
 
             getClasses().forEach((name, wrapper) -> {
                 try {
-                    byte[] bytes = wrapper.toByteArray();
+                    byte[] bytes = wrapper.toByteArray(radon);
 
                     out.writeShort(name.length() + ".class".length());
                     for (char c : (name + ".class").toCharArray())

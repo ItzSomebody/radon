@@ -24,9 +24,9 @@ import org.objectweb.asm.ClassWriter;
 public class CustomClassWriter extends ClassWriter {
     private Radon radon;
 
-    public CustomClassWriter(int flags) {
+    public CustomClassWriter(int flags, Radon radon) {
         super(flags);
-        this.radon = Radon.getInstance();
+        this.radon = radon;
     }
 
     @Override

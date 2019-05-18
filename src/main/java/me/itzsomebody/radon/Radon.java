@@ -62,11 +62,8 @@ public class Radon {
     public Map<String, ClassWrapper> classPath = new HashMap<>();
     public Map<String, byte[]> resources = new HashMap<>();
 
-    private static Radon instance;
-
     public Radon(ObfuscationConfiguration config) {
         this.config = config;
-        instance = this;
     }
 
     /**
@@ -98,7 +95,7 @@ public class Radon {
     }
 
     private void writeOutput() {
-        File output = getConfig().getOutput();
+        File output = config.getOutput();
         Main.info(String.format("Writing output to \"%s\".", output.getAbsolutePath()));
 
         if (output.exists())
@@ -108,7 +105,7 @@ public class Radon {
             ZipOutputStream zos = new ZipOutputStream(new FileOutputStream(output));
             zos.setLevel(getConfig().getCompressionLevel());
 
-            if (getConfig().isCorruptCrc())
+            if (config.isCorruptCrc())
                 try {
                     Field field = ZipOutputStream.class.getDeclaredField("crc");
                     field.setAccessible(true);
@@ -136,7 +133,7 @@ public class Radon {
                     ZipEntry entry = new ZipEntry(classWrapper.getName() + ".class");
 
                     zos.putNextEntry(entry);
-                    zos.write(classWrapper.toByteArray());
+                    zos.write(classWrapper.toByteArray(this));
                     zos.closeEntry();
                 } catch (Throwable t) {
                     Main.severe(String.format("Error writing class %s. Skipping.", classWrapper.getName() + ".class"));
@@ -321,9 +318,5 @@ public class Radon {
 
     public ObfuscationConfiguration getConfig() {
         return config;
-    }
-
-    public static Radon getInstance() {
-        return instance;
     }
 }

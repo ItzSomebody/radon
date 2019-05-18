@@ -21,6 +21,7 @@ package me.itzsomebody.radon.asm;
 import java.util.ArrayList;
 import java.util.List;
 import me.itzsomebody.radon.Main;
+import me.itzsomebody.radon.Radon;
 import me.itzsomebody.radon.asm.accesses.Access;
 import me.itzsomebody.radon.asm.accesses.ClassAccess;
 import org.objectweb.asm.ClassReader;
@@ -186,16 +187,21 @@ public class ClassWrapper {
         return classNode.version >= Opcodes.V1_7 && classNode.version != Opcodes.V1_1;
     }
 
-    public byte[] toByteArray() {
-        // Construct byte writer
-        ClassWriter writer = new CustomClassWriter(ClassWriter.COMPUTE_FRAMES);
+    public int computeConstantPoolSize(Radon radon) {
+        return new ClassReader(toByteArray(radon)).getItemCount();
+    }
 
-        // Insert manually-specified constant pool strings
+    public byte[] toByteArray(Radon radon) {
+        // Construct byte writer
+        ClassWriter writer = new CustomClassWriter(ClassWriter.COMPUTE_FRAMES, radon);
         writer.newUTF8("RADON" + Main.VERSION);
-        strConsts.forEach(writer::newUTF8);
+
 
         // Populate writer with class info
         classNode.accept(writer);
+
+        // Insert manually-specified constant pool strings
+        strConsts.forEach(writer::newUTF8);
 
         try {
             return writer.toByteArray();
@@ -205,9 +211,9 @@ public class ClassWrapper {
 
             writer = new ClassWriter(ClassWriter.COMPUTE_MAXS);
             writer.newUTF8("RADON" + Main.VERSION);
-            strConsts.forEach(writer::newUTF8);
 
             classNode.accept(writer);
+            strConsts.forEach(writer::newUTF8);
 
             return writer.toByteArray();
         }

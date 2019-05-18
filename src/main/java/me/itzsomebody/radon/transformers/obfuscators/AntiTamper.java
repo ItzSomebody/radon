@@ -29,11 +29,11 @@ import me.itzsomebody.radon.asm.ClassWrapper;
 import me.itzsomebody.radon.asm.MethodWrapper;
 import me.itzsomebody.radon.config.ConfigurationSetting;
 import me.itzsomebody.radon.exceptions.InvalidConfigurationValueException;
+import me.itzsomebody.radon.exceptions.RadonException;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
 import me.itzsomebody.radon.utils.RandomUtils;
 import me.itzsomebody.radon.utils.StringUtils;
-import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
@@ -62,7 +62,7 @@ public class AntiTamper extends Transformer {
                             && ((LdcInsnNode) insn).cst instanceof String).forEach(insn -> {
                         toProcess.add(mw);
 
-                        mw.getMethodNode().instructions.insert(insn, new MethodInsnNode(
+                        mw.getInstructions().insert(insn, new MethodInsnNode(
                                 INVOKESTATIC,
                                 memberNames.className,
                                 memberNames.decryptMethodName,
@@ -74,16 +74,21 @@ public class AntiTamper extends Transformer {
                     }));
 
             if (counter.get() > 0) {
-                IntStream.range(0, 120).forEach(i -> cw.addStringConst(StringUtils.randomAlphaString(RandomUtils.getRandomInt(0, 32))));
+                IntStream.range(0, RandomUtils.getRandomInt(1, 120)).forEach(i -> cw.addStringConst(StringUtils.randomAlphaString(RandomUtils.getRandomInt(2, 32))));
 
-                int cpSize = new ClassReader(cw.toByteArray()).getItemCount();
+                int cpSize = cw.computeConstantPoolSize(radon);
 
-                toProcess.forEach(methodWrapper -> Stream.of(methodWrapper.getMethodNode().instructions.toArray()).filter(insn -> insn instanceof LdcInsnNode
+                toProcess.forEach(mw -> Stream.of(mw.getInstructions().toArray()).filter(insn -> insn instanceof LdcInsnNode
                         && ((LdcInsnNode) insn).cst instanceof String).forEach(insn -> {
                     LdcInsnNode ldc = (LdcInsnNode) insn;
                     String s = (String) ldc.cst;
-                    ldc.cst = encrypt(s, memberNames, cw.getName().replace('/', '.'), methodWrapper.getMethodNode().name, cpSize);
+                    ldc.cst = encrypt(s, memberNames, cw.getName().replace('/', '.'), mw.getMethodNode().name, cpSize);
                 }));
+
+                int newCpSize = cw.computeConstantPoolSize(radon);
+
+                if (cpSize != newCpSize)
+                    throw new RadonException("Constant pool size miscalculation in " + cw.getName());
             }
         });
 
