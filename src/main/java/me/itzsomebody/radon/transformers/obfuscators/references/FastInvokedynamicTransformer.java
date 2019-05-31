@@ -333,7 +333,7 @@ public class FastInvokedynamicTransformer extends ReferenceObfuscation {
     }
 
     private class MemberNames {
-        private String className = Transformer.randomClassName(getClasses().keySet());
+        private String className = randomClassName();
         private String decryptMethodName = uniqueRandomString();
         private String getMethodHandleMethodName = uniqueRandomString();
         private String bootstrapMethodName = uniqueRandomString();

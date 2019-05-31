@@ -85,7 +85,7 @@ public class TrashClasses extends Transformer {
     }
 
     private ClassNode generateClass() {
-        ClassNode classNode = createClass(Transformer.randomClassName(this.getClasses().keySet()));
+        ClassNode classNode = createClass(randomClassName());
         int methodsToGenerate = RandomUtils.getRandomInt(3) + 2;
 
         for (int i = 0; i < methodsToGenerate; i++)

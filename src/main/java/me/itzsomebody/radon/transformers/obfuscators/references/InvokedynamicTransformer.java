@@ -918,7 +918,7 @@ public class InvokedynamicTransformer extends ReferenceObfuscation {
     }
 
     private class MemberNames {
-        private String className = Transformer.randomClassName(getClasses().keySet());
+        private String className = randomClassName();
         private String methodCacheFieldName = uniqueRandomString();
         private String fieldCacheFieldName = uniqueRandomString();
         private String hashMethodName = uniqueRandomString();

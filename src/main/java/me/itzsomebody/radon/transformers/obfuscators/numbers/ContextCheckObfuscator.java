@@ -595,7 +595,7 @@ public class ContextCheckObfuscator extends NumberObfuscation {
         private String decodeConstantMethodName;
 
         private MemberNames() {
-            this.className = Transformer.randomClassName(getClasses().keySet());
+            this.className = randomClassName();
             this.constantFieldName = uniqueRandomString();
             this.indicatorFieldName = uniqueRandomString();
             this.elementFieldName = uniqueRandomString();

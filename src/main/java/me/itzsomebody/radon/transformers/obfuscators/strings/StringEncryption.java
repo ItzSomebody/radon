@@ -1181,7 +1181,7 @@ public class StringEncryption extends Transformer {
     }
 
     private class MemberNames {
-        private String className = Transformer.randomClassName(getClasses().keySet());
+        private String className = randomClassName();
         private String cacheFieldName = uniqueRandomString();
         private String bigBoizFieldName = uniqueRandomString();
         private String decryptMethodName = uniqueRandomString();

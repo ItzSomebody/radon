@@ -463,7 +463,7 @@ public class AntiTamper extends Transformer {
     }
 
     private class MemberNames {
-        private String className = Transformer.randomClassName(getClasses().keySet());
+        private String className = randomClassName();
         private String decryptMethodName = uniqueRandomString();
     }
 }
