@@ -50,7 +50,7 @@ public class FieldWrapper {
     }
 
     /**
-     * Attached FieldNode.
+     * @return wrapped {@link FieldNode}.
      */
     public FieldNode getFieldNode() {
         return fieldNode;
@@ -61,42 +61,57 @@ public class FieldWrapper {
     }
 
     /**
-     * Owner of this represented field.
+     * @return owner of this wrapper.
      */
     public ClassWrapper getOwner() {
         return owner;
     }
 
     /**
-     * Original field name.
+     * @return original name of wrapped {@link FieldNode}.
      */
     public String getOriginalName() {
         return originalName;
     }
 
     /**
-     * Original field description.
+     * @return original description of wrapped {@link FieldNode}
      */
     public String getOriginalDescription() {
         return originalDescription;
     }
 
+    /**
+     * @return the current name of the wrapped {@link FieldNode}.
+     */
     public String getName() {
         return fieldNode.name;
     }
 
+    /**
+     * @return the current description of the wrapped {@link FieldNode}.
+     */
     public String getDescription() {
         return fieldNode.desc;
     }
 
+    /**
+     * @return {@link FieldAccess} wrapper of represented {@link FieldNode}'s access flags.
+     */
     public Access getAccess() {
         return access;
     }
 
+    /**
+     * @return raw access flags of wrapped {@link FieldNode}.
+     */
     public int getAccessFlags() {
         return fieldNode.access;
     }
 
+    /**
+     * @param access access flags to set.
+     */
     public void setAccessFlags(int access) {
         fieldNode.access = access;
     }

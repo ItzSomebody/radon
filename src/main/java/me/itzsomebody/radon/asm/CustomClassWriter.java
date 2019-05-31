@@ -21,6 +21,11 @@ package me.itzsomebody.radon.asm;
 import me.itzsomebody.radon.Radon;
 import org.objectweb.asm.ClassWriter;
 
+/**
+ * Custom-implemented version of {@link ClassWriter} which doesn't use the internal classpath.
+ *
+ * @author ItzSomebody
+ */
 public class CustomClassWriter extends ClassWriter {
     private Radon radon;
 
@@ -45,7 +50,7 @@ public class CustomClassWriter extends ClassWriter {
         return getCommonSuperClass(radon.getClassWrapper(type1).getSuperName(), radon.getClassWrapper(type2).getSuperName());
     }
 
-    private String deriveCommonSuperName(String type1, String type2) {
+    private String deriveCommonSuperName(final String type1, final String type2) {
         ClassWrapper first = radon.getClassWrapper(type1);
         ClassWrapper second = radon.getClassWrapper(type2);
         if (radon.isAssignableFrom(type1, type2))

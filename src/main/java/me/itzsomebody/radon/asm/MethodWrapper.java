@@ -32,7 +32,7 @@ import org.objectweb.asm.tree.TryCatchBlockNode;
  * @author ItzSomebody
  */
 public class MethodWrapper {
-    // https://docs.oracle.com/javase/specs/jvms/se10/html/jvms-4.html#jvms-4.7.3
+    // https://docs.oracle.com/javase/specs/jvms/se12/html/jvms-4.html#jvms-4.7.3
     private static final int MAX_CODE_SIZE = 65535;
 
     private MethodNode methodNode;
@@ -68,34 +68,43 @@ public class MethodWrapper {
     }
 
     /**
-     * Owner of the method this MethodWrapper represents.
+     * @return owner of this wrapper.
      */
     public ClassWrapper getOwner() {
         return owner;
     }
 
     /**
-     * Original method name;
+     * @return original name of wrapped {@link MethodNode}.
      */
     public String getOriginalName() {
         return originalName;
     }
 
     /**
-     * Original method description.
+     * @return original description of wrapped {@link MethodNode}
      */
     public String getOriginalDescription() {
         return originalDescription;
     }
 
+    /**
+     * @return the current name of wrapped {@link MethodNode}.
+     */
     public String getName() {
         return methodNode.name;
     }
 
+    /**
+     * @return the current description of wrapped {@link MethodNode}.
+     */
     public String getDescription() {
         return methodNode.desc;
     }
 
+    /**
+     * @return the current {@link InsnList} of wrapped {@link MethodNode}.
+     */
     public InsnList getInstructions() {
         return methodNode.instructions;
     }
@@ -104,22 +113,37 @@ public class MethodWrapper {
         methodNode.instructions = instructions;
     }
 
+    /**
+     * @return the current {@link TryCatchBlockNode}s of wrapped {@link MethodNode}.
+     */
     public List<TryCatchBlockNode> getTryCatchBlocks() {
         return methodNode.tryCatchBlocks;
     }
 
+    /**
+     * @return {@link MethodAccess} wrapper of represented {@link MethodNode}'s access flags.
+     */
     public Access getAccess() {
         return access;
     }
 
+    /**
+     * @return raw access flags of wrapped {@link MethodNode}.
+     */
     public int getAccessFlags() {
         return methodNode.access;
     }
 
+    /**
+     * @param access access flags to set.
+     */
     public void setAccessFlags(int access) {
         methodNode.access = access;
     }
 
+    /**
+     * @return the current max allocation of local variables (registers) of wrapped {@link MethodNode}.
+     */
     public int getMaxLocals() {
         return methodNode.maxLocals;
     }
@@ -128,16 +152,25 @@ public class MethodWrapper {
         methodNode.maxLocals = maxLocals;
     }
 
+    /**
+     * @return true if the wrapped {@link MethodNode} represented by this wrapper contains instructions.
+     */
     public boolean hasInstructions() {
         return methodNode.instructions != null && methodNode.instructions.size() > 0;
     }
 
+    /**
+     * @return computes and returns the size of the wrapped {@link MethodNode}.
+     */
     public int getCodeSize() {
         CodeSizeEvaluator cse = new CodeSizeEvaluator(null);
         methodNode.accept(cse);
         return cse.getMaxSize();
     }
 
+    /**
+     * @return the leeway between the current size of the wrapped {@link MethodNode} and the max allowed size.
+     */
     public int getLeewaySize() {
         return MAX_CODE_SIZE - getCodeSize();
     }

@@ -83,6 +83,9 @@ public class ClassWrapper {
         fields.add(new FieldWrapper(fieldNode, this));
     }
 
+    /**
+     * @param s constant literal to add to constant pool.
+     */
     public void addStringConst(String s) {
         strConsts.add(s);
     }
@@ -124,28 +127,28 @@ public class ClassWrapper {
     }
 
     /**
-     * Original name of ClassNode. Really useful when class got renamed.
+     * @return original name of wrapped {@link ClassNode}.
      */
     public String getOriginalName() {
         return originalName;
     }
 
     /**
-     * Quick way of figuring out if this is represents library class or not.
+     * @return true if this wrapper represents a library class.
      */
     public boolean isLibraryNode() {
         return libraryNode;
     }
 
     /**
-     * Methods.
+     * @return {@link ArrayList} of {@link MethodWrapper}s this wrapper contains.
      */
     public List<MethodWrapper> getMethods() {
         return methods;
     }
 
     /**
-     * Fields.
+     * @return {@link ArrayList} of {@link FieldWrapper}s this wrapper contains.
      */
     public List<FieldWrapper> getFields() {
         return fields;
@@ -155,46 +158,83 @@ public class ClassWrapper {
         return strConsts;
     }
 
+    /**
+     * @return current name of wrapped {@link ClassNode}.
+     */
     public String getName() {
         return classNode.name;
     }
 
+    /**
+     * @return current package name of wrapped {@link ClassNode}.
+     */
     public String getPackageName() {
         return classNode.name.substring(0, classNode.name.lastIndexOf('/') + 1);
     }
 
+    /**
+     * @return current super class name of wrapped {@link ClassNode}.
+     */
     public String getSuperName() {
         return classNode.superName;
     }
 
+    /**
+     * @return current interfaces of wrapped {@link ClassNode}.
+     */
     public List<String> getInterfaces() {
         return classNode.interfaces;
     }
 
+    /**
+     * @return {@link ClassAccess} wrapper of represented {@link ClassNode}'s access flags.
+     */
     public Access getAccess() {
         return access;
     }
 
+    /**
+     * @return raw access flags of wrapped {@link ClassNode}.
+     */
     public int getAccessFlags() {
         return classNode.access;
     }
 
+    /**
+     * @param access access flags to set.
+     */
     public void setAccessFlags(int access) {
         classNode.access = access;
     }
 
+    /**
+     * @return the current class version of the wrapped {@link ClassNode}.
+     */
     public int getVersion() {
         return classNode.version;
     }
 
+    /**
+     * See https://docs.oracle.com/javase/specs/jvms/se12/html/jvms-4.html#jvms-4.9.1
+     *
+     * @return true if the wrapped {@link ClassNode} supports JSR instructions.
+     */
     public boolean allowsJSR() {
         return classNode.version <= Opcodes.V1_5 || classNode.version == Opcodes.V1_1;
     }
 
+    /**
+     * J7 and up include support for INVOKEDYNAMIC instructions.
+     *
+     * @return true if the wrapped {@link ClassNode} supports INVOKEDYNAMIC instructions.
+     */
     public boolean allowsIndy() {
         return classNode.version >= Opcodes.V1_7 && classNode.version != Opcodes.V1_1;
     }
 
+    /**
+     * @return the computed current constant pool size of the wrapped {@link ClassNode}.
+     */
     public int computeConstantPoolSize(Radon radon) {
         return new ClassReader(toByteArray(radon)).getItemCount();
     }

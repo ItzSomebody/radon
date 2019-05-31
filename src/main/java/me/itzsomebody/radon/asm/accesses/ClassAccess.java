@@ -21,6 +21,11 @@ package me.itzsomebody.radon.asm.accesses;
 import me.itzsomebody.radon.asm.ClassWrapper;
 import me.itzsomebody.radon.exceptions.RadonException;
 
+/**
+ * Wrapper for ClassNode access flags.
+ *
+ * @author ItzSomebody
+ */
 public class ClassAccess implements Access {
     private ClassWrapper wrapper;
 

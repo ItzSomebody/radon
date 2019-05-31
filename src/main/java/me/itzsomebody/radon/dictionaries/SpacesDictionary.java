@@ -4,6 +4,11 @@ import java.util.HashSet;
 import java.util.Set;
 import me.itzsomebody.radon.utils.RandomUtils;
 
+/**
+ * Generates strings full of spaces.
+ *
+ * @author ItzSomebody
+ */
 public class SpacesDictionary implements Dictionary {
     private static final char[] CHARSET = new char[0xF + 1];
     private final Set<String> cache = new HashSet<>();

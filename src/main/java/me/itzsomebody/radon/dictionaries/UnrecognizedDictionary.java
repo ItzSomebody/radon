@@ -4,6 +4,11 @@ import java.util.HashSet;
 import java.util.Set;
 import me.itzsomebody.radon.utils.RandomUtils;
 
+/**
+ * Generates strings not recognized by the JVM.
+ *
+ * @author ItzSomebody
+ */
 public class UnrecognizedDictionary implements Dictionary {
     private static final char[] CHARSET = new char[33];
     private final Set<String> cache = new HashSet<>();

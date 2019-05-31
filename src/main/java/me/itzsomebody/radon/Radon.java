@@ -262,6 +262,12 @@ public class Radon {
         }
     }
 
+    /**
+     * Finds {@link ClassWrapper} with given name.
+     *
+     * @return {@link ClassWrapper}.
+     * @throws RadonException if not found.
+     */
     public ClassWrapper getClassWrapper(String ref) {
         if (!classPath.containsKey(ref))
             throw new RadonException("Could not find " + ref);
@@ -269,6 +275,12 @@ public class Radon {
         return classPath.get(ref);
     }
 
+    /**
+     * Finds {@link ClassTree} with given name.
+     *
+     * @return {@link ClassTree}.
+     * @throws RadonException if there are missing classes needed to build the inheritance tree.
+     */
     public ClassTree getTree(String ref) {
         if (!hierarchy.containsKey(ref)) {
             ClassWrapper wrapper = getClassWrapper(ref);
@@ -305,6 +317,12 @@ public class Radon {
         classes.values().forEach(classWrapper -> buildHierarchy(classWrapper, null));
     }
 
+    /**
+     * Equivalent to the following:
+     * Class clazz1 = something;
+     * Class class2 = somethingElse;
+     * return class1.isAssignableFrom(class2);
+     */
     public boolean isAssignableFrom(String type1, String type2) {
         if ("java/lang/Object".equals(type1))
             return true;

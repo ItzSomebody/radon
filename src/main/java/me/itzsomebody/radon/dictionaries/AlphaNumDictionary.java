@@ -4,6 +4,11 @@ import java.util.HashSet;
 import java.util.Set;
 import me.itzsomebody.radon.utils.RandomUtils;
 
+/**
+ * Generates alphanumberic strings.
+ *
+ * @author ItzSomebody
+ */
 public class AlphaNumDictionary implements Dictionary {
     private static final char[] CHARSET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890".toCharArray();
     private final Set<String> cache = new HashSet<>();

@@ -4,6 +4,12 @@ import java.util.HashSet;
 import java.util.Set;
 import me.itzsomebody.radon.utils.RandomUtils;
 
+/**
+ * Generates random unicode strings.
+ *
+ * @author xxDark
+ * @author ItzSomebody
+ */
 public class RandomUnicodeDictionary implements Dictionary {
     private static final char[] CHARSET = new char[25];
     private final Set<String> cache = new HashSet<>();

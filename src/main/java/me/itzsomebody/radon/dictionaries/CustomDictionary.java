@@ -4,6 +4,11 @@ import java.util.HashSet;
 import java.util.Set;
 import me.itzsomebody.radon.utils.RandomUtils;
 
+/**
+ * Generates strings based on custom user-defined dictionary.
+ *
+ * @author ItzSomebody
+ */
 public class CustomDictionary implements Dictionary {
     private static char[] CHARSET;
     private final Set<String> cache = new HashSet<>();

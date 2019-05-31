@@ -21,6 +21,11 @@ package me.itzsomebody.radon.asm.accesses;
 import me.itzsomebody.radon.asm.FieldWrapper;
 import me.itzsomebody.radon.exceptions.RadonException;
 
+/**
+ * Wrapper for FieldNode access flags.
+ *
+ * @author ItzSomebody
+ */
 public class FieldAccess implements Access {
     private FieldWrapper wrapper;
 
