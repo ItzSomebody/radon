@@ -38,8 +38,8 @@ public class BitwiseObfuscator extends NumberObfuscation {
 
         getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper ->
                 classWrapper.getMethods().stream().filter(methodWrapper -> !excluded(methodWrapper)
-                        && hasInstructions(methodWrapper)).forEach(methodWrapper -> {
-                    int leeway = getSizeLeeway(methodWrapper);
+                        && methodWrapper.hasInstructions()).forEach(methodWrapper -> {
+                    int leeway = methodWrapper.getLeewaySize();
                     InsnList methodInstructions = methodWrapper.getInstructions();
 
                     for (AbstractInsnNode insn : methodInstructions.toArray()) {

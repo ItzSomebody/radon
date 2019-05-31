@@ -28,7 +28,6 @@ import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
 import me.itzsomebody.radon.utils.ASMUtils;
 import me.itzsomebody.radon.utils.RandomUtils;
-import me.itzsomebody.radon.utils.StringUtils;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Handle;
 import org.objectweb.asm.MethodVisitor;
@@ -86,7 +85,7 @@ public class TrashClasses extends Transformer {
     }
 
     private ClassNode generateClass() {
-        ClassNode classNode = createClass(StringUtils.randomClassName(this.getClasses().keySet()));
+        ClassNode classNode = createClass(Transformer.randomClassName(this.getClasses().keySet()));
         int methodsToGenerate = RandomUtils.getRandomInt(3) + 2;
 
         for (int i = 0; i < methodsToGenerate; i++)

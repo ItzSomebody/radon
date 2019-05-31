@@ -39,8 +39,6 @@ import org.objectweb.asm.tree.MethodNode;
  * @author ItzSomebody.
  */
 public class ASMUtils {
-    private static final Type STRING_TYPE = Type.getType(String.class);
-
     public static boolean isInstruction(AbstractInsnNode insn) {
         return !(insn instanceof FrameNode) && !(insn instanceof LineNumberNode) && !(insn instanceof LabelNode);
     }
@@ -97,23 +95,21 @@ public class ASMUtils {
     }
 
     public static AbstractInsnNode getNumberInsn(int number) {
-        if (number >= -1 && number <= 5) {
+        if (number >= -1 && number <= 5)
             return new InsnNode(number + 3);
-        } else if (number >= -128 && number <= 127) {
+        else if (number >= -128 && number <= 127)
             return new IntInsnNode(Opcodes.BIPUSH, number);
-        } else if (number >= -32768 && number <= 32767) {
+        else if (number >= -32768 && number <= 32767)
             return new IntInsnNode(Opcodes.SIPUSH, number);
-        } else {
+        else
             return new LdcInsnNode(number);
-        }
     }
 
     public static AbstractInsnNode getNumberInsn(long number) {
-        if (number >= 0 && number <= 1) {
+        if (number >= 0 && number <= 1)
             return new InsnNode((int) (number + 9));
-        } else {
+        else
             return new LdcInsnNode(number);
-        }
     }
 
     public static AbstractInsnNode getNumberInsn(float number) {
@@ -125,11 +121,10 @@ public class ASMUtils {
     }
 
     public static AbstractInsnNode getNumberInsn(double number) {
-        if (number >= 0 && number <= 1) {
+        if (number >= 0 && number <= 1)
             return new InsnNode((int) (number + 14));
-        } else {
+        else
             return new LdcInsnNode(number);
-        }
     }
 
     public static int getIntegerFromInsn(AbstractInsnNode insn) {
@@ -250,9 +245,9 @@ public class ASMUtils {
         InsnList insnList = new InsnList();
         insnList.add(abstractInsnNode);
         if (abstractInsnNodes != null)
-            for (AbstractInsnNode insnNode : abstractInsnNodes) {
+            for (AbstractInsnNode insnNode : abstractInsnNodes)
                 insnList.add(insnNode);
-            }
+
         return insnList;
     }
 
@@ -303,9 +298,6 @@ public class ASMUtils {
                 return ASMUtils.getNumberInsn(RandomUtils.getRandomDouble());
             case Type.ARRAY:
             case Type.OBJECT:
-                if (STRING_TYPE.equals(type) && RandomUtils.getRandomBoolean()) {
-                    return new LdcInsnNode(StringUtils.randomUnrecognizedString(RandomUtils.getRandomInt(3, 10)));
-                }
                 return new InsnNode(Opcodes.ACONST_NULL);
             default:
                 throw new AssertionError();

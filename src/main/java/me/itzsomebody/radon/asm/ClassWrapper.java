@@ -104,6 +104,14 @@ public class ClassWrapper {
         return clinit;
     }
 
+    public boolean isMethodPresent(String name, String desc) {
+        return classNode.methods.stream().anyMatch(methodNode -> methodNode.name.equals(name) && methodNode.desc.equals(desc));
+    }
+
+    public boolean isFieldPresent(String name, String desc) {
+        return classNode.fields.stream().anyMatch(fieldNode -> fieldNode.name.equals(name) && fieldNode.desc.equals(desc));
+    }
+
     /**
      * Attached class node.
      */

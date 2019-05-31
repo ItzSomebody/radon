@@ -20,6 +20,7 @@ package me.itzsomebody.radon;
 
 import java.io.File;
 import java.util.List;
+import me.itzsomebody.radon.dictionaries.Dictionary;
 import me.itzsomebody.radon.exclusions.ExclusionManager;
 import me.itzsomebody.radon.transformers.Transformer;
 
@@ -31,7 +32,7 @@ public class ObfuscationConfiguration {
     private ExclusionManager exclusionManager;
     private int nTrashClasses;
     private int randomizedStringLength;
-    private DictionaryType dictionaryType;
+    private Dictionary dictionary;
     private int compressionLevel;
     private boolean verify;
     private boolean corruptCrc;
@@ -92,12 +93,12 @@ public class ObfuscationConfiguration {
         this.randomizedStringLength = randomizedStringLength;
     }
 
-    public DictionaryType getDictionaryType() {
-        return dictionaryType;
+    public Dictionary getDictionary() {
+        return dictionary;
     }
 
-    public void setDictionaryType(DictionaryType dictionaryType) {
-        this.dictionaryType = dictionaryType;
+    public void setDictionary(Dictionary dictionary) {
+        this.dictionary = dictionary;
     }
 
     public int getCompressionLevel() {

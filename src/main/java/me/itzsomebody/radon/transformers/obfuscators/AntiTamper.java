@@ -22,7 +22,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import me.itzsomebody.radon.Main;
 import me.itzsomebody.radon.asm.ClassWrapper;
@@ -33,7 +32,6 @@ import me.itzsomebody.radon.exceptions.RadonException;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
 import me.itzsomebody.radon.utils.RandomUtils;
-import me.itzsomebody.radon.utils.StringUtils;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Type;
@@ -74,7 +72,8 @@ public class AntiTamper extends Transformer {
                     }));
 
             if (counter.get() > 0) {
-                IntStream.range(0, RandomUtils.getRandomInt(1, 120)).forEach(i -> cw.addStringConst(StringUtils.randomAlphaString(RandomUtils.getRandomInt(2, 32))));
+                for (int i = 0; i < RandomUtils.getRandomInt(1, 120); i++)
+                    cw.addStringConst(getDictionary().randomString(RandomUtils.getRandomInt(2, 32)));
 
                 int cpSize = cw.computeConstantPoolSize(radon);
 
@@ -464,7 +463,7 @@ public class AntiTamper extends Transformer {
     }
 
     private class MemberNames {
-        private String className = StringUtils.randomClassName(getClasses().keySet());
+        private String className = Transformer.randomClassName(getClasses().keySet());
         private String decryptMethodName = uniqueRandomString();
     }
 }

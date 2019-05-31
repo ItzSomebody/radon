@@ -83,7 +83,7 @@ public class Virtualizer extends Transformer implements VMOpcodes {
                         && !excluded(methodWrapper)).forEach(methodWrapper -> {
                     MethodNode methodNode = methodWrapper.getMethodNode();
 
-                    int leeway = getSizeLeeway(methodNode);
+                    int leeway = methodWrapper.getLeewaySize();
                     if (leeway <= 30000 || !canProtect(methodNode.instructions)) // Virtualization of big method = mega bad
                         return;
 
@@ -273,7 +273,7 @@ public class Virtualizer extends Transformer implements VMOpcodes {
                 case FNEG:
                 case DNEG:
                     instructions.add(new Instruction(VM_INT_PUSH, new Object[]{-1}));
-                    instructions.add(new Instruction(VM_MUL, new Object[0]));
+                    instructions.add(new Instruction(VM_NEG, new Object[0]));
                     break;
                 case ISHL:
                 case LSHL:

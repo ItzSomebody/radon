@@ -69,9 +69,9 @@ public class FakeCatchBlocks extends FlowObfuscation {
         String methodName = uniqueRandomString();
 
         getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper ->
-                classWrapper.getMethods().stream().filter(mw -> !excluded(mw) && hasInstructions(mw.getMethodNode())
+                classWrapper.getMethods().stream().filter(mw -> !excluded(mw) && mw.hasInstructions()
                         && !"<init>".equals(mw.getOriginalName())).forEach(methodWrapper -> {
-                    int leeway = getSizeLeeway(methodWrapper);
+                    int leeway = methodWrapper.getLeewaySize();
                     InsnList insns = methodWrapper.getInstructions();
 
                     for (AbstractInsnNode insn : insns.toArray()) {

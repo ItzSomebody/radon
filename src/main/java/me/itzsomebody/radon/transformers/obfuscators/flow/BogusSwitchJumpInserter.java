@@ -20,6 +20,7 @@ package me.itzsomebody.radon.transformers.obfuscators.flow;
 
 import java.util.ArrayList;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import me.itzsomebody.radon.Main;
 import me.itzsomebody.radon.asm.StackHeightZeroFinder;
@@ -33,7 +34,6 @@ import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.LabelNode;
-import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TableSwitchInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
@@ -45,26 +45,26 @@ public class BogusSwitchJumpInserter extends FlowObfuscation {
         AtomicInteger counter = new AtomicInteger();
 
         getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper -> {
+            AtomicBoolean shouldAdd = new AtomicBoolean();
             FieldNode predicate = new FieldNode(PRED_ACCESS, uniqueRandomString(), "I", null, null);
 
-            classWrapper.getMethods().stream().filter(methodWrapper -> !excluded(methodWrapper)
-                    && hasInstructions(methodWrapper.getMethodNode())).forEach(methodWrapper -> {
-                MethodNode methodNode = methodWrapper.getMethodNode();
+            classWrapper.getMethods().stream().filter(mw -> !excluded(mw) && mw.hasInstructions()).forEach(mw -> {
+                InsnList insns = mw.getInstructions();
 
-                int leeway = getSizeLeeway(methodNode);
-                int varIndex = methodNode.maxLocals;
-                methodNode.maxLocals++; // Prevents breaking of other transformers which rely on this field.
+                int leeway = mw.getLeewaySize();
+                int varIndex = mw.getMaxLocals();
+                mw.getMethodNode().maxLocals++; // Prevents breaking of other transformers which rely on this field.
 
-                StackHeightZeroFinder stackHeightZeroFinder = new StackHeightZeroFinder(methodNode, methodNode.instructions.getLast());
+                StackHeightZeroFinder shzf = new StackHeightZeroFinder(mw.getMethodNode(), insns.getLast());
                 try {
-                    stackHeightZeroFinder.execute(false);
+                    shzf.execute(false);
                 } catch (StackEmulationException e) {
                     e.printStackTrace();
                     throw new RadonException(String.format("Error happened while trying to emulate the stack of %s.%s%s",
-                            classWrapper.getName(), methodNode.name, methodNode.desc));
+                            classWrapper.getName(), mw.getName(), mw.getDescription()));
                 }
 
-                Set<AbstractInsnNode> check = stackHeightZeroFinder.getEmptyAt();
+                Set<AbstractInsnNode> check = shzf.getEmptyAt();
                 ArrayList<AbstractInsnNode> emptyAt = new ArrayList<>(check);
 
                 if (emptyAt.size() <= 5 || leeway <= 30000)
@@ -90,10 +90,10 @@ public class BogusSwitchJumpInserter extends FlowObfuscation {
 
                 AbstractInsnNode switchTarget = emptyAt.get(RandomUtils.getRandomInt(emptyAt.size()));
 
-                methodNode.instructions.insertBefore(switchTarget, block);
+                insns.insertBefore(switchTarget, block);
 
                 targets.forEach(target -> {
-                    AbstractInsnNode here = methodNode.instructions.getLast();
+                    AbstractInsnNode here = insns.getLast();
 
                     InsnList landing = new InsnList();
                     landing.add(target);
@@ -101,18 +101,18 @@ public class BogusSwitchJumpInserter extends FlowObfuscation {
                     landing.add(new VarInsnNode(ISTORE, varIndex));
                     landing.add(new JumpInsnNode(GOTO, targets.get(RandomUtils.getRandomInt(targets.size()))));
 
-                    methodNode.instructions.insert(here, landing);
+                    insns.insert(here, landing);
                 });
 
-                methodNode.instructions.insertBefore(methodNode.instructions.getFirst(),
-                        new VarInsnNode(ISTORE, varIndex));
-                methodNode.instructions.insertBefore(methodNode.instructions.getFirst(),
-                        new FieldInsnNode(GETSTATIC, classWrapper.getName(), predicate.name, "I"));
+                insns.insert(new VarInsnNode(ISTORE, varIndex));
+                insns.insert(new FieldInsnNode(GETSTATIC, classWrapper.getName(), predicate.name, "I"));
 
                 counter.addAndGet(targets.size());
+                shouldAdd.set(true);
             });
 
-            classWrapper.getClassNode().fields.add(predicate);
+            if (shouldAdd.get())
+                classWrapper.addField(predicate);
         });
 
         Main.info("Inserted " + counter.get() + " bogus switch jumps");

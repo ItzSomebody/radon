@@ -18,20 +18,17 @@
 
 package me.itzsomebody.radon.transformers;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import me.itzsomebody.radon.Radon;
 import me.itzsomebody.radon.asm.ClassWrapper;
 import me.itzsomebody.radon.asm.FieldWrapper;
 import me.itzsomebody.radon.asm.MethodWrapper;
-import me.itzsomebody.radon.exceptions.RadonException;
+import me.itzsomebody.radon.dictionaries.Dictionary;
 import me.itzsomebody.radon.exclusions.ExclusionType;
-import me.itzsomebody.radon.utils.StringUtils;
+import me.itzsomebody.radon.utils.RandomUtils;
 import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.commons.CodeSizeEvaluator;
-import org.objectweb.asm.tree.MethodNode;
 
 /**
  * Abstract transformer for all the transformers. \o/
@@ -40,11 +37,6 @@ import org.objectweb.asm.tree.MethodNode;
  */
 public abstract class Transformer implements Opcodes {
     protected Radon radon;
-
-    /**
-     * Strings which have already been generated and used.
-     */
-    private HashSet<String> usedStrings = new HashSet<>();
 
     public final void init(Radon radon) {
         this.radon = radon;
@@ -68,73 +60,38 @@ public abstract class Transformer implements Opcodes {
                 + fieldWrapper.getOriginalDescription());
     }
 
-    /**
-     * Returns the remaining leeway of a method's allowed size.
-     *
-     * @param methodNode the {@link MethodNode} to check.
-     * @return the remaining leeway of a method's allowed size.
-     */
-    protected int getSizeLeeway(MethodNode methodNode) {
-        CodeSizeEvaluator cse = new CodeSizeEvaluator(null);
-        methodNode.accept(cse);
-        // Max allowed method size is 65535
-        // https://docs.oracle.com/javase/specs/jvms/se10/html/jvms-4.html#jvms-4.7.3
-        return (65535 - cse.getMaxSize());
-    }
-
-    protected int getSizeLeeway(MethodWrapper wrapper) {
-        return getSizeLeeway(wrapper.getMethodNode());
-    }
-
-    protected final boolean hasInstructions(MethodNode methodNode) {
-        return methodNode.instructions != null && methodNode.instructions.size() > 0;
-    }
-
-    protected final boolean hasInstructions(MethodWrapper methodWrapper) {
-        return hasInstructions(methodWrapper.getMethodNode());
-    }
-
     protected final long tookThisLong(long from) {
         return System.currentTimeMillis() - from;
     }
 
+    protected Dictionary getDictionary() {
+        return radon.getConfig().getDictionary();
+    }
+
+    protected String lastGeneratedString() {
+        return getDictionary().lastUniqueString();
+    }
+
+    protected String nextUniqueString() {
+        return getDictionary().nextUniqueString();
+    }
+
     protected String randomString() {
-        return getRandomString(radon.getConfig().getRandomizedStringLength());
+        return getDictionary().randomString(radon.getConfig().getRandomizedStringLength());
     }
 
     protected String uniqueRandomString() {
-        String str;
-        int count = 0;
-
-        do {
-            if (count++ > 20) {
-                //throw new RadonException("Unable to generate an unused string (try increasing randomized string length)");
-                radon.getConfig().setRandomizedStringLength(radon.getConfig().getRandomizedStringLength() + 1);
-                count = 0;
-            }
-
-            str = getRandomString(radon.getConfig().getRandomizedStringLength());
-        } while (!usedStrings.add(str));
-
-        return str;
+        return getDictionary().uniqueRandomString(radon.getConfig().getRandomizedStringLength());
     }
 
-    private String getRandomString(int length) {
-        switch (radon.getConfig().getDictionaryType()) {
-            case SPACES:
-                return StringUtils.randomSpacesString(length);
-            case UNRECOGNIZED:
-                return StringUtils.randomUnrecognizedString(length);
-            case ALPHABETICAL:
-                return StringUtils.randomAlphaString(length);
-            case ALPHANUMERIC:
-                return StringUtils.randomAlphaNumericString(length);
-            case UNICODE:
-                return StringUtils.randomUnicodeString(length);
-            default: {
-                throw new RadonException("Illegal dictionary type: " + radon.getConfig().getDictionaryType());
-            }
-        }
+    public String randomClassName() {
+        Collection<String> classNames = getClasses().keySet();
+        ArrayList<String> list = new ArrayList<>(classNames);
+
+        String first = list.get(RandomUtils.getRandomInt(classNames.size()));
+        String second = list.get(RandomUtils.getRandomInt(classNames.size()));
+
+        return first + '$' + second.substring(second.lastIndexOf("/") + 1);
     }
 
     protected final Map<String, ClassWrapper> getClasses() {
@@ -165,28 +122,4 @@ public abstract class Transformer implements Opcodes {
     public abstract void setConfiguration(Map<String, Object> config);
 
     public abstract void verifyConfiguration(Map<String, Object> config);
-
-    /**
-     * Insertion sorts the provided {@link List<Transformer>} using the {@link ExclusionType} ordinal as the priority
-     * key. O(n^2) here we come \o/
-     *
-     * @param transformers @link List<Transformer>} to be sorted.
-     */
-    public static void sort(List<Transformer> transformers) {
-        if (transformers.size() < 2) // Already sorted
-            return;
-
-        for (int i = 1; i < transformers.size(); i++) {
-            Transformer transformer = transformers.get(i);
-            int key = transformer.getExclusionType().ordinal();
-
-            int j = i - 1;
-            while (j >= 0 && transformers.get(j).getExclusionType().ordinal() > key) {
-                transformers.set(j + 1, transformers.get(j));
-                j -= 1;
-            }
-
-            transformers.set(j + 1, transformer);
-        }
-    }
 }

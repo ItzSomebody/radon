@@ -18,14 +18,15 @@
 
 package me.itzsomebody.radon.transformers.obfuscators.flow;
 
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import me.itzsomebody.radon.Main;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.FieldNode;
+import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.JumpInsnNode;
-import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
 /**
@@ -41,41 +42,43 @@ public class GotoReplacer extends FlowObfuscation {
     public void transform() {
         AtomicInteger counter = new AtomicInteger();
 
-        getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper -> {
+        getClassWrappers().stream().filter(cw -> !excluded(cw)).forEach(cw -> {
+            AtomicBoolean shouldAdd = new AtomicBoolean();
             FieldNode predicate = new FieldNode(PRED_ACCESS, uniqueRandomString(), "Z", null, null);
 
-            classWrapper.getMethods().stream().filter(methodWrapper -> !excluded(methodWrapper)
-                    && hasInstructions(methodWrapper.getMethodNode())).forEach(methodWrapper -> {
-                MethodNode methodNode = methodWrapper.getMethodNode();
+            cw.getMethods().stream().filter(mw -> !excluded(mw) && mw.hasInstructions()).forEach(mw -> {
+                InsnList insns = mw.getInstructions();
 
-                int leeway = getSizeLeeway(methodNode);
-                int varIndex = methodNode.maxLocals;
-                methodNode.maxLocals++; // Prevents breaking of other transformers which rely on this field.
+                int leeway = mw.getLeewaySize();
+                int varIndex = mw.getMaxLocals();
+                mw.getMethodNode().maxLocals++; // Prevents breaking of other transformers which rely on this field.
 
-                for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
+                for (AbstractInsnNode insn : insns.toArray()) {
                     if (leeway < 10000)
                         break;
 
                     if (insn.getOpcode() == GOTO) {
-                        methodNode.instructions.insertBefore(insn, new VarInsnNode(ILOAD, varIndex));
-                        methodNode.instructions.insertBefore(insn, new JumpInsnNode(IFEQ, ((JumpInsnNode) insn).label));
-                        methodNode.instructions.insert(insn, new InsnNode(ATHROW));
-                        methodNode.instructions.insert(insn, new InsnNode(ACONST_NULL));
-                        methodNode.instructions.remove(insn);
+                        insns.insertBefore(insn, new VarInsnNode(ILOAD, varIndex));
+                        insns.insertBefore(insn, new JumpInsnNode(IFEQ, ((JumpInsnNode) insn).label));
+                        insns.insert(insn, new InsnNode(ATHROW));
+                        insns.insert(insn, new InsnNode(ACONST_NULL));
+                        insns.remove(insn);
 
                         leeway -= 10;
 
                         counter.incrementAndGet();
+                        shouldAdd.set(true);
                     }
                 }
 
-                methodNode.instructions.insertBefore(methodNode.instructions.getFirst(),
-                        new VarInsnNode(ISTORE, varIndex));
-                methodNode.instructions.insertBefore(methodNode.instructions.getFirst(),
-                        new FieldInsnNode(GETSTATIC, classWrapper.getName(), predicate.name, "Z"));
+                if (shouldAdd.get()) {
+                    insns.insert(new VarInsnNode(ISTORE, varIndex));
+                    insns.insert(new FieldInsnNode(GETSTATIC, cw.getName(), predicate.name, "Z"));
+                }
             });
 
-            classWrapper.getClassNode().fields.add(predicate);
+            if (shouldAdd.get())
+                cw.addField(predicate);
         });
 
         Main.info("Swapped " + counter.get() + " GOTO instructions");

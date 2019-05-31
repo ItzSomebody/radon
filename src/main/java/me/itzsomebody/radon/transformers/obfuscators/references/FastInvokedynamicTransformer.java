@@ -22,8 +22,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 import me.itzsomebody.radon.Main;
 import me.itzsomebody.radon.asm.ClassWrapper;
+import me.itzsomebody.radon.transformers.Transformer;
 import me.itzsomebody.radon.utils.ASMUtils;
-import me.itzsomebody.radon.utils.StringUtils;
 import org.objectweb.asm.Handle;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
@@ -49,7 +49,7 @@ public class FastInvokedynamicTransformer extends ReferenceObfuscation {
 
         getClassWrappers().stream().filter(cw -> !excluded(cw) && !"java/lang/Enum".equals(cw.getSuperName())
                 && cw.allowsIndy()).forEach(classWrapper ->
-                classWrapper.getMethods().stream().filter(mw -> !excluded(mw) && hasInstructions(mw)).forEach(mw -> {
+                classWrapper.getMethods().stream().filter(mw -> !excluded(mw) && mw.hasInstructions()).forEach(mw -> {
                     InsnList insns = mw.getInstructions();
 
                     Stream.of(insns.toArray()).forEach(insn -> {
@@ -64,6 +64,7 @@ public class FastInvokedynamicTransformer extends ReferenceObfuscation {
                                 newDesc = newDesc.replace("(", "(Ljava/lang/Object;");
 
                             newDesc = ASMUtils.getGenericMethodDesc(newDesc);
+                            // fixme: j11 doesn't like null bytes
                             String name = m.owner.replace('/', '.') + "\u0000\u0000" + m.name + "\u0000\u0000"
                                     + m.desc + "\u0000\u0000" + ((insn.getOpcode() == INVOKESTATIC) ? "a" : "b");
 
@@ -332,7 +333,7 @@ public class FastInvokedynamicTransformer extends ReferenceObfuscation {
     }
 
     private class MemberNames {
-        private String className = StringUtils.randomClassName(getClasses().keySet());
+        private String className = Transformer.randomClassName(getClasses().keySet());
         private String decryptMethodName = uniqueRandomString();
         private String getMethodHandleMethodName = uniqueRandomString();
         private String bootstrapMethodName = uniqueRandomString();

@@ -25,8 +25,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
-import me.itzsomebody.radon.DictionaryType;
 import me.itzsomebody.radon.ObfuscationConfiguration;
+import me.itzsomebody.radon.dictionaries.AlphaNumDictionary;
+import me.itzsomebody.radon.dictionaries.CustomDictionary;
+import me.itzsomebody.radon.dictionaries.Dictionary;
+import me.itzsomebody.radon.dictionaries.RandomUnicodeDictionary;
+import me.itzsomebody.radon.dictionaries.SpacesDictionary;
+import me.itzsomebody.radon.dictionaries.UnrecognizedDictionary;
 import me.itzsomebody.radon.exceptions.InvalidConfigurationValueException;
 import me.itzsomebody.radon.exceptions.RadonException;
 import me.itzsomebody.radon.exclusions.Exclusion;
@@ -140,6 +145,26 @@ public class ConfigurationParser {
         return transformers;
     }
 
+    private Dictionary getDictionary() {
+        String dictionaryName = getValue(ConfigurationSetting.DICTIONARY.getName(), config);
+
+        if (dictionaryName == null)
+            return new AlphaNumDictionary();
+
+        switch (dictionaryName) {
+            case "alphanumeric":
+                return new AlphaNumDictionary();
+            case "random_unicode":
+                return new RandomUnicodeDictionary();
+            case "spaces":
+                return new SpacesDictionary();
+            case "unrecognized":
+                return new UnrecognizedDictionary();
+            default:
+                return new CustomDictionary(dictionaryName);
+        }
+    }
+
     /**
      * Creates a new {@link ObfuscationConfiguration} from the provided configuration.
      *
@@ -155,7 +180,7 @@ public class ConfigurationParser {
         configuration.setExclusionManager(getExclusionManager());
         configuration.setnTrashClasses(getValueOrDefault(ConfigurationSetting.TRASH_CLASSES.getName(), config, 0));
         configuration.setRandomizedStringLength(getValueOrDefault(ConfigurationSetting.RANDOMIZED_STRING_LENGTH.getName(), config, 1));
-        configuration.setDictionaryType(DictionaryType.valueOf(getValueOrDefault(ConfigurationSetting.DICTIONARY.getName(), config, "alphanumeric").toUpperCase()));
+        configuration.setDictionary(getDictionary());
         configuration.setCompressionLevel(getValueOrDefault(ConfigurationSetting.COMPRESSION_LEVEL.getName(), config, 9));
         configuration.setVerify(getValueOrDefault(ConfigurationSetting.VERIFY.getName(), config, false));
         configuration.setCorruptCrc(getValueOrDefault(ConfigurationSetting.CORRUPT_CRC.getName(), config, false));

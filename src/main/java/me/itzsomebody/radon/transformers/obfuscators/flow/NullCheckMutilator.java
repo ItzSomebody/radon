@@ -44,10 +44,10 @@ public class NullCheckMutilator extends FlowObfuscation {
 
         getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper ->
                 classWrapper.getMethods().stream().filter(methodWrapper -> !excluded(methodWrapper)
-                        && hasInstructions(methodWrapper.getMethodNode())).forEach(methodWrapper -> {
+                        && methodWrapper.hasInstructions()).forEach(methodWrapper -> {
                     MethodNode methodNode = methodWrapper.getMethodNode();
 
-                    int leeway = getSizeLeeway(methodNode);
+                    int leeway = methodWrapper.getLeewaySize();
 
                     for (AbstractInsnNode insn : methodNode.instructions.toArray()) {
                         if (leeway < 10000)

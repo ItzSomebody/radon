@@ -43,20 +43,21 @@ public class BlockSplitter extends FlowObfuscation {
         getClassWrappers().stream().filter(cw -> !excluded(cw)).forEach(cw ->
                 cw.getMethods().stream().filter(mw -> !excluded(mw)).forEach(mw -> {
                     MethodNode methodNode = mw.getMethodNode();
+                    InsnList insns = mw.getInstructions();
 
-                    if (methodNode.instructions.size() > 10) {
+                    if (insns.size() > 10) {
                         LabelNode p1 = new LabelNode();
                         LabelNode p2 = new LabelNode();
 
-                        AbstractInsnNode p2Start = methodNode.instructions.get((methodNode.instructions.size() - 1) / 2);
-                        AbstractInsnNode p2End = methodNode.instructions.getLast();
+                        AbstractInsnNode p2Start = insns.get((insns.size() - 1) / 2);
+                        AbstractInsnNode p2End = insns.getLast();
 
-                        AbstractInsnNode p1Start = methodNode.instructions.getFirst();
+                        AbstractInsnNode p1Start = insns.getFirst();
 
                         // We can't have trap ranges mutilated by block splitting
                         if (methodNode.tryCatchBlocks.stream().anyMatch(tcbn ->
-                                methodNode.instructions.indexOf(tcbn.end) >= methodNode.instructions.indexOf(p2Start)
-                                        && methodNode.instructions.indexOf(tcbn.start) <= methodNode.instructions.indexOf(p2Start)))
+                                insns.indexOf(tcbn.end) >= insns.indexOf(p2Start)
+                                        && insns.indexOf(tcbn.start) <= insns.indexOf(p2Start)))
                             return;
 
                         ArrayList<AbstractInsnNode> insnNodes = new ArrayList<>();
@@ -71,23 +72,23 @@ public class BlockSplitter extends FlowObfuscation {
                         }
 
                         insnNodes.forEach(insn -> {
-                            methodNode.instructions.remove(insn);
+                            insns.remove(insn);
                             p1Block.add(insn);
                         });
 
                         p1Block.insert(p1);
                         p1Block.add(new JumpInsnNode(GOTO, p2));
 
-                        methodNode.instructions.insert(p2End, p1Block);
-                        methodNode.instructions.insertBefore(p2Start, new JumpInsnNode(GOTO, p1));
-                        methodNode.instructions.insertBefore(p2Start, p2);
+                        insns.insert(p2End, p1Block);
+                        insns.insertBefore(p2Start, new JumpInsnNode(GOTO, p1));
+                        insns.insertBefore(p2Start, p2);
 
                         counter.incrementAndGet();
 
                         // We might have messed up variable ranges when rearranging the block order.
                         if (methodNode.localVariables != null)
                             new ArrayList<>(methodNode.localVariables).stream().filter(lvn ->
-                                    methodNode.instructions.indexOf(lvn.end) < methodNode.instructions.indexOf(lvn.start)
+                                    insns.indexOf(lvn.end) < insns.indexOf(lvn.start)
                             ).forEach(methodNode.localVariables::remove);
                     }
                 }));

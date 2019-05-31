@@ -40,6 +40,7 @@ import me.itzsomebody.radon.asm.FieldWrapper;
 import me.itzsomebody.radon.asm.MemberRemapper;
 import me.itzsomebody.radon.asm.MethodWrapper;
 import me.itzsomebody.radon.config.ConfigurationSetting;
+import me.itzsomebody.radon.dictionaries.Dictionary;
 import me.itzsomebody.radon.exceptions.InvalidConfigurationValueException;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
@@ -77,6 +78,10 @@ public class Renamer extends Transformer {
         mappings = new HashMap<>();
         Map<String, String> packageMappings = new HashMap<>();
 
+        Dictionary classDictionary = radon.getConfig().getDictionary().copy();
+        Dictionary methodDictionary = classDictionary.copy();
+        Dictionary fieldDictionary = classDictionary.copy();
+
         Main.info("Generating mappings.");
         long current = System.currentTimeMillis();
 
@@ -85,14 +90,14 @@ public class Renamer extends Transformer {
                 HashSet<String> visited = new HashSet<>();
 
                 if (!cannotRenameMethod(radon.getTree(classWrapper.getOriginalName()), methodWrapper, visited))
-                    genMethodMappings(methodWrapper, methodWrapper.getOwner().getOriginalName(), uniqueRandomString());
+                    genMethodMappings(methodWrapper, methodWrapper.getOwner().getOriginalName(), methodDictionary.nextUniqueString());
             });
 
             classWrapper.getFields().forEach(fieldWrapper -> {
                 HashSet<String> visited = new HashSet<>();
 
                 if (!cannotRenameField(radon.getTree(classWrapper.getOriginalName()), fieldWrapper, visited))
-                    genFieldMappings(fieldWrapper, fieldWrapper.getOwner().getOriginalName(), uniqueRandomString());
+                    genFieldMappings(fieldWrapper, fieldWrapper.getOwner().getOriginalName(), fieldDictionary.nextUniqueString());
             });
 
             if (!excluded(classWrapper)) {
@@ -107,9 +112,9 @@ public class Renamer extends Transformer {
                     newName = getRepackageName();
 
                 if (!newName.isEmpty())
-                    newName += '/' + uniqueRandomString();
+                    newName += '/' + classDictionary.nextUniqueString();
                 else
-                    newName = uniqueRandomString();
+                    newName = classDictionary.nextUniqueString();
 
                 mappings.put(classWrapper.getOriginalName(), newName);
             }
@@ -121,7 +126,7 @@ public class Renamer extends Transformer {
 
         // Apply mappings
         Remapper simpleRemapper = new MemberRemapper(mappings);
-        new ArrayList<>(getClassWrappers()).forEach(classWrapper -> {
+        getClassWrappers().forEach(classWrapper -> {
             ClassNode classNode = classWrapper.getClassNode();
 
             ClassNode copy = new ClassNode();

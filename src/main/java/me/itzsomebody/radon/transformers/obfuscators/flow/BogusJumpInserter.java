@@ -19,6 +19,7 @@
 package me.itzsomebody.radon.transformers.obfuscators.flow;
 
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import me.itzsomebody.radon.Main;
 import me.itzsomebody.radon.asm.StackHeightZeroFinder;
@@ -30,6 +31,7 @@ import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.FieldNode;
+import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.LabelNode;
@@ -53,57 +55,59 @@ public class BogusJumpInserter extends FlowObfuscation {
         AtomicInteger counter = new AtomicInteger();
 
         getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper -> {
+            AtomicBoolean shouldAdd = new AtomicBoolean();
             FieldNode predicate = new FieldNode(PRED_ACCESS, uniqueRandomString(), "Z", null, null);
 
-            classWrapper.getMethods().stream().filter(methodWrapper -> !excluded(methodWrapper)
-                    && hasInstructions(methodWrapper.getMethodNode())).forEach(methodWrapper -> {
-                MethodNode methodNode = methodWrapper.getMethodNode();
+            classWrapper.getMethods().stream().filter(mw -> !excluded(mw) && mw.hasInstructions()).forEach(mw -> {
+                InsnList insns = mw.getInstructions();
 
-                int leeway = getSizeLeeway(methodNode);
-                int varIndex = methodNode.maxLocals;
-                methodNode.maxLocals++; // Prevents breaking of other transformers which rely on this field.
+                int leeway = mw.getLeewaySize();
+                int varIndex = mw.getMaxLocals();
+                mw.getMethodNode().maxLocals++; // Prevents breaking of other transformers which rely on this field.
 
-                AbstractInsnNode[] untouchedList = methodNode.instructions.toArray();
-                LabelNode labelNode = exitLabel(methodNode);
+                AbstractInsnNode[] untouchedList = insns.toArray();
+                LabelNode labelNode = exitLabel(mw.getMethodNode());
                 boolean calledSuper = false;
 
-                StackHeightZeroFinder stackHeightZeroFinder = new StackHeightZeroFinder(methodNode, methodNode.instructions.getLast());
+                StackHeightZeroFinder shzf = new StackHeightZeroFinder(mw.getMethodNode(), insns.getLast());
                 try {
-                    stackHeightZeroFinder.execute(false);
+                    shzf.execute(false);
                 } catch (StackEmulationException e) {
                     e.printStackTrace();
                     throw new RadonException(String.format("Error happened while trying to emulate the stack of %s.%s%s",
-                            classWrapper.getName(), methodNode.name, methodNode.desc));
+                            classWrapper.getName(), mw.getName(), mw.getDescription()));
                 }
 
-                Set<AbstractInsnNode> emptyAt = stackHeightZeroFinder.getEmptyAt();
+                Set<AbstractInsnNode> emptyAt = shzf.getEmptyAt();
                 for (AbstractInsnNode insn : untouchedList) {
                     if (leeway < 10000)
                         break;
 
                     // Bad way of detecting if this class was instantiated
-                    if ("<init>".equals(methodNode.name))
+                    if ("<init>".equals(mw.getName()))
                         calledSuper = (insn instanceof MethodInsnNode && insn.getOpcode() == INVOKESPECIAL
                                 && insn.getPrevious() instanceof VarInsnNode && ((VarInsnNode) insn.getPrevious()).var == 0);
-                    if (insn != methodNode.instructions.getFirst() && !(insn instanceof LineNumberNode)) {
-                        if ("<init>".equals(methodNode.name) && !calledSuper)
+                    if (insn != insns.getFirst() && !(insn instanceof LineNumberNode)) {
+                        if ("<init>".equals(mw.getName()) && !calledSuper)
                             continue;
                         if (emptyAt.contains(insn)) { // We need to make sure stack is empty before making jumps
-                            methodNode.instructions.insertBefore(insn, new VarInsnNode(ILOAD, varIndex));
-                            methodNode.instructions.insertBefore(insn, new JumpInsnNode(IFNE, labelNode));
+                            insns.insertBefore(insn, new VarInsnNode(ILOAD, varIndex));
+                            insns.insertBefore(insn, new JumpInsnNode(IFNE, labelNode));
                             leeway -= 4;
                             counter.incrementAndGet();
+                            shouldAdd.set(true);
                         }
                     }
                 }
 
-                methodNode.instructions.insertBefore(methodNode.instructions.getFirst(),
-                        new VarInsnNode(ISTORE, varIndex));
-                methodNode.instructions.insertBefore(methodNode.instructions.getFirst(),
-                        new FieldInsnNode(GETSTATIC, classWrapper.getName(), predicate.name, "Z"));
+                if (shouldAdd.get()) {
+                    insns.insert(new VarInsnNode(ISTORE, varIndex));
+                    insns.insert(new FieldInsnNode(GETSTATIC, classWrapper.getName(), predicate.name, "Z"));
+                }
             });
 
-            classWrapper.getClassNode().fields.add(predicate);
+            if (shouldAdd.get())
+                classWrapper.addField(predicate);
         });
 
         Main.info("Inserted " + counter.get() + " bogus jumps");
@@ -118,55 +122,56 @@ public class BogusJumpInserter extends FlowObfuscation {
     private static LabelNode exitLabel(MethodNode methodNode) {
         LabelNode lb = new LabelNode();
         LabelNode escapeNode = new LabelNode();
-        AbstractInsnNode target = methodNode.instructions.getFirst();
-        methodNode.instructions.insertBefore(target, new JumpInsnNode(GOTO, escapeNode));
-        methodNode.instructions.insertBefore(target, lb);
-        Type returnType = Type.getReturnType(methodNode.desc);
-        switch (returnType.getSort()) {
+
+        InsnList insns = methodNode.instructions;
+        AbstractInsnNode target = insns.getFirst();
+
+        insns.insertBefore(target, new JumpInsnNode(GOTO, escapeNode));
+        insns.insertBefore(target, lb);
+
+        switch (Type.getReturnType(methodNode.desc).getSort()) {
             case Type.VOID:
-                methodNode.instructions.insertBefore(target, new InsnNode(RETURN));
+                insns.insertBefore(target, new InsnNode(RETURN));
                 break;
             case Type.BOOLEAN:
-                methodNode.instructions.insertBefore(target, ASMUtils.getNumberInsn(RandomUtils.getRandomInt(2)));
-                methodNode.instructions.insertBefore(target, new InsnNode(IRETURN));
+                insns.insertBefore(target, ASMUtils.getNumberInsn(RandomUtils.getRandomInt(2)));
+                insns.insertBefore(target, new InsnNode(IRETURN));
                 break;
             case Type.CHAR:
-                methodNode.instructions.insertBefore(target, ASMUtils.getNumberInsn(RandomUtils
+                insns.insertBefore(target, ASMUtils.getNumberInsn(RandomUtils
                         .getRandomInt(Character.MAX_VALUE + 1)));
-                methodNode.instructions.insertBefore(target, new InsnNode(IRETURN));
+                insns.insertBefore(target, new InsnNode(IRETURN));
                 break;
             case Type.BYTE:
-                methodNode.instructions.insertBefore(target, ASMUtils.getNumberInsn(RandomUtils
-                        .getRandomInt(Byte.MAX_VALUE + 1)));
-                methodNode.instructions.insertBefore(target, new InsnNode(IRETURN));
+                insns.insertBefore(target, ASMUtils.getNumberInsn(RandomUtils.getRandomInt(Byte.MAX_VALUE + 1)));
+                insns.insertBefore(target, new InsnNode(IRETURN));
                 break;
             case Type.SHORT:
-                methodNode.instructions.insertBefore(target, ASMUtils.getNumberInsn(RandomUtils
-                        .getRandomInt(Short.MAX_VALUE + 1)));
-                methodNode.instructions.insertBefore(target, new InsnNode(IRETURN));
+                insns.insertBefore(target, ASMUtils.getNumberInsn(RandomUtils.getRandomInt(Short.MAX_VALUE + 1)));
+                insns.insertBefore(target, new InsnNode(IRETURN));
                 break;
             case Type.INT:
-                methodNode.instructions.insertBefore(target, ASMUtils.getNumberInsn(RandomUtils.getRandomInt()));
-                methodNode.instructions.insertBefore(target, new InsnNode(IRETURN));
+                insns.insertBefore(target, ASMUtils.getNumberInsn(RandomUtils.getRandomInt()));
+                insns.insertBefore(target, new InsnNode(IRETURN));
                 break;
             case Type.LONG:
-                methodNode.instructions.insertBefore(target, ASMUtils.getNumberInsn(RandomUtils.getRandomLong()));
-                methodNode.instructions.insertBefore(target, new InsnNode(LRETURN));
+                insns.insertBefore(target, ASMUtils.getNumberInsn(RandomUtils.getRandomLong()));
+                insns.insertBefore(target, new InsnNode(LRETURN));
                 break;
             case Type.FLOAT:
-                methodNode.instructions.insertBefore(target, ASMUtils.getNumberInsn(RandomUtils.getRandomFloat()));
-                methodNode.instructions.insertBefore(target, new InsnNode(FRETURN));
+                insns.insertBefore(target, ASMUtils.getNumberInsn(RandomUtils.getRandomFloat()));
+                insns.insertBefore(target, new InsnNode(FRETURN));
                 break;
             case Type.DOUBLE:
-                methodNode.instructions.insertBefore(target, ASMUtils.getNumberInsn(RandomUtils.getRandomDouble()));
-                methodNode.instructions.insertBefore(target, new InsnNode(DRETURN));
+                insns.insertBefore(target, ASMUtils.getNumberInsn(RandomUtils.getRandomDouble()));
+                insns.insertBefore(target, new InsnNode(DRETURN));
                 break;
             default:
-                methodNode.instructions.insertBefore(target, new InsnNode(ACONST_NULL));
-                methodNode.instructions.insertBefore(target, new InsnNode(ARETURN));
+                insns.insertBefore(target, new InsnNode(ACONST_NULL));
+                insns.insertBefore(target, new InsnNode(ARETURN));
                 break;
         }
-        methodNode.instructions.insertBefore(target, escapeNode);
+        insns.insertBefore(target, escapeNode);
 
         return lb;
     }

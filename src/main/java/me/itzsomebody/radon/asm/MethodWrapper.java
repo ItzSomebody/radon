@@ -21,6 +21,7 @@ package me.itzsomebody.radon.asm;
 import java.util.List;
 import me.itzsomebody.radon.asm.accesses.Access;
 import me.itzsomebody.radon.asm.accesses.MethodAccess;
+import org.objectweb.asm.commons.CodeSizeEvaluator;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TryCatchBlockNode;
@@ -31,6 +32,9 @@ import org.objectweb.asm.tree.TryCatchBlockNode;
  * @author ItzSomebody
  */
 public class MethodWrapper {
+    // https://docs.oracle.com/javase/specs/jvms/se10/html/jvms-4.html#jvms-4.7.3
+    private static final int MAX_CODE_SIZE = 65535;
+
     private MethodNode methodNode;
     private final String originalName;
     private final String originalDescription;
@@ -122,5 +126,19 @@ public class MethodWrapper {
 
     public void setMaxLocals(int maxLocals) {
         methodNode.maxLocals = maxLocals;
+    }
+
+    public boolean hasInstructions() {
+        return methodNode.instructions != null && methodNode.instructions.size() > 0;
+    }
+
+    public int getCodeSize() {
+        CodeSizeEvaluator cse = new CodeSizeEvaluator(null);
+        methodNode.accept(cse);
+        return cse.getMaxSize();
+    }
+
+    public int getLeewaySize() {
+        return MAX_CODE_SIZE - getCodeSize();
     }
 }

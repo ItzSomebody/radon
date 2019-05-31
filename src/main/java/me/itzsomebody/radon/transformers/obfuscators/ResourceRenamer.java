@@ -45,7 +45,7 @@ public class ResourceRenamer extends Transformer {
 
         getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper ->
                 classWrapper.getMethods().stream().filter(methodWrapper -> !excluded(methodWrapper)
-                        && hasInstructions(methodWrapper)).forEach(methodWrapper -> {
+                        && methodWrapper.hasInstructions()).forEach(methodWrapper -> {
                     MethodNode methodNode = methodWrapper.getMethodNode();
 
                     Stream.of(methodNode.instructions.toArray()).filter(insn -> insn instanceof LdcInsnNode
@@ -69,7 +69,7 @@ public class ResourceRenamer extends Transformer {
                     });
                 }));
 
-        new HashMap<>(getResources()).forEach((name, b) -> {
+        getResources().forEach((name, b) -> {
             if (mappings.containsKey(name)) {
                 getResources().remove(name);
                 getResources().put(mappings.get(name).substring(1), b);

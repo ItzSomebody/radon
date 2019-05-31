@@ -33,7 +33,6 @@ import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
 import me.itzsomebody.radon.utils.ASMUtils;
 import me.itzsomebody.radon.utils.RandomUtils;
-import me.itzsomebody.radon.utils.StringUtils;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
@@ -1182,7 +1181,7 @@ public class StringEncryption extends Transformer {
     }
 
     private class MemberNames {
-        private String className = StringUtils.randomClassName(getClasses().keySet());
+        private String className = Transformer.randomClassName(getClasses().keySet());
         private String cacheFieldName = uniqueRandomString();
         private String bigBoizFieldName = uniqueRandomString();
         private String decryptMethodName = uniqueRandomString();

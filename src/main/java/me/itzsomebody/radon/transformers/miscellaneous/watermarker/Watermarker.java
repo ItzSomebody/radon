@@ -72,7 +72,7 @@ public class Watermarker extends Transformer {
                 } while (classWrapper.getMethods().size() == 0);
 
                 MethodWrapper mw = classWrapper.getMethods().get(RandomUtils.getRandomInt(0, classWrapper.getClassNode().methods.size()));
-                if (hasInstructions(mw)) {
+                if (mw.hasInstructions()) {
                     mw.getInstructions().insert(createInstructions(watermark, mw.getMaxLocals()));
                     mw.setMaxLocals(mw.getMaxLocals());
                 }

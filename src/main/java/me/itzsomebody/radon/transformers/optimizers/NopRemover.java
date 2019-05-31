@@ -37,7 +37,7 @@ public class NopRemover extends Optimizer {
 
         getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper ->
                 classWrapper.getMethods().stream().filter(methodWrapper -> !excluded(methodWrapper)
-                        && hasInstructions(methodWrapper.getMethodNode())).forEach(methodWrapper -> {
+                        && methodWrapper.hasInstructions()).forEach(methodWrapper -> {
                     MethodNode methodNode = methodWrapper.getMethodNode();
 
                     Stream.of(methodNode.instructions.toArray()).filter(insn -> insn.getOpcode() == NOP)

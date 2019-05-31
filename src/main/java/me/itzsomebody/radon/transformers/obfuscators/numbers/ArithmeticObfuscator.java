@@ -38,7 +38,7 @@ public class ArithmeticObfuscator extends NumberObfuscation {
 
         getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper ->
                 classWrapper.getMethods().stream().filter(methodWrapper -> !excluded(methodWrapper)).forEach(methodWrapper -> {
-                    int leeway = getSizeLeeway(methodWrapper);
+                    int leeway = methodWrapper.getLeewaySize();
                     InsnList methodInstructions = methodWrapper.getInstructions();
 
                     for (AbstractInsnNode insn : methodInstructions.toArray()) {
@@ -52,6 +52,7 @@ public class ArithmeticObfuscator extends NumberObfuscation {
                             methodInstructions.remove(insn);
 
                             counter.incrementAndGet();
+                            leeway -= insns.size() * 2;
                         } else if (ASMUtils.isLongInsn(insn) && master.isLongTamperingEnabled()) {
                             InsnList insns = obfuscateNumber(ASMUtils.getLongFromInsn(insn));
 
@@ -59,6 +60,7 @@ public class ArithmeticObfuscator extends NumberObfuscation {
                             methodInstructions.remove(insn);
 
                             counter.incrementAndGet();
+                            leeway -= insns.size() * 2;
                         } else if (ASMUtils.isFloatInsn(insn) && master.isFloatTamperingEnabled()) {
                             InsnList insns = obfuscateNumber(ASMUtils.getFloatFromInsn(insn));
 
@@ -66,6 +68,7 @@ public class ArithmeticObfuscator extends NumberObfuscation {
                             methodInstructions.remove(insn);
 
                             counter.incrementAndGet();
+                            leeway -= insns.size() * 2;
                         } else if (ASMUtils.isDoubleInsn(insn) && master.isDoubleTamperingEnabled()) {
                             InsnList insns = obfuscateNumber(ASMUtils.getDoubleFromInsn(insn));
 
@@ -73,6 +76,7 @@ public class ArithmeticObfuscator extends NumberObfuscation {
                             methodInstructions.remove(insn);
 
                             counter.incrementAndGet();
+                            leeway -= insns.size() * 2;
                         }
                     }
                 }));

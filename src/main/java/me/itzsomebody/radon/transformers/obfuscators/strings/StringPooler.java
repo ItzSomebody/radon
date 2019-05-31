@@ -48,7 +48,7 @@ public class StringPooler extends StringEncryption {
             String fieldName = uniqueRandomString();
 
             cw.getMethods().stream().filter(methodWrapper -> !excluded(methodWrapper)
-                    && hasInstructions(methodWrapper.getMethodNode())).forEach(methodWrapper -> {
+                    && methodWrapper.hasInstructions()).forEach(methodWrapper -> {
                 InsnList insns = methodWrapper.getInstructions();
 
                 Stream.of(insns.toArray()).filter(insn -> insn instanceof LdcInsnNode

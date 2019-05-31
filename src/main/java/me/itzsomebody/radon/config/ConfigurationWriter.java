@@ -54,7 +54,7 @@ public class ConfigurationWriter {
         putIfNonNull(ConfigurationSetting.EXCLUSIONS.getName(), configuration.getExclusionManager().getExclusions());
         putIfNonNull(ConfigurationSetting.TRASH_CLASSES.getName(), configuration.getnTrashClasses());
         putIfNonNull(ConfigurationSetting.RANDOMIZED_STRING_LENGTH.getName(), configuration.getRandomizedStringLength());
-        putIfNonNull(ConfigurationSetting.DICTIONARY.getName(), configuration.getDictionaryType().getName());
+        putIfNonNull(ConfigurationSetting.DICTIONARY.getName(), configuration.getDictionary().getDictionaryName());
         putIfNonNull(ConfigurationSetting.COMPRESSION_LEVEL.getName(), configuration.getCompressionLevel());
         putIfNonNull(ConfigurationSetting.VERIFY.getName(), configuration.isVerify());
     }

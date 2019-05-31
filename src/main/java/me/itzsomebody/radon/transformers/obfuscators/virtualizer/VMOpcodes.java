@@ -60,5 +60,6 @@ public interface VMOpcodes {
     int VM_JNN = 56;
     int VM_NOP = 57;
     int VM_KILL = 58;
-    int VM_JNE = 58;
+    int VM_NEG = 59;
+    int VM_JNE = 60;
 }

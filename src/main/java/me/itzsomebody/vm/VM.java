@@ -90,6 +90,68 @@ import me.itzsomebody.vm.handlers.VirtGet;
 import me.itzsomebody.vm.handlers.VirtSet;
 import me.itzsomebody.vm.handlers.Xor;
 
+import static me.itzsomebody.radon.transformers.obfuscators.virtualizer.VMOpcodes.VM_ADD;
+import static me.itzsomebody.radon.transformers.obfuscators.virtualizer.VMOpcodes.VM_AND;
+import static me.itzsomebody.radon.transformers.obfuscators.virtualizer.VMOpcodes.VM_ARR_LENGTH;
+import static me.itzsomebody.radon.transformers.obfuscators.virtualizer.VMOpcodes.VM_ARR_LOAD;
+import static me.itzsomebody.radon.transformers.obfuscators.virtualizer.VMOpcodes.VM_ARR_STORE;
+import static me.itzsomebody.radon.transformers.obfuscators.virtualizer.VMOpcodes.VM_CHECKCAST;
+import static me.itzsomebody.radon.transformers.obfuscators.virtualizer.VMOpcodes.VM_DCMPG;
+import static me.itzsomebody.radon.transformers.obfuscators.virtualizer.VMOpcodes.VM_DCMPL;
+import static me.itzsomebody.radon.transformers.obfuscators.virtualizer.VMOpcodes.VM_DIV;
+import static me.itzsomebody.radon.transformers.obfuscators.virtualizer.VMOpcodes.VM_DOUBLE_PUSH;
+import static me.itzsomebody.radon.transformers.obfuscators.virtualizer.VMOpcodes.VM_DUP;
+import static me.itzsomebody.radon.transformers.obfuscators.virtualizer.VMOpcodes.VM_FCMPG;
+import static me.itzsomebody.radon.transformers.obfuscators.virtualizer.VMOpcodes.VM_FCMPL;
+import static me.itzsomebody.radon.transformers.obfuscators.virtualizer.VMOpcodes.VM_FLOAT_PUSH;
+import static me.itzsomebody.radon.transformers.obfuscators.virtualizer.VMOpcodes.VM_INC;
+import static me.itzsomebody.radon.transformers.obfuscators.virtualizer.VMOpcodes.VM_INSTANCE_OF;
+import static me.itzsomebody.radon.transformers.obfuscators.virtualizer.VMOpcodes.VM_INSTANTIATE;
+import static me.itzsomebody.radon.transformers.obfuscators.virtualizer.VMOpcodes.VM_INT_PUSH;
+import static me.itzsomebody.radon.transformers.obfuscators.virtualizer.VMOpcodes.VM_JEQ;
+import static me.itzsomebody.radon.transformers.obfuscators.virtualizer.VMOpcodes.VM_JGE;
+import static me.itzsomebody.radon.transformers.obfuscators.virtualizer.VMOpcodes.VM_JGT;
+import static me.itzsomebody.radon.transformers.obfuscators.virtualizer.VMOpcodes.VM_JLE;
+import static me.itzsomebody.radon.transformers.obfuscators.virtualizer.VMOpcodes.VM_JLT;
+import static me.itzsomebody.radon.transformers.obfuscators.virtualizer.VMOpcodes.VM_JMP;
+import static me.itzsomebody.radon.transformers.obfuscators.virtualizer.VMOpcodes.VM_JN;
+import static me.itzsomebody.radon.transformers.obfuscators.virtualizer.VMOpcodes.VM_JNE;
+import static me.itzsomebody.radon.transformers.obfuscators.virtualizer.VMOpcodes.VM_JNN;
+import static me.itzsomebody.radon.transformers.obfuscators.virtualizer.VMOpcodes.VM_JNZ;
+import static me.itzsomebody.radon.transformers.obfuscators.virtualizer.VMOpcodes.VM_JSR;
+import static me.itzsomebody.radon.transformers.obfuscators.virtualizer.VMOpcodes.VM_JZ;
+import static me.itzsomebody.radon.transformers.obfuscators.virtualizer.VMOpcodes.VM_KILL;
+import static me.itzsomebody.radon.transformers.obfuscators.virtualizer.VMOpcodes.VM_LCMP;
+import static me.itzsomebody.radon.transformers.obfuscators.virtualizer.VMOpcodes.VM_LOAD;
+import static me.itzsomebody.radon.transformers.obfuscators.virtualizer.VMOpcodes.VM_LONG_PUSH;
+import static me.itzsomebody.radon.transformers.obfuscators.virtualizer.VMOpcodes.VM_MOD;
+import static me.itzsomebody.radon.transformers.obfuscators.virtualizer.VMOpcodes.VM_MONITOR;
+import static me.itzsomebody.radon.transformers.obfuscators.virtualizer.VMOpcodes.VM_MUL;
+import static me.itzsomebody.radon.transformers.obfuscators.virtualizer.VMOpcodes.VM_NEG;
+import static me.itzsomebody.radon.transformers.obfuscators.virtualizer.VMOpcodes.VM_NEW_ARR;
+import static me.itzsomebody.radon.transformers.obfuscators.virtualizer.VMOpcodes.VM_NOP;
+import static me.itzsomebody.radon.transformers.obfuscators.virtualizer.VMOpcodes.VM_NULL_PUSH;
+import static me.itzsomebody.radon.transformers.obfuscators.virtualizer.VMOpcodes.VM_OBJ_PUSH;
+import static me.itzsomebody.radon.transformers.obfuscators.virtualizer.VMOpcodes.VM_OR;
+import static me.itzsomebody.radon.transformers.obfuscators.virtualizer.VMOpcodes.VM_POP;
+import static me.itzsomebody.radon.transformers.obfuscators.virtualizer.VMOpcodes.VM_POP2;
+import static me.itzsomebody.radon.transformers.obfuscators.virtualizer.VMOpcodes.VM_PRIM_CAST;
+import static me.itzsomebody.radon.transformers.obfuscators.virtualizer.VMOpcodes.VM_RET;
+import static me.itzsomebody.radon.transformers.obfuscators.virtualizer.VMOpcodes.VM_SHL;
+import static me.itzsomebody.radon.transformers.obfuscators.virtualizer.VMOpcodes.VM_SHR;
+import static me.itzsomebody.radon.transformers.obfuscators.virtualizer.VMOpcodes.VM_STATIC_CALL;
+import static me.itzsomebody.radon.transformers.obfuscators.virtualizer.VMOpcodes.VM_STATIC_GET;
+import static me.itzsomebody.radon.transformers.obfuscators.virtualizer.VMOpcodes.VM_STATIC_SET;
+import static me.itzsomebody.radon.transformers.obfuscators.virtualizer.VMOpcodes.VM_STORE;
+import static me.itzsomebody.radon.transformers.obfuscators.virtualizer.VMOpcodes.VM_SUB;
+import static me.itzsomebody.radon.transformers.obfuscators.virtualizer.VMOpcodes.VM_SWAP;
+import static me.itzsomebody.radon.transformers.obfuscators.virtualizer.VMOpcodes.VM_THROW;
+import static me.itzsomebody.radon.transformers.obfuscators.virtualizer.VMOpcodes.VM_USHR;
+import static me.itzsomebody.radon.transformers.obfuscators.virtualizer.VMOpcodes.VM_VIRT_CALL;
+import static me.itzsomebody.radon.transformers.obfuscators.virtualizer.VMOpcodes.VM_VIRT_GET;
+import static me.itzsomebody.radon.transformers.obfuscators.virtualizer.VMOpcodes.VM_VIRT_SET;
+import static me.itzsomebody.radon.transformers.obfuscators.virtualizer.VMOpcodes.VM_XOR;
+
 public class VM {
     private static final Map<String, Method> METHOD_CACHE;
     private static final Map<String, Field> FIELD_CACHE;
@@ -114,70 +176,70 @@ public class VM {
         }
 
         HANDLERS = new Handler[61];
-        HANDLERS[0] = new NullPush();
-        HANDLERS[1] = new IntPush();
-        HANDLERS[2] = new LongPush();
-        HANDLERS[3] = new FloatPush();
-        HANDLERS[4] = new DoublePush();
-        HANDLERS[5] = new ObjPush();
-        HANDLERS[6] = new Add();
-        HANDLERS[7] = new Sub();
-        HANDLERS[8] = new Mul();
-        HANDLERS[9] = new Div();
-        HANDLERS[10] = new Mod();
-        HANDLERS[11] = new And();
-        HANDLERS[12] = new Or();
-        HANDLERS[13] = new Xor();
-        HANDLERS[14] = new Shl();
-        HANDLERS[15] = new Shr();
-        HANDLERS[16] = new Ushr();
-        HANDLERS[17] = new Load();
-        HANDLERS[18] = new Store();
-        HANDLERS[19] = new ArrLoad();
-        HANDLERS[20] = new ArrStore();
-        HANDLERS[21] = new Pop();
-        HANDLERS[22] = new Pop2();
-        HANDLERS[23] = new Dup();
-        HANDLERS[24] = new Swap();
-        HANDLERS[25] = new Inc();
-        HANDLERS[26] = new PrimCast();
-        HANDLERS[27] = new Lcmp();
-        HANDLERS[28] = new Fcmpl();
-        HANDLERS[29] = new Fcmpg();
-        HANDLERS[30] = new Dcmpl();
-        HANDLERS[31] = new Dcmpg();
-        HANDLERS[32] = new Jz();
-        HANDLERS[33] = new Jnz();
-        HANDLERS[34] = new Jlt();
-        HANDLERS[35] = new Jle();
-        HANDLERS[36] = new Jgt();
-        HANDLERS[37] = new Jge();
-        HANDLERS[38] = new Jeq();
-        HANDLERS[39] = new Jmp();
-        HANDLERS[40] = new Jsr();
-        HANDLERS[41] = new Ret();
-        HANDLERS[42] = new VirtGet();
-        HANDLERS[43] = new StaticGet();
-        HANDLERS[44] = new VirtSet();
-        HANDLERS[45] = new StaticSet();
-        HANDLERS[46] = new VirtCall();
-        HANDLERS[47] = new StaticCall();
-        HANDLERS[48] = new Instantiate();
-        HANDLERS[49] = new NewArr();
-        HANDLERS[50] = new ArrLength();
-        HANDLERS[51] = new Throw();
-        HANDLERS[52] = new Checkcast();
-        HANDLERS[53] = new Instanceof();
-        HANDLERS[54] = new Monitor();
-        HANDLERS[55] = new Jn();
-        HANDLERS[56] = new Jnn();
-        HANDLERS[57] = new Nop();
-        HANDLERS[58] = new Kill();
-        HANDLERS[59] = new Neg();
-        HANDLERS[60] = new Jne();
+        HANDLERS[VM_NULL_PUSH] = new NullPush();
+        HANDLERS[VM_INT_PUSH] = new IntPush();
+        HANDLERS[VM_LONG_PUSH] = new LongPush();
+        HANDLERS[VM_FLOAT_PUSH] = new FloatPush();
+        HANDLERS[VM_DOUBLE_PUSH] = new DoublePush();
+        HANDLERS[VM_OBJ_PUSH] = new ObjPush();
+        HANDLERS[VM_ADD] = new Add();
+        HANDLERS[VM_SUB] = new Sub();
+        HANDLERS[VM_MUL] = new Mul();
+        HANDLERS[VM_DIV] = new Div();
+        HANDLERS[VM_MOD] = new Mod();
+        HANDLERS[VM_AND] = new And();
+        HANDLERS[VM_OR] = new Or();
+        HANDLERS[VM_XOR] = new Xor();
+        HANDLERS[VM_SHL] = new Shl();
+        HANDLERS[VM_SHR] = new Shr();
+        HANDLERS[VM_USHR] = new Ushr();
+        HANDLERS[VM_LOAD] = new Load();
+        HANDLERS[VM_STORE] = new Store();
+        HANDLERS[VM_ARR_LOAD] = new ArrLoad();
+        HANDLERS[VM_ARR_STORE] = new ArrStore();
+        HANDLERS[VM_POP] = new Pop();
+        HANDLERS[VM_POP2] = new Pop2();
+        HANDLERS[VM_DUP] = new Dup();
+        HANDLERS[VM_SWAP] = new Swap();
+        HANDLERS[VM_INC] = new Inc();
+        HANDLERS[VM_PRIM_CAST] = new PrimCast();
+        HANDLERS[VM_LCMP] = new Lcmp();
+        HANDLERS[VM_FCMPL] = new Fcmpl();
+        HANDLERS[VM_FCMPG] = new Fcmpg();
+        HANDLERS[VM_DCMPL] = new Dcmpl();
+        HANDLERS[VM_DCMPG] = new Dcmpg();
+        HANDLERS[VM_JZ] = new Jz();
+        HANDLERS[VM_JNZ] = new Jnz();
+        HANDLERS[VM_JLT] = new Jlt();
+        HANDLERS[VM_JLE] = new Jle();
+        HANDLERS[VM_JGT] = new Jgt();
+        HANDLERS[VM_JGE] = new Jge();
+        HANDLERS[VM_JEQ] = new Jeq();
+        HANDLERS[VM_JMP] = new Jmp();
+        HANDLERS[VM_JSR] = new Jsr();
+        HANDLERS[VM_RET] = new Ret();
+        HANDLERS[VM_VIRT_GET] = new VirtGet();
+        HANDLERS[VM_STATIC_GET] = new StaticGet();
+        HANDLERS[VM_VIRT_SET] = new VirtSet();
+        HANDLERS[VM_STATIC_SET] = new StaticSet();
+        HANDLERS[VM_VIRT_CALL] = new VirtCall();
+        HANDLERS[VM_STATIC_CALL] = new StaticCall();
+        HANDLERS[VM_INSTANTIATE] = new Instantiate();
+        HANDLERS[VM_NEW_ARR] = new NewArr();
+        HANDLERS[VM_ARR_LENGTH] = new ArrLength();
+        HANDLERS[VM_THROW] = new Throw();
+        HANDLERS[VM_CHECKCAST] = new Checkcast();
+        HANDLERS[VM_INSTANCE_OF] = new Instanceof();
+        HANDLERS[VM_MONITOR] = new Monitor();
+        HANDLERS[VM_JN] = new Jn();
+        HANDLERS[VM_JNN] = new Jnn();
+        HANDLERS[VM_NOP] = new Nop();
+        HANDLERS[VM_KILL] = new Kill();
+        HANDLERS[VM_NEG] = new Neg();
+        HANDLERS[VM_JNE] = new Jne();
     }
 
-    public VM(VMContext context) throws Exception {
+    public VM(VMContext context) {
         this.stack = context.getStack();
         this.registers = context.getRegisters();
         this.instructions = STUB.instructions[context.getOffset()];
@@ -218,11 +280,6 @@ public class VM {
         while (executing) {
             try {
                 Instruction instruction = instructions[pc];
-                /*System.out.println("pc = " + pc);
-                System.out.println("opcode = " + instruction.getOpcode());
-                System.out.println("operands = " + Arrays.toString(instruction.getOperands()));
-                System.out.println("registers = " + Arrays.toString(registers));
-                System.out.println("stack = " + Arrays.toString(stack.stack));*/
 
                 Handler handler = HANDLERS[instruction.getOpcode()];
                 handler.handle(this, instruction.getOperands());
@@ -261,9 +318,8 @@ public class VM {
     private static String parametersToString(Class[] params) {
         StringBuilder sb = new StringBuilder();
 
-        for (int i = 0; i < params.length; i++) {
+        for (int i = 0; i < params.length; i++)
             sb.append(params[i].getName()).append(' ');
-        }
 
         return sb.toString().trim();
     }

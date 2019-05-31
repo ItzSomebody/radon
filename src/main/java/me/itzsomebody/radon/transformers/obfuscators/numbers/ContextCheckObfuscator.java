@@ -21,9 +21,9 @@ package me.itzsomebody.radon.transformers.obfuscators.numbers;
 import java.util.concurrent.atomic.AtomicInteger;
 import me.itzsomebody.radon.Main;
 import me.itzsomebody.radon.asm.ClassWrapper;
+import me.itzsomebody.radon.transformers.Transformer;
 import me.itzsomebody.radon.utils.ASMUtils;
 import me.itzsomebody.radon.utils.RandomUtils;
-import me.itzsomebody.radon.utils.StringUtils;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.Label;
 import org.objectweb.asm.MethodVisitor;
@@ -48,8 +48,8 @@ public class ContextCheckObfuscator extends NumberObfuscation {
 
         getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper ->
                 classWrapper.getMethods().stream().filter(methodWrapper -> !excluded(methodWrapper)
-                        && hasInstructions(methodWrapper)).forEach(methodWrapper -> {
-                    int leeway = getSizeLeeway(methodWrapper);
+                        && methodWrapper.hasInstructions()).forEach(methodWrapper -> {
+                    int leeway = methodWrapper.getLeewaySize();
                     InsnList methodInstructions = methodWrapper.getInstructions();
 
                     for (AbstractInsnNode insn : methodInstructions.toArray()) {
@@ -595,7 +595,7 @@ public class ContextCheckObfuscator extends NumberObfuscation {
         private String decodeConstantMethodName;
 
         private MemberNames() {
-            this.className = StringUtils.randomClassName(getClasses().keySet());
+            this.className = Transformer.randomClassName(getClasses().keySet());
             this.constantFieldName = uniqueRandomString();
             this.indicatorFieldName = uniqueRandomString();
             this.elementFieldName = uniqueRandomString();

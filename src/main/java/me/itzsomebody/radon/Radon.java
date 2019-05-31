@@ -28,9 +28,11 @@ import java.util.Deque;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
@@ -40,6 +42,7 @@ import me.itzsomebody.radon.asm.ClassTree;
 import me.itzsomebody.radon.asm.ClassWrapper;
 import me.itzsomebody.radon.exceptions.MissingClassException;
 import me.itzsomebody.radon.exceptions.RadonException;
+import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
 import me.itzsomebody.radon.transformers.miscellaneous.TrashClasses;
 import me.itzsomebody.radon.utils.FileUtils;
@@ -58,9 +61,9 @@ import org.objectweb.asm.tree.MethodNode;
 public class Radon {
     private ObfuscationConfiguration config;
     private Map<String, ClassTree> hierarchy = new HashMap<>();
-    public Map<String, ClassWrapper> classes = new HashMap<>();
+    public Map<String, ClassWrapper> classes = new ConcurrentHashMap<>();
     public Map<String, ClassWrapper> classPath = new HashMap<>();
-    public Map<String, byte[]> resources = new HashMap<>();
+    public Map<String, byte[]> resources = new ConcurrentHashMap<>();
 
     public Radon(ObfuscationConfiguration config) {
         this.config = config;
@@ -74,15 +77,28 @@ public class Radon {
         loadInput();
         buildInheritance();
 
+        List<Transformer> transformers = getConfig().getTransformers();
+
         if (getConfig().getnTrashClasses() > 0)
-            getConfig().getTransformers().add(0, new TrashClasses());
-        if (getConfig().getTransformers().isEmpty())
+            transformers.add(new TrashClasses());
+        if (transformers.isEmpty())
             throw new RadonException("No transformers are enabled.");
 
-        Transformer.sort(getConfig().getTransformers());
+        transformers.sort((t1, t2) -> {
+            ExclusionType type1 = t1.getExclusionType();
+            ExclusionType type2 = t2.getExclusionType();
+
+            // In the event I forget to add an exclusion type
+            if (type1 == null)
+                throw new RadonException(t1.getName() + " has a null exclusion type");
+            if (type2 == null)
+                throw new RadonException(t2.getName() + " has a null exclusion type");
+
+            return Integer.compare(type1.ordinal(), type2.ordinal());
+        });
 
         Main.info("------------------------------------------------");
-        getConfig().getTransformers().stream().filter(Objects::nonNull).forEach(transformer -> {
+        transformers.stream().filter(Objects::nonNull).forEach(transformer -> {
             long current = System.currentTimeMillis();
             Main.info(String.format("Running %s transformer.", transformer.getName()));
             transformer.init(this);
