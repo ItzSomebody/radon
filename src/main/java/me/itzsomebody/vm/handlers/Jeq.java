@@ -25,7 +25,7 @@ public class Jeq extends Handler {
     public void handle(VM vm, Object[] operands) {
         int jumpTo = vm.pop().asInt();
 
-        if (vm.pop() == vm.pop())
+        if (vm.pop().asObj() == vm.pop().asObj())
             vm.setPc(jumpTo);
     }
 }

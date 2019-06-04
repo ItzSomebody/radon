@@ -25,7 +25,7 @@ public class Jn extends Handler {
     public void handle(VM vm, Object[] operands) {
         int jumpTo = vm.pop().asInt();
 
-        if (vm.pop() == null)
+        if (vm.pop().asObj() == null)
             vm.setPc(jumpTo);
     }
 }
