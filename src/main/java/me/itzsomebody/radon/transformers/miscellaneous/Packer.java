@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.jar.Manifest;
+import java.util.zip.GZIPOutputStream;
 import me.itzsomebody.radon.Main;
 import me.itzsomebody.radon.asm.ClassWrapper;
 import me.itzsomebody.radon.config.ConfigurationSetting;
@@ -55,19 +56,31 @@ public class Packer extends Transformer {
 
         try {
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
-            DataOutputStream out = new DataOutputStream(bos);
-            out.writeShort(getClassWrappers().size() + getResources().size() - 1);
+            GZIPOutputStream gos = new GZIPOutputStream(bos);
+            DataOutputStream out = new DataOutputStream(gos);
+            out.writeInt(getClassWrappers().size() + getResources().size() - 1);
 
             ArrayList<String> toRemove = new ArrayList<>();
 
+            /*
+             * Spec:
+             *
+             * struct Stub {
+             *     u4 nEntries;
+             *     entries[nEntries];
+             * };
+             *
+             * struct StubEntry {
+             *     name;
+             *     u4 nBytes;
+             *     bytes[nBytes];
+             * };
+             */
             getClasses().forEach((name, wrapper) -> {
                 try {
                     byte[] bytes = wrapper.toByteArray(radon);
 
-                    out.writeShort(name.length() + ".class".length());
-                    for (char c : (name + ".class").toCharArray())
-                        out.writeChar(c);
-
+                    out.writeUTF(name + ".class");
                     out.writeInt(bytes.length);
                     for (byte b : bytes)
                         out.writeByte(b);
@@ -95,10 +108,7 @@ public class Packer extends Transformer {
                         return;
                     }
 
-                    out.writeShort(name.length());
-                    for (char c : name.toCharArray())
-                        out.writeChar(c);
-
+                    out.writeUTF(name);
                     out.writeInt(bytes.length);
                     for (byte b : bytes)
                         out.writeByte(b);
@@ -117,6 +127,8 @@ public class Packer extends Transformer {
                 getClasses().remove(s);
                 getResources().remove(s);
             });
+
+            gos.close();
 
             getResources().put(memberNames.stubName.substring(1), bos.toByteArray());
             ClassNode loader = createPackerEntryPoint(memberNames);
@@ -162,165 +174,102 @@ public class Packer extends Transformer {
         FieldVisitor fv;
         MethodVisitor mv;
 
-        cw.visit(V1_5, ACC_PUBLIC + ACC_SUPER, memberNames.className, null, "java/lang/ClassLoader", null);
+        cw.visit(V1_5, ACC_PUBLIC | ACC_SUPER, memberNames.className, null, "java/lang/ClassLoader", null);
 
         {
-            fv = cw.visitField(ACC_PRIVATE + ACC_FINAL + ACC_STATIC, memberNames.resourcesFieldName, "Ljava/util/Map;", "Ljava/util/Map<Ljava/lang/String;[B>;", null);
+            fv = cw.visitField(ACC_PRIVATE | ACC_FINAL | ACC_STATIC, memberNames.resourcesFieldName, "Ljava/util/Map;", "Ljava/util/Map<Ljava/lang/String;[B>;", null);
             fv.visitEnd();
         }
         {
-            fv = cw.visitField(ACC_PRIVATE + ACC_STATIC, memberNames.stubBytesFieldName, "[B", null, null);
-            fv.visitEnd();
-        }
-        {
-            mv = cw.visitMethod(ACC_PUBLIC, "<init>", "()V", null, null);
+            mv = cw.visitMethod(ACC_PRIVATE, "<init>", "()V", null, new String[]{"java/io/IOException"});
             mv.visitCode();
             Label l0 = new Label();
-            Label l1 = new Label();
-            Label l2 = new Label();
-            mv.visitTryCatchBlock(l0, l1, l2, "java/lang/Exception");
-            Label l3 = new Label();
-            mv.visitLabel(l3);
+            mv.visitLabel(l0);
             mv.visitVarInsn(ALOAD, 0);
             mv.visitMethodInsn(INVOKESPECIAL, "java/lang/ClassLoader", "<init>", "()V", false);
-            mv.visitLabel(l0);
+            Label l1 = new Label();
+            mv.visitLabel(l1);
+            mv.visitTypeInsn(NEW, "java/util/zip/GZIPInputStream");
+            mv.visitInsn(DUP);
             mv.visitLdcInsn(Type.getType("L" + memberNames.className + ";"));
             mv.visitLdcInsn(memberNames.stubName);
             mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Class", "getResourceAsStream", "(Ljava/lang/String;)Ljava/io/InputStream;", false);
-            mv.visitMethodInsn(INVOKESTATIC, memberNames.className, memberNames.toByteArrayMethodName, "(Ljava/io/InputStream;)[B", false);
-            mv.visitFieldInsn(PUTSTATIC, memberNames.className, memberNames.stubBytesFieldName, "[B");
+            mv.visitMethodInsn(INVOKESPECIAL, "java/util/zip/GZIPInputStream", "<init>", "(Ljava/io/InputStream;)V", false);
+            mv.visitVarInsn(ASTORE, 1);
+            Label l2 = new Label();
+            mv.visitLabel(l2);
+            mv.visitTypeInsn(NEW, "java/io/DataInputStream");
+            mv.visitInsn(DUP);
+            mv.visitVarInsn(ALOAD, 1);
+            mv.visitMethodInsn(INVOKESPECIAL, "java/io/DataInputStream", "<init>", "(Ljava/io/InputStream;)V", false);
+            mv.visitVarInsn(ASTORE, 2);
+            Label l3 = new Label();
+            mv.visitLabel(l3);
+            mv.visitVarInsn(ALOAD, 2);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/io/DataInputStream", "readInt", "()I", false);
+            mv.visitVarInsn(ISTORE, 3);
             Label l4 = new Label();
             mv.visitLabel(l4);
             mv.visitInsn(ICONST_0);
-            mv.visitVarInsn(ISTORE, 1);
+            mv.visitVarInsn(ISTORE, 4);
             Label l5 = new Label();
             mv.visitLabel(l5);
-            mv.visitVarInsn(ALOAD, 0);
-            mv.visitVarInsn(ILOAD, 1);
-            mv.visitMethodInsn(INVOKESPECIAL, memberNames.className, memberNames.readShortMethodName, "(I)I", false);
-            mv.visitVarInsn(ISTORE, 2);
+            mv.visitVarInsn(ILOAD, 4);
+            mv.visitVarInsn(ILOAD, 3);
             Label l6 = new Label();
-            mv.visitLabel(l6);
-            mv.visitIincInsn(1, 2);
+            mv.visitJumpInsn(IF_ICMPGE, l6);
             Label l7 = new Label();
             mv.visitLabel(l7);
-            mv.visitInsn(ICONST_0);
-            mv.visitVarInsn(ISTORE, 3);
+            mv.visitVarInsn(ALOAD, 2);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/io/DataInputStream", "readUTF", "()Ljava/lang/String;", false);
+            mv.visitVarInsn(ASTORE, 5);
             Label l8 = new Label();
             mv.visitLabel(l8);
-            mv.visitVarInsn(ILOAD, 3);
-            mv.visitVarInsn(ILOAD, 2);
-            mv.visitJumpInsn(IF_ICMPGE, l1);
+            mv.visitVarInsn(ALOAD, 2);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/io/DataInputStream", "readInt", "()I", false);
+            mv.visitIntInsn(NEWARRAY, T_BYTE);
+            mv.visitVarInsn(ASTORE, 6);
             Label l9 = new Label();
             mv.visitLabel(l9);
-            mv.visitVarInsn(ALOAD, 0);
-            mv.visitVarInsn(ILOAD, 1);
-            mv.visitMethodInsn(INVOKESPECIAL, memberNames.className, memberNames.readShortMethodName, "(I)I", false);
-            mv.visitVarInsn(ISTORE, 4);
+            mv.visitInsn(ICONST_0);
+            mv.visitVarInsn(ISTORE, 7);
             Label l10 = new Label();
             mv.visitLabel(l10);
-            mv.visitIincInsn(1, 2);
+            mv.visitVarInsn(ILOAD, 7);
+            mv.visitVarInsn(ALOAD, 6);
+            mv.visitInsn(ARRAYLENGTH);
             Label l11 = new Label();
-            mv.visitLabel(l11);
-            mv.visitVarInsn(ILOAD, 4);
-            mv.visitIntInsn(NEWARRAY, T_CHAR);
-            mv.visitVarInsn(ASTORE, 5);
+            mv.visitJumpInsn(IF_ICMPGE, l11);
             Label l12 = new Label();
             mv.visitLabel(l12);
-            mv.visitInsn(ICONST_0);
-            mv.visitVarInsn(ISTORE, 6);
+            mv.visitVarInsn(ALOAD, 6);
+            mv.visitVarInsn(ILOAD, 7);
+            mv.visitVarInsn(ALOAD, 2);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/io/DataInputStream", "readByte", "()B", false);
+            mv.visitInsn(BASTORE);
             Label l13 = new Label();
             mv.visitLabel(l13);
-            mv.visitVarInsn(ILOAD, 6);
-            mv.visitVarInsn(ILOAD, 4);
-            Label l14 = new Label();
-            mv.visitJumpInsn(IF_ICMPGE, l14);
-            Label l15 = new Label();
-            mv.visitLabel(l15);
-            mv.visitVarInsn(ALOAD, 5);
-            mv.visitVarInsn(ILOAD, 6);
-            mv.visitVarInsn(ALOAD, 0);
-            mv.visitVarInsn(ILOAD, 1);
-            mv.visitMethodInsn(INVOKESPECIAL, memberNames.className, memberNames.readCharMethodName, "(I)C", false);
-            mv.visitInsn(CASTORE);
-            Label l16 = new Label();
-            mv.visitLabel(l16);
-            mv.visitIincInsn(1, 2);
-            Label l17 = new Label();
-            mv.visitLabel(l17);
-            mv.visitIincInsn(6, 1);
-            mv.visitJumpInsn(GOTO, l13);
-            mv.visitLabel(l14);
-            mv.visitTypeInsn(NEW, "java/lang/String");
-            mv.visitInsn(DUP);
-            mv.visitVarInsn(ALOAD, 5);
-            mv.visitMethodInsn(INVOKESPECIAL, "java/lang/String", "<init>", "([C)V", false);
-            mv.visitVarInsn(ASTORE, 6);
-            Label l18 = new Label();
-            mv.visitLabel(l18);
-            mv.visitVarInsn(ALOAD, 0);
-            mv.visitVarInsn(ILOAD, 1);
-            mv.visitMethodInsn(INVOKESPECIAL, memberNames.className, memberNames.readIntMethodName, "(I)I", false);
-            mv.visitVarInsn(ISTORE, 7);
-            Label l19 = new Label();
-            mv.visitLabel(l19);
-            mv.visitVarInsn(ILOAD, 7);
-            mv.visitIntInsn(NEWARRAY, T_BYTE);
-            mv.visitVarInsn(ASTORE, 8);
-            Label l20 = new Label();
-            mv.visitLabel(l20);
-            mv.visitIincInsn(1, 4);
-            Label l21 = new Label();
-            mv.visitLabel(l21);
-            mv.visitInsn(ICONST_0);
-            mv.visitVarInsn(ISTORE, 9);
-            Label l22 = new Label();
-            mv.visitLabel(l22);
-            mv.visitVarInsn(ILOAD, 9);
-            mv.visitVarInsn(ILOAD, 7);
-            Label l23 = new Label();
-            mv.visitJumpInsn(IF_ICMPGE, l23);
-            Label l24 = new Label();
-            mv.visitLabel(l24);
-            mv.visitVarInsn(ALOAD, 8);
-            mv.visitVarInsn(ILOAD, 9);
-            mv.visitVarInsn(ALOAD, 0);
-            mv.visitVarInsn(ILOAD, 1);
-            mv.visitIincInsn(1, 1);
-            mv.visitMethodInsn(INVOKESPECIAL, memberNames.className, memberNames.readByteMethodName, "(I)B", false);
-            mv.visitInsn(BASTORE);
-            Label l25 = new Label();
-            mv.visitLabel(l25);
-            mv.visitIincInsn(9, 1);
-            mv.visitJumpInsn(GOTO, l22);
-            mv.visitLabel(l23);
+            mv.visitIincInsn(7, 1);
+            mv.visitJumpInsn(GOTO, l10);
+            mv.visitLabel(l11);
             mv.visitFieldInsn(GETSTATIC, memberNames.className, memberNames.resourcesFieldName, "Ljava/util/Map;");
+            mv.visitVarInsn(ALOAD, 5);
             mv.visitVarInsn(ALOAD, 6);
-            mv.visitVarInsn(ALOAD, 8);
             mv.visitMethodInsn(INVOKEINTERFACE, "java/util/Map", "put", "(Ljava/lang/Object;Ljava/lang/Object;)Ljava/lang/Object;", true);
             mv.visitInsn(POP);
-            Label l26 = new Label();
-            mv.visitLabel(l26);
-            mv.visitIincInsn(3, 1);
-            mv.visitJumpInsn(GOTO, l8);
-            mv.visitLabel(l1);
-            Label l27 = new Label();
-            mv.visitJumpInsn(GOTO, l27);
-            mv.visitLabel(l2);
-            mv.visitVarInsn(ASTORE, 1);
-            Label l28 = new Label();
-            mv.visitLabel(l28);
-            mv.visitVarInsn(ALOAD, 1);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Exception", "printStackTrace", "()V", false);
-            mv.visitLabel(l27);
+            Label l14 = new Label();
+            mv.visitLabel(l14);
+            mv.visitIincInsn(4, 1);
+            mv.visitJumpInsn(GOTO, l5);
+            mv.visitLabel(l6);
             mv.visitInsn(RETURN);
-            Label l29 = new Label();
-            mv.visitLabel(l29);
-            mv.visitMaxs(4, 10);
+            Label l15 = new Label();
+            mv.visitLabel(l15);
+            mv.visitMaxs(4, 8);
             mv.visitEnd();
         }
         {
-            mv = cw.visitMethod(ACC_PROTECTED, "findClass", "(Ljava/lang/String;)Ljava/lang/Class;", "(Ljava/lang/String;)Ljava/lang/Class<*>;", new String[]{"java/lang/ClassNotFoundException"});
+            mv = cw.visitMethod(ACC_PROTECTED, "findClass", "(Ljava/lang/String;)Ljava/lang/Class;", null, new String[]{"java/lang/ClassNotFoundException"});
             mv.visitCode();
             Label l0 = new Label();
             mv.visitLabel(l0);
@@ -369,236 +318,35 @@ public class Packer extends Transformer {
             mv.visitCode();
             Label l0 = new Label();
             mv.visitLabel(l0);
-            mv.visitVarInsn(ALOAD, 1);
-            mv.visitLdcInsn("/");
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "startsWith", "(Ljava/lang/String;)Z", false);
-            Label l1 = new Label();
-            mv.visitJumpInsn(IFEQ, l1);
-            Label l2 = new Label();
-            mv.visitLabel(l2);
-            mv.visitVarInsn(ALOAD, 1);
-            mv.visitInsn(ICONST_1);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "substring", "(I)Ljava/lang/String;", false);
-            mv.visitVarInsn(ASTORE, 1);
-            Label l3 = new Label();
-            mv.visitJumpInsn(GOTO, l3);
-            mv.visitLabel(l1);
-            mv.visitLdcInsn(Type.getType("L" + memberNames.className + ";"));
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Class", "getName", "()Ljava/lang/String;", false);
-            mv.visitIntInsn(BIPUSH, 46);
-            mv.visitIntInsn(BIPUSH, 47);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "replace", "(CC)Ljava/lang/String;", false);
-            mv.visitVarInsn(ASTORE, 2);
-            Label l4 = new Label();
-            mv.visitLabel(l4);
-            mv.visitTypeInsn(NEW, "java/lang/StringBuilder");
-            mv.visitInsn(DUP);
-            mv.visitMethodInsn(INVOKESPECIAL, "java/lang/StringBuilder", "<init>", "()V", false);
-            mv.visitVarInsn(ALOAD, 2);
-            mv.visitInsn(ICONST_0);
-            mv.visitVarInsn(ALOAD, 2);
-            mv.visitIntInsn(BIPUSH, 47);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "lastIndexOf", "(I)I", false);
-            mv.visitInsn(ICONST_1);
-            mv.visitInsn(IADD);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "substring", "(II)Ljava/lang/String;", false);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/String;)Ljava/lang/StringBuilder;", false);
-            mv.visitVarInsn(ALOAD, 1);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "append", "(Ljava/lang/String;)Ljava/lang/StringBuilder;", false);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/StringBuilder", "toString", "()Ljava/lang/String;", false);
-            mv.visitVarInsn(ASTORE, 1);
-            mv.visitLabel(l3);
             mv.visitFieldInsn(GETSTATIC, memberNames.className, memberNames.resourcesFieldName, "Ljava/util/Map;");
             mv.visitVarInsn(ALOAD, 1);
             mv.visitMethodInsn(INVOKEINTERFACE, "java/util/Map", "get", "(Ljava/lang/Object;)Ljava/lang/Object;", true);
             mv.visitTypeInsn(CHECKCAST, "[B");
             mv.visitInsn(DUP);
             mv.visitVarInsn(ASTORE, 2);
-            Label l5 = new Label();
-            mv.visitLabel(l5);
-            Label l6 = new Label();
-            mv.visitJumpInsn(IFNULL, l6);
-            Label l7 = new Label();
-            mv.visitLabel(l7);
+            Label l1 = new Label();
+            mv.visitLabel(l1);
+            Label l2 = new Label();
+            mv.visitJumpInsn(IFNULL, l2);
+            Label l3 = new Label();
+            mv.visitLabel(l3);
             mv.visitTypeInsn(NEW, "java/io/ByteArrayInputStream");
             mv.visitInsn(DUP);
             mv.visitVarInsn(ALOAD, 2);
             mv.visitMethodInsn(INVOKESPECIAL, "java/io/ByteArrayInputStream", "<init>", "([B)V", false);
             mv.visitInsn(ARETURN);
-            mv.visitLabel(l6);
+            mv.visitLabel(l2);
             mv.visitVarInsn(ALOAD, 0);
             mv.visitVarInsn(ALOAD, 1);
             mv.visitMethodInsn(INVOKESPECIAL, "java/lang/ClassLoader", "getResourceAsStream", "(Ljava/lang/String;)Ljava/io/InputStream;", false);
             mv.visitInsn(ARETURN);
-            Label l8 = new Label();
-            mv.visitLabel(l8);
-            mv.visitMaxs(5, 3);
-            mv.visitEnd();
-        }
-        {
-            mv = cw.visitMethod(ACC_PRIVATE, memberNames.readByteMethodName, "(I)B", null, null);
-            mv.visitCode();
-            Label l0 = new Label();
-            mv.visitLabel(l0);
-            mv.visitFieldInsn(GETSTATIC, memberNames.className, memberNames.stubBytesFieldName, "[B");
-            mv.visitVarInsn(ILOAD, 1);
-            mv.visitInsn(BALOAD);
-            mv.visitInsn(IRETURN);
-            Label l1 = new Label();
-            mv.visitLabel(l1);
-            mv.visitMaxs(2, 2);
-            mv.visitEnd();
-        }
-        {
-            mv = cw.visitMethod(ACC_PRIVATE, memberNames.readCharMethodName, "(I)C", null, null);
-            mv.visitCode();
-            Label l0 = new Label();
-            mv.visitLabel(l0);
-            mv.visitVarInsn(ALOAD, 0);
-            mv.visitVarInsn(ILOAD, 1);
-            mv.visitMethodInsn(INVOKESPECIAL, memberNames.className, memberNames.readShortMethodName, "(I)I", false);
-            mv.visitInsn(I2C);
-            mv.visitInsn(IRETURN);
-            Label l1 = new Label();
-            mv.visitLabel(l1);
-            mv.visitMaxs(2, 2);
-            mv.visitEnd();
-        }
-        {
-            mv = cw.visitMethod(ACC_PRIVATE, memberNames.readShortMethodName, "(I)I", null, null);
-            mv.visitCode();
-            Label l0 = new Label();
-            mv.visitLabel(l0);
-            mv.visitFieldInsn(GETSTATIC, memberNames.className, memberNames.stubBytesFieldName, "[B");
-            mv.visitVarInsn(ASTORE, 2);
-            Label l1 = new Label();
-            mv.visitLabel(l1);
-            mv.visitVarInsn(ALOAD, 2);
-            mv.visitVarInsn(ILOAD, 1);
-            mv.visitInsn(BALOAD);
-            mv.visitIntInsn(SIPUSH, 255);
-            mv.visitInsn(IAND);
-            mv.visitIntInsn(BIPUSH, 8);
-            mv.visitInsn(ISHL);
-            mv.visitVarInsn(ALOAD, 2);
-            mv.visitVarInsn(ILOAD, 1);
-            mv.visitInsn(ICONST_1);
-            mv.visitInsn(IADD);
-            mv.visitInsn(BALOAD);
-            mv.visitIntInsn(SIPUSH, 255);
-            mv.visitInsn(IAND);
-            mv.visitInsn(IOR);
-            mv.visitInsn(IRETURN);
-            Label l2 = new Label();
-            mv.visitLabel(l2);
-            mv.visitMaxs(4, 3);
-            mv.visitEnd();
-        }
-        {
-            mv = cw.visitMethod(ACC_PRIVATE, memberNames.readIntMethodName, "(I)I", null, null);
-            mv.visitCode();
-            Label l0 = new Label();
-            mv.visitLabel(l0);
-            mv.visitFieldInsn(GETSTATIC, memberNames.className, memberNames.stubBytesFieldName, "[B");
-            mv.visitVarInsn(ASTORE, 2);
-            Label l1 = new Label();
-            mv.visitLabel(l1);
-            mv.visitVarInsn(ALOAD, 2);
-            mv.visitVarInsn(ILOAD, 1);
-            mv.visitInsn(BALOAD);
-            mv.visitIntInsn(SIPUSH, 255);
-            mv.visitInsn(IAND);
-            mv.visitIntInsn(BIPUSH, 24);
-            mv.visitInsn(ISHL);
-            mv.visitVarInsn(ALOAD, 2);
-            mv.visitVarInsn(ILOAD, 1);
-            mv.visitInsn(ICONST_1);
-            mv.visitInsn(IADD);
-            mv.visitInsn(BALOAD);
-            mv.visitIntInsn(SIPUSH, 255);
-            mv.visitInsn(IAND);
-            mv.visitIntInsn(BIPUSH, 16);
-            mv.visitInsn(ISHL);
-            mv.visitInsn(IOR);
-            mv.visitVarInsn(ALOAD, 2);
-            mv.visitVarInsn(ILOAD, 1);
-            mv.visitInsn(ICONST_2);
-            mv.visitInsn(IADD);
-            mv.visitInsn(BALOAD);
-            mv.visitIntInsn(SIPUSH, 255);
-            mv.visitInsn(IAND);
-            mv.visitIntInsn(BIPUSH, 8);
-            mv.visitInsn(ISHL);
-            mv.visitInsn(IOR);
-            mv.visitVarInsn(ALOAD, 2);
-            mv.visitVarInsn(ILOAD, 1);
-            mv.visitInsn(ICONST_3);
-            mv.visitInsn(IADD);
-            mv.visitInsn(BALOAD);
-            mv.visitIntInsn(SIPUSH, 255);
-            mv.visitInsn(IAND);
-            mv.visitInsn(IOR);
-            mv.visitInsn(IRETURN);
-            Label l2 = new Label();
-            mv.visitLabel(l2);
-            mv.visitMaxs(4, 3);
-            mv.visitEnd();
-        }
-        {
-            mv = cw.visitMethod(ACC_PRIVATE + ACC_STATIC, memberNames.toByteArrayMethodName, "(Ljava/io/InputStream;)[B", null, new String[]{"java/io/IOException"});
-            mv.visitCode();
-            Label l0 = new Label();
-            mv.visitLabel(l0);
-            mv.visitTypeInsn(NEW, "java/io/ByteArrayOutputStream");
-            mv.visitInsn(DUP);
-            mv.visitMethodInsn(INVOKESPECIAL, "java/io/ByteArrayOutputStream", "<init>", "()V", false);
-            mv.visitVarInsn(ASTORE, 1);
-            Label l1 = new Label();
-            mv.visitLabel(l1);
-            mv.visitIntInsn(SIPUSH, 1024);
-            mv.visitIntInsn(NEWARRAY, T_BYTE);
-            mv.visitVarInsn(ASTORE, 2);
-            Label l2 = new Label();
-            mv.visitLabel(l2);
-            mv.visitVarInsn(ALOAD, 0);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/io/InputStream", "available", "()I", false);
-            Label l3 = new Label();
-            mv.visitJumpInsn(IFLE, l3);
             Label l4 = new Label();
             mv.visitLabel(l4);
-            mv.visitVarInsn(ALOAD, 0);
-            mv.visitVarInsn(ALOAD, 2);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/io/InputStream", "read", "([B)I", false);
-            mv.visitVarInsn(ISTORE, 3);
-            Label l5 = new Label();
-            mv.visitLabel(l5);
-            mv.visitVarInsn(ALOAD, 1);
-            mv.visitVarInsn(ALOAD, 2);
-            mv.visitInsn(ICONST_0);
-            mv.visitVarInsn(ILOAD, 3);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/io/ByteArrayOutputStream", "write", "([BII)V", false);
-            Label l6 = new Label();
-            mv.visitLabel(l6);
-            mv.visitJumpInsn(GOTO, l2);
-            mv.visitLabel(l3);
-            mv.visitVarInsn(ALOAD, 0);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/io/InputStream", "close", "()V", false);
-            Label l7 = new Label();
-            mv.visitLabel(l7);
-            mv.visitVarInsn(ALOAD, 1);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/io/ByteArrayOutputStream", "close", "()V", false);
-            Label l8 = new Label();
-            mv.visitLabel(l8);
-            mv.visitVarInsn(ALOAD, 1);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/io/ByteArrayOutputStream", "toByteArray", "()[B", false);
-            mv.visitInsn(ARETURN);
-            Label l9 = new Label();
-            mv.visitLabel(l9);
-            mv.visitMaxs(4, 4);
+            mv.visitMaxs(3, 3);
             mv.visitEnd();
         }
         {
-            mv = cw.visitMethod(ACC_PUBLIC + ACC_STATIC, "main", "([Ljava/lang/String;)V", null, new String[]{"java/lang/Throwable"});
+            mv = cw.visitMethod(ACC_PUBLIC | ACC_STATIC, "main", "([Ljava/lang/String;)V", null, new String[]{"java/lang/Throwable"});
             mv.visitCode();
             Label l0 = new Label();
             mv.visitLabel(l0);
@@ -670,12 +418,6 @@ public class Packer extends Transformer {
     private class MemberNames {
         private String className = uniqueRandomString();
         private String resourcesFieldName = uniqueRandomString();
-        private String stubBytesFieldName = uniqueRandomString();
-        private String readByteMethodName = uniqueRandomString();
-        private String readCharMethodName = uniqueRandomString();
-        private String readShortMethodName = uniqueRandomString();
-        private String readIntMethodName = uniqueRandomString();
-        private String toByteArrayMethodName = uniqueRandomString();
         private String stubName = '/' + uniqueRandomString();
     }
 }
