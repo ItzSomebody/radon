@@ -61,9 +61,9 @@ import org.objectweb.asm.tree.MethodNode;
 public class Radon {
     private ObfuscationConfiguration config;
     private Map<String, ClassTree> hierarchy = new HashMap<>();
-    public Map<String, ClassWrapper> classes = new ConcurrentHashMap<>();
+    public Map<String, ClassWrapper> classes = new HashMap<>();
     public Map<String, ClassWrapper> classPath = new HashMap<>();
-    public Map<String, byte[]> resources = new ConcurrentHashMap<>();
+    public Map<String, byte[]> resources = new HashMap<>();
 
     public Radon(ObfuscationConfiguration config) {
         this.config = config;

@@ -69,7 +69,7 @@ public class ResourceRenamer extends Transformer {
                     });
                 }));
 
-        getResources().forEach((name, b) -> {
+        new HashMap<>(getResources()).forEach((name, b) -> {
             if (mappings.containsKey(name)) {
                 getResources().remove(name);
                 getResources().put(mappings.get(name).substring(1), b);

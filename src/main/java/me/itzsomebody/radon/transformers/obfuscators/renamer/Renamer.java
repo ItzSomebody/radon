@@ -126,7 +126,7 @@ public class Renamer extends Transformer {
 
         // Apply mappings
         Remapper simpleRemapper = new MemberRemapper(mappings);
-        getClassWrappers().forEach(classWrapper -> {
+        new ArrayList<>(getClassWrappers()).forEach(classWrapper -> {
             ClassNode classNode = classWrapper.getClassNode();
 
             ClassNode copy = new ClassNode();
@@ -136,10 +136,8 @@ public class Renamer extends Transformer {
             // we update the MethodNode/FieldNode/ClassNode each wrapper wraps instead.
             IntStream.range(0, copy.methods.size())
                     .forEach(i -> classWrapper.getMethods().get(i).setMethodNode(copy.methods.get(i)));
-
-            if (copy.fields != null)
-                IntStream.range(0, copy.fields.size())
-                        .forEach(i -> classWrapper.getFields().get(i).setFieldNode(copy.fields.get(i)));
+            IntStream.range(0, copy.fields.size())
+                    .forEach(i -> classWrapper.getFields().get(i).setFieldNode(copy.fields.get(i)));
 
             classWrapper.setClassNode(copy);
 
