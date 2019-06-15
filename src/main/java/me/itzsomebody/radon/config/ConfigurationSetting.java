@@ -24,6 +24,7 @@ import me.itzsomebody.radon.transformers.Transformer;
 import me.itzsomebody.radon.transformers.miscellaneous.Packer;
 import me.itzsomebody.radon.transformers.miscellaneous.expiration.Expiration;
 import me.itzsomebody.radon.transformers.miscellaneous.watermarker.Watermarker;
+import me.itzsomebody.radon.transformers.obfuscators.antidebug.AntiDebug;
 import me.itzsomebody.radon.transformers.obfuscators.AntiTamper;
 import me.itzsomebody.radon.transformers.obfuscators.BadAnnotation;
 import me.itzsomebody.radon.transformers.obfuscators.InstructionSetReducer;
@@ -57,6 +58,7 @@ public enum ConfigurationSetting {
     STATIC_INITIALIZATION(Boolean.class, new StaticInitialization()),
     NUMBER_OBFUSCATION(Map.class, new NumberObfuscation()),
     ANTI_TAMPER(Boolean.class, new AntiTamper()),
+    ANTI_DEBUG(Map.class, new AntiDebug()),
     INSTRUCTION_SET_REDUCER(Boolean.class, new InstructionSetReducer()),
     VIRTUALIZER(Boolean.class, new Virtualizer()),
     RESOURCE_RENAMER(Boolean.class, new ResourceRenamer()),

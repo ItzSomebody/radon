@@ -16,11 +16,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package me.itzsomebody.radon.transformers.obfuscators;
+package me.itzsomebody.radon.transformers.obfuscators.antidebug;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Stream;
+import me.itzsomebody.radon.Main;
 import me.itzsomebody.radon.config.ConfigurationSetting;
 import me.itzsomebody.radon.exceptions.InvalidConfigurationValueException;
 import me.itzsomebody.radon.exclusions.ExclusionType;
@@ -33,15 +36,45 @@ import org.objectweb.asm.tree.JumpInsnNode;
 import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
+import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 
-public class AntiDebug extends Transformer {
-    private static final String[] DEBUG_OPTIONS = new String[]{"-agentlib:jdwp", "-Xdebug", "-Xrunjdwp:", "-javaagent:"};
-    private static final List<String> JAVA_AGENT_OPTIONS = Collections.singletonList("-javaagent:");
+import static me.itzsomebody.radon.utils.ConfigUtils.getValueOrDefault;
 
-    protected final AntidebugSetup setup;
-    private final List<String> debugOptions;
-    private final AtomicInteger debugOptionIndex;
+/**
+ * Blocks debugging options on the commandline.
+ *
+ * @author vovanre
+ */
+public class AntiDebug extends Transformer {
+    private static final Map<String, AntiDebugSetting> KEY_MAP = new HashMap<>();
+    private static final String[] DEBUG_OPTIONS = new String[]{"-agentlib:jdwp", "-Xdebug", "-Xrunjdwp:", "-javaagent:"};
+
+    private AtomicInteger debugOptionIndex;
+    private String message;
+
+    static {
+        Stream.of(AntiDebugSetting.values()).forEach(setting -> KEY_MAP.put(setting.getName(), setting));
+    }
+
+    @Override
+    public void transform() {
+        AtomicInteger counter = new AtomicInteger();
+        debugOptionIndex = new AtomicInteger();
+
+        getClassWrappers().stream().filter(cw -> !cw.getAccess().isInterface() && !excluded(cw)).forEach(cw -> {
+            MethodNode clinit = cw.getOrCreateClinit();
+
+
+            int checkCount = RandomUtils.getRandomInt(1, DEBUG_OPTIONS.length);
+            for (int i = 0; i < checkCount; i++) {
+                clinit.instructions.insert(generateCheck());
+                counter.incrementAndGet();
+            }
+        });
+
+        Main.info("Injected " + counter.get() + " anti-debugging checks");
+    }
 
     private InsnList generateCheck() {
         LabelNode notDebugLabel = new LabelNode();
@@ -50,9 +83,9 @@ public class AntiDebug extends Transformer {
         insnList.add(new JumpInsnNode(IFEQ, notDebugLabel));
 
         if (RandomUtils.getRandomBoolean()) {
-            if (this.setup.getMessage() != null) {
+            if (getMessage() != null) {
                 insnList.add(new FieldInsnNode(GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;"));
-                insnList.add(new LdcInsnNode(this.setup.getMessage()));
+                insnList.add(new LdcInsnNode(getMessage()));
                 insnList.add(new MethodInsnNode(INVOKEVIRTUAL, "java/io/PrintStream", "println", "(Ljava/lang/String;)V", false));
             }
             if (RandomUtils.getRandomBoolean()) {
@@ -64,7 +97,7 @@ public class AntiDebug extends Transformer {
                 insnList.add(new MethodInsnNode(INVOKEVIRTUAL, "java/lang/Runtime", "halt", "(I)V", false));
             }
         } else {
-            String message = this.setup.getMessage();
+            String message = getMessage();
             if (message == null)
                 message = randomString();
 
@@ -80,12 +113,11 @@ public class AntiDebug extends Transformer {
 
     private InsnList createIsDebugList() {
         boolean isUpper = RandomUtils.getRandomBoolean();
-        String argument = this.debugOptions.get(debugOptionIndex.incrementAndGet() % debugOptions.size());
-        if (isUpper) {
+        String argument = DEBUG_OPTIONS[debugOptionIndex.incrementAndGet() % DEBUG_OPTIONS.length];
+        if (isUpper)
             argument = argument.toUpperCase();
-        } else {
+        else
             argument = argument.toLowerCase();
-        }
 
         InsnList insnList = new InsnList();
         insnList.add(new MethodInsnNode(INVOKESTATIC, "java/lang/management/ManagementFactory", "getRuntimeMXBean", "()Ljava/lang/management/RuntimeMXBean;", false));
@@ -96,14 +128,6 @@ public class AntiDebug extends Transformer {
         insnList.add(new MethodInsnNode(INVOKEVIRTUAL, "java/lang/String", "contains", "(Ljava/lang/CharSequence;)Z", false));
 
         return insnList;
-    }
-
-    @Override
-    public void transform() {
-        getClassWrappers().stream().filter(cw -> !cw.getAccess().isInterface()
-                && !excluded(cw)).forEach(cw -> cw.getMethods().stream().filter(mw -> !excluded(mw)).forEach(mw -> {
-
-        }));
     }
 
     @Override
@@ -118,16 +142,37 @@ public class AntiDebug extends Transformer {
 
     @Override
     public Object getConfiguration() {
-        return true;
+        Map<String, Object> config = new LinkedHashMap<>();
+
+        config.put(AntiDebugSetting.MESSAGE.getName(), getMessage());
+
+        return config;
     }
 
     @Override
     public void setConfiguration(Map<String, Object> config) {
-        // Not needed
+        setMessage(getValueOrDefault(AntiDebugSetting.MESSAGE.getName(), config, null));
     }
 
     @Override
     public void verifyConfiguration(Map<String, Object> config) {
-        throw new InvalidConfigurationValueException(ConfigurationSetting.ANTI_DEBUG + " expects a boolean");
+        config.forEach((k, v) -> {
+            AntiDebugSetting setting = KEY_MAP.get(k);
+
+            if (setting == null)
+                throw new InvalidConfigurationValueException(ConfigurationSetting.ANTI_DEBUG.getName() + '.' + k
+                        + " is an invalid configuration key");
+            if (!setting.getExpectedType().isInstance(v))
+                throw new InvalidConfigurationValueException(ConfigurationSetting.ANTI_DEBUG.getName() + '.' + k,
+                        setting.getExpectedType(), v.getClass());
+        });
+    }
+
+    private void setMessage(String message) {
+        this.message = message;
+    }
+
+    private String getMessage() {
+        return message;
     }
 }
