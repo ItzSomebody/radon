@@ -41,4 +41,7 @@ dependencies {
     compile 'org.ow2.asm:asm-commons:7.0'
     compile 'org.ow2.asm:asm-util:7.0'
 	compile 'org.yaml:snakeyaml:1.20-SNAPSHOT'
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.powermock:powermock-api-mockito:1.6.6'
+    testCompile 'org.powermock:powermock-module-junit4:1.6.6'
 }
