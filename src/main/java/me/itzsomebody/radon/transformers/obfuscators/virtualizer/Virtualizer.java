@@ -79,8 +79,8 @@ public class Virtualizer extends Transformer implements VMOpcodes {
         StubCreator stubCreator = new StubCreator();
 
         getClassWrappers().stream().filter(classWrapper -> !excluded(classWrapper)).forEach(classWrapper ->
-                classWrapper.getMethods().stream().filter(methodWrapper -> !"<init>".equals(methodWrapper.getOriginalName())
-                        && !excluded(methodWrapper)).forEach(methodWrapper -> {
+                classWrapper.getMethods().stream().filter(mw -> !"<init>".equals(mw.getOriginalName()) && !excluded(mw)
+                        && mw.hasInstructions()).forEach(methodWrapper -> {
                     MethodNode methodNode = methodWrapper.getMethodNode();
 
                     int leeway = methodWrapper.getLeewaySize();
