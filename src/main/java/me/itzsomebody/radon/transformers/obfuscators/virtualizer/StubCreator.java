@@ -5,6 +5,7 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.zip.GZIPOutputStream;
 import me.itzsomebody.vm.Instruction;
 import org.objectweb.asm.Type;
 
@@ -29,7 +30,8 @@ public class StubCreator {
     }
 
     public byte[] createStub() throws IOException {
-        DataOutputStream dos = new DataOutputStream(out);
+        GZIPOutputStream gzip = new GZIPOutputStream(out);
+        DataOutputStream dos = new DataOutputStream(gzip);
 
         dos.writeShort(instructionLists.size());
 
@@ -69,6 +71,8 @@ public class StubCreator {
                 }
             }
         }
+
+        gzip.close();
 
         return out.toByteArray();
     }

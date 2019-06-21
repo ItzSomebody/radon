@@ -19,12 +19,14 @@
 package me.itzsomebody.vm;
 
 import java.io.DataInputStream;
+import java.util.zip.GZIPInputStream;
 
 public class Stub {
     public Instruction[][] instructions;
 
     public Stub() throws Exception {
-        DataInputStream din = new DataInputStream(Stub.class.getResourceAsStream("/radon.vm"));
+        GZIPInputStream gzip = new GZIPInputStream(Stub.class.getResourceAsStream("/radon.vm"));
+        DataInputStream din = new DataInputStream(gzip);
 
         int nFunctions = din.readShort();
         instructions = new Instruction[nFunctions][];
