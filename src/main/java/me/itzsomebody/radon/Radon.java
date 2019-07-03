@@ -144,7 +144,7 @@ public class Radon {
 
             classes.values().forEach(classWrapper -> {
                 try {
-                    ZipEntry entry = new ZipEntry(classWrapper.getName() + ".class");
+                    ZipEntry entry = new ZipEntry(classWrapper.getEntryName());
 
                     zos.putNextEntry(entry);
                     zos.write(classWrapper.toByteArray(this));
@@ -238,6 +238,11 @@ public class Radon {
 
                                 classPath.put(cw.getName(), cw);
                                 classes.put(cw.getName(), cw);
+
+                                String entryName = entry.getName();
+                                String wrapperEntryName = cw.getEntryName();
+                                if (entryName.endsWith(wrapperEntryName) && !entryName.equals(wrapperEntryName))
+                                    cw.setEntryPrefix(entry.getName().substring(0, entryName.length() - wrapperEntryName.length()));
                             } catch (Throwable t) {
                                 Main.warning(String.format("Could not load %s as a class.", entry.getName()));
                                 this.resources.put(entry.getName(), IOUtils.toByteArray(in));

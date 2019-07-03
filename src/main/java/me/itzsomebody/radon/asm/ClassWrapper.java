@@ -40,11 +40,13 @@ import org.objectweb.asm.tree.MethodNode;
 public class ClassWrapper {
     private static final int LIB_FLAGS = ClassReader.SKIP_DEBUG | ClassReader.SKIP_FRAMES | ClassReader.SKIP_CODE;
     private static final int INPUT_FLAGS = ClassReader.SKIP_FRAMES;
+    private static final String DEFAULT_ENTRY_PREFIX = "";
 
     private ClassNode classNode;
     private final String originalName;
     private final boolean libraryNode;
 
+    private String entryPrefix;
     private final Access access;
     private final List<MethodWrapper> methods = new ArrayList<>();
     private final List<FieldWrapper> fields = new ArrayList<>();
@@ -58,6 +60,7 @@ public class ClassWrapper {
         this.originalName = classNode.name;
         this.libraryNode = libraryNode;
 
+        this.entryPrefix = DEFAULT_ENTRY_PREFIX;
         this.access = new ClassAccess(this);
         classNode.methods.forEach(methodNode -> methods.add(new MethodWrapper(methodNode, this)));
         classNode.fields.forEach(fieldNode -> fields.add(new FieldWrapper(fieldNode, this)));
@@ -68,6 +71,7 @@ public class ClassWrapper {
         this.originalName = classNode.name;
         this.libraryNode = libraryNode;
 
+        this.entryPrefix = DEFAULT_ENTRY_PREFIX;
         this.access = new ClassAccess(this);
         classNode.methods.forEach(methodNode -> methods.add(new MethodWrapper(methodNode, this)));
         classNode.fields.forEach(fieldNode -> fields.add(new FieldWrapper(fieldNode, this)));
@@ -265,5 +269,13 @@ public class ClassWrapper {
 
             return writer.toByteArray();
         }
+    }
+
+    public void setEntryPrefix(String entryPrefix) {
+        this.entryPrefix = entryPrefix;
+    }
+
+    public String getEntryName() {
+        return entryPrefix + classNode.name + ".class";
     }
 }
