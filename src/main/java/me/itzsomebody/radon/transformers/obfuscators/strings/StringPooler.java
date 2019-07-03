@@ -74,7 +74,7 @@ public class StringPooler extends StringEncryption {
                 MethodNode clinit = cw.getClassNode().methods.stream().filter(methodNode ->
                         "<clinit>".equals(methodNode.name)).findFirst().orElse(null);
                 if (clinit == null) {
-                    clinit = new MethodNode(ACC_PRIVATE + ACC_STATIC + ACC_SYNTHETIC, "<clinit>", "()V", null, null);
+                    clinit = new MethodNode(ACC_PRIVATE | ACC_STATIC | ACC_SYNTHETIC, "<clinit>", "()V", null, null);
                     InsnList insns = new InsnList();
                     insns.add(new MethodInsnNode(INVOKESTATIC, cw.getName(), methodName, "()V", false));
                     insns.add(new InsnNode(RETURN));
@@ -83,8 +83,8 @@ public class StringPooler extends StringEncryption {
                 } else
                     clinit.instructions.insertBefore(clinit.instructions.getFirst(), new MethodInsnNode(INVOKESTATIC,
                             cw.getName(), methodName, "()V", false));
-                FieldNode fieldNode = new FieldNode(ACC_PRIVATE + ACC_STATIC + ACC_SYNTHETIC, fieldName, "[Ljava/lang/String;", null, null);
-                cw.getClassNode().fields.add(fieldNode);
+                FieldNode fieldNode = new FieldNode(ACC_PRIVATE | ACC_STATIC | ACC_SYNTHETIC, fieldName, "[Ljava/lang/String;", null, null);
+                cw.addField(fieldNode);
             }
         });
 
@@ -92,7 +92,7 @@ public class StringPooler extends StringEncryption {
     }
 
     private MethodNode stringPool(String className, String methodName, String fieldName, ArrayList<String> strings) {
-        MethodNode method = new MethodNode(ACC_PRIVATE + ACC_STATIC + ACC_SYNTHETIC + ACC_BRIDGE, methodName, "()V",
+        MethodNode method = new MethodNode(ACC_PRIVATE | ACC_STATIC | ACC_SYNTHETIC | ACC_BRIDGE, methodName, "()V",
                 null, null);
 
         method.visitCode();

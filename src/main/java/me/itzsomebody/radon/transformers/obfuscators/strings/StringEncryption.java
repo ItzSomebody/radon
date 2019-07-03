@@ -91,14 +91,14 @@ public class StringEncryption extends Transformer {
                         LdcInsnNode ldc = (LdcInsnNode) insn;
                         ldc.cst = encrypt((String) ldc.cst, key1, key2, key3, key4);
 
-                        methodWrapper.getMethodNode().instructions.insert(ldc, new MethodInsnNode(
+                        methodWrapper.getInstructions().insert(ldc, new MethodInsnNode(
                                 INVOKESTATIC,
                                 memberNames.className,
                                 memberNames.decryptMethodName,
                                 "(Ljava/lang/Object;I)Ljava/lang/String;",
                                 false
                         ));
-                        methodWrapper.getMethodNode().instructions.insert(ldc, ASMUtils.getNumberInsn(randomKey));
+                        methodWrapper.getInstructions().insert(ldc, ASMUtils.getNumberInsn(randomKey));
 
                         counter.incrementAndGet();
                     });
@@ -756,7 +756,6 @@ public class StringEncryption extends Transformer {
             mv.visitLabel(l63);
 
             if (isContextCheckingEnabled()) {
-
                 mv.visitVarInsn(ALOAD, 17);
                 mv.visitInsn(ICONST_1);
                 mv.visitInsn(AALOAD);
