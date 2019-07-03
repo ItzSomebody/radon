@@ -24,8 +24,7 @@ public enum FlowObfuscationSetting {
     INSERT_BOGUS_JUMPS(Boolean.class, new BogusJumpInserter()),
     SPLIT_BLOCKS(Boolean.class, new BlockSplitter()),
     FAKE_CATCH_BLOCKS(Boolean.class, new FakeCatchBlocks()),
-    MUTILATE_NULL_CHECK(Boolean.class, new NullCheckMutilator()),
-    COMBINE_TRY_WITH_CATCH(Boolean.class, new TryCatchCombiner());
+    MUTILATE_NULL_CHECK(Boolean.class, new NullCheckMutilator());
 
     private final Class expectedType;
     private final FlowObfuscation flowObfuscation;
