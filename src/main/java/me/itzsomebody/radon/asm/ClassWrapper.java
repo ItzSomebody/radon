@@ -242,16 +242,16 @@ public class ClassWrapper {
     public byte[] toByteArray(Radon radon) {
         // Construct byte writer
         ClassWriter writer = new CustomClassWriter(ClassWriter.COMPUTE_FRAMES, radon);
-        writer.newUTF8("RADON" + Main.VERSION);
-
-
-        // Populate writer with class info
-        classNode.accept(writer);
-
-        // Insert manually-specified constant pool strings
-        strConsts.forEach(writer::newUTF8);
 
         try {
+            writer.newUTF8("RADON" + Main.VERSION);
+
+            // Populate writer with class info
+            classNode.accept(writer);
+
+            // Insert manually-specified constant pool strings
+            strConsts.forEach(writer::newUTF8);
+
             return writer.toByteArray();
         } catch (Throwable t) {
             Main.info(String.format("Error writing class %s. Skipping frames (might cause runtime errors).", getName() + ".class"));

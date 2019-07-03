@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.zip.CRC32;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
@@ -75,7 +74,6 @@ public class Radon {
     public void run() {
         loadClassPath();
         loadInput();
-        buildInheritance();
 
         List<Transformer> transformers = getConfig().getTransformers();
 
@@ -313,7 +311,7 @@ public class Radon {
             hierarchy.get(wrapper.getName()).getSubClasses().add(sub.getName());
     }
 
-    private void buildInheritance() {
+    public void buildInheritance() {
         classes.values().forEach(classWrapper -> buildHierarchy(classWrapper, null));
     }
 

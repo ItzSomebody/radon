@@ -75,6 +75,7 @@ public class Renamer extends Transformer {
 
     @Override
     public void transform() {
+        radon.buildInheritance();
         mappings = new HashMap<>();
         Map<String, String> packageMappings = new HashMap<>();
 
