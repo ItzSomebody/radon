@@ -42,7 +42,6 @@ import org.objectweb.asm.tree.ClassNode;
 
 /**
  * Packs classes and resources into a stub file which is unpacked on runtime.
- * fixme: This is a mega-dumb transformer and is also broken. :omega_lul:
  *
  * @author ItzSomebody.
  */
@@ -301,7 +300,9 @@ public class Packer extends Transformer {
             mv.visitInsn(ICONST_0);
             mv.visitVarInsn(ALOAD, 2);
             mv.visitInsn(ARRAYLENGTH);
-            mv.visitMethodInsn(INVOKEVIRTUAL, memberNames.className, "defineClass", "(Ljava/lang/String;[BII)Ljava/lang/Class;", false);
+            mv.visitLdcInsn(Type.getType("L" + memberNames.className + ";"));
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Class", "getProtectionDomain", "()Ljava/security/ProtectionDomain;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, memberNames.className, "defineClass", "(Ljava/lang/String;[BIILjava/security/ProtectionDomain;)Ljava/lang/Class;", false);
             mv.visitInsn(ARETURN);
             mv.visitLabel(l2);
             mv.visitVarInsn(ALOAD, 0);
@@ -310,7 +311,7 @@ public class Packer extends Transformer {
             mv.visitInsn(ARETURN);
             Label l4 = new Label();
             mv.visitLabel(l4);
-            mv.visitMaxs(5, 3);
+            mv.visitMaxs(6, 3);
             mv.visitEnd();
         }
         {
@@ -346,42 +347,23 @@ public class Packer extends Transformer {
             mv.visitEnd();
         }
         {
-            mv = cw.visitMethod(ACC_PUBLIC | ACC_STATIC, "main", "([Ljava/lang/String;)V", null, new String[]{"java/lang/Throwable"});
+            mv = cw.visitMethod(ACC_PUBLIC | ACC_STATIC | ACC_VARARGS, "main", "([Ljava/lang/String;)V", null, new String[]{"java/lang/Throwable"});
             mv.visitCode();
             Label l0 = new Label();
             mv.visitLabel(l0);
-            mv.visitLineNumber(50, l0);
             mv.visitTypeInsn(NEW, memberNames.className);
             mv.visitInsn(DUP);
             mv.visitMethodInsn(INVOKESPECIAL, memberNames.className, "<init>", "()V", false);
             mv.visitVarInsn(ASTORE, 1);
             Label l1 = new Label();
             mv.visitLabel(l1);
-            mv.visitLdcInsn(Type.getType("Ljava/lang/ClassLoader;"));
-            mv.visitLdcInsn("defaultDomain");
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Class", "getDeclaredField", "(Ljava/lang/String;)Ljava/lang/reflect/Field;", false);
+            mv.visitVarInsn(ALOAD, 1);
+            mv.visitLdcInsn(mainClass);
+            mv.visitMethodInsn(INVOKEVIRTUAL, memberNames.className, "findClass", "(Ljava/lang/String;)Ljava/lang/Class;", false);
             mv.visitVarInsn(ASTORE, 2);
             Label l2 = new Label();
             mv.visitLabel(l2);
             mv.visitVarInsn(ALOAD, 2);
-            mv.visitInsn(ICONST_1);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/reflect/Field", "setAccessible", "(Z)V", false);
-            Label l3 = new Label();
-            mv.visitLabel(l3);
-            mv.visitVarInsn(ALOAD, 2);
-            mv.visitVarInsn(ALOAD, 1);
-            mv.visitLdcInsn(Type.getType("L" + memberNames.className + ";"));
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Class", "getProtectionDomain", "()Ljava/security/ProtectionDomain;", false);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/reflect/Field", "set", "(Ljava/lang/Object;Ljava/lang/Object;)V", false);
-            Label l4 = new Label();
-            mv.visitLabel(l4);
-            mv.visitVarInsn(ALOAD, 1);
-            mv.visitLdcInsn(mainClass);
-            mv.visitMethodInsn(INVOKEVIRTUAL, memberNames.className, "findClass", "(Ljava/lang/String;)Ljava/lang/Class;", false);
-            mv.visitVarInsn(ASTORE, 3);
-            Label l5 = new Label();
-            mv.visitLabel(l5);
-            mv.visitVarInsn(ALOAD, 3);
             mv.visitLdcInsn("main");
             mv.visitInsn(ICONST_1);
             mv.visitTypeInsn(ANEWARRAY, "java/lang/Class");
@@ -390,15 +372,15 @@ public class Packer extends Transformer {
             mv.visitLdcInsn(Type.getType("[Ljava/lang/String;"));
             mv.visitInsn(AASTORE);
             mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Class", "getMethod", "(Ljava/lang/String;[Ljava/lang/Class;)Ljava/lang/reflect/Method;", false);
-            mv.visitVarInsn(ASTORE, 4);
-            Label l6 = new Label();
-            mv.visitLabel(l6);
-            mv.visitVarInsn(ALOAD, 4);
+            mv.visitVarInsn(ASTORE, 3);
+            Label l3 = new Label();
+            mv.visitLabel(l3);
+            mv.visitVarInsn(ALOAD, 3);
             mv.visitInsn(ICONST_1);
             mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/reflect/Method", "setAccessible", "(Z)V", false);
-            Label l7 = new Label();
-            mv.visitLabel(l7);
-            mv.visitVarInsn(ALOAD, 4);
+            Label l4 = new Label();
+            mv.visitLabel(l4);
+            mv.visitVarInsn(ALOAD, 3);
             mv.visitInsn(ACONST_NULL);
             mv.visitInsn(ICONST_1);
             mv.visitTypeInsn(ANEWARRAY, "java/lang/Object");
@@ -408,12 +390,12 @@ public class Packer extends Transformer {
             mv.visitInsn(AASTORE);
             mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/reflect/Method", "invoke", "(Ljava/lang/Object;[Ljava/lang/Object;)Ljava/lang/Object;", false);
             mv.visitInsn(POP);
-            Label l8 = new Label();
-            mv.visitLabel(l8);
+            Label l5 = new Label();
+            mv.visitLabel(l5);
             mv.visitInsn(RETURN);
-            Label l9 = new Label();
-            mv.visitLabel(l9);
-            mv.visitMaxs(6, 5);
+            Label l6 = new Label();
+            mv.visitLabel(l6);
+            mv.visitMaxs(6, 4);
             mv.visitEnd();
         }
         {
