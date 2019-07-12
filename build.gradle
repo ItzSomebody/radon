@@ -1,47 +1,44 @@
+plugins {
+    id 'com.github.johnrengelman.shadow' version '5.1.0'
+    id 'java'
+}
+
 group 'me.itzsomebody'
 version '2.0.0-SNAPSHOT'
 
-apply plugin: 'java'
-
+defaultTasks 'clean', 'shadowJar'
 sourceCompatibility = 1.8
-
-jar {
-    baseName = project.name
-    
-    manifest {
-        attributes 'Main-Class': 'me.itzsomebody.radon.Main'
-    }
-}
-
-task fatJar(type: Jar) {
-    baseName = project.name + '-shaded'
-    
-    manifest {
-        attributes 'Main-Class': 'me.itzsomebody.radon.Main'
-    }
-    
-    from { configurations.compile.collect { !it.isDirectory() && it.getName().endsWith(".jar") ? zipTree(it) : it } }
-    with jar
-}
+def main = 'me.itzsomebody.radon.Main'
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }
 
+jar {
+    manifest { attributes 'Main-Class': main }
+}
+
+shadowJar() {
+    classifier = null
+
+    relocate 'org.objectweb.asm', 'me.itzsomebody.radon.asm.lib'
+    exclude 'module-info.class'
+    manifest { attributes 'Main-Class': main }
+}
+
 repositories {
     mavenCentral()
-	maven { // Needed for SnakeYAML
-        url "http://oss.sonatype.org/content/groups/public/"
-    }
+    maven { url "http://oss.sonatype.org/content/groups/public/" } // SnakeYAML
 }
 
 dependencies {
-    compile 'org.ow2.asm:asm:7.0'
-    compile 'org.ow2.asm:asm-tree:7.0'
-    compile 'org.ow2.asm:asm-commons:7.0'
-    compile 'org.ow2.asm:asm-util:7.0'
-	compile 'org.yaml:snakeyaml:1.20-SNAPSHOT'
-    testCompile 'junit:junit:4.12'
-    testCompile 'org.powermock:powermock-api-mockito:1.6.6'
-    testCompile 'org.powermock:powermock-module-junit4:1.6.6'
+    implementation 'org.ow2.asm:asm:7.1'
+    implementation 'org.ow2.asm:asm-tree:7.1'
+    implementation 'org.ow2.asm:asm-commons:7.1'
+    implementation 'org.ow2.asm:asm-util:7.1'
+    implementation 'org.yaml:snakeyaml:1.20-SNAPSHOT'
+
+    testImplementation 'junit:junit:4.12'
+    testImplementation 'org.powermock:powermock-api-mockito:1.6.6'
+    testImplementation 'org.powermock:powermock-module-junit4:1.6.6'
 }

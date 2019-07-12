@@ -22,9 +22,9 @@ public enum FlowObfuscationSetting {
     REPLACE_GOTO(Boolean.class, new GotoReplacer()),
     INSERT_BOGUS_SWITCH_JUMPS(Boolean.class, new BogusSwitchJumpInserter()),
     INSERT_BOGUS_JUMPS(Boolean.class, new BogusJumpInserter()),
+    MUTILATE_NULL_CHECK(Boolean.class, new NullCheckMutilator()),
     SPLIT_BLOCKS(Boolean.class, new BlockSplitter()),
-    FAKE_CATCH_BLOCKS(Boolean.class, new FakeCatchBlocks()),
-    MUTILATE_NULL_CHECK(Boolean.class, new NullCheckMutilator());
+    FAKE_CATCH_BLOCKS(Boolean.class, new FakeCatchBlocks());
 
     private final Class expectedType;
     private final FlowObfuscation flowObfuscation;

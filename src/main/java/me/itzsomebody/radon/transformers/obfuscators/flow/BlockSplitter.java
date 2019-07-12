@@ -39,7 +39,7 @@ import org.objectweb.asm.tree.MethodNode;
  */
 public class BlockSplitter extends FlowObfuscation {
     // used to limit number of recursive calls on doSplit()
-    private static final int LIMIT_SIZE = 10;
+    private static final int LIMIT_SIZE = 11;
 
     @Override
     public void transform() {
