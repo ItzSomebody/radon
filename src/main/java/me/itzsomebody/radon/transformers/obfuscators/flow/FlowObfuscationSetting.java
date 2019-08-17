@@ -19,23 +19,17 @@
 package me.itzsomebody.radon.transformers.obfuscators.flow;
 
 public enum FlowObfuscationSetting {
-    REPLACE_GOTO(Boolean.class, new GotoReplacer()),
-    INSERT_BOGUS_SWITCH_JUMPS(Boolean.class, new BogusSwitchJumpInserter()),
-    INSERT_BOGUS_JUMPS(Boolean.class, new BogusJumpInserter()),
-    MUTILATE_NULL_CHECK(Boolean.class, new NullCheckMutilator()),
-    SPLIT_BLOCKS(Boolean.class, new BlockSplitter()),
-    FAKE_CATCH_BLOCKS(Boolean.class, new FakeCatchBlocks());
+    REPLACE_GOTO(new GotoReplacer()),
+    INSERT_BOGUS_SWITCH_JUMPS(new BogusSwitchJumpInserter()),
+    INSERT_BOGUS_JUMPS(new BogusJumpInserter()),
+    MUTILATE_NULL_CHECK(new NullCheckMutilator()),
+    SPLIT_BLOCKS(new BlockSplitter()),
+    FAKE_CATCH_BLOCKS(new FakeCatchBlocks());
 
-    private final Class expectedType;
     private final FlowObfuscation flowObfuscation;
 
-    FlowObfuscationSetting(Class expectedType, FlowObfuscation flowObfuscation) {
-        this.expectedType = expectedType;
+    FlowObfuscationSetting(FlowObfuscation flowObfuscation) {
         this.flowObfuscation = flowObfuscation;
-    }
-
-    public Class getExpectedType() {
-        return expectedType;
     }
 
     public FlowObfuscation getFlowObfuscation() {

@@ -16,20 +16,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package me.itzsomebody.radon.transformers.miscellaneous.watermarker;
+package me.itzsomebody.radon.transformers.miscellaneous;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.stream.Stream;
 import me.itzsomebody.radon.Main;
 import me.itzsomebody.radon.asm.ClassWrapper;
 import me.itzsomebody.radon.asm.MethodWrapper;
-import me.itzsomebody.radon.config.ConfigurationSetting;
-import me.itzsomebody.radon.exceptions.InvalidConfigurationValueException;
+import me.itzsomebody.radon.config.Configuration;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
 import me.itzsomebody.radon.utils.ASMUtils;
@@ -37,7 +32,7 @@ import me.itzsomebody.radon.utils.RandomUtils;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.VarInsnNode;
 
-import static me.itzsomebody.radon.utils.ConfigUtils.getValueOrDefault;
+import static me.itzsomebody.radon.config.ConfigurationSetting.WATERMARK;
 
 /**
  * Embeds a watermark into random classes.
@@ -45,13 +40,8 @@ import static me.itzsomebody.radon.utils.ConfigUtils.getValueOrDefault;
  * @author ItzSomebody.
  */
 public class Watermarker extends Transformer {
-    private final Map<String, WatermarkerSetting> KEY_MAP = new HashMap<>();
     private String message;
     private String key;
-
-    public Watermarker() {
-        Stream.of(WatermarkerSetting.values()).forEach(setting -> KEY_MAP.put(setting.getName(), setting));
-    }
 
     @Override
     public void transform() {
@@ -121,34 +111,9 @@ public class Watermarker extends Transformer {
     }
 
     @Override
-    public Object getConfiguration() {
-        Map<String, Object> config = new LinkedHashMap<>();
-
-        config.put(WatermarkerSetting.MESSAGE.getName(), getMessage());
-        config.put(WatermarkerSetting.KEY.getName(), getKey());
-
-        return config;
-    }
-
-    @Override
-    public void setConfiguration(Map<String, Object> config) {
-        setMessage(getValueOrDefault(WatermarkerSetting.MESSAGE.getName(), config, null));
-        setKey(getValueOrDefault(WatermarkerSetting.KEY.getName(), config, null));
-    }
-
-    @Override
-    public void verifyConfiguration(Map<String, Object> config) {
-        config.forEach((k, v) -> {
-            WatermarkerSetting setting = KEY_MAP.get(k);
-
-            if (setting == null)
-                throw new InvalidConfigurationValueException(ConfigurationSetting.WATERMARK.getName() + '.' + k
-                        + " is an invalid configuration key");
-            if (!setting.getExpectedType().isInstance(v))
-                throw new InvalidConfigurationValueException(ConfigurationSetting.WATERMARK.getName() + '.' + k,
-                        setting.getExpectedType(), v.getClass());
-
-        });
+    public void setConfiguration(Configuration config) {
+        setMessage(config.getOrDefault(WATERMARK + ".message", "blah"));
+        setKey(config.getOrDefault(WATERMARK + ".key", "blah"));
     }
 
     @Override

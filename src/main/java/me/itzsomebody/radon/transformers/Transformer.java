@@ -25,6 +25,7 @@ import me.itzsomebody.radon.Radon;
 import me.itzsomebody.radon.asm.ClassWrapper;
 import me.itzsomebody.radon.asm.FieldWrapper;
 import me.itzsomebody.radon.asm.MethodWrapper;
+import me.itzsomebody.radon.config.Configuration;
 import me.itzsomebody.radon.dictionaries.Dictionary;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.utils.RandomUtils;
@@ -116,10 +117,5 @@ public abstract class Transformer implements Opcodes {
 
     public abstract ExclusionType getExclusionType();
 
-    // Might return a boolean / integer / string / whatever instead of Map.
-    public abstract Object getConfiguration();
-
-    public abstract void setConfiguration(Map<String, Object> config);
-
-    public abstract void verifyConfiguration(Map<String, Object> config);
+    public abstract void setConfiguration(Configuration config);
 }

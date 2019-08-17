@@ -19,15 +19,13 @@
 package me.itzsomebody.radon.transformers.optimizers;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Stream;
-import me.itzsomebody.radon.config.ConfigurationSetting;
-import me.itzsomebody.radon.exceptions.InvalidConfigurationValueException;
+import me.itzsomebody.radon.config.Configuration;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
+
+import static me.itzsomebody.radon.config.ConfigurationSetting.OPTIMIZER;
 
 /**
  * Optimizer.
@@ -35,16 +33,7 @@ import me.itzsomebody.radon.transformers.Transformer;
  * @author ItzSomebody
  */
 public class Optimizer extends Transformer {
-    private static final Map<String, OptimizerSetting> KEY_MAP = new HashMap<>();
-    private static final Map<Optimizer, OptimizerSetting> OPTIMIZER_SETTING_MAP = new HashMap<>();
     private final List<Optimizer> optimizers = new ArrayList<>();
-
-    static {
-        OptimizerSetting[] values = OptimizerSetting.values();
-        Stream.of(values).forEach(setting -> KEY_MAP.put(setting.getName(), setting));
-        Stream.of(values).forEach(setting -> OPTIMIZER_SETTING_MAP.put(setting.getOptimizer(), setting));
-    }
-    // TODO Add some more inliners cuz why not
 
     @Override
     public void transform() {
@@ -65,35 +54,15 @@ public class Optimizer extends Transformer {
     }
 
     @Override
-    public Object getConfiguration() {
-        Map<String, Object> config = new LinkedHashMap<>();
+    public void setConfiguration(Configuration config) {
+        Stream.of(OptimizerSetting.values()).filter(setting -> {
+            String path = OPTIMIZER + "." + setting.getName();
 
-        optimizers.forEach(optimizer -> config.put(optimizer.getOptimizerSetting().getName(), true));
+            if (config.contains(path)) {
+                return config.get(path);
+            }
 
-        return config;
-    }
-
-    @Override
-    public void setConfiguration(Map<String, Object> config) {
-        Stream.of(OptimizerSetting.values()).filter(setting -> config.containsKey(setting.getName())
-                && (Boolean) config.get(setting.getName())).forEach(setting -> optimizers.add(setting.getOptimizer()));
-    }
-
-    @Override
-    public void verifyConfiguration(Map<String, Object> config) {
-        config.forEach((k, v) -> {
-            OptimizerSetting setting = KEY_MAP.get(k);
-
-            if (setting == null)
-                throw new InvalidConfigurationValueException(ConfigurationSetting.OPTIMIZER.getName() + '.' + k
-                        + " is an invalid configuration key");
-            if (!setting.getExpectedType().isInstance(v))
-                throw new InvalidConfigurationValueException(ConfigurationSetting.OPTIMIZER.getName() + '.' + k,
-                        setting.getExpectedType(), v.getClass());
-        });
-    }
-
-    private OptimizerSetting getOptimizerSetting() {
-        return OPTIMIZER_SETTING_MAP.get(this);
+            return false;
+        }).forEach(setting -> optimizers.add(setting.getOptimizer()));
     }
 }

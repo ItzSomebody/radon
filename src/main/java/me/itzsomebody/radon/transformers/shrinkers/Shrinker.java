@@ -19,15 +19,13 @@
 package me.itzsomebody.radon.transformers.shrinkers;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Stream;
-import me.itzsomebody.radon.config.ConfigurationSetting;
-import me.itzsomebody.radon.exceptions.InvalidConfigurationValueException;
+import me.itzsomebody.radon.config.Configuration;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
+
+import static me.itzsomebody.radon.config.ConfigurationSetting.SHRINKER;
 
 /**
  * Abstract class for shrinking transformers.
@@ -35,15 +33,7 @@ import me.itzsomebody.radon.transformers.Transformer;
  * @author ItzSomebody
  */
 public class Shrinker extends Transformer {
-    private static final Map<String, ShrinkerSetting> KEY_MAP = new HashMap<>();
-    private static final Map<Shrinker, ShrinkerSetting> SHRINKER_SETTING_MAP = new HashMap<>();
     private final List<Shrinker> shrinkers = new ArrayList<>();
-
-    static {
-        ShrinkerSetting[] values = ShrinkerSetting.values();
-        Stream.of(values).forEach(setting -> KEY_MAP.put(setting.getName(), setting));
-        Stream.of(values).forEach(setting -> SHRINKER_SETTING_MAP.put(setting.getShrinker(), setting));
-    }
 
     @Override
     public void transform() {
@@ -64,35 +54,15 @@ public class Shrinker extends Transformer {
     }
 
     @Override
-    public Object getConfiguration() {
-        Map<String, Object> config = new LinkedHashMap<>();
+    public void setConfiguration(Configuration config) {
+        Stream.of(ShrinkerSetting.values()).filter(setting -> {
+            String path = SHRINKER + "." + setting.getName();
 
-        shrinkers.forEach(shrinker -> config.put(shrinker.getShrinkerSetting().getName(), true));
+            if (config.contains(path)) {
+                return config.get(path);
+            }
 
-        return config;
-    }
-
-    @Override
-    public void setConfiguration(Map<String, Object> config) {
-        Stream.of(ShrinkerSetting.values()).filter(setting -> config.containsKey(setting.getName())
-                && (Boolean) config.get(setting.getName())).forEach(setting -> shrinkers.add(setting.getShrinker()));
-    }
-
-    @Override
-    public void verifyConfiguration(Map<String, Object> config) {
-        config.forEach((k, v) -> {
-            ShrinkerSetting setting = KEY_MAP.get(k);
-
-            if (setting == null)
-                throw new InvalidConfigurationValueException(ConfigurationSetting.SHRINKER.getName() + '.' + k
-                        + " is an invalid configuration key");
-            if (!setting.getExpectedType().isInstance(v))
-                throw new InvalidConfigurationValueException(ConfigurationSetting.SHRINKER.getName() + '.' + k,
-                        setting.getExpectedType(), v.getClass());
-        });
-    }
-
-    private ShrinkerSetting getShrinkerSetting() {
-        return SHRINKER_SETTING_MAP.get(this);
+            return false;
+        }).forEach(setting -> shrinkers.add(setting.getShrinker()));
     }
 }

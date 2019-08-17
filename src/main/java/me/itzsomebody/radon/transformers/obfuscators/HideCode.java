@@ -16,21 +16,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package me.itzsomebody.radon.transformers.obfuscators.hidecode;
+package me.itzsomebody.radon.transformers.obfuscators;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Stream;
 import me.itzsomebody.radon.Main;
-import me.itzsomebody.radon.config.ConfigurationSetting;
-import me.itzsomebody.radon.exceptions.InvalidConfigurationValueException;
+import me.itzsomebody.radon.config.Configuration;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
 import me.itzsomebody.radon.utils.ASMUtils;
 
-import static me.itzsomebody.radon.utils.ConfigUtils.getValueOrDefault;
+import static me.itzsomebody.radon.config.ConfigurationSetting.HIDE_CODE;
 
 /**
  * Adds a synthetic modifier and bridge modifier if possible to attempt to hide code against some lower-quality
@@ -39,14 +34,9 @@ import static me.itzsomebody.radon.utils.ConfigUtils.getValueOrDefault;
  * @author ItzSomebody
  */
 public class HideCode extends Transformer {
-    private static final Map<String, HideCodeSetting> KEY_MAP = new HashMap<>();
     private boolean hideClassesEnabled;
     private boolean hideMethodsEnabled;
     private boolean hideFieldsEnabled;
-
-    static {
-        Stream.of(HideCodeSetting.values()).forEach(setting -> KEY_MAP.put(setting.getName(), setting));
-    }
 
     @Override
     public void transform() {
@@ -101,35 +91,10 @@ public class HideCode extends Transformer {
     }
 
     @Override
-    public Object getConfiguration() {
-        Map<String, Object> config = new LinkedHashMap<>();
-
-        config.put(HideCodeSetting.HIDE_CLASSES.getName(), isHideClassesEnabled());
-        config.put(HideCodeSetting.HIDE_METHODS.getName(), isHideMethodsEnabled());
-        config.put(HideCodeSetting.HIDE_FIELDS.getName(), isHideFieldsEnabled());
-
-        return config;
-    }
-
-    @Override
-    public void setConfiguration(Map<String, Object> config) {
-        setHideClassesEnabled(getValueOrDefault(HideCodeSetting.HIDE_CLASSES.getName(), config, false));
-        setHideFieldsEnabled(getValueOrDefault(HideCodeSetting.HIDE_FIELDS.getName(), config, false));
-        setHideMethodsEnabled(getValueOrDefault(HideCodeSetting.HIDE_METHODS.getName(), config, false));
-    }
-
-    @Override
-    public void verifyConfiguration(Map<String, Object> config) {
-        config.forEach((k, v) -> {
-            HideCodeSetting setting = KEY_MAP.get(k);
-
-            if (setting == null)
-                throw new InvalidConfigurationValueException(ConfigurationSetting.HIDE_CODE.getName() + '.' + k
-                        + " is an invalid configuration key");
-            if (!setting.getExpectedType().isInstance(v))
-                throw new InvalidConfigurationValueException(ConfigurationSetting.HIDE_CODE.getName() + '.' + k,
-                        setting.getExpectedType(), v.getClass());
-        });
+    public void setConfiguration(Configuration config) {
+        setHideClassesEnabled(config.getOrDefault(HIDE_CODE + ".hide_classes", false));
+        setHideFieldsEnabled(config.getOrDefault(HIDE_CODE + ".hide_fields", false));
+        setHideMethodsEnabled(config.getOrDefault(HIDE_CODE + ".hide_methods", false));
     }
 
     private boolean isHideClassesEnabled() {

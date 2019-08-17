@@ -19,11 +19,9 @@
 package me.itzsomebody.radon.transformers.obfuscators;
 
 import java.lang.reflect.Modifier;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import me.itzsomebody.radon.Main;
-import me.itzsomebody.radon.config.ConfigurationSetting;
-import me.itzsomebody.radon.exceptions.InvalidConfigurationValueException;
+import me.itzsomebody.radon.config.Configuration;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
 import me.itzsomebody.radon.utils.ASMUtils;
@@ -93,17 +91,7 @@ public class StaticInitialization extends Transformer {
     }
 
     @Override
-    public Object getConfiguration() {
-        return true;
-    }
-
-    @Override
-    public void setConfiguration(Map<String, Object> config) {
+    public void setConfiguration(Configuration config) {
         // Not needed
-    }
-
-    @Override
-    public void verifyConfiguration(Map<String, Object> config) {
-        throw new InvalidConfigurationValueException(ConfigurationSetting.STATIC_INITIALIZATION + " expects a boolean");
     }
 }

@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package me.itzsomebody.radon.transformers.obfuscators.renamer;
+package me.itzsomebody.radon.transformers.obfuscators;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -27,7 +27,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -39,9 +38,8 @@ import me.itzsomebody.radon.asm.ClassTree;
 import me.itzsomebody.radon.asm.FieldWrapper;
 import me.itzsomebody.radon.asm.MemberRemapper;
 import me.itzsomebody.radon.asm.MethodWrapper;
-import me.itzsomebody.radon.config.ConfigurationSetting;
+import me.itzsomebody.radon.config.Configuration;
 import me.itzsomebody.radon.dictionaries.Dictionary;
-import me.itzsomebody.radon.exceptions.InvalidConfigurationValueException;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
 import me.itzsomebody.radon.utils.FileUtils;
@@ -49,7 +47,7 @@ import org.objectweb.asm.commons.ClassRemapper;
 import org.objectweb.asm.commons.Remapper;
 import org.objectweb.asm.tree.ClassNode;
 
-import static me.itzsomebody.radon.utils.ConfigUtils.getValueOrDefault;
+import static me.itzsomebody.radon.config.ConfigurationSetting.RENAMER;
 
 
 /**
@@ -58,15 +56,10 @@ import static me.itzsomebody.radon.utils.ConfigUtils.getValueOrDefault;
  * @author ItzSomebody
  */
 public class Renamer extends Transformer {
-    private static final Map<String, RenamerSetting> KEY_MAP = new HashMap<>();
     private String[] adaptTheseResources;
     private boolean dumpMappings;
     private String repackageName;
     private Map<String, String> mappings;
-
-    static {
-        Stream.of(RenamerSetting.values()).forEach(setting -> KEY_MAP.put(setting.getName(), setting));
-    }
 
     private static boolean methodCanBeRenamed(MethodWrapper wrapper) {
         return !wrapper.getAccess().isNative() && !"main".equals(wrapper.getOriginalName())
@@ -319,35 +312,10 @@ public class Renamer extends Transformer {
     }
 
     @Override
-    public Object getConfiguration() {
-        Map<String, Object> config = new LinkedHashMap<>();
-
-        config.put(RenamerSetting.ADAPT_THESE_RESOURCES.getName(), getAdaptTheseResources());
-        config.put(RenamerSetting.DUMP_MAPPINGS.getName(), isDumpMappings());
-        config.put(RenamerSetting.REPACKAGE_NAME.getName(), getRepackageName());
-
-        return config;
-    }
-
-    @Override
-    public void setConfiguration(Map<String, Object> config) {
-        setAdaptTheseResources(getValueOrDefault(RenamerSetting.ADAPT_THESE_RESOURCES.getName(), config, new ArrayList<String>()).toArray(new String[0]));
-        setDumpMappings(getValueOrDefault(RenamerSetting.DUMP_MAPPINGS.getName(), config, false));
-        setRepackageName(getValueOrDefault(RenamerSetting.REPACKAGE_NAME.getName(), config, null));
-    }
-
-    @Override
-    public void verifyConfiguration(Map<String, Object> config) {
-        config.forEach((k, v) -> {
-            RenamerSetting setting = KEY_MAP.get(k);
-
-            if (setting == null)
-                throw new InvalidConfigurationValueException(ConfigurationSetting.RENAMER.getName() + '.' + k
-                        + " is an invalid configuration key");
-            if (!setting.getExpectedType().isInstance(v))
-                throw new InvalidConfigurationValueException(ConfigurationSetting.RENAMER.getName() + '.' + k,
-                        setting.getExpectedType(), v.getClass());
-        });
+    public void setConfiguration(Configuration config) {
+        setAdaptTheseResources(config.getOrDefault(RENAMER + ".adapt_these_resources", new String[0]));
+        setDumpMappings(config.getOrDefault(RENAMER + ".dump_mappings", false));
+        setRepackageName(config.getOrDefault(RENAMER + ".repackage_name", null));
     }
 
     private String[] getAdaptTheseResources() {
@@ -358,11 +326,11 @@ public class Renamer extends Transformer {
         this.adaptTheseResources = adaptTheseResources;
     }
 
-    public boolean isDumpMappings() {
+    private boolean isDumpMappings() {
         return dumpMappings;
     }
 
-    public void setDumpMappings(boolean dumpMappings) {
+    private void setDumpMappings(boolean dumpMappings) {
         this.dumpMappings = dumpMappings;
     }
 

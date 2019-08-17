@@ -19,15 +19,13 @@
 package me.itzsomebody.radon.transformers.obfuscators;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 import me.itzsomebody.radon.Main;
 import me.itzsomebody.radon.asm.ClassWrapper;
 import me.itzsomebody.radon.asm.MethodWrapper;
-import me.itzsomebody.radon.config.ConfigurationSetting;
-import me.itzsomebody.radon.exceptions.InvalidConfigurationValueException;
+import me.itzsomebody.radon.config.Configuration;
 import me.itzsomebody.radon.exceptions.RadonException;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
@@ -42,7 +40,7 @@ import org.objectweb.asm.tree.MethodInsnNode;
 /**
  * This applies passive integrity checking to the application with a special
  * type of string encryption.
- * FIXME: kinda broken
+ * todo: scrap and remake
  *
  * @author ItzSomebody
  */
@@ -108,18 +106,8 @@ public class AntiTamper extends Transformer {
     }
 
     @Override
-    public Object getConfiguration() {
-        return true;
-    }
-
-    @Override
-    public void setConfiguration(Map<String, Object> config) {
+    public void setConfiguration(Configuration config) {
         // Not needed
-    }
-
-    @Override
-    public void verifyConfiguration(Map<String, Object> config) {
-        throw new InvalidConfigurationValueException(ConfigurationSetting.ANTI_TAMPER + " expects a boolean");
     }
 
     private static String encrypt(String s, MemberNames memberNames, String className, String methodName, int cpSize) {

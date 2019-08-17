@@ -18,17 +18,13 @@
 
 package me.itzsomebody.radon.transformers.obfuscators.strings;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 import me.itzsomebody.radon.Main;
 import me.itzsomebody.radon.asm.ClassWrapper;
-import me.itzsomebody.radon.config.ConfigurationSetting;
-import me.itzsomebody.radon.exceptions.InvalidConfigurationValueException;
+import me.itzsomebody.radon.config.Configuration;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
 import me.itzsomebody.radon.utils.ASMUtils;
@@ -40,7 +36,7 @@ import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 
-import static me.itzsomebody.radon.utils.ConfigUtils.getValueOrDefault;
+import static me.itzsomebody.radon.config.ConfigurationSetting.STRING_ENCRYPTION;
 
 /**
  * Abstract class for string encryption transformers.
@@ -48,14 +44,9 @@ import static me.itzsomebody.radon.utils.ConfigUtils.getValueOrDefault;
  * @author ItzSomebody
  */
 public class StringEncryption extends Transformer {
-    private static final Map<String, StringEncryptionSetting> KEY_MAP = new HashMap<>();
     private List<String> exemptedStrings;
     private boolean contextCheckingEnabled;
     private boolean stringPoolingEnabled;
-
-    static {
-        Stream.of(StringEncryptionSetting.values()).forEach(setting -> KEY_MAP.put(setting.getName(), setting));
-    }
 
     @Override
     public void transform() {
@@ -121,35 +112,10 @@ public class StringEncryption extends Transformer {
     }
 
     @Override
-    public Object getConfiguration() {
-        Map<String, Object> config = new LinkedHashMap<>();
-
-        config.put(StringEncryptionSetting.EXEMPTED_STRINGS.getName(), getExemptedStrings());
-        config.put(StringEncryptionSetting.POOL_STRINGS.getName(), isStringPoolingEnabled());
-        config.put(StringEncryptionSetting.CHECK_CONTEXT.getName(), isContextCheckingEnabled());
-
-        return config;
-    }
-
-    @Override
-    public void setConfiguration(Map<String, Object> config) {
-        setExemptedStrings(getValueOrDefault(StringEncryptionSetting.EXEMPTED_STRINGS.getName(), config, new ArrayList<>()));
-        setStringPoolingEnabled(getValueOrDefault(StringEncryptionSetting.POOL_STRINGS.getName(), config, false));
-        setContextCheckingEnabled(getValueOrDefault(StringEncryptionSetting.CHECK_CONTEXT.getName(), config, false));
-    }
-
-    @Override
-    public void verifyConfiguration(Map<String, Object> config) {
-        config.forEach((k, v) -> {
-            StringEncryptionSetting setting = KEY_MAP.get(k);
-
-            if (setting == null)
-                throw new InvalidConfigurationValueException(ConfigurationSetting.STRING_ENCRYPTION.getName() + '.' + k
-                        + " is an invalid configuration key");
-            if (!setting.getExpectedType().isInstance(v))
-                throw new InvalidConfigurationValueException(ConfigurationSetting.STRING_ENCRYPTION.getName() + '.' + k,
-                        setting.getExpectedType(), v.getClass());
-        });
+    public void setConfiguration(Configuration config) {
+        setExemptedStrings(config.getOrDefault(STRING_ENCRYPTION + ".exempted_strings", Collections.emptyList()));
+        setStringPoolingEnabled(config.getOrDefault(STRING_ENCRYPTION + ".pool_strings", false));
+        setContextCheckingEnabled(config.getOrDefault(STRING_ENCRYPTION + ".check_context", false));
     }
 
     protected boolean excludedString(String str) {

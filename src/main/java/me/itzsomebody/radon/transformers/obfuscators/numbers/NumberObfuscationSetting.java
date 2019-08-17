@@ -19,24 +19,14 @@
 package me.itzsomebody.radon.transformers.obfuscators.numbers;
 
 public enum NumberObfuscationSetting {
-    CONTEXT_CHECKING(Boolean.class, new ContextCheckObfuscator()),
-    ARITHMETIC_OPERATIONS(Boolean.class, new ArithmeticObfuscator()),
-    BITWISE_OPERATIONS(Boolean.class, new BitwiseObfuscator()),
-    DOUBLE_TAMPERING(Boolean.class, null),
-    FLOAT_TAMPERING(Boolean.class, null),
-    INTEGER_TAMPERING(Boolean.class, null),
-    LONG_TAMPERING(Boolean.class, null);
+    CONTEXT_CHECKING(new ContextCheckObfuscator()),
+    ARITHMETIC_OPERATIONS(new ArithmeticObfuscator()),
+    BITWISE_OPERATIONS(new BitwiseObfuscator());
 
-    private final Class expectedType;
     private final NumberObfuscation numberObfuscation;
 
-    NumberObfuscationSetting(Class expectedType, NumberObfuscation numberObfuscation) {
-        this.expectedType = expectedType;
+    NumberObfuscationSetting(NumberObfuscation numberObfuscation) {
         this.numberObfuscation = numberObfuscation;
-    }
-
-    public Class getExpectedType() {
-        return expectedType;
     }
 
     public NumberObfuscation getNumberObfuscation() {

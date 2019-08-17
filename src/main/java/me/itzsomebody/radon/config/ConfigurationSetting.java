@@ -21,22 +21,22 @@ package me.itzsomebody.radon.config;
 import java.util.List;
 import java.util.Map;
 import me.itzsomebody.radon.transformers.Transformer;
+import me.itzsomebody.radon.transformers.miscellaneous.Expiration;
 import me.itzsomebody.radon.transformers.miscellaneous.Packer;
-import me.itzsomebody.radon.transformers.miscellaneous.expiration.Expiration;
-import me.itzsomebody.radon.transformers.miscellaneous.watermarker.Watermarker;
-import me.itzsomebody.radon.transformers.obfuscators.antidebug.AntiDebug;
+import me.itzsomebody.radon.transformers.miscellaneous.Watermarker;
+import me.itzsomebody.radon.transformers.obfuscators.AntiDebug;
 import me.itzsomebody.radon.transformers.obfuscators.AntiTamper;
 import me.itzsomebody.radon.transformers.obfuscators.BadAnnotation;
+import me.itzsomebody.radon.transformers.obfuscators.HideCode;
 import me.itzsomebody.radon.transformers.obfuscators.InstructionSetReducer;
+import me.itzsomebody.radon.transformers.obfuscators.MemberShuffler;
+import me.itzsomebody.radon.transformers.obfuscators.Renamer;
 import me.itzsomebody.radon.transformers.obfuscators.ResourceRenamer;
-import me.itzsomebody.radon.transformers.obfuscators.ejector.Ejector;
 import me.itzsomebody.radon.transformers.obfuscators.StaticInitialization;
+import me.itzsomebody.radon.transformers.obfuscators.ejector.Ejector;
 import me.itzsomebody.radon.transformers.obfuscators.flow.FlowObfuscation;
-import me.itzsomebody.radon.transformers.obfuscators.hidecode.HideCode;
 import me.itzsomebody.radon.transformers.obfuscators.numbers.NumberObfuscation;
 import me.itzsomebody.radon.transformers.obfuscators.references.ReferenceObfuscation;
-import me.itzsomebody.radon.transformers.obfuscators.renamer.Renamer;
-import me.itzsomebody.radon.transformers.obfuscators.shuffler.MemberShuffler;
 import me.itzsomebody.radon.transformers.obfuscators.strings.StringEncryption;
 import me.itzsomebody.radon.transformers.obfuscators.virtualizer.Virtualizer;
 import me.itzsomebody.radon.transformers.optimizers.Optimizer;
@@ -48,10 +48,20 @@ import me.itzsomebody.radon.transformers.shrinkers.Shrinker;
  * @author ItzSomebody
  */
 public enum ConfigurationSetting {
+    // ============ stuff
     INPUT(String.class, null),
     OUTPUT(String.class, null),
     LIBRARIES(List.class, null),
     EXCLUSIONS(List.class, null),
+
+    DICTIONARY(String.class, null),
+    RANDOMIZED_STRING_LENGTH(Integer.class, null),
+    COMPRESSION_LEVEL(Integer.class, null),
+    VERIFY(Boolean.class, null),
+    CORRUPT_CRC(Boolean.class, null),
+    TRASH_CLASSES(Integer.class, null),
+
+    // ============ transformers
     STRING_ENCRYPTION(Map.class, new StringEncryption()),
     FLOW_OBFUSCATION(Map.class, new FlowObfuscation()),
     REFERENCE_OBFUSCATION(Map.class, new ReferenceObfuscation()),
@@ -63,9 +73,7 @@ public enum ConfigurationSetting {
     VIRTUALIZER(Boolean.class, new Virtualizer()),
     RESOURCE_RENAMER(Boolean.class, new ResourceRenamer()),
     PACKER(Boolean.class, new Packer()),
-    //CLASS_ENCRYPTION(Map.class, new ClassEncryption()), // Just kidding, lol
     HIDE_CODE(Map.class, new HideCode()),
-    //CRASHER(Boolean.class, new Crasher()),
     EXPIRATION(Map.class, new Expiration()),
     WATERMARK(Map.class, new Watermarker()),
     OPTIMIZER(Map.class, new Optimizer()),
@@ -73,12 +81,6 @@ public enum ConfigurationSetting {
     MEMBER_SHUFFLER(Map.class, new MemberShuffler()),
     EJECTOR(Map.class, new Ejector()),
     RENAMER(Map.class, new Renamer()),
-    DICTIONARY(String.class, null),
-    RANDOMIZED_STRING_LENGTH(Integer.class, null),
-    COMPRESSION_LEVEL(Integer.class, null),
-    VERIFY(Boolean.class, null),
-    CORRUPT_CRC(Boolean.class, null),
-    TRASH_CLASSES(Integer.class, null),
     BAD_ANNOTATION(Boolean.class, new BadAnnotation());
 
     private final Class expectedType;
@@ -112,7 +114,12 @@ public enum ConfigurationSetting {
      *
      * @return the name of this Enum constant in lowercase.
      */
-    public String getName() {
+    public String getConfigName() {
         return name().toLowerCase();
+    }
+
+    @Override
+    public String toString() {
+        return getConfigName();
     }
 }

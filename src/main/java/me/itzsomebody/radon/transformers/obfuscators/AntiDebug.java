@@ -16,16 +16,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package me.itzsomebody.radon.transformers.obfuscators.antidebug;
+package me.itzsomebody.radon.transformers.obfuscators;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Stream;
 import me.itzsomebody.radon.Main;
-import me.itzsomebody.radon.config.ConfigurationSetting;
-import me.itzsomebody.radon.exceptions.InvalidConfigurationValueException;
+import me.itzsomebody.radon.config.Configuration;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
 import me.itzsomebody.radon.utils.RandomUtils;
@@ -39,7 +34,7 @@ import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 
-import static me.itzsomebody.radon.utils.ConfigUtils.getValueOrDefault;
+import static me.itzsomebody.radon.config.ConfigurationSetting.ANTI_DEBUG;
 
 /**
  * Blocks debugging options on the commandline.
@@ -47,15 +42,10 @@ import static me.itzsomebody.radon.utils.ConfigUtils.getValueOrDefault;
  * @author vovanre
  */
 public class AntiDebug extends Transformer {
-    private static final Map<String, AntiDebugSetting> KEY_MAP = new HashMap<>();
     private static final String[] DEBUG_OPTIONS = new String[]{"-agentlib:jdwp", "-Xdebug", "-Xrunjdwp:", "-javaagent:"};
 
     private AtomicInteger debugOptionIndex;
     private String message;
-
-    static {
-        Stream.of(AntiDebugSetting.values()).forEach(setting -> KEY_MAP.put(setting.getName(), setting));
-    }
 
     @Override
     public void transform() {
@@ -141,31 +131,8 @@ public class AntiDebug extends Transformer {
     }
 
     @Override
-    public Object getConfiguration() {
-        Map<String, Object> config = new LinkedHashMap<>();
-
-        config.put(AntiDebugSetting.MESSAGE.getName(), getMessage());
-
-        return config;
-    }
-
-    @Override
-    public void setConfiguration(Map<String, Object> config) {
-        setMessage(getValueOrDefault(AntiDebugSetting.MESSAGE.getName(), config, null));
-    }
-
-    @Override
-    public void verifyConfiguration(Map<String, Object> config) {
-        config.forEach((k, v) -> {
-            AntiDebugSetting setting = KEY_MAP.get(k);
-
-            if (setting == null)
-                throw new InvalidConfigurationValueException(ConfigurationSetting.ANTI_DEBUG.getName() + '.' + k
-                        + " is an invalid configuration key");
-            if (!setting.getExpectedType().isInstance(v))
-                throw new InvalidConfigurationValueException(ConfigurationSetting.ANTI_DEBUG.getName() + '.' + k,
-                        setting.getExpectedType(), v.getClass());
-        });
+    public void setConfiguration(Configuration config) {
+        setMessage(config.getOrDefault(ANTI_DEBUG + ".message", "Debugger properties detected"));
     }
 
     private void setMessage(String message) {

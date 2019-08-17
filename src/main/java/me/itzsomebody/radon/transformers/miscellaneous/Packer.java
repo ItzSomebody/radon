@@ -23,14 +23,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.jar.Manifest;
 import java.util.zip.GZIPOutputStream;
 import me.itzsomebody.radon.Main;
 import me.itzsomebody.radon.asm.ClassWrapper;
-import me.itzsomebody.radon.config.ConfigurationSetting;
-import me.itzsomebody.radon.exceptions.InvalidConfigurationValueException;
+import me.itzsomebody.radon.config.Configuration;
 import me.itzsomebody.radon.exceptions.RadonException;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
@@ -153,18 +151,8 @@ public class Packer extends Transformer {
     }
 
     @Override
-    public Object getConfiguration() {
-        return true;
-    }
-
-    @Override
-    public void setConfiguration(Map<String, Object> config) {
+    public void setConfiguration(Configuration config) {
         // Not needed
-    }
-
-    @Override
-    public void verifyConfiguration(Map<String, Object> config) {
-        throw new InvalidConfigurationValueException(ConfigurationSetting.PACKER + " expects a boolean");
     }
 
     @SuppressWarnings("Duplicates")

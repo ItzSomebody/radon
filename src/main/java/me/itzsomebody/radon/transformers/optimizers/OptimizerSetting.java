@@ -19,20 +19,14 @@
 package me.itzsomebody.radon.transformers.optimizers;
 
 public enum OptimizerSetting {
-    INLINE_GOTO_GOTO(Boolean.class, new GotoGotoInliner()),
-    INLINE_GOTO_RETURN(Boolean.class, new GotoReturnInliner()),
-    REMOVE_NOPS(Boolean.class, new NopRemover());
+    INLINE_GOTO_GOTO(new GotoGotoInliner()),
+    INLINE_GOTO_RETURN(new GotoReturnInliner()),
+    REMOVE_NOPS(new NopRemover());
 
-    private final Class expectedType;
     private final Optimizer optimizer;
 
-    OptimizerSetting(Class expectedType, Optimizer optimizer) {
-        this.expectedType = expectedType;
+    OptimizerSetting(Optimizer optimizer) {
         this.optimizer = optimizer;
-    }
-
-    public Class getExpectedType() {
-        return expectedType;
     }
 
     public Optimizer getOptimizer() {

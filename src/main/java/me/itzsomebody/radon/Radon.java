@@ -39,6 +39,7 @@ import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 import me.itzsomebody.radon.asm.ClassTree;
 import me.itzsomebody.radon.asm.ClassWrapper;
+import me.itzsomebody.radon.config.ObfuscationConfiguration;
 import me.itzsomebody.radon.exceptions.MissingClassException;
 import me.itzsomebody.radon.exceptions.RadonException;
 import me.itzsomebody.radon.exclusions.ExclusionType;

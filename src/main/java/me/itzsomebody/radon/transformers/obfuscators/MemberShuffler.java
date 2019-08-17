@@ -16,21 +16,16 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package me.itzsomebody.radon.transformers.obfuscators.shuffler;
+package me.itzsomebody.radon.transformers.obfuscators;
 
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Stream;
 import me.itzsomebody.radon.Main;
-import me.itzsomebody.radon.config.ConfigurationSetting;
-import me.itzsomebody.radon.exceptions.InvalidConfigurationValueException;
+import me.itzsomebody.radon.config.Configuration;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
 
-import static me.itzsomebody.radon.utils.ConfigUtils.getValueOrDefault;
+import static me.itzsomebody.radon.config.ConfigurationSetting.MEMBER_SHUFFLER;
 
 /**
  * Randomizes the order of methods and fields in a class.
@@ -38,13 +33,8 @@ import static me.itzsomebody.radon.utils.ConfigUtils.getValueOrDefault;
  * @author ItzSomebody
  */
 public class MemberShuffler extends Transformer {
-    private static final Map<String, MemberShufflerSetting> KEY_MAP = new HashMap<>();
     private boolean shuffleMethodsEnabled;
     private boolean shuffleFieldsEnabled;
-
-    static {
-        Stream.of(MemberShufflerSetting.values()).forEach(setting -> KEY_MAP.put(setting.getName(), setting));
-    }
 
     @Override
     public void transform() {
@@ -76,33 +66,9 @@ public class MemberShuffler extends Transformer {
     }
 
     @Override
-    public Object getConfiguration() {
-        Map<String, Object> config = new LinkedHashMap<>();
-
-        config.put(MemberShufflerSetting.SHUFFLE_FIELDS.getName(), isShuffleFieldsEnabled());
-        config.put(MemberShufflerSetting.SHUFFLE_METHODS.getName(), isShuffleMethodsEnabled());
-
-        return config;
-    }
-
-    @Override
-    public void setConfiguration(Map<String, Object> config) {
-        setShuffleFieldsEnabled(getValueOrDefault(MemberShufflerSetting.SHUFFLE_FIELDS.getName(), config, false));
-        setShuffleMethodsEnabled(getValueOrDefault(MemberShufflerSetting.SHUFFLE_METHODS.getName(), config, false));
-    }
-
-    @Override
-    public void verifyConfiguration(Map<String, Object> config) {
-        config.forEach((k, v) -> {
-            MemberShufflerSetting setting = KEY_MAP.get(k);
-
-            if (setting == null)
-                throw new InvalidConfigurationValueException(ConfigurationSetting.MEMBER_SHUFFLER.getName() + '.' + k
-                        + " is an invalid configuration key");
-            if (!setting.getExpectedType().isInstance(v))
-                throw new InvalidConfigurationValueException(ConfigurationSetting.MEMBER_SHUFFLER.getName() + '.' + k,
-                        setting.getExpectedType(), v.getClass());
-        });
+    public void setConfiguration(Configuration config) {
+        setShuffleFieldsEnabled(config.getOrDefault(MEMBER_SHUFFLER + ".shuffle_fields", false));
+        setShuffleMethodsEnabled(config.getOrDefault(MEMBER_SHUFFLER + ".shuffle_methods", false));
     }
 
     private boolean isShuffleMethodsEnabled() {

@@ -61,7 +61,7 @@ public class FileUtils {
                     getSubDirectoryFiles(f, libraries);
                 } else {
                     if (f.getName().toLowerCase().endsWith(".jar")) {
-                        //System.out.println(fileLists[i].getName());
+                        //System.out.println(fileLists[i].getConfigName());
                         libraries.add(f);
                     }
                 }

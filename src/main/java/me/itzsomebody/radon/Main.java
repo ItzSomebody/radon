@@ -33,7 +33,8 @@ import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 import java.util.zip.ZipFile;
 import me.itzsomebody.radon.cli.CommandArgumentsParser;
-import me.itzsomebody.radon.config.ConfigurationParser;
+import me.itzsomebody.radon.config.Configuration;
+import me.itzsomebody.radon.config.ObfuscationConfiguration;
 import me.itzsomebody.radon.utils.CustomOutputStream;
 import me.itzsomebody.radon.utils.IOUtils;
 import me.itzsomebody.radon.utils.WatermarkUtils;
@@ -105,10 +106,10 @@ public class Main {
             showLicense();
         else if (parser.containsSwitch("config")) {
             File file = new File(parser.getSwitchArgs("config")[0]);
-            ConfigurationParser config;
+            Configuration config;
 
             try {
-                config = new ConfigurationParser(new FileInputStream(file));
+                config = new Configuration(new FileInputStream(file));
             } catch (FileNotFoundException exc) {
                 severe(String.format("Configuration \"%s\" file not found", file.getName()));
                 return;
@@ -116,7 +117,7 @@ public class Main {
 
             try {
                 // Parse the config and let's run Radon.
-                Radon radon = new Radon(config.createObfuscatorConfiguration());
+                Radon radon = new Radon(ObfuscationConfiguration.from(config));
                 radon.run();
             } catch (Throwable t) {
                 t.printStackTrace();

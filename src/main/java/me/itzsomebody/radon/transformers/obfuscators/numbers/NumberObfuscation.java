@@ -19,18 +19,14 @@
 package me.itzsomebody.radon.transformers.obfuscators.numbers;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Stream;
-import me.itzsomebody.radon.config.ConfigurationSetting;
-import me.itzsomebody.radon.exceptions.InvalidConfigurationValueException;
+import me.itzsomebody.radon.config.Configuration;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
 import me.itzsomebody.radon.utils.RandomUtils;
 
-import static me.itzsomebody.radon.utils.ConfigUtils.getValueOrDefault;
+import static me.itzsomebody.radon.config.ConfigurationSetting.NUMBER_OBFUSCATION;
 
 /**
  * Abstract class for number obfuscation transformers.
@@ -38,8 +34,6 @@ import static me.itzsomebody.radon.utils.ConfigUtils.getValueOrDefault;
  * @author ItzSomebody
  */
 public class NumberObfuscation extends Transformer {
-    private static final Map<String, NumberObfuscationSetting> KEY_MAP = new HashMap<>();
-    private static final Map<NumberObfuscation, NumberObfuscationSetting> NUMBEROBF_SETTING_MAP = new HashMap<>();
     private final List<NumberObfuscation> numberObfuscators = new ArrayList<>();
     private boolean integerTamperingEnabled;
     private boolean longTamperingEnabled;
@@ -47,13 +41,6 @@ public class NumberObfuscation extends Transformer {
     private boolean doubleTamperingEnabled;
 
     protected NumberObfuscation master;
-
-    static {
-        NumberObfuscationSetting[] values = NumberObfuscationSetting.values();
-        Stream.of(values).forEach(setting -> KEY_MAP.put(setting.getName(), setting));
-        Stream.of(values).filter(setting -> setting.getNumberObfuscation() != null)
-                .forEach(setting -> NUMBEROBF_SETTING_MAP.put(setting.getNumberObfuscation(), setting));
-    }
 
     @Override
     public void transform() {
@@ -75,43 +62,21 @@ public class NumberObfuscation extends Transformer {
     }
 
     @Override
-    public Object getConfiguration() {
-        Map<String, Object> config = new LinkedHashMap<>();
+    public void setConfiguration(Configuration config) {
+        Stream.of(NumberObfuscationSetting.values()).filter(setting -> {
+            String path = NUMBER_OBFUSCATION + "." + setting.getName();
 
-        numberObfuscators.forEach(obfuscator -> config.put(obfuscator.getNumberObfuscationSetting().getName(), true));
+            if (config.contains(path)) {
+                return config.get(path);
+            }
 
-        config.put(NumberObfuscationSetting.DOUBLE_TAMPERING.getName(), isDoubleTamperingEnabled());
-        config.put(NumberObfuscationSetting.FLOAT_TAMPERING.getName(), isFloatTamperingEnabled());
-        config.put(NumberObfuscationSetting.INTEGER_TAMPERING.getName(), isIntegerTamperingEnabled());
-        config.put(NumberObfuscationSetting.LONG_TAMPERING.getName(), isLongTamperingEnabled());
+            return false;
+        }).forEach(setting -> numberObfuscators.add(setting.getNumberObfuscation()));
 
-        return config;
-    }
-
-    @Override
-    public void setConfiguration(Map<String, Object> config) {
-        Stream.of(NumberObfuscationSetting.values()).filter(setting -> setting.getNumberObfuscation() != null
-                && config.containsKey(setting.getName()) && (Boolean) config.get(setting.getName()))
-                .forEach(setting -> numberObfuscators.add(setting.getNumberObfuscation()));
-
-        setDoubleTamperingEnabled(getValueOrDefault(NumberObfuscationSetting.DOUBLE_TAMPERING.getName(), config, false));
-        setFloatTamperingEnabled(getValueOrDefault(NumberObfuscationSetting.FLOAT_TAMPERING.getName(), config, false));
-        setIntegerTamperingEnabled(getValueOrDefault(NumberObfuscationSetting.INTEGER_TAMPERING.getName(), config, false));
-        setLongTamperingEnabled(getValueOrDefault(NumberObfuscationSetting.LONG_TAMPERING.getName(), config, false));
-    }
-
-    @Override
-    public void verifyConfiguration(Map<String, Object> config) {
-        config.forEach((k, v) -> {
-            NumberObfuscationSetting setting = KEY_MAP.get(k);
-
-            if (setting == null)
-                throw new InvalidConfigurationValueException(ConfigurationSetting.NUMBER_OBFUSCATION.getName() + '.' + k
-                        + " is an invalid configuration key");
-            if (!setting.getExpectedType().isInstance(v))
-                throw new InvalidConfigurationValueException(ConfigurationSetting.NUMBER_OBFUSCATION.getName() + '.' + k,
-                        setting.getExpectedType(), v.getClass());
-        });
+        setDoubleTamperingEnabled(config.getOrDefault(NUMBER_OBFUSCATION + ".double_tampering", false));
+        setFloatTamperingEnabled(config.getOrDefault(NUMBER_OBFUSCATION + ".float_tampering", false));
+        setIntegerTamperingEnabled(config.getOrDefault(NUMBER_OBFUSCATION + ".integer_tampering", false));
+        setLongTamperingEnabled(config.getOrDefault(NUMBER_OBFUSCATION + ".long_tampering", false));
     }
 
     private void initMaster(NumberObfuscation master) {
@@ -176,9 +141,5 @@ public class NumberObfuscation extends Transformer {
 
     protected void setDoubleTamperingEnabled(boolean doubleTamperingEnabled) {
         this.doubleTamperingEnabled = doubleTamperingEnabled;
-    }
-
-    private NumberObfuscationSetting getNumberObfuscationSetting() {
-        return NUMBEROBF_SETTING_MAP.get(this);
     }
 }

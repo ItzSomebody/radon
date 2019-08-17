@@ -16,26 +16,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package me.itzsomebody.radon.transformers.obfuscators.strings;
+package me.itzsomebody.radon.dictionaries;
 
-import java.util.List;
+public class DictionaryFactory {
+    public static Dictionary get(String s) {
+        Dictionary[] dictionaries = {
+                new AlphaNumDictionary(),
+                new RandomUnicodeDictionary(),
+                new SpacesDictionary(),
+                new UnrecognizedDictionary()
+        };
 
-public enum StringEncryptionSetting {
-    EXEMPTED_STRINGS(List.class),
-    POOL_STRINGS(Boolean.class),
-    CHECK_CONTEXT(Boolean.class);
+        for (Dictionary dictionary : dictionaries) {
+            if (dictionary.getDictionaryName().equals(s)) {
+                return dictionary;
+            }
+        }
 
-    private final Class expectedType;
-
-    StringEncryptionSetting(Class expectedType) {
-        this.expectedType = expectedType;
-    }
-
-    public Class getExpectedType() {
-        return expectedType;
-    }
-
-    public String getName() {
-        return name().toLowerCase();
+        return new CustomDictionary(s);
     }
 }

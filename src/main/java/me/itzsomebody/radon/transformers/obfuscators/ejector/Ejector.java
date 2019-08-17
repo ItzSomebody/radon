@@ -19,18 +19,13 @@
 package me.itzsomebody.radon.transformers.obfuscators.ejector;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Stream;
 import me.itzsomebody.radon.Main;
 import me.itzsomebody.radon.analysis.constant.ConstantAnalyzer;
 import me.itzsomebody.radon.analysis.constant.values.AbstractValue;
 import me.itzsomebody.radon.asm.ClassWrapper;
-import me.itzsomebody.radon.config.ConfigurationSetting;
-import me.itzsomebody.radon.exceptions.InvalidConfigurationValueException;
+import me.itzsomebody.radon.config.Configuration;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
 import me.itzsomebody.radon.transformers.obfuscators.ejector.phases.AbstractEjectPhase;
@@ -39,7 +34,7 @@ import me.itzsomebody.radon.transformers.obfuscators.ejector.phases.MethodCallEj
 import org.objectweb.asm.tree.analysis.AnalyzerException;
 import org.objectweb.asm.tree.analysis.Frame;
 
-import static me.itzsomebody.radon.utils.ConfigUtils.getValueOrDefault;
+import static me.itzsomebody.radon.config.ConfigurationSetting.EJECTOR;
 
 /**
  * Extracts parts of code to individual methods.
@@ -47,12 +42,6 @@ import static me.itzsomebody.radon.utils.ConfigUtils.getValueOrDefault;
  * @author vovanre
  */
 public class Ejector extends Transformer {
-    private static final Map<String, EjectorSetting> KEY_MAP = new HashMap<>();
-
-    static {
-        Stream.of(EjectorSetting.values()).forEach(setting -> KEY_MAP.put(setting.getName(), setting));
-    }
-
     private boolean ejectMethodCalls;
     private boolean ejectFieldSet;
     private boolean junkArguments;
@@ -110,37 +99,11 @@ public class Ejector extends Transformer {
     }
 
     @Override
-    public Object getConfiguration() {
-        Map<String, Object> config = new LinkedHashMap<>();
-
-        config.put(EjectorSetting.EJECT_CALL.getName(), isEjectMethodCalls());
-        config.put(EjectorSetting.EJECT_FIELD_SET.getName(), isEjectFieldSet());
-        config.put(EjectorSetting.JUNK_ARGUMENT.getName(), isJunkArguments());
-        config.put(EjectorSetting.JUNK_ARGUMENT_STRENGTH.getName(), getJunkArgumentStrength());
-
-        return config;
-    }
-
-    @Override
-    public void setConfiguration(Map<String, Object> config) {
-        setEjectMethodCalls(getValueOrDefault(EjectorSetting.EJECT_CALL.getName(), config, false));
-        setEjectFieldSet(getValueOrDefault(EjectorSetting.EJECT_FIELD_SET.getName(), config, false));
-        setJunkArguments(getValueOrDefault(EjectorSetting.JUNK_ARGUMENT.getName(), config, false));
-        setJunkArgumentStrength(getValueOrDefault(EjectorSetting.JUNK_ARGUMENT_STRENGTH.getName(), config, 5));
-    }
-
-    @Override
-    public void verifyConfiguration(Map<String, Object> config) {
-        config.forEach((k, v) -> {
-            EjectorSetting setting = KEY_MAP.get(k);
-
-            if (setting == null)
-                throw new InvalidConfigurationValueException(ConfigurationSetting.EJECTOR.getName() + '.' + k
-                        + " is an invalid configuration key");
-            if (!setting.getExpectedType().isInstance(v))
-                throw new InvalidConfigurationValueException(ConfigurationSetting.EJECTOR.getName() + '.' + k,
-                        setting.getExpectedType(), v.getClass());
-        });
+    public void setConfiguration(Configuration config) {
+        setEjectMethodCalls(config.getOrDefault(EJECTOR + ".eject_call", false));
+        setEjectFieldSet(config.getOrDefault(EJECTOR + ".eject_field_set", false));
+        setJunkArguments(config.getOrDefault(EJECTOR + ".junk_arguments", false));
+        setJunkArgumentStrength(config.getOrDefault(EJECTOR + ".junk_argument_strength", 5));
     }
 
     private boolean isEjectMethodCalls() {
@@ -160,16 +123,8 @@ public class Ejector extends Transformer {
         this.ejectFieldSet = ejectFieldSet;
     }
 
-    private boolean isJunkArguments() {
-        return junkArguments;
-    }
-
     private void setJunkArguments(boolean junkArguments) {
         this.junkArguments = junkArguments;
-    }
-
-    private int getJunkArgumentStrength() {
-        return junkArgumentStrength;
     }
 
     private void setJunkArgumentStrength(int junkArgumentStrength) {

@@ -19,33 +19,27 @@
 package me.itzsomebody.radon.transformers.shrinkers;
 
 public enum ShrinkerSetting {
-    REMOVE_DEPRECATED(Boolean.class, new DeprecatedAccessRemover()),
-    REMOVE_INNER_CLASSES(Boolean.class, new InnerClassesRemover()),
-    REMOVE_INVISIBLE_ANNOTATIONS(Boolean.class, new InvisibleAnnotationsRemover()),
-    REMOVE_INVISIBLE_PARAMETER_ANNOTATIONS(Boolean.class, new InvisibleParameterAnnotationsRemover()),
-    REMOVE_INVISIBLE_TYPE_ANNOTATIONS(Boolean.class, new InvisibleTypeAnnotationsRemover()),
-    REMOVE_LINE_NUMBERS(Boolean.class, new LineNumberRemover()),
-    REMOVE_LOCAL_VARIABLES(Boolean.class, new LocalVariableRemover()),
-    REMOVE_OUTER_METHOD(Boolean.class, new OuterMethodRemover()),
-    REMOVE_SIGNATURE(Boolean.class, new SignatureRemover()),
-    REMOVE_SOURCE_DEBUG(Boolean.class, new SourceDebugRemover()),
-    REMOVE_SOURCE_FILE(Boolean.class, new SourceFileRemover()),
-    REMOVE_SYNTHETIC(Boolean.class, new SyntheticAccessRemover()),
-    REMOVE_UNKNOWN_ATTRIBUTES(Boolean.class, new UnknownAttributesRemover()),
-    REMOVE_VISIBLE_ANNOTATIONS(Boolean.class, new VisibleAnnotationsRemover()),
-    REMOVE_VISIBLE_PARAMETER_ANNOTATIONS(Boolean.class, new VisibleParameterAnnotationsRemover()),
-    REMOVE_VISIBLE_TYPE_ANNOTATIONS(Boolean.class, new VisibleTypeAnnotationsRemover());
+    REMOVE_DEPRECATED(new DeprecatedAccessRemover()),
+    REMOVE_INNER_CLASSES(new InnerClassesRemover()),
+    REMOVE_INVISIBLE_ANNOTATIONS(new InvisibleAnnotationsRemover()),
+    REMOVE_INVISIBLE_PARAMETER_ANNOTATIONS(new InvisibleParameterAnnotationsRemover()),
+    REMOVE_INVISIBLE_TYPE_ANNOTATIONS(new InvisibleTypeAnnotationsRemover()),
+    REMOVE_LINE_NUMBERS(new LineNumberRemover()),
+    REMOVE_LOCAL_VARIABLES(new LocalVariableRemover()),
+    REMOVE_OUTER_METHOD(new OuterMethodRemover()),
+    REMOVE_SIGNATURE(new SignatureRemover()),
+    REMOVE_SOURCE_DEBUG(new SourceDebugRemover()),
+    REMOVE_SOURCE_FILE(new SourceFileRemover()),
+    REMOVE_SYNTHETIC(new SyntheticAccessRemover()),
+    REMOVE_UNKNOWN_ATTRIBUTES(new UnknownAttributesRemover()),
+    REMOVE_VISIBLE_ANNOTATIONS(new VisibleAnnotationsRemover()),
+    REMOVE_VISIBLE_PARAMETER_ANNOTATIONS(new VisibleParameterAnnotationsRemover()),
+    REMOVE_VISIBLE_TYPE_ANNOTATIONS(new VisibleTypeAnnotationsRemover());
 
-    private final Class expectedType;
     private final Shrinker shrinker;
 
-    ShrinkerSetting(Class expectedType, Shrinker shrinker) {
-        this.expectedType = expectedType;
+    ShrinkerSetting(Shrinker shrinker) {
         this.shrinker = shrinker;
-    }
-
-    public Class getExpectedType() {
-        return expectedType;
     }
 
     public Shrinker getShrinker() {

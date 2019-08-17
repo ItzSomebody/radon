@@ -33,8 +33,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import me.itzsomebody.radon.Main;
 import me.itzsomebody.radon.asm.ClassWrapper;
-import me.itzsomebody.radon.config.ConfigurationSetting;
-import me.itzsomebody.radon.exceptions.InvalidConfigurationValueException;
+import me.itzsomebody.radon.config.Configuration;
 import me.itzsomebody.radon.exceptions.RadonException;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
@@ -67,8 +66,7 @@ import org.objectweb.asm.tree.VarInsnNode;
 
 /**
  * Translates Java bytecode into a custom bytecode instruction set. Piece of trash and hackiest thing ever.
- * TODO: clean everything up
- * FIXME: sorta broken
+ * TODO: rewrite
  *
  * @author ItzSomebody
  */
@@ -735,18 +733,8 @@ public class Virtualizer extends Transformer implements VMOpcodes {
     }
 
     @Override
-    public Object getConfiguration() {
-        return true;
-    }
-
-    @Override
-    public void setConfiguration(Map<String, Object> config) {
+    public void setConfiguration(Configuration config) {
         // Not needed
-    }
-
-    @Override
-    public void verifyConfiguration(Map<String, Object> config) {
-        throw new InvalidConfigurationValueException(ConfigurationSetting.VIRTUALIZER + " expects a boolean");
     }
 
     private class VirtualizerResult {

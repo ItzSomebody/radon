@@ -19,15 +19,13 @@
 package me.itzsomebody.radon.transformers.obfuscators.references;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Stream;
-import me.itzsomebody.radon.config.ConfigurationSetting;
-import me.itzsomebody.radon.exceptions.InvalidConfigurationValueException;
+import me.itzsomebody.radon.config.Configuration;
 import me.itzsomebody.radon.exclusions.ExclusionType;
 import me.itzsomebody.radon.transformers.Transformer;
+
+import static me.itzsomebody.radon.config.ConfigurationSetting.REFERENCE_OBFUSCATION;
 
 /**
  * Abstract class for reference obfuscation transformers.
@@ -35,16 +33,7 @@ import me.itzsomebody.radon.transformers.Transformer;
  * @author ItzSomebody
  */
 public class ReferenceObfuscation extends Transformer {
-    private static final Map<String, ReferenceObfuscationSetting> KEY_MAP = new HashMap<>();
-    private static final Map<ReferenceObfuscation, ReferenceObfuscationSetting> REFERENCEOBF_SETTING_MAP = new HashMap<>();
     private final List<ReferenceObfuscation> referenceObfuscators = new ArrayList<>();
-
-    static {
-        ReferenceObfuscationSetting[] values = ReferenceObfuscationSetting.values();
-        Stream.of(values).forEach(setting -> KEY_MAP.put(setting.getName(), setting));
-        Stream.of(values).filter(setting -> setting.getReferenceObfuscation() != null)
-                .forEach(setting -> REFERENCEOBF_SETTING_MAP.put(setting.getReferenceObfuscation(), setting));
-    }
 
     @Override
     public void transform() {
@@ -65,36 +54,15 @@ public class ReferenceObfuscation extends Transformer {
     }
 
     @Override
-    public Object getConfiguration() {
-        Map<String, Object> config = new LinkedHashMap<>();
+    public void setConfiguration(Configuration config) {
+        Stream.of(ReferenceObfuscationSetting.values()).filter(setting -> {
+            String path = REFERENCE_OBFUSCATION + "." + setting.getName();
 
-        referenceObfuscators.forEach(obfuscator -> config.put(obfuscator.getReferenceObfuscationSetting().getName(), true));
+            if (config.contains(path)) {
+                return config.get(path);
+            }
 
-        return config;
-    }
-
-    @Override
-    public void setConfiguration(Map<String, Object> config) {
-        Stream.of(ReferenceObfuscationSetting.values()).filter(setting -> setting.getReferenceObfuscation() != null
-                && config.containsKey(setting.getName()) && (Boolean) config.get(setting.getName()))
-                .forEach(setting -> referenceObfuscators.add(setting.getReferenceObfuscation()));
-    }
-
-    @Override
-    public void verifyConfiguration(Map<String, Object> config) {
-        config.forEach((k, v) -> {
-            ReferenceObfuscationSetting setting = KEY_MAP.get(k);
-
-            if (setting == null)
-                throw new InvalidConfigurationValueException(ConfigurationSetting.REFERENCE_OBFUSCATION.getName() + '.' + k
-                        + " is an invalid configuration key");
-            if (!setting.getExpectedType().isInstance(v))
-                throw new InvalidConfigurationValueException(ConfigurationSetting.REFERENCE_OBFUSCATION.getName() + '.' + k,
-                        setting.getExpectedType(), v.getClass());
-        });
-    }
-
-    private ReferenceObfuscationSetting getReferenceObfuscationSetting() {
-        return REFERENCEOBF_SETTING_MAP.get(this);
+            return false;
+        }).forEach(setting -> referenceObfuscators.add(setting.getReferenceObfuscation()));
     }
 }

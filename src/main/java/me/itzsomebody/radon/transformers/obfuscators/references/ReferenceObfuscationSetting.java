@@ -19,19 +19,13 @@
 package me.itzsomebody.radon.transformers.obfuscators.references;
 
 public enum ReferenceObfuscationSetting {
-    HIDE_WITH_INDY(Boolean.class, new InvokedynamicTransformer()),
-    HIDE_WITH_FAST_INDY(Boolean.class, new FastInvokedynamicTransformer());
+    HIDE_WITH_INDY(new InvokedynamicTransformer()),
+    HIDE_WITH_FAST_INDY(new FastInvokedynamicTransformer());
 
-    private final Class expectedType;
     private ReferenceObfuscation referenceObfuscation;
 
-    ReferenceObfuscationSetting(Class expectedType, ReferenceObfuscation referenceObfuscation) {
-        this.expectedType = expectedType;
+    ReferenceObfuscationSetting(ReferenceObfuscation referenceObfuscation) {
         this.referenceObfuscation = referenceObfuscation;
-    }
-
-    public Class getExpectedType() {
-        return expectedType;
     }
 
     public ReferenceObfuscation getReferenceObfuscation() {
