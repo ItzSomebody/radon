@@ -25,14 +25,15 @@ import java.io.IOException;
 import java.lang.reflect.Modifier;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 import me.itzsomebody.radon.Main;
 import me.itzsomebody.radon.asm.ClassTree;
 import me.itzsomebody.radon.asm.FieldWrapper;
@@ -56,7 +57,7 @@ import static me.itzsomebody.radon.config.ConfigurationSetting.RENAMER;
  * @author ItzSomebody
  */
 public class Renamer extends Transformer {
-    private String[] adaptTheseResources;
+    private List<String> adaptTheseResources;
     private boolean dumpMappings;
     private String repackageName;
     private Map<String, String> mappings;
@@ -146,35 +147,32 @@ public class Renamer extends Transformer {
         // Now we gotta fix those resources because we probably screwed up random files.
         Main.info("Attempting to map class names in resources");
         AtomicInteger fixed = new AtomicInteger();
-        getResources().forEach((name, byteArray) -> {
-            if (getAdaptTheseResources() != null)
-                Stream.of(getAdaptTheseResources()).forEach(s -> {
-                    Pattern pattern = Pattern.compile(s);
+        getResources().forEach((name, byteArray) -> getAdaptTheseResources().forEach(s -> {
+            Pattern pattern = Pattern.compile(s);
 
-                    if (pattern.matcher(name).matches()) {
-                        String stringVer = new String(byteArray, StandardCharsets.UTF_8);
+            if (pattern.matcher(name).matches()) {
+                String stringVer = new String(byteArray, StandardCharsets.UTF_8);
 
-                        for (String mapping : mappings.keySet()) {
-                            String original = mapping.replace("/", ".");
-                            if (stringVer.contains(original)) {
-                                // Regex that ensures that class names that match words in the manifest don't break the
-                                // manifest.
-                                // Example: name == Main
-                                if ("META-INF/MANIFEST.MF".equals(name) // Manifest
-                                        || "plugin.yml".equals(name) // Spigot plugin
-                                        || "bungee.yml".equals(name)) // Bungeecord plugin
-                                    stringVer = stringVer.replaceAll("(?<=[: ])" + original,
-                                            mappings.get(mapping).replace("/", "."));
-                                else
-                                    stringVer = stringVer.replace(original, mappings.get(mapping).replace("/", "."));
-                            }
-                        }
-
-                        getResources().put(name, stringVer.getBytes(StandardCharsets.UTF_8));
-                        fixed.incrementAndGet();
+                for (String mapping : mappings.keySet()) {
+                    String original = mapping.replace("/", ".");
+                    if (stringVer.contains(original)) {
+                        // Regex that ensures that class names that match words in the manifest don't break the
+                        // manifest.
+                        // Example: name == Main
+                        if ("META-INF/MANIFEST.MF".equals(name) // Manifest
+                                || "plugin.yml".equals(name) // Spigot plugin
+                                || "bungee.yml".equals(name)) // Bungeecord plugin
+                            stringVer = stringVer.replaceAll("(?<=[: ])" + original,
+                                    mappings.get(mapping).replace("/", "."));
+                        else
+                            stringVer = stringVer.replace(original, mappings.get(mapping).replace("/", "."));
                     }
-                });
-        });
+                }
+
+                getResources().put(name, stringVer.getBytes(StandardCharsets.UTF_8));
+                fixed.incrementAndGet();
+            }
+        }));
 
         Main.info(String.format("Mapped %d names in resources. [%dms]", fixed.get(), tookThisLong(current)));
 
@@ -313,16 +311,16 @@ public class Renamer extends Transformer {
 
     @Override
     public void setConfiguration(Configuration config) {
-        setAdaptTheseResources(config.getOrDefault(RENAMER + ".adapt_these_resources", new String[0]));
+        setAdaptTheseResources(config.getOrDefault(RENAMER + ".adapt_these_resources", Collections.emptyList()));
         setDumpMappings(config.getOrDefault(RENAMER + ".dump_mappings", false));
         setRepackageName(config.getOrDefault(RENAMER + ".repackage_name", null));
     }
 
-    private String[] getAdaptTheseResources() {
+    public List<String> getAdaptTheseResources() {
         return adaptTheseResources;
     }
 
-    private void setAdaptTheseResources(String[] adaptTheseResources) {
+    public void setAdaptTheseResources(List<String> adaptTheseResources) {
         this.adaptTheseResources = adaptTheseResources;
     }
 
