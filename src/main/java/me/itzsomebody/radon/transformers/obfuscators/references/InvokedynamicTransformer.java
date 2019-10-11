@@ -22,7 +22,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 import me.itzsomebody.radon.Main;
 import me.itzsomebody.radon.asm.ClassWrapper;
-import me.itzsomebody.radon.transformers.Transformer;
 import me.itzsomebody.radon.utils.ASMUtils;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.Handle;
@@ -216,7 +215,7 @@ public class InvokedynamicTransformer extends ReferenceObfuscation {
             mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/reflect/Method", "getParameterTypes", "()[Ljava/lang/Class;", false);
             mv.visitVarInsn(ILOAD, 2);
             mv.visitInsn(AALOAD);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Class", "getConfigName", "()Ljava/lang/String;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Class", "getName", "()Ljava/lang/String;", false);
             mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "hashCode", "()I", false);
             mv.visitInsn(IXOR);
             mv.visitVarInsn(ISTORE, 1);
@@ -228,7 +227,7 @@ public class InvokedynamicTransformer extends ReferenceObfuscation {
             mv.visitVarInsn(ILOAD, 1);
             mv.visitVarInsn(ALOAD, 0);
             mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/reflect/Method", "getReturnType", "()Ljava/lang/Class;", false);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Class", "getConfigName", "()Ljava/lang/String;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Class", "getName", "()Ljava/lang/String;", false);
             mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "hashCode", "()I", false);
             mv.visitInsn(IXOR);
             mv.visitVarInsn(ISTORE, 1);
@@ -265,7 +264,7 @@ public class InvokedynamicTransformer extends ReferenceObfuscation {
             mv.visitVarInsn(ALOAD, 3);
             mv.visitVarInsn(ILOAD, 5);
             mv.visitInsn(AALOAD);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/reflect/Method", "getConfigName", "()Ljava/lang/String;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/reflect/Method", "getName", "()Ljava/lang/String;", false);
             mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "hashCode", "()I", false);
             mv.visitVarInsn(ILOAD, 1);
             Label l5 = new Label();
@@ -404,7 +403,7 @@ public class InvokedynamicTransformer extends ReferenceObfuscation {
             mv.visitVarInsn(ALOAD, 3);
             mv.visitVarInsn(ILOAD, 5);
             mv.visitInsn(AALOAD);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/reflect/Field", "getConfigName", "()Ljava/lang/String;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/reflect/Field", "getName", "()Ljava/lang/String;", false);
             mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "hashCode", "()I", false);
             mv.visitVarInsn(ILOAD, 1);
             Label l5 = new Label();
@@ -413,7 +412,7 @@ public class InvokedynamicTransformer extends ReferenceObfuscation {
             mv.visitVarInsn(ILOAD, 5);
             mv.visitInsn(AALOAD);
             mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/reflect/Field", "getType", "()Ljava/lang/Class;", false);
-            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Class", "getConfigName", "()Ljava/lang/String;", false);
+            mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/Class", "getName", "()Ljava/lang/String;", false);
             mv.visitMethodInsn(INVOKEVIRTUAL, "java/lang/String", "hashCode", "()I", false);
             mv.visitVarInsn(ILOAD, 2);
             mv.visitJumpInsn(IF_ICMPNE, l5);
