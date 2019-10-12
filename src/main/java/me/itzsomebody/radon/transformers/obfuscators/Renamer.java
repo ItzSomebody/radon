@@ -22,7 +22,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.lang.reflect.Modifier;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -191,7 +190,7 @@ public class Renamer extends Transformer {
 
         mappings.put(key, newName);
 
-        if (!Modifier.isStatic(methodWrapper.getMethodNode().access)) { // Static methods can't be overridden
+        if (!methodWrapper.getAccess().isStatic()) { // Static methods can't be overridden
             tree.getParentClasses().forEach(parentClass -> genMethodMappings(methodWrapper, parentClass, newName));
             tree.getSubClasses().forEach(subClass -> genMethodMappings(methodWrapper, subClass, newName));
         }
@@ -212,7 +211,7 @@ public class Renamer extends Transformer {
             return true;
 
         // Methods which are static don't need to be checked for inheritance
-        if (!Modifier.isStatic(wrapper.getMethodNode().access)) {
+        if (!wrapper.getAccess().isStatic()) {
             // We can't rename members which inherit methods from external libraries
             if (tree.getClassWrapper() != wrapper.getOwner() && tree.getClassWrapper().isLibraryNode()
                     && tree.getClassWrapper().getMethods().stream().anyMatch(mw -> mw.getOriginalName().equals(wrapper.getOriginalName())
@@ -235,7 +234,7 @@ public class Renamer extends Transformer {
 
         mappings.put(owner + '.' + fieldWrapper.getOriginalName() + '.' + fieldWrapper.getOriginalDescription(), newName);
 
-        if (!Modifier.isStatic(fieldWrapper.getFieldNode().access)) { // Static fields can't be overridden
+        if (!fieldWrapper.getAccess().isStatic()) { // Static fields can't be inherited
             tree.getParentClasses().forEach(parentClass -> genFieldMappings(fieldWrapper, parentClass, newName));
             tree.getSubClasses().forEach(subClass -> genFieldMappings(fieldWrapper, subClass, newName));
         }
@@ -256,7 +255,7 @@ public class Renamer extends Transformer {
             return true;
 
         // Fields which are static don't need to be checked for inheritance
-        if (!Modifier.isStatic(wrapper.getFieldNode().access)) {
+        if (!wrapper.getAccess().isStatic()) {
             // We can't rename members which inherit methods from external libraries
             if (tree.getClassWrapper() != wrapper.getOwner() && tree.getClassWrapper().isLibraryNode()
                     && tree.getClassWrapper().getFields().stream().anyMatch(fw -> fw.getOriginalName().equals(wrapper.getOriginalName())
