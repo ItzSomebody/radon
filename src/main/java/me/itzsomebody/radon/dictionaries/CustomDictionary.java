@@ -94,23 +94,23 @@ public class CustomDictionary implements Dictionary {
     }
     
     /**
-     * @param i A unique positive integer
+     * @param index A unique positive integer
      * @param charset A dictionary to permutate through
      * @return A unique string from for the given integer using permutations of the given charset
      */
-    private String intToStr(int i, final StrSequence charset)
+    private String intToStr(int index, final StrSequence charset)
     {
         String[] buf = new String[100];
         int charPos = 99;
         
-        i = -i; // Negate
+        index = -index; // Negate
         
-        while (i <= -charset.length())
+        while (index <= -charset.length())
         {
-            buf[charPos--] = charset.strAt(-(i % charset.length()));
-            i = i / charset.length();
+            buf[charPos--] = charset.strAt(-(index % charset.length()));
+            index = index / charset.length();
         }
-        buf[charPos] = charset.strAt(-i);
+        buf[charPos] = charset.strAt(-index);
         
         String[] out = new String[100-charPos];
         System.arraycopy(buf, charPos, out, 0, (100-charPos));
