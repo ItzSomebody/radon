@@ -30,7 +30,7 @@ import me.itzsomebody.radon.utils.StrSequence;
  * @author ItzSomebody
  */
 public class CustomDictionary implements Dictionary {
-    private static StrSequence CHARSET;
+    private final StrSequence CHARSET;
     private final Set<String> cache = new HashSet<>();
     private int index;
     private int cachedLength;
