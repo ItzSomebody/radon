@@ -19,8 +19,10 @@
 package me.itzsomebody.radon.dictionaries;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import me.itzsomebody.radon.utils.RandomUtils;
+import me.itzsomebody.radon.utils.StrSequence;
 
 /**
  * Generates strings based on custom user-defined dictionary.
@@ -28,24 +30,32 @@ import me.itzsomebody.radon.utils.RandomUtils;
  * @author ItzSomebody
  */
 public class CustomDictionary implements Dictionary {
-    private static char[] CHARSET;
+    private final StrSequence CHARSET;
     private final Set<String> cache = new HashSet<>();
     private int index;
     private int cachedLength;
     private String lastGenerated;
 
     public CustomDictionary(String charset) {
-        CHARSET = charset.toCharArray();
+        this(new StrSequence(charset.toCharArray()));
+    }
+    
+    public CustomDictionary(List<String> charset) {
+        this(new StrSequence(charset));
+    }
+    
+    public CustomDictionary(StrSequence strSequence) {
+        CHARSET = strSequence;
     }
 
     @Override
     public String randomString(int length) {
-        char[] c = new char[length];
+        String[] c = new String[length];
 
         for (int i = 0; i < length; i++)
-            c[i] = CHARSET[RandomUtils.getRandomInt(CHARSET.length)];
+            c[i] = CHARSET.strAt(RandomUtils.getRandomInt(CHARSET.length()));
 
-        return new String(c);
+        return String.join("", c);
     }
 
     @Override
@@ -54,7 +64,7 @@ public class CustomDictionary implements Dictionary {
             length = cachedLength;
 
         int count = 0;
-        int arrLen = CHARSET.length;
+        int arrLen = CHARSET.length();
         String s;
 
         do {
@@ -73,27 +83,38 @@ public class CustomDictionary implements Dictionary {
 
     @Override
     public String nextUniqueString() {
-        // copy-pasted from Integer.toString(int i, int radix)
-        int charsetLength = CHARSET.length;
-        int i = index;
-        char[] buf = new char[33];
-        boolean negative = (i < 0);
-        int charPos = 32;
-
-        if (!negative) {
-            i = -i;
-        }
-
-        while (i <= -charsetLength) {
-            buf[charPos--] = CHARSET[-(i % charsetLength)];
-            i /= charsetLength;
-        }
-        buf[charPos] = CHARSET[-i];
-
-        String s = new String(buf, charPos, (33 - charPos));
-        lastGenerated = s;
+    
+        String out = intToStr(index, CHARSET);
+        if(cache.contains(out))
+            throw new IllegalStateException("Cache contained string " + out);
+        
+        cache.add(out);
         index++;
-        return s;
+        return out;
+    }
+    
+    /**
+     * @param index A unique positive integer
+     * @param charset A dictionary to permutate through
+     * @return A unique string from for the given integer using permutations of the given charset
+     */
+    private String intToStr(int index, final StrSequence charset)
+    {
+        String[] buf = new String[100];
+        int charPos = 99;
+        
+        index = -index; // Negate
+        
+        while (index <= -charset.length())
+        {
+            buf[charPos--] = charset.strAt(-(index % charset.length()));
+            index = index / charset.length();
+        }
+        buf[charPos] = charset.strAt(-index);
+        
+        String[] out = new String[100-charPos];
+        System.arraycopy(buf, charPos, out, 0, (100-charPos));
+        return String.join("", out);
     }
 
     @Override
@@ -103,7 +124,7 @@ public class CustomDictionary implements Dictionary {
 
     @Override
     public String getDictionaryName() {
-        return new String(CHARSET);
+        return CHARSET.toString();
     }
 
     @Override
@@ -115,6 +136,6 @@ public class CustomDictionary implements Dictionary {
 
     @Override
     public Dictionary copy() {
-        return new CustomDictionary(getDictionaryName());
+        return new CustomDictionary(CHARSET);
     }
 }
