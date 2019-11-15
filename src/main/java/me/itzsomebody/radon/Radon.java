@@ -145,7 +145,12 @@ public class Radon {
 
             classes.values().forEach(classWrapper -> {
                 try {
-                    ZipEntry entry = new ZipEntry(classWrapper.getEntryName());
+
+                    String name = classWrapper.getEntryName();
+                    if(config.isFakeDirectories())
+                        name += "/";
+
+                    ZipEntry entry = new ZipEntry(name);
 
                     zos.putNextEntry(entry);
                     zos.write(classWrapper.toByteArray(this));

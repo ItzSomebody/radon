@@ -35,6 +35,7 @@ import me.itzsomebody.radon.utils.FileUtils;
 
 import static me.itzsomebody.radon.config.ConfigurationSetting.COMPRESSION_LEVEL;
 import static me.itzsomebody.radon.config.ConfigurationSetting.CORRUPT_CRC;
+import static me.itzsomebody.radon.config.ConfigurationSetting.FAKE_DIRECTORY;
 import static me.itzsomebody.radon.config.ConfigurationSetting.DICTIONARY;
 import static me.itzsomebody.radon.config.ConfigurationSetting.EXCLUSIONS;
 import static me.itzsomebody.radon.config.ConfigurationSetting.INPUT;
@@ -102,6 +103,7 @@ public final class ObfuscationConfiguration {
         obfConfig.setCompressionLevel(config.getOrDefault(COMPRESSION_LEVEL, Deflater.BEST_COMPRESSION));
         obfConfig.setVerify(config.getOrDefault(VERIFY, false));
         obfConfig.setCorruptCrc(config.getOrDefault(CORRUPT_CRC, false));
+        obfConfig.setFakeDirectories(config.getOrDefault(FAKE_DIRECTORY, false));
         obfConfig.setnTrashClasses(config.getOrDefault(TRASH_CLASSES, 0));
 
         // TRANSFORMERS
@@ -135,6 +137,7 @@ public final class ObfuscationConfiguration {
     private int compressionLevel;
     private boolean verify;
     private boolean corruptCrc;
+    private boolean fakeDirectories;
     private int nTrashClasses;
 
     private List<Transformer> transformers;
@@ -209,6 +212,14 @@ public final class ObfuscationConfiguration {
 
     public void setCorruptCrc(boolean corruptCrc) {
         this.corruptCrc = corruptCrc;
+    }
+
+    public boolean isFakeDirectories() {
+        return fakeDirectories;
+    }
+
+    public void setFakeDirectories(boolean fakeDirectories) {
+        this.fakeDirectories = fakeDirectories;
     }
 
     public int getnTrashClasses() {

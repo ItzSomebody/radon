@@ -60,6 +60,7 @@ public enum ConfigurationSetting {
     VERIFY(Boolean.class, null),
     CORRUPT_CRC(Boolean.class, null),
     TRASH_CLASSES(Integer.class, null),
+    FAKE_DIRECTORY(Boolean.class, null),
 
     // ============ transformers
     STRING_ENCRYPTION(Map.class, new StringEncryption()),
