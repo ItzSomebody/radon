@@ -104,10 +104,16 @@ public class CreeperDictionary implements Dictionary
 		if(index >= LYRICS.length)
 		{
 			index = 0;
-			loop++;
 		}
-		lastGenerated = loop + "" + index + "_" + LYRICS[index];
+		
+		String loopStr = loop + "";
+		
+		while(loopStr.length() < 4)
+			loopStr = "0" + loopStr;
+		
+		lastGenerated = loopStr + "_" + LYRICS[index];
 		index++;
+		loop++;
 		return lastGenerated;
 	}
 	
