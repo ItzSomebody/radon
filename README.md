@@ -23,7 +23,7 @@ for fun:
 * [JObf](https://github.com/superblaubeere27/obfuscator)
 * [NeonObf](https://github.com/MoofMonkey/NeonObf)
 * [Obzcure](https://obzcu.re/) -
-[Discord](https://discordapp.com/invite/fUCPxq8) (Dev is away for a few months)
+[Discord](https://discordapp.com/invite/fUCPxq8)
 * [Sandmark](http://sandmark.cs.arizona.edu)
 * [Stringer](https://jfxstore.com/stringer/)
 * [yGuard](https://www.yworks.com/products/yguard)
