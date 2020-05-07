@@ -23,10 +23,11 @@ import java.util.List;
 public class DictionaryFactory {
     public static Dictionary get(String s) {
         Dictionary[] dictionaries = {
-                new AlphaNumDictionary(),
-                new RandomUnicodeDictionary(),
-                new SpacesDictionary(),
-                new UnrecognizedDictionary()
+            new AlphaNumDictionary(),
+            new RandomUnicodeDictionary(),
+            new SpacesDictionary(),
+            new UnrecognizedDictionary(),
+            new CreeperDictionary()
         };
 
         for (Dictionary dictionary : dictionaries) {
