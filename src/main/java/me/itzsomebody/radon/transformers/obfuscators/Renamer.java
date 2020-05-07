@@ -220,9 +220,10 @@ public class Renamer extends Transformer {
 
             return tree.getParentClasses().stream().anyMatch(parent -> cannotRenameMethod(radon.getTree(parent), wrapper, visited))
                     || (tree.getSubClasses().stream().anyMatch(sub -> cannotRenameMethod(radon.getTree(sub), wrapper, visited)));
+        } else {
+            return tree.getClassWrapper().getAccess().isEnum()
+                    && ("valueOf".equals(wrapper.getOriginalName()) || "values".equals(wrapper.getOriginalName()));
         }
-
-        return false;
     }
 
     private void genFieldMappings(FieldWrapper fieldWrapper, String owner, String newName) {
