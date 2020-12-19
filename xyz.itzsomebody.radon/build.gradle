@@ -1,0 +1,76 @@
+/*
+ * Radon - An open-source Java obfuscator
+ * Copyright (C) 2020 ItzSomebody
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ */
+
+import org.apache.tools.ant.filters.ReplaceTokens
+
+plugins {
+    id 'com.github.johnrengelman.shadow'
+    id 'java'
+}
+
+// So people stop asking why 'gradle build' doesn't work. Lmao I'm lazy
+build.dependsOn 'shadowJar'
+sourceCompatibility = javaVer
+
+// Main class
+def mainClass = 'xyz.itzsomebody.radon.RadonMain'
+
+// Function to grab the git commit hash of HEAD
+def getCommitHash = { ->
+    def stdout = new ByteArrayOutputStream()
+    exec {
+        commandLine 'git', 'rev-parse', 'HEAD'
+        standardOutput = stdout
+    }
+    return stdout.toString().trim()
+}
+
+// Search for and replace project version and commit hash placeholders in the source code
+task processSource(type: Sync) {
+    from sourceSets.main.java
+    filter(ReplaceTokens, tokens: [VERSION: version, COMMITHASH: getCommitHash()])
+    into "$buildDir/src"
+}
+
+compileJava {
+    source = processSource.outputs
+}
+
+// Creates a fat jar
+shadowJar() {
+    archiveClassifier.set(null)
+
+    // Relocate lib classes
+    relocate 'org.objectweb.asm', 'xyz.itzsomebody.radon.lib.org.objectweb.asm'
+    relocate 'org.yaml.snakeyaml', 'xyz.itzsomebody.radon.lib.org.yaml.snakeyaml'
+    exclude 'module-info.class'
+
+    manifest { attributes 'Main-Class': mainClass }
+}
+
+dependencies {
+    implementation 'org.yaml:snakeyaml:1.26'
+    implementation project(':xyz.itzsomebody.codegen')
+    implementation project(':xyz.itzsomebody.commons')
+
+    for (lib in ['asm', 'asm-tree', 'asm-commons', 'asm-util']) {
+        implementation group: 'org.ow2.asm', name: lib, version: asmVer
+    }
+
+    testImplementation 'junit:junit:4.12'
+}

@@ -3,7 +3,7 @@ install: true
 dist: trusty
 
 jdk:
-  - oraclejdk8
+  - oraclejdk11
 
 script:
   - ./gradlew build

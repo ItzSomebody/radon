@@ -18,3 +18,7 @@ out/
 
 # VS Code
 .settings/
+
+# Radon
+radon.log
+radon.log.lck
