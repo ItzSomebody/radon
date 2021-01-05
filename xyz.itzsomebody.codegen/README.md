@@ -1,4 +1,4 @@
 # CodeGen
 
-This is Radon's bytecode generation library based on the airlift bytecode library. The goal of this library is to
-remove heavy reliance on ASMifier and the asm-tree API by providing a high-level API to generate instructions.
+This module contains radon's bytecode code generation utility. These are intended to reduce some of the heavy reliance
+on the asm-tree API and ASMifier.

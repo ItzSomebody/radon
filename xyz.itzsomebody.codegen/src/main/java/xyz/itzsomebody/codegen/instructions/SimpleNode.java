@@ -16,11 +16,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package xyz.itzsomebody.codegen.compilable;
+package xyz.itzsomebody.codegen.instructions;
 
 import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.InsnNode;
+import xyz.itzsomebody.codegen.WrappedType;
+import xyz.itzsomebody.codegen.exceptions.UncompilableNodeException;
 
 public enum SimpleNode implements CompilableNode {
     // Tux, will you nop sled with me?
@@ -187,5 +190,30 @@ public enum SimpleNode implements CompilableNode {
     @Override
     public AbstractInsnNode getNode() {
         return new InsnNode(opcode);
+    }
+
+    public static SimpleNode getArrayStoreOp(WrappedType type) {
+        switch (type.getSort()) {
+            case Type.BOOLEAN:
+            case Type.INT:
+                return INT_ARRAY_STORE;
+            case Type.CHAR:
+                return CHAR_ARRAY_STORE;
+            case Type.BYTE:
+                return BYTE_ARRAY_STORE;
+            case Type.SHORT:
+                return SHORT_ARRAY_STORE;
+            case Type.FLOAT:
+                return FLOAT_ARRAY_STORE;
+            case Type.LONG:
+                return LONG_ARRAY_STORE;
+            case Type.DOUBLE:
+                return DOUBLE_ARRAY_STORE;
+            case Type.ARRAY:
+            case Type.OBJECT:
+                return OBJECT_ARRAY_STORE;
+            default:
+                throw new UncompilableNodeException("Attempted to get array store opcode for " + type);
+        }
     }
 }

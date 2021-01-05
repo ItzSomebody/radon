@@ -71,7 +71,7 @@ for fun:
 * **Q: Does Radon have Gradle, Maven, or Ant integration?**  
 *A: No. You are more than welcome to make a PR to add such functionality if desired.*
   
-* **Q: Will there be a GUI for Radon 3?**
+* **Q: Will there be a GUI for Radon 3?**  
 *A: Yes, however, a GUI is very low on my priority list, so it might be awhile before one is actually made.*
 
 * **Q: Will there be a Radon 4?**  

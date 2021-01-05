@@ -16,11 +16,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package xyz.itzsomebody.codegen.compilable;
+package xyz.itzsomebody.codegen.instructions;
 
 import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
+import xyz.itzsomebody.codegen.exceptions.UncompilableNodeException;
+import xyz.itzsomebody.codegen.expressions.IRVariable;
 
 public class RegisterNode implements CompilableNode {
     private final int opcode;
@@ -78,5 +81,49 @@ public class RegisterNode implements CompilableNode {
 
     public static RegisterNode ret(int slot) {
         return new RegisterNode(Opcodes.RET, slot);
+    }
+
+    public static RegisterNode loadVar(IRVariable variable) {
+        switch (variable.getWrappedType().getSort()) {
+            case Type.BOOLEAN:
+            case Type.CHAR:
+            case Type.BYTE:
+            case Type.SHORT:
+            case Type.INT:
+                return loadInt(variable.getSlot());
+            case Type.FLOAT:
+                return loadFloat(variable.getSlot());
+            case Type.LONG:
+                return loadLong(variable.getSlot());
+            case Type.DOUBLE:
+                return loadDouble(variable.getSlot());
+            case Type.ARRAY:
+            case Type.OBJECT:
+                return loadObject(variable.getSlot());
+            default:
+                throw new UncompilableNodeException("Attempted to load variable of type " + variable.getWrappedType());
+        }
+    }
+
+    public static RegisterNode storeVar(IRVariable variable) {
+        switch (variable.getWrappedType().getSort()) {
+            case Type.BOOLEAN:
+            case Type.CHAR:
+            case Type.BYTE:
+            case Type.SHORT:
+            case Type.INT:
+                return storeInt(variable.getSlot());
+            case Type.FLOAT:
+                return storeFloat(variable.getSlot());
+            case Type.LONG:
+                return storeLong(variable.getSlot());
+            case Type.DOUBLE:
+                return storeDouble(variable.getSlot());
+            case Type.ARRAY:
+            case Type.OBJECT:
+                return storeObject(variable.getSlot());
+            default:
+                throw new UncompilableNodeException("Attempted to store variable of type " + variable.getWrappedType());
+        }
     }
 }

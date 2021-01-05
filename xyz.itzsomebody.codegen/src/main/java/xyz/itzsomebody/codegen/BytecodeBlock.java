@@ -18,25 +18,27 @@
 
 package xyz.itzsomebody.codegen;
 
+import xyz.itzsomebody.codegen.instructions.CompilableNode;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class BytecodeBlock {
-    private final List<BytecodeNode> nodes = new ArrayList<>();
+    private final List<CompilableNode> nodes = new ArrayList<>();
 
     public BytecodeBlock append(BytecodeBlock block) {
         nodes.addAll(block.nodes);
         return this;
     }
 
-    public BytecodeBlock append(BytecodeNode node) {
+    public BytecodeBlock append(CompilableNode node) {
         nodes.add(node);
         return this;
     }
 
     // todo
 
-    public List<BytecodeNode> getNodes() {
+    public List<CompilableNode> getNodes() {
         return nodes;
     }
 }
