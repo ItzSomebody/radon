@@ -44,6 +44,7 @@ public class ExclusionManager {
     }
 
     public boolean find(String other, Exclusion.ExclusionType exclusionType) {
+        // fixme: flawed cache logic
         if (cache.containsKey(other)) {
             return cache.get(other);
         }

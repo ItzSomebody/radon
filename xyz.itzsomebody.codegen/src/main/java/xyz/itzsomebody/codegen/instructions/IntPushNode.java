@@ -20,22 +20,27 @@ package xyz.itzsomebody.codegen.compilable;
 
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
+import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.IntInsnNode;
-import xyz.itzsomebody.codegen.exceptions.UncompilableNodeException;
+import org.objectweb.asm.tree.LdcInsnNode;
 
 public class IntPushNode implements CompilableNode {
     private final int operand;
 
     public IntPushNode(int operand) {
-        // Check for unsupported range
-        if (!(operand >= Short.MIN_VALUE && operand <= Short.MAX_VALUE)) {
-            throw new UncompilableNodeException("Attempted to create an IntPushNode with an operand of " + operand);
-        }
         this.operand = operand;
     }
 
     @Override
     public AbstractInsnNode getNode() {
-        return new IntInsnNode((operand >= Byte.MIN_VALUE && operand <= Byte.MAX_VALUE) ? Opcodes.BIPUSH : Opcodes.SIPUSH, operand);
+        if (operand >= -1 && operand <= 5) {
+            return new InsnNode(operand + 3);
+        } else if (operand >= Byte.MIN_VALUE && operand <= Byte.MAX_VALUE) {
+            return new IntInsnNode(Opcodes.BIPUSH, operand);
+        } else if (operand >= Short.MIN_VALUE && operand <= Short.MAX_VALUE) {
+            return new IntInsnNode(Opcodes.SIPUSH, operand);
+        } else {
+            return new LdcInsnNode(operand);
+        }
     }
 }

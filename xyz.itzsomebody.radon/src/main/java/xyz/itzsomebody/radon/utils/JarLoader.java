@@ -21,6 +21,7 @@ package xyz.itzsomebody.radon.utils;
 import org.objectweb.asm.ClassReader;
 import xyz.itzsomebody.radon.RadonConstants;
 import xyz.itzsomebody.radon.exceptions.FatalRadonException;
+import xyz.itzsomebody.radon.exceptions.PreventableRadonException;
 import xyz.itzsomebody.radon.utils.asm.ClassWrapper;
 import xyz.itzsomebody.radon.utils.logging.RadonLogger;
 
@@ -92,13 +93,13 @@ public class JarLoader {
         var file = new File(path);
 
         if (!file.exists()) {
-            throw new FatalRadonException("Input \"" + file.getAbsolutePath() + "\" doesn't exist");
+            throw new PreventableRadonException("Input \"" + file.getAbsolutePath() + "\" doesn't exist");
         }
         if (!file.canRead()) {
-            throw new FatalRadonException("Input \"" + file.getAbsolutePath() + "\" doesn't have read permissions");
+            throw new PreventableRadonException("Input \"" + file.getAbsolutePath() + "\" doesn't have read permissions");
         }
         if (!file.isFile()) {
-            throw new FatalRadonException("Input \"" + file.getAbsolutePath() + "\" isn't a file");
+            throw new PreventableRadonException("Input \"" + file.getAbsolutePath() + "\" isn't a file");
         }
 
         try {
@@ -127,9 +128,9 @@ public class JarLoader {
                 }
             }
         } catch (ZipException e) {
-            throw new FatalRadonException("Input \"" + file.getAbsolutePath() + "\" couldn't be loaded as a ZIP. (" + e.getMessage() + ")");
+            throw new PreventableRadonException("Input \"" + file.getAbsolutePath() + "\" couldn't be loaded as a ZIP. (" + e.getMessage() + ")");
         } catch (IOException e) {
-            throw new FatalRadonException("Input \"" + file.getAbsolutePath() + "\" couldn't be due to an IO error. (" + e.getMessage() + ")");
+            throw new PreventableRadonException("Input \"" + file.getAbsolutePath() + "\" couldn't be due to an IO error. (" + e.getMessage() + ")");
         }
     }
 

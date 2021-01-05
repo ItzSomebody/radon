@@ -61,30 +61,29 @@ public class RandomUtils {
     // Floats
     // ------
 
-    // todo add notice abt copying shit
     public static float randomFloat(float origin, float bound) {
         if (origin >= bound) {
             throw new IllegalArgumentException("bound must be greater than origin");
         }
 
-        float result = randomFloat();
+        float r = (float)((randomInt()) >>> 8) * 5.9604645E-8F;
         if (origin < bound) {
-            result = result * (bound - origin) + origin;
-            if (result >= bound) {
-                result = Float.intBitsToFloat(Float.floatToIntBits(bound) - 1);
+            r = r * (bound - origin) + origin;
+            if (r >= bound) {
+                r = Float.intBitsToFloat(Float.floatToIntBits(bound) - 1);
             }
         }
 
-        return result;
+        return r;
     }
 
     public static float randomFloat(float bound) {
-        if (bound < 0.0F) {
+        if (bound <= 0.0F) {
             throw new IllegalArgumentException("bound must be positive");
         }
 
-        float result = randomFloat();
-        return result < bound ? result : Float.intBitsToFloat(Float.floatToIntBits(bound) - 1);
+        float r = (float)((randomInt()) >>> 8) * 5.9604645E-8F;
+        return r < bound ? r : Float.intBitsToFloat(Float.floatToIntBits(bound) - 1);
     }
 
     public static float randomFloat() {
@@ -115,8 +114,14 @@ public class RandomUtils {
         return instance().nextBoolean();
     }
 
+    public static byte[] randomBytes(int length) {
+        var arr = new byte[length];
+        instance().nextBytes(arr);
+        return arr;
+    }
+
     public static byte[] randomBytes() {
-        byte[] arr = new byte[randomInt(0xFFFF)];
+        var arr = new byte[randomInt(0xFFFF)];
         instance().nextBytes(arr);
         return arr;
     }
