@@ -3,7 +3,22 @@ package xyz.itzsomebody.codegen;
 import org.objectweb.asm.Type;
 import xyz.itzsomebody.codegen.exceptions.UncompilableNodeException;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class WrappedType {
+    private static final Map<String, Class<?>> BOXED_TYPES = new HashMap<>() {
+        {
+            put(Type.getInternalName(Boolean.class), boolean.class);
+            put(Type.getInternalName(Character.class), char.class);
+            put(Type.getInternalName(Byte.class), byte.class);
+            put(Type.getInternalName(Short.class), short.class);
+            put(Type.getInternalName(Integer.class), int.class);
+            put(Type.getInternalName(Float.class), float.class);
+            put(Type.getInternalName(Long.class), long.class);
+            put(Type.getInternalName(Double.class), double.class);
+        }
+    };
     private static AbsentWrappedType absent;
     private final Type type;
     private final boolean isInterface;
@@ -54,8 +69,30 @@ public class WrappedType {
         }
     }
 
+    public WrappedType getPrimitiveType() {
+        var primitiveClass = BOXED_TYPES.get(getInternalName());
+        if (primitiveClass == null) {
+            throw new UncompilableNodeException("Attempted to get primitive type of " + this);
+        }
+
+        return WrappedType.from(primitiveClass);
+    }
+
+    public boolean isBoxed() {
+        return BOXED_TYPES.containsKey(getInternalName());
+    }
+
     public boolean isArray() {
         return type.getSize() == Type.ARRAY;
+    }
+
+    public boolean isIntType() {
+        var sort = getSort();
+        return (sort == Type.BOOLEAN)
+                || (sort == Type.CHAR)
+                || (sort == Type.BYTE)
+                || (sort == Type.SHORT)
+                || (sort == Type.INT);
     }
 
     public String unwrap() {
@@ -120,7 +157,19 @@ public class WrappedType {
 
     @Override
     public String toString() {
-        return "WrappedType{type=" + type + '}';
+        return "WrappedType{" +
+                "type=" + type +
+                ", isInterface=" + isInterface +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object other) {
+        if (!(other instanceof WrappedType)) {
+            return false;
+        }
+
+        return getType().equals(((WrappedType) other).getType());
     }
 
     static class AbsentWrappedType extends WrappedType {

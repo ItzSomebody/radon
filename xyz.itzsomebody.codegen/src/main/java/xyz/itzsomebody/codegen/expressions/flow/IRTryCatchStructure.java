@@ -18,7 +18,7 @@ public class IRTryCatchStructure extends IRFlowStructure {
     public IRTryCatchStructure(BytecodeBlock trapRange, BytecodeBlock handler, WrappedType exceptionType) {
         this.trapRange = trapRange;
         this.handler = handler;
-        this.exceptionType =exceptionType;
+        this.exceptionType = exceptionType;
     }
 
     public TryCatchBlockNode getTryCatchBlocKNode() {

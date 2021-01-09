@@ -10,13 +10,11 @@ import xyz.itzsomebody.codegen.instructions.TypeNode;
 import java.util.List;
 
 public class IRNewInstanceExpression extends IRExpression {
-    private final WrappedType type;
     private final List<WrappedType> argumentTypes;
     private final List<IRExpression> arguments;
 
     public IRNewInstanceExpression(WrappedType type, List<WrappedType> argumentTypes, List<IRExpression> arguments) {
         super(type);
-        this.type = type;
         this.argumentTypes = argumentTypes;
         this.arguments = arguments;
     }
@@ -24,12 +22,12 @@ public class IRNewInstanceExpression extends IRExpression {
     @Override
     public BytecodeBlock getInstructions() {
         var block = new BytecodeBlock()
-                .append(TypeNode.newInstance(type))
+                .append(TypeNode.newInstance(getType()))
                 .append(SimpleNode.DUP);
         for (var expr : arguments) {
             block.append(expr.getInstructions());
         }
-        block.append(InvokeNode.invokeConstructor(type, argumentTypes));
+        block.append(InvokeNode.invokeConstructor(getType(), argumentTypes));
         return block;
     }
 }
