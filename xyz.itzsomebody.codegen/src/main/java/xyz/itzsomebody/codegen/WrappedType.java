@@ -1,16 +1,37 @@
 package xyz.itzsomebody.codegen;
 
 import org.objectweb.asm.Type;
+import xyz.itzsomebody.codegen.exceptions.UncompilableNodeException;
 
 public class WrappedType {
+    private static AbsentWrappedType absent;
     private final Type type;
+    private final boolean isInterface;
 
     public WrappedType(Type type) {
         this.type = type;
+        this.isInterface = false;
+    }
+
+    public WrappedType(Type type, boolean isInterface) {
+        this.type = type;
+        this.isInterface = isInterface;
+    }
+
+    public static AbsentWrappedType getAbsent() {
+        if (absent == null) {
+            absent = new AbsentWrappedType();
+        }
+
+        return absent;
     }
 
     public Type getType() {
         return type;
+    }
+
+    public boolean isInterface() {
+        return isInterface;
     }
 
     public int getSort() {
@@ -35,6 +56,22 @@ public class WrappedType {
 
     public boolean isArray() {
         return type.getSize() == Type.ARRAY;
+    }
+
+    public String unwrap() {
+        if (type.getSort() == Type.OBJECT || type.getSort() == Type.ARRAY) {
+            return 'L' + type.getInternalName() + ';';
+        } else {
+            return type.getInternalName();
+        }
+    }
+
+    public String getInternalName() {
+        return type.getInternalName();
+    }
+
+    public String getClassName() {
+        return type.getClassName();
     }
 
     public static WrappedType fromClassName(String className) {
@@ -73,16 +110,62 @@ public class WrappedType {
         return new WrappedType(Type.getType(internalName.toString()));
     }
 
-    public static WrappedType fromInternalName(String internalName) {
-        return new WrappedType(Type.getType(internalName));
+    public static WrappedType fromInternalName(String internalName, boolean isInterface) {
+        return new WrappedType(Type.getType(internalName), isInterface);
     }
 
     public static WrappedType from(Class<?> clazz) {
-        return new WrappedType(Type.getType(clazz));
+        return new WrappedType(Type.getType(clazz), clazz.isInterface());
     }
 
     @Override
     public String toString() {
         return "WrappedType{type=" + type + '}';
+    }
+
+    static class AbsentWrappedType extends WrappedType {
+        private AbsentWrappedType() {
+            super(null);
+        }
+
+        @Override
+        public Type getType() {
+            throw new UncompilableNodeException("Attempted to get type of AbsentWrappedType");
+        }
+
+        @Override
+        public boolean isInterface() {
+            throw new UncompilableNodeException("Attempted to determine interface flag of AbsentWrappedType");
+        }
+
+        @Override
+        public int getSort() {
+            throw new UncompilableNodeException("Attempted to get sort of AbsentWrappedType");
+        }
+
+        @Override
+        public boolean isPrimitive() {
+            throw new UncompilableNodeException("Attempted to determine primitive flag of AbsentWrappedType");
+        }
+
+        @Override
+        public boolean isArray() {
+            throw new UncompilableNodeException("Attempted to determine array flag of AbsentWrappedType");
+        }
+
+        @Override
+        public String unwrap() {
+            throw new UncompilableNodeException("Attempted to unwrap AbsentWrappedType");
+        }
+
+        @Override
+        public String getInternalName() {
+            throw new UncompilableNodeException("Attempted to get internal name of AbsentWrappedType");
+        }
+
+        @Override
+        public String getClassName() {
+            throw new UncompilableNodeException("Attempted to get class name of AbsentWrappedType");
+        }
     }
 }

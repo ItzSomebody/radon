@@ -18,6 +18,7 @@
 
 package xyz.itzsomebody.codegen;
 
+import org.objectweb.asm.tree.InsnList;
 import xyz.itzsomebody.codegen.instructions.CompilableNode;
 
 import java.util.ArrayList;
@@ -34,6 +35,12 @@ public class BytecodeBlock {
     public BytecodeBlock append(CompilableNode node) {
         nodes.add(node);
         return this;
+    }
+
+    public InsnList compile() {
+        var insns = new InsnList();
+        nodes.forEach(node -> insns.add(node.getNode()));
+        return insns;
     }
 
     // todo

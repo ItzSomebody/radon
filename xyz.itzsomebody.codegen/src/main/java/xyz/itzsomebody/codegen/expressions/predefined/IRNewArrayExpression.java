@@ -13,6 +13,7 @@ public class IRNewArrayExpression extends IRExpression {
     private final IRExpression[] elements;
 
     public IRNewArrayExpression(IRExpression length, WrappedType type, IRExpression[] elements) {
+        super(type);
         this.length = length;
         this.type = type;
         this.elements = elements;

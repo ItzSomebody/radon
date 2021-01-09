@@ -18,7 +18,7 @@ public class NewArrayNode implements CompilableNode {
         if (wrappedType.isPrimitive()) {
             return new IntInsnNode(Opcodes.NEWARRAY, wrappedType.getSort());
         } else {
-            return new TypeInsnNode(Opcodes.ANEWARRAY, wrappedType.getType().getInternalName());
+            return new TypeInsnNode(Opcodes.ANEWARRAY, wrappedType.getInternalName());
         }
     }
 }

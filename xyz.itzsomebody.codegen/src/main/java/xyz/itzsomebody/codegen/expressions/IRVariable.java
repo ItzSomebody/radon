@@ -7,9 +7,10 @@ import xyz.itzsomebody.codegen.instructions.RegisterNode;
 
 public class IRVariable extends IRExpression {
     private final WrappedType wrappedType;
-    private final int slot;
+    private final int slot; // fixme: this is cheating so fix eventually
 
     public IRVariable(WrappedType wrappedType, int slot) {
+        super(wrappedType);
         this.wrappedType = wrappedType;
         this.slot = slot;
     }

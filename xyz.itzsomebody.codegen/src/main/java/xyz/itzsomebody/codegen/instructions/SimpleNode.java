@@ -192,7 +192,7 @@ public enum SimpleNode implements CompilableNode {
         return new InsnNode(opcode);
     }
 
-    public static SimpleNode getArrayStoreOp(WrappedType type) {
+    public static SimpleNode getArrayStoreOp(WrappedType type) { // fixme maybe move to Utils?
         switch (type.getSort()) {
             case Type.BOOLEAN:
             case Type.INT:
@@ -214,6 +214,50 @@ public enum SimpleNode implements CompilableNode {
                 return OBJECT_ARRAY_STORE;
             default:
                 throw new UncompilableNodeException("Attempted to get array store opcode for " + type);
+        }
+    }
+
+    public static SimpleNode getArrayLoadOp(WrappedType type) {
+        switch (type.getSort()) {
+            case Type.BOOLEAN:
+            case Type.INT:
+                return INT_ARRAY_LOAD;
+            case Type.CHAR:
+                return CHAR_ARRAY_LOAD;
+            case Type.BYTE:
+                return BYTE_ARRAY_LOAD;
+            case Type.SHORT:
+                return SHORT_ARRAY_LOAD;
+            case Type.FLOAT:
+                return FLOAT_ARRAY_LOAD;
+            case Type.LONG:
+                return LONG_ARRAY_LOAD;
+            case Type.DOUBLE:
+                return DOUBLE_ARRAY_LOAD;
+            case Type.ARRAY:
+            case Type.OBJECT:
+                return OBJECT_ARRAY_LOAD;
+            default:
+                throw new UncompilableNodeException("Attempted to get array load opcode for " + type);
+        }
+    }
+
+    public static SimpleNode negateOpcodeFor(WrappedType type) {
+        switch (type.getSort()) {
+            case Type.BOOLEAN:
+            case Type.CHAR:
+            case Type.BYTE:
+            case Type.SHORT:
+            case Type.INT:
+                return INT_NEG;
+            case Type.FLOAT:
+                return FLOAT_NEG;
+            case Type.LONG:
+                return LONG_NEG;
+            case Type.DOUBLE:
+                return DOUBLE_NEG;
+            default:
+                throw new UncompilableNodeException("Attempted to get negate opcode for " + type);
         }
     }
 }

@@ -10,6 +10,7 @@ public class IRSetVariableExpression extends IRExpression {
     private final IRExpression expression;
 
     public IRSetVariableExpression(IRVariable variable, IRExpression expression) {
+        super(variable.getWrappedType());
         this.variable = variable;
         this.expression = expression;
     }
