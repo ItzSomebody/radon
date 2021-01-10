@@ -14,6 +14,8 @@ like some pointers to production-safe (more or less) and less buggy Java
 bytecode obfuscators, I would suggest one of these:
 * [Paramorphism](https://paramorphism.serenity.enterprises/) -
 [Discord](https://discordapp.com/invite/k9DPvEy)
+* [Binscure](https://binclub.dev/binscure) -
+[Discord](https://discord.com/invite/fUkXhEu)
 * [Proguard](https://www.guardsquare.com/en/products/proguard)
 * [Zelix KlassMaster](http://www.zelix.com/)
 
