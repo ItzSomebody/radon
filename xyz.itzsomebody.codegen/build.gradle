@@ -28,5 +28,5 @@ dependencies {
         implementation group: 'org.ow2.asm', name: lib, version: asmVer
     }
 
-    testImplementation 'junit:junit:4.12'
+    testImplementation junitVer
 }

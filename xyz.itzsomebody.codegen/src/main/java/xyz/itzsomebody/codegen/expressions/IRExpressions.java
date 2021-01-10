@@ -21,9 +21,11 @@ package xyz.itzsomebody.codegen.expressions;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
+import xyz.itzsomebody.codegen.BytecodeBlock;
 import xyz.itzsomebody.codegen.Utils;
 import xyz.itzsomebody.codegen.WrappedHandle;
 import xyz.itzsomebody.codegen.WrappedType;
+import xyz.itzsomebody.codegen.expressions.flow.*;
 import xyz.itzsomebody.codegen.expressions.predefined.*;
 import xyz.itzsomebody.codegen.instructions.ConstantNode;
 import xyz.itzsomebody.codegen.instructions.SimpleNode;
@@ -31,6 +33,7 @@ import xyz.itzsomebody.codegen.instructions.SimpleNode;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
 
 public class IRExpressions {
@@ -402,5 +405,31 @@ public class IRExpressions {
 
     public static IRExpression setField(WrappedType owner, String name, WrappedType type, IRExpression value) {
         return new IRSetFieldExpression(null, value, owner, name, type);
+    }
+
+    // FLOW STRUCTURES
+
+    public static IRFlowStructure forLoop(BytecodeBlock initializer, BytecodeBlock condition, BytecodeBlock updater, BytecodeBlock body) {
+        return new IRForStructure(initializer, condition, updater, body);
+    }
+
+    public static IRFlowStructure ifBlock(BytecodeBlock condition, BytecodeBlock ifTrue, BytecodeBlock ifFalse) {
+        return new IRIfStructure(condition, ifTrue, ifFalse);
+    }
+
+    public static IRFlowStructure switchStatement(IRExpression operand, ArrayList<Integer> keys, ArrayList<BytecodeBlock> cases, BytecodeBlock defaultBody) {
+        return new IRSwitchStructure(operand, keys, cases, defaultBody);
+    }
+
+    public static IRFlowStructure synchronizedBlock(IRExpression instance, BytecodeBlock body) {
+        return new IRSynchronizedStructure(instance, body);
+    }
+
+    public static IRFlowStructure tryCatch(BytecodeBlock tryBody, BytecodeBlock catchBody, WrappedType exceptionType) {
+        return new IRTryCatchStructure(tryBody, catchBody, exceptionType);
+    }
+
+    public static IRFlowStructure whileLoop(BytecodeBlock condition, BytecodeBlock body) {
+        return new IRWhileStructure(condition, body);
     }
 }

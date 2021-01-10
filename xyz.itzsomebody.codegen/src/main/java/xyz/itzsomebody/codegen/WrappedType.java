@@ -103,7 +103,7 @@ public class WrappedType {
     }
 
     public boolean isArray() {
-        return type.getSize() == Type.ARRAY;
+        return type.getSort() == Type.ARRAY;
     }
 
     public boolean isIntType() {
@@ -116,7 +116,7 @@ public class WrappedType {
     }
 
     public String unwrap() {
-        if (type.getSort() == Type.OBJECT || type.getSort() == Type.ARRAY) {
+        if (type.getSort() == Type.OBJECT) {
             return 'L' + type.getInternalName() + ';';
         } else {
             return type.getInternalName();
@@ -131,7 +131,7 @@ public class WrappedType {
         return type.getClassName();
     }
 
-    public static WrappedType fromClassName(String className) {
+    public static WrappedType fromClassName(String className, boolean isInterface) {
         StringBuilder internalName = new StringBuilder();
 
         if (className.endsWith("[]")) {
@@ -151,6 +151,9 @@ public class WrappedType {
             case "double":
                 internalName.append("D");
                 break;
+            case "boolean":
+                internalName.append("Z");
+                break;
             case "byte":
                 internalName.append("B");
                 break;
@@ -161,14 +164,18 @@ public class WrappedType {
                 internalName.append("C");
                 break;
             default:
-                internalName.append(className.replace('.', '/'));
+                internalName.append('L').append(className.replace('.', '/')).append(';');
         }
 
-        return new WrappedType(Type.getType(internalName.toString()));
+        return new WrappedType(Type.getType(internalName.toString()), isInterface);
     }
 
     public static WrappedType fromInternalName(String internalName, boolean isInterface) {
-        return new WrappedType(Type.getType("L" + internalName + ";"), isInterface);
+        if ("ZBCSIJFDV".contains(internalName) || internalName.startsWith("[")) {
+            return new WrappedType(Type.getType(internalName), isInterface);
+        } else {
+            return new WrappedType(Type.getType("L" + internalName + ";"), isInterface);
+        }
     }
 
     public static WrappedType from(Class<?> clazz) {
@@ -222,8 +229,18 @@ public class WrappedType {
         }
 
         @Override
+        public boolean isBoxed() {
+            throw new UncompilableNodeException("Attempted to determine boxed flag of AbsentWrappedType");
+        }
+
+        @Override
         public boolean isArray() {
             throw new UncompilableNodeException("Attempted to determine array flag of AbsentWrappedType");
+        }
+
+        @Override
+        public boolean isIntType() {
+            throw new UncompilableNodeException("Attempted to determine isIntType flag of AbsentWrappedType");
         }
 
         @Override

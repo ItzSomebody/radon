@@ -29,6 +29,7 @@ allprojects {
 
     ext {
         asmVer = '9.0'
+        junitVer = 'junit:junit:4.12'
         javaVer = 11
     }
 
