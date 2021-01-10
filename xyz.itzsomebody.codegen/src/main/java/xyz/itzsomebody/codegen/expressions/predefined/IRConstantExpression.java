@@ -19,21 +19,20 @@
 package xyz.itzsomebody.codegen.expressions.predefined;
 
 import xyz.itzsomebody.codegen.BytecodeBlock;
+import xyz.itzsomebody.codegen.WrappedType;
 import xyz.itzsomebody.codegen.expressions.IRExpression;
-import xyz.itzsomebody.codegen.instructions.SimpleNode;
+import xyz.itzsomebody.codegen.instructions.ConstantNode;
 
-public class IRNegateExpression extends IRExpression {
-    private final IRExpression operand;
+public class IRConstantExpression extends IRExpression {
+    private final ConstantNode cst;
 
-    public IRNegateExpression(IRExpression operand) {
-        super(operand.getType());
-        this.operand = operand;
+    public IRConstantExpression(ConstantNode cst, WrappedType type) {
+        super(type);
+        this.cst = cst;
     }
 
     @Override
     public BytecodeBlock getInstructions() {
-        return new BytecodeBlock()
-                .append(operand.getInstructions())
-                .append(SimpleNode.negateOpcodeFor(operand.getType()));
+        return new BytecodeBlock().append(cst);
     }
 }

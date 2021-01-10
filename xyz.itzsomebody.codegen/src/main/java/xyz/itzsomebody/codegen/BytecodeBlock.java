@@ -1,6 +1,6 @@
 /*
  * Radon - An open-source Java obfuscator
- * Copyright (C) 2020 ItzSomebody
+ * Copyright (C) 2021 ItzSomebody
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -42,8 +42,6 @@ public class BytecodeBlock {
         nodes.forEach(node -> insns.add(node.getNode()));
         return insns;
     }
-
-    // todo
 
     public List<CompilableNode> getNodes() {
         return nodes;

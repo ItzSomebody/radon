@@ -1,3 +1,21 @@
+/*
+ * Radon - An open-source Java obfuscator
+ * Copyright (C) 2021 ItzSomebody
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ */
+
 package xyz.itzsomebody.codegen.expressions.predefined;
 
 import xyz.itzsomebody.codegen.BytecodeBlock;
@@ -25,8 +43,8 @@ public class IRInvocationExpression extends IRExpression {
         this.argTypes = argTypes;
     }
 
-    public IRInvocationExpression(IRExpression instance, Method method, List<IRExpression> args, WrappedType returnType) {
-        this(instance, WrappedType.from(method.getDeclaringClass()), method.getName(), args, Utils.wrapMethodDescriptor(method), returnType);
+    public IRInvocationExpression(IRExpression instance, Method method, List<IRExpression> args) {
+        this(instance, WrappedType.from(method.getDeclaringClass()), method.getName(), args, Utils.wrapMethodParameters(method), WrappedType.from(method.getReturnType()));
     }
 
     @Override
