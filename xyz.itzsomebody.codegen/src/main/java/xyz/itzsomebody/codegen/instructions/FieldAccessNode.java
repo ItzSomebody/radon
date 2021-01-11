@@ -38,7 +38,7 @@ public class FieldAccessNode implements CompilableNode {
 
     @Override
     public AbstractInsnNode getNode() {
-        return new FieldInsnNode(opcode, owner.getInternalName(), name, type.getInternalName());
+        return new FieldInsnNode(opcode, owner.getInternalName(), name, type.unwrap());
     }
 
     public static FieldAccessNode getStatic(WrappedType owner, String name, WrappedType type) {
