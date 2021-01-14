@@ -1,15 +1,56 @@
+/*
+ * Radon - An open-source Java obfuscator
+ * Copyright (C) 2021 ItzSomebody
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ */
+
 package xyz.itzsomebody.codegen.expressions.predefined;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.objectweb.asm.ConstantDynamic;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.IntInsnNode;
 import org.objectweb.asm.tree.LdcInsnNode;
+import xyz.itzsomebody.codegen.WrappedHandle;
+import xyz.itzsomebody.codegen.WrappedType;
+
+import java.lang.invoke.MethodHandles;
+import java.util.Collections;
 
 import static xyz.itzsomebody.codegen.expressions.IRExpressions.*;
 
-public class IRConstantTester { // todo: test constantdynamic:tm:
+public class IRConstantTester {
+    @Test
+    public void testDynamicConst() throws Exception {
+        var block = dynamicConst("tux", WrappedType.from(String.class), WrappedHandle.getInvokeStaticHandle(IRConstantTester.class.getMethod("dynamicTester", MethodHandles.Lookup.class, String.class, Class.class)), Collections.emptyList()).getInstructions();
+        var insn = block.compile().getFirst();
+
+        Assert.assertTrue(insn instanceof LdcInsnNode && ((LdcInsnNode) insn).cst instanceof ConstantDynamic);
+
+        var dynamic = (ConstantDynamic) ((LdcInsnNode) insn).cst;
+        var handle = dynamic.getBootstrapMethod();
+
+        Assert.assertEquals(Type.getInternalName(IRConstantTester.class), handle.getOwner());
+        Assert.assertEquals("dynamicTester", handle.getName());
+        Assert.assertEquals("(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/Class;)Ljava/lang/String;", handle.getDesc());
+        Assert.assertEquals("tux", dynamic.getName());
+        Assert.assertEquals("Ljava/lang/String;", dynamic.getDescriptor());
+    }
+
     @Test
     public void testNullConst() {
         var block = nullConst(String.class).getInstructions();
@@ -60,5 +101,9 @@ public class IRConstantTester { // todo: test constantdynamic:tm:
     public void testClassConst() {
         Assert.assertEquals(Opcodes.LDC, classConst(String.class).getInstructions().compile().get(0).getOpcode());
         Assert.assertEquals(Type.getType(String.class), ((LdcInsnNode) classConst(String.class).getInstructions().compile().get(0)).cst);
+    }
+
+    public static String dynamicTester(MethodHandles.Lookup lookup, String name, Class<?> type) {
+        return "test";
     }
 }

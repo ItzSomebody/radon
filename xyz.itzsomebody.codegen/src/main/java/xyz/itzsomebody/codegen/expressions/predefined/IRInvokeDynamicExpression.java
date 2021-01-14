@@ -31,7 +31,6 @@ public class IRInvokeDynamicExpression extends IRExpression {
     private final String name;
     private final List<IRExpression> args;
     private final List<WrappedType> argTypes;
-    private final WrappedType returnType;
     private final WrappedHandle bootstrap;
     private final List<ConstantNode> bootstrapArgs;
 
@@ -40,7 +39,6 @@ public class IRInvokeDynamicExpression extends IRExpression {
         this.name = name;
         this.args = args;
         this.argTypes = argTypes;
-        this.returnType = returnType;
         this.bootstrap = bootstrap;
         this.bootstrapArgs = bootstrapArgs;
     }
@@ -49,7 +47,7 @@ public class IRInvokeDynamicExpression extends IRExpression {
     public BytecodeBlock getInstructions() {
         var block = new BytecodeBlock();
         args.forEach(arg -> block.append(arg.getInstructions()));
-        block.append(InvokeDynamicNode.invokeDynamic(name, argTypes, returnType, bootstrap, bootstrapArgs));
+        block.append(InvokeDynamicNode.invokeDynamic(name, argTypes, getType(), bootstrap, bootstrapArgs));
         return block;
     }
 }

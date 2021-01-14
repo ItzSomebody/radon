@@ -105,7 +105,6 @@ public class UtilsTester {
                 ConstantNode.floatConst(0F),
                 ConstantNode.doubleConst(0D),
                 ConstantNode.classConst(WrappedType.from(String.class))
-                // todo: maybe test dynamic constants?
         ));
 
         Assert.assertArrayEquals(expected, actual);

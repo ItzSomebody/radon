@@ -32,4 +32,8 @@ public class GenerationContext {
         slotOffset += type.getType().getSize();
         return variable;
     }
+
+    public IRVariable newVariable(Class<?> clazz) {
+        return newVariable(WrappedType.from(clazz));
+    }
 }

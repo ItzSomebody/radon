@@ -25,7 +25,7 @@ import xyz.itzsomebody.codegen.instructions.RegisterNode;
 
 public class IRVariable extends IRExpression {
     private final WrappedType wrappedType;
-    private final int slot; // fixme: this is technically cheating so fix eventually
+    private final int slot;
 
     public IRVariable(WrappedType wrappedType, int slot) {
         super(wrappedType);

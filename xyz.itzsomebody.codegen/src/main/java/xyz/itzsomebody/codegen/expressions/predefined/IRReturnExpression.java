@@ -20,6 +20,7 @@ package xyz.itzsomebody.codegen.expressions.predefined;
 
 import org.objectweb.asm.Type;
 import xyz.itzsomebody.codegen.BytecodeBlock;
+import xyz.itzsomebody.codegen.WrappedType;
 import xyz.itzsomebody.codegen.expressions.IRExpression;
 import xyz.itzsomebody.codegen.instructions.SimpleNode;
 
@@ -27,12 +28,16 @@ public class IRReturnExpression extends IRExpression {
     private final IRExpression target;
 
     public IRReturnExpression(IRExpression target) {
-        super(target.getType());
+        super(WrappedType.getAbsent());
         this.target = target;
     }
 
     @Override
     public BytecodeBlock getInstructions() {
+        if (target == null) {
+            return new BytecodeBlock().append(SimpleNode.RETURN_VOID);
+        }
+
         var block = new BytecodeBlock().append(target.getInstructions());
         var type = target.getType();
 

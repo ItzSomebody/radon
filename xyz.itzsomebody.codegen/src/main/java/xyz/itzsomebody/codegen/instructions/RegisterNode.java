@@ -81,7 +81,7 @@ public class RegisterNode implements CompilableNode {
 
     public static RegisterNode ret(int slot) {
         return new RegisterNode(Opcodes.RET, slot);
-    }
+    } // todo: add jsr support to troll cooker
 
     public static RegisterNode loadVar(IRVariable variable) {
         switch (variable.getWrappedType().getSort()) {

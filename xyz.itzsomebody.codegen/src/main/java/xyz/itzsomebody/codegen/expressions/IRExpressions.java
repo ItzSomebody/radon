@@ -182,11 +182,11 @@ public class IRExpressions {
     // CONSTANT DYNAMIC
 
     public static IRExpression dynamicConst(String name, WrappedType type, WrappedHandle bootstrapMethod, List<ConstantNode> bootstrapArgs) {
-        return new IRConstantDynamicExpression(name, type, bootstrapMethod, bootstrapArgs);
+        return new IRConstantExpression(ConstantNode.dynamicConst(name, type, bootstrapMethod, bootstrapArgs), type);
     }
 
     public static IRExpression dynamicConst(String name, WrappedType type, Method bootstrap, List<ConstantNode> bootstrapArgs) {
-        return dynamicConst(name, type, WrappedHandle.getInvokeStaticHandle(bootstrap), bootstrapArgs);
+        return new IRConstantExpression(ConstantNode.dynamicConst(name, type, bootstrap, bootstrapArgs), type);
     }
 
     // CONSTANTS
@@ -323,6 +323,16 @@ public class IRExpressions {
         return new IRInvocationExpression(null, owner, name, args, argTypes, returnType);
     }
 
+    // INVOKE DYNAMIC
+
+    public static IRExpression invokeDynamic(String name, List<IRExpression> args, List<WrappedType> argTypes, WrappedType returnType, Method bootstrap, List<ConstantNode> bootstrapArgs) {
+        return new IRInvokeDynamicExpression(name, args, argTypes, returnType, WrappedHandle.getInvokeStaticHandle(bootstrap), bootstrapArgs);
+    }
+
+    public static IRExpression invokeDynamic(String name, List<IRExpression> args, List<WrappedType> argTypes, WrappedType returnType, WrappedHandle bootstrap, List<ConstantNode> bootstrapArgs) {
+        return new IRInvokeDynamicExpression(name, args, argTypes, returnType, bootstrap, bootstrapArgs);
+    }
+
     // NEGATIONS
 
     public static IRExpression negate(IRExpression operand) {
@@ -395,15 +405,15 @@ public class IRExpressions {
         return new IRSetFieldExpression(instance, value, owner, name, type);
     }
 
-    public static IRExpression setField(Field field, IRExpression value) {
+    public static IRExpression setStatic(Field field, IRExpression value) {
         return new IRSetFieldExpression(null, value, field);
     }
 
-    public static IRExpression setField(Class<?> owner, String name, Class<?> type, IRExpression value) {
+    public static IRExpression setStatic(Class<?> owner, String name, Class<?> type, IRExpression value) {
         return new IRSetFieldExpression(null, value, WrappedType.from(owner), name, WrappedType.from(type));
     }
 
-    public static IRExpression setField(WrappedType owner, String name, WrappedType type, IRExpression value) {
+    public static IRExpression setStatic(WrappedType owner, String name, WrappedType type, IRExpression value) {
         return new IRSetFieldExpression(null, value, owner, name, type);
     }
 

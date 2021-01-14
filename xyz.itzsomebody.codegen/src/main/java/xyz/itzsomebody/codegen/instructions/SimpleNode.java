@@ -72,7 +72,7 @@ public enum SimpleNode implements CompilableNode {
     OBJECT_ARRAY_STORE(Opcodes.AASTORE),
     BYTE_ARRAY_STORE(Opcodes.BASTORE),
     CHAR_ARRAY_STORE(Opcodes.CASTORE),
-    SHORT_ARRAY_STORE(Opcodes.SALOAD),
+    SHORT_ARRAY_STORE(Opcodes.SASTORE),
 
     // Stack stuff
     POP(Opcodes.POP),

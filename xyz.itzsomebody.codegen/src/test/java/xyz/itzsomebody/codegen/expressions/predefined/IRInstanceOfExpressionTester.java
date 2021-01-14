@@ -18,26 +18,24 @@
 
 package xyz.itzsomebody.codegen.expressions.predefined;
 
-import xyz.itzsomebody.codegen.BytecodeBlock;
+import org.junit.Assert;
+import org.junit.Test;
+import org.objectweb.asm.tree.TypeInsnNode;
 import xyz.itzsomebody.codegen.WrappedType;
-import xyz.itzsomebody.codegen.expressions.IRExpression;
-import xyz.itzsomebody.codegen.expressions.IRVariable;
-import xyz.itzsomebody.codegen.instructions.RegisterNode;
 
-public class IRSetVariableExpression extends IRExpression {
-    private final IRVariable variable;
-    private final IRExpression expression;
+import static xyz.itzsomebody.codegen.expressions.IRExpressions.instanceOf;
+import static xyz.itzsomebody.codegen.expressions.IRExpressions.nullConst;
 
-    public IRSetVariableExpression(IRVariable variable, IRExpression expression) {
-        super(WrappedType.getAbsent());
-        this.variable = variable;
-        this.expression = expression;
+public class IRInstanceOfExpressionTester {
+    @Test
+    public void testInstanceOfClass() {
+        var tin = (TypeInsnNode) instanceOf(nullConst(Integer.class), Number.class).getInstructions().compile().get(1);
+        Assert.assertEquals("java/lang/Number", tin.desc);
     }
 
-    @Override
-    public BytecodeBlock getInstructions() {
-        return new BytecodeBlock()
-                .append(expression.getInstructions())
-                .append(RegisterNode.storeVar(variable));
+    @Test
+    public void testInstanceOfWrappedType() {
+        var tin = (TypeInsnNode) instanceOf(nullConst(Integer.class), WrappedType.from(Number.class)).getInstructions().compile().get(1);
+        Assert.assertEquals("java/lang/Number", tin.desc);
     }
 }

@@ -55,7 +55,7 @@ public class Utils {
         return sb.toString();
     }
 
-    public static ArrayList<LabelNode> unwrapLabels(ArrayList<BytecodeLabel> wrappedLabels) {
+    public static ArrayList<LabelNode> unwrapLabels(List<BytecodeLabel> wrappedLabels) {
         var unwrappedLabels = new ArrayList<LabelNode>(wrappedLabels.size());
         wrappedLabels.forEach(wrappedLabel -> unwrappedLabels.add(wrappedLabel.getLabel()));
         return unwrappedLabels;

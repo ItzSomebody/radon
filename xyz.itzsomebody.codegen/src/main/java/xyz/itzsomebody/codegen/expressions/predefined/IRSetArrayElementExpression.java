@@ -41,6 +41,6 @@ public class IRSetArrayElementExpression extends IRExpression {
                 .append(array.getInstructions())
                 .append(index.getInstructions())
                 .append(value.getInstructions())
-                .append(SimpleNode.getArrayStoreOp(getType()));
+                .append(SimpleNode.getArrayStoreOp(array.getType()));
     }
 }

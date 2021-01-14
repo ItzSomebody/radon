@@ -18,5 +18,44 @@
 
 package xyz.itzsomebody.codegen.instructions;
 
-public class InvokeDynamicNodeTester { // todo: make this (invokedynamic is pain)
+import org.junit.Assert;
+import org.junit.Test;
+import org.objectweb.asm.Type;
+import org.objectweb.asm.tree.InvokeDynamicInsnNode;
+import xyz.itzsomebody.codegen.WrappedHandle;
+import xyz.itzsomebody.codegen.WrappedType;
+
+import java.lang.invoke.CallSite;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
+import java.util.Collections;
+import java.util.List;
+
+public class InvokeDynamicNodeTester {
+    @Test
+    public void testInvokeDynamicWithMethod() throws Exception {
+        var method = InvokeDynamicNodeTester.class.getMethod("testBootstrap", MethodHandles.Lookup.class, String.class, MethodType.class);
+        var invoke = (InvokeDynamicInsnNode) InvokeDynamicNode.invokeDynamic("tux", List.of(WrappedType.from(String.class)), WrappedType.from(void.class), method, Collections.emptyList()).getNode();
+        Assert.assertEquals("tux", invoke.name);
+        Assert.assertEquals("(Ljava/lang/String;)V", invoke.desc);
+        var handle = invoke.bsm;
+        Assert.assertEquals(Type.getInternalName(InvokeDynamicNodeTester.class), handle.getOwner());
+        Assert.assertEquals("testBootstrap", handle.getName());
+        Assert.assertEquals("(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;", handle.getDesc());
+    }
+
+    @Test
+    public void testInvokeDynamicWithWrappedHandle() throws Exception {
+        var invoke = (InvokeDynamicInsnNode) InvokeDynamicNode.invokeDynamic("tux", List.of(WrappedType.from(String.class)), WrappedType.from(void.class), WrappedHandle.getInvokeStaticHandle(InvokeDynamicNodeTester.class.getMethod("testBootstrap", MethodHandles.Lookup.class, String.class, MethodType.class)), Collections.emptyList()).getNode();
+        Assert.assertEquals("tux", invoke.name);
+        Assert.assertEquals("(Ljava/lang/String;)V", invoke.desc);
+        var handle = invoke.bsm;
+        Assert.assertEquals(Type.getInternalName(InvokeDynamicNodeTester.class), handle.getOwner());
+        Assert.assertEquals("testBootstrap", handle.getName());
+        Assert.assertEquals("(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;", handle.getDesc());
+    }
+
+    public static CallSite testBootstrap(MethodHandles.Lookup lookup, String name, MethodType methodType) {
+        return null;
+    }
 }

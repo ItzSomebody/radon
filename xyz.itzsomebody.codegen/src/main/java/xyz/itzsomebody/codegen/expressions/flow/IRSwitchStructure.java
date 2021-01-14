@@ -18,6 +18,7 @@
 
 package xyz.itzsomebody.codegen.expressions.flow;
 
+import org.jetbrains.annotations.NotNull;
 import xyz.itzsomebody.codegen.BytecodeBlock;
 import xyz.itzsomebody.codegen.expressions.IRExpression;
 import xyz.itzsomebody.codegen.instructions.BytecodeLabel;
@@ -25,35 +26,37 @@ import xyz.itzsomebody.codegen.instructions.JumpNode;
 import xyz.itzsomebody.codegen.instructions.SwitchNode;
 
 import java.util.ArrayList;
+import java.util.SortedSet;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
-// FIXME: keys (and their cases, consequently) MUST be sorted
 public class IRSwitchStructure extends IRFlowStructure {
     private final IRExpression operand;
-    private final ArrayList<Integer> keys;
-    private final ArrayList<BytecodeBlock> cases;
+    private final SortedSet<IRCaseStructure> cases = new TreeSet<>();
     private final BytecodeBlock defaultBody;
     private final ArrayList<BytecodeLabel> caseLabels = new ArrayList<>();
     private final BytecodeLabel defaultLabel = new BytecodeLabel();
     private final BytecodeLabel exitLabel = new BytecodeLabel();
 
-    public IRSwitchStructure(IRExpression operand, ArrayList<Integer> keys, ArrayList<BytecodeBlock> cases, BytecodeBlock defaultBody) {
+    public IRSwitchStructure(IRExpression operand, ArrayList<Integer> keys, ArrayList<BytecodeBlock> caseBodies, BytecodeBlock defaultBody) {
         this.operand = operand;
-        this.keys = keys;
-        this.cases = cases;
         this.defaultBody = defaultBody;
+
+        IntStream.range(0, keys.size()).forEach(index -> cases.add(new IRCaseStructure(keys.get(index), caseBodies.get(index))));
     }
 
     @Override
     public BytecodeBlock getInstructions() {
         var block = new BytecodeBlock()
                 .append(operand.getInstructions())
-                .append(new SwitchNode(keys, caseLabels, defaultLabel));
+                .append(new SwitchNode(cases.stream().map(IRCaseStructure::getKey).collect(Collectors.toList()), caseLabels, defaultLabel));
 
         // Cases
-        cases.forEach(caseBody -> {
+        cases.forEach(caseStructure -> {
             var caseLabel = new BytecodeLabel();
             block.append(caseLabel)
-                    .append(caseBody)
+                    .append(caseStructure.getBody())
                     .append(JumpNode.jumpUnconditionally(exitLabel));
             caseLabels.add(caseLabel);
         });
@@ -77,5 +80,28 @@ public class IRSwitchStructure extends IRFlowStructure {
 
     public BytecodeLabel getExitLabel() {
         return exitLabel;
+    }
+
+    static class IRCaseStructure implements Comparable<IRCaseStructure> {
+        private final int key;
+        private final BytecodeBlock body;
+
+        IRCaseStructure(int key, BytecodeBlock body) {
+            this.key = key;
+            this.body = body;
+        }
+
+        public int getKey() {
+            return key;
+        }
+
+        public BytecodeBlock getBody() {
+            return body;
+        }
+
+        @Override
+        public int compareTo(@NotNull IRSwitchStructure.IRCaseStructure other) {
+            return Integer.compare(key, other.key);
+        }
     }
 }

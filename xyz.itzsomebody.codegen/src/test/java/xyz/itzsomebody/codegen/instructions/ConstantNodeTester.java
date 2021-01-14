@@ -23,7 +23,7 @@ import org.junit.Test;
 import org.objectweb.asm.Opcodes;
 import xyz.itzsomebody.codegen.WrappedType;
 
-public class ConstantNodeTester { // todo: maybe test dynamic const?
+public class ConstantNodeTester {
     @Test
     public void testNullConst() {
         Assert.assertNull(ConstantNode.nullConst().getValue());
