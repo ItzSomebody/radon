@@ -11,7 +11,6 @@ HotSpot.
 * Compared to Radon 2, Radon 3 can be significantly more risky in how it performs transformations on bytecode.
 * Radon 2 uses the GitHub wiki for documentation of transformers and usage. Radon 3 has no usage guide and uses GitHub
 pages for documentation of transformers (however, the wiki will not be removed for ease of reference).
-* Radon 3 removes the nested YAML structure in Radon 2 and instead puts all transformers on the root level.
 * Radon 3 removes delegation for "shrinking" transformers via the above point.
 * Radon 3 adheres to a style guide (sort of) whereas no previous version of Radon has.
 * Radon 3 reimplements the exclusion system in a much more efficient matter.

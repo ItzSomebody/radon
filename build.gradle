@@ -22,16 +22,32 @@ plugins {
 
 defaultTasks 'clean', 'test', 'build'
 
+ext {
+    // ASM
+    asmVer = '9.0'
+    asm = 'org.ow2.asm:asm:' + asmVer
+    asmAnalysis = 'org.ow2.asm:asm-analysis:' + asmVer
+    asmCommons = 'org.ow2.asm:asm-commons:' + asmVer
+    asmTree = 'org.ow2.asm:asm-tree:' + asmVer
+    asmUtil = 'org.ow2.asm:asm-util:' + asmVer
+
+    // junit
+    junit = 'junit:junit:4.12'
+
+    // Annotations
+    annotations = 'org.jetbrains:annotations:20.1.0'
+
+    // SnakeYAML
+    snakeYAML = 'org.yaml:snakeyaml:1.26'
+
+    // Java version
+    javaVer = 11
+}
+
 allprojects {
     // Project group and version
     group 'xyz.itzsomebody'
     version '3.0.0-SNAPSHOT'
-
-    ext {
-        asmVer = '9.0'
-        junitVer = 'junit:junit:4.12'
-        javaVer = 11
-    }
 
     // Compile using UTF-8 encoding
     tasks.withType(JavaCompile) {

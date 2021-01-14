@@ -23,10 +23,8 @@ plugins {
 sourceCompatibility = javaVer
 
 dependencies {
-    implementation 'org.jetbrains:annotations:20.1.0'
-    for (lib in ['asm', 'asm-tree', 'asm-commons', 'asm-util']) {
-        implementation group: 'org.ow2.asm', name: lib, version: asmVer
-    }
-
-    testImplementation junitVer
+    implementation annotations
+    implementation asm
+    implementation asmTree
+    testImplementation junit
 }

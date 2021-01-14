@@ -64,13 +64,14 @@ shadowJar() {
 }
 
 dependencies {
-    implementation 'org.yaml:snakeyaml:1.26'
     implementation project(':xyz.itzsomebody.codegen')
     implementation project(':xyz.itzsomebody.commons')
-
-    for (lib in ['asm', 'asm-tree', 'asm-commons', 'asm-util']) {
-        implementation group: 'org.ow2.asm', name: lib, version: asmVer
-    }
-
-    testImplementation 'junit:junit:4.12'
+    implementation annotations
+    implementation snakeYAML
+    implementation asm
+    implementation asmAnalysis
+    implementation asmCommons
+    implementation asmTree
+    implementation asmUtil
+    testImplementation junit
 }
