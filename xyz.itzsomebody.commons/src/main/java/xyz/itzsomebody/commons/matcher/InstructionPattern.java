@@ -1,6 +1,6 @@
 /*
  * Radon - An open-source Java obfuscator
- * Copyright (C) 2020 ItzSomebody
+ * Copyright (C) 2021 ItzSomebody
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,17 +16,26 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package xyz.itzsomebody.radon.dictionaries;
+package xyz.itzsomebody.commons.matcher;
 
-import xyz.itzsomebody.radon.dictionaries.defined.AlphabeticalDictionary;
+import org.jetbrains.annotations.NotNull;
+import org.objectweb.asm.tree.AbstractInsnNode;
+import xyz.itzsomebody.commons.matcher.rules.InstructionRule;
 
-public class DictionaryFactory {
-    public static Dictionary forName(String name) {
-        // todo
-        return new AlphabeticalDictionary();
+import java.util.List;
+
+public class InstructionPattern {
+    private final List<InstructionRule> rules;
+
+    public InstructionPattern(@NotNull InstructionRule... rules) {
+        this.rules = List.of(rules);
     }
 
-    public static Dictionary defaultDictionary() {
-        return new AlphabeticalDictionary();
+    public List<InstructionRule> getRules() {
+        return rules;
+    }
+
+    public InstructionMatcher matcher(AbstractInsnNode start) {
+        return new InstructionMatcher(this, start);
     }
 }

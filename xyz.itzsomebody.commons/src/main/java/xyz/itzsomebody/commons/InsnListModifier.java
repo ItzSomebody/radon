@@ -122,7 +122,7 @@ public class InsnListModifier {
         inserts.forEach(insns::insert);
         insertBefores.forEach(insns::insertBefore);
         replacements.forEach((old, replacement) -> {
-            insns.insert(replacement);
+            insns.insert(old, replacement);
             insns.remove(old);
         });
         removals.forEach(insns::remove);

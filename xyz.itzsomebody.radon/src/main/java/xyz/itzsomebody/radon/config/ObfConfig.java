@@ -59,8 +59,8 @@ public class ObfConfig {
 
         // Transformers
         var transformers = new ArrayList<Transformer>();
-        var transformerConfigs = config.getOrDefault(Key.TRANSFORMERS.getKeyString(), Collections.<String, Object>emptyMap());
-        transformerConfigs.forEach((k, v) -> {
+        var listedTransformers = config.getOrDefault(Key.TRANSFORMERS.getKeyString(), Collections.<String, Object>emptyMap());
+        listedTransformers.forEach((k, v) -> {
             try {
                 // Typically, it's bad to use Enum#valueOf(Object) but should be fine here as performance impact is minimal
                 // since we're just loading the config and not obfuscating anything yet.

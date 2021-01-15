@@ -19,7 +19,9 @@
 package xyz.itzsomebody.codegen;
 
 import org.objectweb.asm.tree.InsnList;
+import xyz.itzsomebody.codegen.expressions.predefined.IRReturnExpression;
 import xyz.itzsomebody.codegen.instructions.CompilableNode;
+import xyz.itzsomebody.codegen.instructions.SimpleNode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +43,11 @@ public class BytecodeBlock {
         var insns = new InsnList();
         nodes.forEach(node -> insns.add(node.getNode()));
         return insns;
+    }
+
+    public BytecodeBlock voidReturn(){
+        nodes.add(SimpleNode.RETURN_VOID);
+        return this;
     }
 
     public List<CompilableNode> getNodes() {
