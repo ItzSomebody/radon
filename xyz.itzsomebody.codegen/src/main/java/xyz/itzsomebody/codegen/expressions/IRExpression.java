@@ -143,4 +143,8 @@ public abstract class IRExpression {
     public IRExpression ret() {
         return new IRReturnExpression(this);
     }
+
+    public IRExpression throwMe() {
+        return new IRThrowExceptionExpression(this);
+    }
 }

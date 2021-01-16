@@ -18,12 +18,23 @@
 
 package xyz.itzsomebody.radon.dictionaries;
 
+import xyz.itzsomebody.radon.dictionaries.defined.AlphaNumericDictionary;
 import xyz.itzsomebody.radon.dictionaries.defined.AlphabeticalDictionary;
+import xyz.itzsomebody.radon.exceptions.PreventableRadonException;
+
+import java.util.List;
 
 public class DictionaryFactory {
+    private static final Dictionary[] DEFINED = {
+            new AlphabeticalDictionary(),
+            new AlphaNumericDictionary()
+    };
+
     public static Dictionary forName(String name) {
-        // todo
-        return new AlphabeticalDictionary();
+        return List.of(DEFINED).stream()
+                .filter(dictionary -> name.equalsIgnoreCase(dictionary.configName()))
+                .findFirst()
+                .orElseThrow(() -> new PreventableRadonException("Unknown dictionary: " + name));
     }
 
     public static Dictionary defaultDictionary() {

@@ -118,4 +118,8 @@ public class FieldWrapper implements Opcodes {
     public static FieldWrapper from(FieldNode FieldNode, ClassWrapper owner) {
         return new FieldWrapper(FieldNode, owner);
     }
+
+    public boolean hasVisibleAnnotations() {
+        return fieldNode.visibleAnnotations != null && fieldNode.visibleAnnotations.size() > 0;
+    }
 }

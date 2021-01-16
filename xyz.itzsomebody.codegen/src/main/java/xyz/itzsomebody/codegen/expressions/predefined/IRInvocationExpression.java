@@ -59,7 +59,7 @@ public class IRInvocationExpression extends IRExpression {
 
         if (instance == null) {
             block.append(InvokeNode.invokeStatic(owner, name, argTypes, getType()));
-        } else if (instance.getType().isInterface()) {
+        } else if (owner.isInterface()) {
             block.append(InvokeNode.invokeInterface(owner, name, argTypes, getType()));
         } else {
             block.append(InvokeNode.invokeVirtual(owner, name, argTypes, getType()));

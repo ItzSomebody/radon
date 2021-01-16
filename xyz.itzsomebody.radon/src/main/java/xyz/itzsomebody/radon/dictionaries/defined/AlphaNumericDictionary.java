@@ -45,7 +45,7 @@ public class AlphaNumericDictionary implements Dictionary {
 
     @Override
     public String configName() {
-        return "alphabetical";
+        return "alphanumeric";
     }
 
     @Override

@@ -148,6 +148,10 @@ public class MethodWrapper implements Opcodes {
         return methodNode.instructions.size() > 0;
     }
 
+    public boolean hasVisibleAnnotations() {
+        return methodNode.visibleAnnotations != null && methodNode.visibleAnnotations.size() > 0;
+    }
+
     public int getCodeSize() {
         CodeSizeEvaluator evaluator = new CodeSizeEvaluator(null);
         methodNode.accept(evaluator);

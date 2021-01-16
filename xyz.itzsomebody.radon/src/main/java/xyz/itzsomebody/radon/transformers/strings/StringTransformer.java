@@ -32,6 +32,7 @@ import java.util.Set;
 public abstract class StringTransformer extends Transformer {
     private Set<String> excludedStrings;
     protected Dictionary dictionary;
+    protected int allowedLeeway;
 
     protected boolean isExcludedString(String s) {
         return excludedStrings.contains(s);
@@ -51,14 +52,24 @@ public abstract class StringTransformer extends Transformer {
         // Dictionary :O
         var dictionaryName = config.<String>get(getLocalConfigPath() + "." + StringConfigKey.DICTIONARY.getKey());
         dictionary = (dictionaryName == null) ? DictionaryFactory.defaultDictionary() : DictionaryFactory.forName(dictionaryName);
+
+        // Leeway
+        allowedLeeway = config.getOrDefault(getLocalConfigPath() + "." + StringConfigKey.LEEWAY.getKey(), 5000);
     }
 
     enum StringConfigKey {
         EXCLUDED_STRINGS,
-        DICTIONARY;
+        DICTIONARY,
+        LEEWAY;
 
         public String getKey() {
             return name().toLowerCase();
+        }
+
+        @Override
+        public String toString() {
+            // This is in case I forget to do getKey()
+            return getKey();
         }
     }
 }

@@ -18,10 +18,18 @@
 
 package xyz.itzsomebody.radon.transformers;
 
+import xyz.itzsomebody.radon.transformers.misc.*;
 import xyz.itzsomebody.radon.transformers.strings.Str2Base64Encoding;
 import xyz.itzsomebody.radon.transformers.strings.StaticFieldStrPool;
 
 public enum Transformers {
+    // Misc.
+    ADD_BRIDGE_ACCESS_FLAG(AddBridgeAccess.class),
+    ADD_DEPRECATED_ACCESS_FLAG(AddDeprecatedAccess.class),
+    ADD_SYNTHETIC_ACCESS_FLAG(AddSyntheticAccess.class),
+    ADD_TRASH_CLASSES(AddTrashClasses.class),
+    INJECT_ANTI_DEBUGGER(AntiDebugger.class),
+
     // String encryption/encoding
     STRING_TO_BASE64_ENCODING(Str2Base64Encoding.class),
     POOL_STRINGS_TO_STATIC_FIELD(StaticFieldStrPool.class),

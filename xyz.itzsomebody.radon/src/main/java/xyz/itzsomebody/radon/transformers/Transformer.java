@@ -101,7 +101,7 @@ public abstract class Transformer implements Opcodes {
     }
 
     public String getName() {
-        return getClass().getSimpleName();
+        return getClass().getName();
     }
 
     public String getLocalConfigPath() {

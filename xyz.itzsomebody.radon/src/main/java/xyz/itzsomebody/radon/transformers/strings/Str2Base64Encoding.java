@@ -18,7 +18,11 @@
 
 package xyz.itzsomebody.radon.transformers.strings;
 
-import org.objectweb.asm.tree.*;
+import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.LdcInsnNode;
+import org.objectweb.asm.tree.MethodInsnNode;
+import org.objectweb.asm.tree.MethodNode;
+import xyz.itzsomebody.commons.InsnListModifier;
 import xyz.itzsomebody.radon.config.Configuration;
 import xyz.itzsomebody.radon.transformers.Transformers;
 import xyz.itzsomebody.radon.utils.asm.ClassWrapper;
@@ -43,7 +47,6 @@ public class Str2Base64Encoding extends StringTransformer {
 
         if (decodeFromRandomClass) {
             toInject = randomClass();
-            // fixme: its illegal to inject into interface
         } else {
             ClassNode cn = new ClassNode();
             cn.version = V1_5;
@@ -55,46 +58,35 @@ public class Str2Base64Encoding extends StringTransformer {
             addClass(toInject);
         }
 
-        MethodNode decryptor = decryptorNode(dictionary.next());
-        while (toInject.containsMethodNode(decryptor.name, decryptor.desc)) {
-            decryptor.name = dictionary.next();
-        }
+        var decryptor = decryptorNode(toInject.generateNextAllowedMethodName(dictionary.copy(), "(Ljava/lang/String;)Ljava/lang/String;"));
         toInject.addMethod(decryptor);
 
         AtomicInteger count = new AtomicInteger();
 
         classStream().filter(this::notExcluded).forEach(classWrapper -> {
             classWrapper.methodStream().filter(mw -> notExcluded(mw) && mw.hasInstructions()).forEach(methodWrapper -> {
-                int leeway = methodWrapper.getLeewaySize();
-                MethodNode methodNode = methodWrapper.getMethodNode();
-
-                for (AbstractInsnNode current : methodNode.instructions.toArray()) {
-                    if (leeway <= 10) {
-                        return;
-                    }
-
-                    if (current instanceof LdcInsnNode && ((LdcInsnNode) current).cst instanceof String) {
-                        ((LdcInsnNode) current).cst = encodeString((String) ((LdcInsnNode) current).cst);
-                        methodNode.instructions.insert(current, new MethodInsnNode(
-                                INVOKESTATIC,
-                                toInject.getName(),
-                                decryptor.name,
-                                decryptor.desc,
-                                false
-                        ));
-
-                        // https://docs.oracle.com/javase/specs/jvms/se11/html/jvms-6.html#jvms-6.5.invokestatic
-                        // opcode
-                        // indexbyte1
-                        // indexbyte2
-                        leeway -= 3;
-                        count.incrementAndGet();
-                    }
+                if (methodWrapper.getLeewaySize() > allowedLeeway) {
+                    var methodNode = methodWrapper.getMethodNode();
+                    var modifier = new InsnListModifier();
+                    methodNode.instructions.forEach(current -> {
+                        if (current instanceof LdcInsnNode && ((LdcInsnNode) current).cst instanceof String) {
+                            ((LdcInsnNode) current).cst = encodeString((String) ((LdcInsnNode) current).cst);
+                            modifier.insert(current, new MethodInsnNode(
+                                    INVOKESTATIC,
+                                    toInject.getName(),
+                                    decryptor.name,
+                                    decryptor.desc,
+                                    toInject.isInterface()
+                            ));
+                            count.incrementAndGet();
+                        }
+                    });
+                    modifier.apply(methodNode.instructions);
                 }
             });
         });
 
-        RadonLogger.info("Base64 encoded " + count.get() + " string");
+        RadonLogger.info("Base64 encoded " + count.get() + " strings");
     }
 
     @Override
@@ -123,7 +115,7 @@ public class Str2Base64Encoding extends StringTransformer {
     }
 
     private MethodNode decryptorNode(String methodName) {
-        MethodNode mw = new MethodNode(ACC_PUBLIC | ACC_STATIC | ACC_SYNTHETIC | ACC_BRIDGE, methodName, "(Ljava/lang/String;)Ljava/lang/String;", null, null);
+        var mw = new MethodNode(ACC_PUBLIC | ACC_STATIC | ACC_SYNTHETIC | ACC_BRIDGE, methodName, "(Ljava/lang/String;)Ljava/lang/String;", null, null);
         mw.visitCode();
         mw.visitTypeInsn(NEW, "java/lang/String");
         mw.visitInsn(DUP);

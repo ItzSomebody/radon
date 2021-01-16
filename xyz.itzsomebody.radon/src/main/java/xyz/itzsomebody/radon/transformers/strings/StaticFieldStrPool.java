@@ -26,39 +26,31 @@ import static xyz.itzsomebody.codegen.expressions.IRExpressions.*;
 public class StaticFieldStrPool extends StringTransformer {
     @Override
     public void transform() {
-        AtomicInteger count = new AtomicInteger();
-
+        var count = new AtomicInteger();
         classStream().filter(this::notExcluded).forEach(classWrapper -> {
             var strList = new ArrayList<String>();
-            String tempMethodName;
-            do {
-                tempMethodName = dictionary.next();
-            } while (classWrapper.containsMethodNode(tempMethodName, "()V"));
-            String tempFieldName;
-            do {
-                tempFieldName = dictionary.next();
-            } while (classWrapper.containsFieldNode(tempFieldName, "[Ljava/lang/String;"));
-
-            final String stringPoolInitMethodName = tempMethodName;
-            final String stringPoolFieldName = tempFieldName;
+            var stringPoolInitMethodName = classWrapper.generateNextAllowedMethodName(dictionary.copy(), "()V");
+            var stringPoolFieldName = classWrapper.generateNextAllowedFieldName(dictionary.copy(), "[Ljava/lang/String;");
             classWrapper.methodStream().filter(mw -> notExcluded(mw) && mw.hasInstructions()).forEach(methodWrapper -> {
-                var methodNode = methodWrapper.getMethodNode();
-                var modifier = new InsnListModifier();
-                methodNode.instructions.forEach(insn -> {
-                    if (insn instanceof LdcInsnNode && ((LdcInsnNode) insn).cst instanceof String) {
-                        var str = (String) ((LdcInsnNode) insn).cst;
+                if (methodWrapper.getLeewaySize() > allowedLeeway) {
+                    var methodNode = methodWrapper.getMethodNode();
+                    var modifier = new InsnListModifier();
+                    methodNode.instructions.forEach(insn -> {
+                        if (insn instanceof LdcInsnNode && ((LdcInsnNode) insn).cst instanceof String) {
+                            var str = (String) ((LdcInsnNode) insn).cst;
 
-                        if (!isExcludedString(str)) {
-                            modifier.replace(insn, getArrayElement(
-                                    getStatic(WrappedType.fromInternalName(classWrapper.getName(), classWrapper.isInterface()), stringPoolFieldName, WrappedType.from(String[].class)),
-                                    intConst(strList.size())
-                            ).getInstructions().compile());
-                            strList.add(str);
-                            count.incrementAndGet();
+                            if (!isExcludedString(str)) {
+                                modifier.replace(insn, getArrayElement(
+                                        getStatic(WrappedType.fromInternalName(classWrapper.getName(), classWrapper.isInterface()), stringPoolFieldName, WrappedType.from(String[].class)),
+                                        intConst(strList.size())
+                                ).getInstructions().compile());
+                                strList.add(str);
+                                count.incrementAndGet();
+                            }
                         }
-                    }
-                });
-                modifier.apply(methodNode.instructions);
+                    });
+                    modifier.apply(methodNode.instructions);
+                }
             });
 
             if (strList.size() != 0) {

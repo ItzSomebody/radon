@@ -23,6 +23,7 @@ import xyz.itzsomebody.radon.exceptions.MissingClassException;
 import xyz.itzsomebody.radon.exceptions.MissingResourceException;
 import xyz.itzsomebody.radon.exclusions.ExclusionManager;
 import xyz.itzsomebody.radon.transformers.Transformer;
+import xyz.itzsomebody.radon.transformers.misc.AddTrashClasses;
 import xyz.itzsomebody.radon.utils.JarLoader;
 import xyz.itzsomebody.radon.utils.JarWriter;
 import xyz.itzsomebody.radon.utils.asm.ClassWrapper;
@@ -65,7 +66,7 @@ public class Radon {
 
         // Run 'em all
         transformers.forEach(transformer -> {
-            RadonLogger.info("[Transformers] Executing: " + transformer.getName());
+            RadonLogger.info("[Transformers] Executing: " + transformer.getName() + " (" + transformer.getConfigName() + ")");
             transformer.init(this);
 
             // Quality way of measuring execution time /sarcasm

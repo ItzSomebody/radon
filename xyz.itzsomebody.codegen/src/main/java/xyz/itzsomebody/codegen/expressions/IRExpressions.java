@@ -417,6 +417,10 @@ public class IRExpressions {
         return new IRSetFieldExpression(null, value, owner, name, type);
     }
 
+    public static IRExpression throwException(IRExpression exception) {
+        return new IRThrowExceptionExpression(exception);
+    }
+
     // FLOW STRUCTURES
 
     public static IRFlowStructure forLoop(BytecodeBlock initializer, BytecodeBlock condition, BytecodeBlock updater, BytecodeBlock body) {

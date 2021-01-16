@@ -27,6 +27,7 @@ import org.objectweb.asm.tree.MethodNode;
 import xyz.itzsomebody.radon.Radon;
 import xyz.itzsomebody.radon.RadonConstants;
 import xyz.itzsomebody.radon.config.ObfConfig;
+import xyz.itzsomebody.radon.dictionaries.Dictionary;
 import xyz.itzsomebody.radon.utils.logging.RadonLogger;
 
 import java.util.ArrayList;
@@ -236,6 +237,29 @@ public class ClassWrapper implements Opcodes {
         return classNode.fields.stream().anyMatch(fieldNode -> name.equals(fieldNode.name) && desc.equals(fieldNode.desc));
     }
 
+    public String generateNextAllowedMethodName(Dictionary dictionary, String desc) {
+        String name = dictionary.next();
+        while (containsMethodNode(name, desc)) {
+            name = dictionary.next();
+        }
+        return name;
+    }
+
+    public String generateNextAllowedFieldName(Dictionary dictionary, String desc) {
+        String name = dictionary.next();
+        while (containsFieldNode(name, desc)) {
+            name = dictionary.next();
+        }
+        return name;
+    }
+
+    /**
+     * Returns true if the class allows dynamic constants (Java 11 and above).
+     */
+    public boolean allowsConstDy() {
+        return (classNode.version >= V11) && (classNode.version != V1_1);
+    }
+
     /**
      * Returns true if this class allows invokedynamic instructions (Java 7 and above).
      */
@@ -248,6 +272,10 @@ public class ClassWrapper implements Opcodes {
      */
     public boolean allowsJsr() {
         return (classNode.version <= V1_5) || (classNode.version == V1_1);
+    }
+
+    public boolean hasVisibleAnnotations() {
+        return classNode.visibleAnnotations != null && classNode.visibleAnnotations.size() > 0;
     }
 
     /**

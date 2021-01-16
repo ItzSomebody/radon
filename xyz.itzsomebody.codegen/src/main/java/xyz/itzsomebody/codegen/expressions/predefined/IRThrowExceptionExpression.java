@@ -16,7 +16,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package xyz.itzsomebody.radon.transformers.misc;
+package xyz.itzsomebody.codegen.expressions.predefined;
 
-public class ExpirationKillSwitch {
+import xyz.itzsomebody.codegen.BytecodeBlock;
+import xyz.itzsomebody.codegen.WrappedType;
+import xyz.itzsomebody.codegen.expressions.IRExpression;
+import xyz.itzsomebody.codegen.instructions.SimpleNode;
+
+public class IRThrowExceptionExpression extends IRExpression {
+    private final IRExpression exception;
+
+    public IRThrowExceptionExpression(IRExpression exception) {
+        super(WrappedType.getAbsent());
+        this.exception = exception;
+    }
+
+    @Override
+    public BytecodeBlock getInstructions() {
+        return new BytecodeBlock()
+                .append(exception.getInstructions())
+                .append(SimpleNode.THROW_EXCEPTION);
+    }
 }
