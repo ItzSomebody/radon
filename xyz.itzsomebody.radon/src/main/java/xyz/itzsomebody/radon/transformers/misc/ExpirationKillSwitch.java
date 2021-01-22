@@ -18,5 +18,128 @@
 
 package xyz.itzsomebody.radon.transformers.misc;
 
-public class ExpirationKillSwitch {
+import org.objectweb.asm.tree.InsnList;
+import xyz.itzsomebody.codegen.BytecodeBlock;
+import xyz.itzsomebody.codegen.WrappedType;
+import xyz.itzsomebody.radon.config.Configuration;
+import xyz.itzsomebody.radon.exceptions.PreventableRadonException;
+import xyz.itzsomebody.radon.exclusions.Exclusion;
+import xyz.itzsomebody.radon.transformers.Transformer;
+import xyz.itzsomebody.radon.transformers.Transformers;
+import xyz.itzsomebody.radon.utils.RandomUtils;
+import xyz.itzsomebody.radon.utils.logging.RadonLogger;
+
+import javax.swing.*;
+import java.awt.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static xyz.itzsomebody.codegen.expressions.IRExpressions.*;
+
+/**
+ * Inserts an expiration block of instructions in each constructor method.
+ *
+ * @author itzsomebody
+ */
+/*
+ * Another really easy thing to patch out. So I also turned this into a production test of codegen.
+ */
+public class ExpirationKillSwitch extends Transformer {
+    private static final Class<?>[] EXCEPTIONS = {
+            Throwable.class,
+            Exception.class,
+            RuntimeException.class,
+            NullPointerException.class,
+            IllegalArgumentException.class,
+            IllegalStateException.class
+    };
+    private String message;
+    private long expirationTime;
+    private boolean injectJOptionPane;
+
+    @Override
+    public void transform() {
+        var counter = new AtomicInteger();
+        classes().stream().filter(this::notExcluded).forEach(cw -> {
+            cw.methodStream().filter(mw -> notExcluded(mw) && mw.getMethodNode().name.startsWith("<")).forEach(mw -> {
+                mw.getMethodNode().instructions.insert(generateExpirationCode());
+                counter.incrementAndGet();
+            });
+        });
+        RadonLogger.info("Added " + counter.get() + " expiration code blocks");
+    }
+
+    // For reference
+    private static void example() {
+        // replace 0L with time and "tucks" with message
+        if (new Date().after(new Date(0L))) {
+            JOptionPane.showMessageDialog(null, "tucks");
+            throw new RuntimeException("tucks");
+        }
+    }
+
+    private InsnList generateExpirationCode() {
+        var condition = new BytecodeBlock()
+                .append(
+                        newInstance(
+                                WrappedType.from(Date.class),
+                                Collections.emptyList(),
+                                Collections.emptyList()
+                        ).invoke(
+                                "after",
+                                List.of(WrappedType.from(Date.class)),
+                                WrappedType.from(boolean.class),
+                                newInstance(
+                                        WrappedType.from(Date.class),
+                                        List.of(WrappedType.from(long.class)),
+                                        List.of(longConst(expirationTime))
+                                )
+                        ).getInstructions()
+                );
+
+        var trueBlock = new BytecodeBlock();
+        if (injectJOptionPane) {
+            trueBlock.append(invokeStatic(
+                    WrappedType.from(JOptionPane.class),
+                    "showMessageDialog",
+                    List.of(nullConst(Component.class), stringConst(message)),
+                    List.of(WrappedType.from(Component.class), WrappedType.from(Object.class)),
+                    WrappedType.from(void.class)
+            ).getInstructions());
+        }
+        trueBlock.append(newInstance(
+                WrappedType.from(EXCEPTIONS[RandomUtils.randomInt(EXCEPTIONS.length)]),
+                List.of(WrappedType.from(String.class)),
+                List.of(stringConst(message))
+        ).throwMe().getInstructions());
+
+        return ifBlock(condition, trueBlock, new BytecodeBlock()).getInstructions().compile();
+    }
+
+    @Override
+    public Exclusion.ExclusionType getExclusionType() {
+        return Exclusion.ExclusionType.INJECT_EXPIRATION_KILL_SWITCH;
+    }
+
+    @Override
+    public void loadSetup(Configuration config) {
+        message = config.getOrDefault(getLocalConfigPath() + ".message", "Expired! Pay me lots of money for my garbage commercial software!!!");
+        injectJOptionPane = config.getOrDefault(getLocalConfigPath() + ".inject_joptionpane", false);
+
+        String date = config.getOrDefault(getLocalConfigPath() + ".expiration_date", "1/2/2020");
+        try {
+            expirationTime = new SimpleDateFormat("MM/dd/yyyy").parse(date).getTime();
+        } catch (ParseException e) {
+            throw new PreventableRadonException("Error parsing " + date + " into format MM/dd/yyyy: (" + e.getMessage() + ", offset=" + e.getErrorOffset() + ")");
+        }
+    }
+
+    @Override
+    public String getConfigName() {
+        return Transformers.INJECT_EXPIRATION_KILL_SWITCH.getConfigName();
+    }
 }

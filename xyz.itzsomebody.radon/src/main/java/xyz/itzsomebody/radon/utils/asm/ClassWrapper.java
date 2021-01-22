@@ -101,6 +101,10 @@ public class ClassWrapper implements Opcodes {
         return classNode.superName;
     }
 
+    public List<String> getInterfaceNames() {
+        return classNode.interfaces;
+    }
+
     public String getOriginalName() {
         return originalName;
     }

@@ -19,25 +19,29 @@
 package xyz.itzsomebody.radon.dictionaries.defined;
 
 import xyz.itzsomebody.radon.dictionaries.Dictionary;
-import xyz.itzsomebody.radon.utils.RandomUtils;
 
-public class AlphaNumericDictionary implements Dictionary {
-    private static final char[] CHARSET = "1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".toCharArray();
+public class CustomCharsetDictionary implements Dictionary {
+    private final char[] charset;
     private int index = 1;
+
+    public CustomCharsetDictionary(String charsetString) {
+        charset = charsetString.toCharArray();
+    }
 
     @Override
     public String next() {
-        return Dictionary.toBijectiveBase(CHARSET, index++);
+        return Dictionary.toBijectiveBase(charset, index++);
     }
 
     @Override
     public String randomStr(int length) {
-        return Dictionary.randomString(CHARSET, length);
+        return Dictionary.randomString(charset, length);
     }
 
     @Override
     public String configName() {
-        return "alphanumeric";
+        // This is intentional
+        return null;
     }
 
     @Override

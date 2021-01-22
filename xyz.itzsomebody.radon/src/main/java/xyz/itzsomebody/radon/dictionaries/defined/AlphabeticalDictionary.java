@@ -19,46 +19,19 @@
 package xyz.itzsomebody.radon.dictionaries.defined;
 
 import xyz.itzsomebody.radon.dictionaries.Dictionary;
-import xyz.itzsomebody.radon.utils.RandomUtils;
 
 public class AlphabeticalDictionary implements Dictionary {
     private static final char[] CHARSET = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".toCharArray();
-    private int index = 0;
+    private int index = 1;
 
     @Override
     public String next() {
-        // Pasted from java.lang.Integer.toString(int i, int radix)
-        // todo: make this no longer pasted
-        var charsetLength = CHARSET.length;
-        var i = index;
-        var buf = new char[33];
-        var negative = (i < 0);
-        var charPos = 32;
-
-        if (!negative) {
-            i = -i;
-        }
-
-        while (i <= -charsetLength) {
-            buf[charPos--] = CHARSET[-(i % charsetLength)];
-            i /= charsetLength;
-        }
-        buf[charPos] = CHARSET[-i];
-
-        index++;
-        return new String(buf, charPos, (33 - charPos));
+        return Dictionary.toBijectiveBase(CHARSET, index++);
     }
 
     @Override
     public String randomStr(int length) {
-        var charsetLength = CHARSET.length;
-        var buf = new char[length];
-
-        for (int i = 0; i < length; i++) {
-            buf[i] = CHARSET[RandomUtils.randomInt(charsetLength)];
-        }
-
-        return new String(buf);
+        return Dictionary.randomString(CHARSET, length);
     }
 
     @Override

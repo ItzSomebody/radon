@@ -29,6 +29,8 @@ public enum Transformers {
     ADD_SYNTHETIC_ACCESS_FLAG(AddSyntheticAccess.class),
     ADD_TRASH_CLASSES(AddTrashClasses.class),
     INJECT_ANTI_DEBUGGER(AntiDebugger.class),
+    INJECT_EXPIRATION_KILL_SWITCH(ExpirationKillSwitch.class),
+    RENAMER(Renamer.class),
 
     // String encryption/encoding
     STRING_TO_BASE64_ENCODING(Str2Base64Encoding.class),

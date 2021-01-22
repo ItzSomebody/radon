@@ -21,9 +21,15 @@ package xyz.itzsomebody.radon.dictionaries.defined;
 import xyz.itzsomebody.radon.dictionaries.Dictionary;
 import xyz.itzsomebody.radon.utils.RandomUtils;
 
-public class AlphaNumericDictionary implements Dictionary {
-    private static final char[] CHARSET = "1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".toCharArray();
+public class RandomUnicodeDictionary implements Dictionary {
+    private static final char[] CHARSET = new char[25];
     private int index = 1;
+
+    static {
+        for (int i = 0; i < CHARSET.length; i++) {
+            CHARSET[i] = (char) RandomUtils.randomInt('\u2000', '\uFFFF');
+        }
+    }
 
     @Override
     public String next() {
@@ -37,11 +43,11 @@ public class AlphaNumericDictionary implements Dictionary {
 
     @Override
     public String configName() {
-        return "alphanumeric";
+        return "random_unicode";
     }
 
     @Override
     public Dictionary copy() {
-        return new AlphaNumericDictionary();
+        return new RandomUnicodeDictionary();
     }
 }

@@ -19,11 +19,16 @@
 package xyz.itzsomebody.radon.dictionaries.defined;
 
 import xyz.itzsomebody.radon.dictionaries.Dictionary;
-import xyz.itzsomebody.radon.utils.RandomUtils;
 
-public class AlphaNumericDictionary implements Dictionary {
-    private static final char[] CHARSET = "1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".toCharArray();
+public class SpacesDictionary implements Dictionary {
+    private static final char[] CHARSET = new char[0xF + 1];
     private int index = 1;
+
+    static {
+        for (int i = 0; i < CHARSET.length; i++) {
+            CHARSET[i] = (char) ('\u2000' + i);
+        }
+    }
 
     @Override
     public String next() {
@@ -37,11 +42,11 @@ public class AlphaNumericDictionary implements Dictionary {
 
     @Override
     public String configName() {
-        return "alphanumeric";
+        return "spaces";
     }
 
     @Override
     public Dictionary copy() {
-        return new AlphaNumericDictionary();
+        return new SpacesDictionary();
     }
 }

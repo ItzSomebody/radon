@@ -16,32 +16,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package xyz.itzsomebody.radon.dictionaries.defined;
+package xyz.itzsomebody.radon.utils.asm;
 
-import xyz.itzsomebody.radon.dictionaries.Dictionary;
-import xyz.itzsomebody.radon.utils.RandomUtils;
+import org.objectweb.asm.commons.SimpleRemapper;
 
-public class AlphaNumericDictionary implements Dictionary {
-    private static final char[] CHARSET = "1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".toCharArray();
-    private int index = 1;
+import java.util.Map;
 
-    @Override
-    public String next() {
-        return Dictionary.toBijectiveBase(CHARSET, index++);
+public class RadonRemapper extends SimpleRemapper {
+    public RadonRemapper(Map<String, String> mappings) {
+        super(mappings);
     }
 
     @Override
-    public String randomStr(int length) {
-        return Dictionary.randomString(CHARSET, length);
-    }
-
-    @Override
-    public String configName() {
-        return "alphanumeric";
-    }
-
-    @Override
-    public Dictionary copy() {
-        return new AlphaNumericDictionary();
+    public String mapFieldName(String owner, String name, String descriptor) {
+        String remappedName = map(owner + '.' + name + ' ' + descriptor);
+        return (remappedName != null) ? remappedName : name;
     }
 }

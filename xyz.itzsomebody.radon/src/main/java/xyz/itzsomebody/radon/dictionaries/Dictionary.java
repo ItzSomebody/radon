@@ -18,6 +18,8 @@
 
 package xyz.itzsomebody.radon.dictionaries;
 
+import xyz.itzsomebody.radon.utils.RandomUtils;
+
 public interface Dictionary {
     String next();
 
@@ -26,4 +28,25 @@ public interface Dictionary {
     String configName();
 
     Dictionary copy();
+
+    // https://en.wikipedia.org/wiki/Bijective_numeration
+    static String toBijectiveBase(char[] charset, int decimal) {
+        var sb = new StringBuilder();
+        while (decimal-- > 0) {
+            sb.insert(0, charset[decimal % charset.length]);
+            decimal /= charset.length;
+        }
+        return sb.toString();
+    }
+
+    static String randomString(char[] charset, int length) {
+        var charsetLength = charset.length;
+        var buf = new char[length];
+
+        for (int i = 0; i < length; i++) {
+            buf[i] = charset[RandomUtils.randomInt(charsetLength)];
+        }
+
+        return new String(buf);
+    }
 }

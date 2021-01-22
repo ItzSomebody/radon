@@ -1,6 +1,6 @@
 /*
  * Radon - An open-source Java obfuscator
- * Copyright (C) 2020 ItzSomebody
+ * Copyright (C) 2021 ItzSomebody
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,23 +18,28 @@
 
 package xyz.itzsomebody.radon.dictionaries;
 
-import xyz.itzsomebody.radon.dictionaries.defined.AlphaNumericDictionary;
-import xyz.itzsomebody.radon.dictionaries.defined.AlphabeticalDictionary;
-import xyz.itzsomebody.radon.exceptions.PreventableRadonException;
+import xyz.itzsomebody.radon.dictionaries.defined.*;
+import xyz.itzsomebody.radon.utils.logging.RadonLogger;
 
 import java.util.List;
 
 public class DictionaryFactory {
     private static final Dictionary[] DEFINED = {
             new AlphabeticalDictionary(),
-            new AlphaNumericDictionary()
+            new AlphaNumericDictionary(),
+            new RandomUnicodeDictionary(),
+            new SpacesDictionary(),
+            new UnrecognizedDictionary()
     };
 
     public static Dictionary forName(String name) {
         return List.of(DEFINED).stream()
                 .filter(dictionary -> name.equalsIgnoreCase(dictionary.configName()))
                 .findFirst()
-                .orElseThrow(() -> new PreventableRadonException("Unknown dictionary: " + name));
+                .orElseGet(() -> {
+                    RadonLogger.info("Unknown dictionary \"" + name + "\" -- treating as user-defined charset dictionary");
+                    return new CustomCharsetDictionary(name);
+                });
     }
 
     public static Dictionary defaultDictionary() {

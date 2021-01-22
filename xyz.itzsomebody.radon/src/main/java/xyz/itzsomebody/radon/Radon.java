@@ -23,14 +23,15 @@ import xyz.itzsomebody.radon.exceptions.MissingClassException;
 import xyz.itzsomebody.radon.exceptions.MissingResourceException;
 import xyz.itzsomebody.radon.exclusions.ExclusionManager;
 import xyz.itzsomebody.radon.transformers.Transformer;
-import xyz.itzsomebody.radon.transformers.misc.AddTrashClasses;
 import xyz.itzsomebody.radon.utils.JarLoader;
 import xyz.itzsomebody.radon.utils.JarWriter;
 import xyz.itzsomebody.radon.utils.asm.ClassWrapper;
 import xyz.itzsomebody.radon.utils.logging.RadonLogger;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class Radon {
     private static Radon radon;
@@ -80,6 +81,31 @@ public class Radon {
         // ========================== Write output
         var writer = new JarWriter();
         writer.write(getConfigValue(ObfConfig.Key.OUTPUT.getKeyString()));
+    }
+
+    private void buildHierarchy(ClassWrapper wrapper, ClassWrapper sub, Set<String> visited) {
+        if (visited.add(wrapper.getName())) {
+            if (wrapper.getSuperName() != null) {
+                var superParent = getClasspathWrapper(wrapper.getSuperName());
+                wrapper.getParents().add(superParent);
+                buildHierarchy(superParent, wrapper, visited);
+            }
+            if (wrapper.getInterfaceNames() != null) {
+                wrapper.getInterfaceNames().forEach(interfaceName -> {
+                    var interfaceParent = getClasspathWrapper(interfaceName);
+                    wrapper.getParents().add(interfaceParent);
+                    buildHierarchy(interfaceParent, wrapper, visited);
+                });
+            }
+        }
+        if (sub != null) {
+            wrapper.getChildren().add(sub);
+        }
+    }
+
+    public void buildHierarchyGraph() {
+        HashSet<String> visited = new HashSet<>();
+        classes.values().forEach(wrapper -> buildHierarchy(wrapper, null, visited));
     }
 
     public static Radon getInstance() {

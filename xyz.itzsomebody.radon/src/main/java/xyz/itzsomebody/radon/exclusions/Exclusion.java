@@ -80,6 +80,7 @@ public class Exclusion {
         FLOW_OBFUSCATION,
         ANTI_TAMPER,
         INJECT_ANTI_DEBUGGER,
+        INJECT_EXPIRATION_KILL_SWITCH,
         ANTI_MEMORY_DUMP,
         VIRTUALIZER,
         PACKER,
