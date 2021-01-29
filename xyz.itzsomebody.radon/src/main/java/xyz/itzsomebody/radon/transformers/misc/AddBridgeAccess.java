@@ -45,7 +45,7 @@ public class AddBridgeAccess extends Transformer {
 
     @Override
     public Exclusion.ExclusionType getExclusionType() {
-        return Exclusion.ExclusionType.ADD_BRIDGE_ACCESS;
+        return Exclusion.ExclusionType.ADD_BRIDGE_ACCESS_FLAG;
     }
 
     @Override

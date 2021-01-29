@@ -31,6 +31,10 @@ public enum Transformers {
     INJECT_ANTI_DEBUGGER(AntiDebugger.class),
     INJECT_EXPIRATION_KILL_SWITCH(ExpirationKillSwitch.class),
     RENAMER(Renamer.class),
+    RESOURCE_RENAMER(ResourceRenamer.class),
+    SCRAMBLE_LINE_NUMBERS(ScrambleLineNumbers.class),
+    SHUFFLE_MEMBERS(ShuffleMembers.class),
+    WATERMARK(Watermarker.class),
 
     // String encryption/encoding
     STRING_TO_BASE64_ENCODING(Str2Base64Encoding.class),

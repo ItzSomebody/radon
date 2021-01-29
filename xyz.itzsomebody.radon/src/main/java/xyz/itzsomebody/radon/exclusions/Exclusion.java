@@ -69,11 +69,13 @@ public class Exclusion {
         GLOBAL,
         OPTIMIZER,
         SHRINKER,
-        ADD_BRIDGE_ACCESS,
-        ADD_DEPRECATED_ACCESS,
-        ADD_SYNTHETIC_ACCESS,
+        ADD_BRIDGE_ACCESS_FLAG,
+        ADD_DEPRECATED_ACCESS_FLAG,
+        ADD_SYNTHETIC_ACCESS_FLAG,
         ADD_TRASH_CLASSES,
         RENAMER,
+        RESOURCE_RENAMER,
+        SCRAMBLE_LINE_NUMBERS,
         STRING_OBFUSCATION,
         REFERENCE_OBFUSCATION,
         NUMBER_OBFUSCATION,
@@ -84,7 +86,8 @@ public class Exclusion {
         ANTI_MEMORY_DUMP,
         VIRTUALIZER,
         PACKER,
-        MEMBER_SHUFFLER; // fixme
+        WATERMARK,
+        SHUFFLE_MEMBERS; // fixme
 
         public static ExclusionType forIdentifier(String identifier) {
             // This is O(n), but should be fine since this is run only during config load

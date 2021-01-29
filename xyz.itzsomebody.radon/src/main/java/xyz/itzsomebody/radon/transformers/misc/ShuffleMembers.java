@@ -18,5 +18,51 @@
 
 package xyz.itzsomebody.radon.transformers.misc;
 
-public class ShuffleMembers {
+import xyz.itzsomebody.radon.config.Configuration;
+import xyz.itzsomebody.radon.exclusions.Exclusion;
+import xyz.itzsomebody.radon.transformers.Transformer;
+import xyz.itzsomebody.radon.transformers.Transformers;
+import xyz.itzsomebody.radon.utils.logging.RadonLogger;
+
+import java.util.Collections;
+import java.util.concurrent.atomic.AtomicInteger;
+
+public class ShuffleMembers extends Transformer {
+    private boolean shuffleMethods;
+    private boolean shuffleFields;
+
+    @Override
+    public void transform() {
+        if (shuffleFields || shuffleMethods) {
+            var count = new AtomicInteger();
+            classes().stream().filter(this::notExcluded).forEach(cw -> {
+                // FIXME: Also update list of method/field wrappers
+                if (shuffleMethods) {
+                    Collections.shuffle(cw.getClassNode().methods);
+                    count.addAndGet(cw.getMethods().size());
+                }
+                if (shuffleFields) {
+                    Collections.shuffle(cw.getClassNode().fields);
+                    count.addAndGet(cw.getFields().size());
+                }
+            });
+            RadonLogger.info("Shuffled " + count.get() + " members");
+        }
+    }
+
+    @Override
+    public Exclusion.ExclusionType getExclusionType() {
+        return Exclusion.ExclusionType.SHUFFLE_MEMBERS;
+    }
+
+    @Override
+    public void loadSetup(Configuration config) {
+        shuffleFields = config.getOrDefault(getLocalConfigPath() + ".shuffle_fields", true);
+        shuffleMethods = config.getOrDefault(getLocalConfigPath() + ".shuffle_methods", false);
+    }
+
+    @Override
+    public String getConfigName() {
+        return Transformers.SHUFFLE_MEMBERS.getConfigName();
+    }
 }

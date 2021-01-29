@@ -68,7 +68,7 @@ public class AddSyntheticAccess extends Transformer {
 
     @Override
     public Exclusion.ExclusionType getExclusionType() {
-        return Exclusion.ExclusionType.ADD_SYNTHETIC_ACCESS;
+        return Exclusion.ExclusionType.ADD_SYNTHETIC_ACCESS_FLAG;
     }
 
     @Override

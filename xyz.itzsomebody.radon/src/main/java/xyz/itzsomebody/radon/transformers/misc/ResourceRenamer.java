@@ -18,5 +18,70 @@
 
 package xyz.itzsomebody.radon.transformers.misc;
 
-public class ResourceRenamer {
+import org.objectweb.asm.tree.ClassNode;
+import xyz.itzsomebody.radon.config.Configuration;
+import xyz.itzsomebody.radon.dictionaries.Dictionary;
+import xyz.itzsomebody.radon.dictionaries.DictionaryFactory;
+import xyz.itzsomebody.radon.exclusions.Exclusion;
+import xyz.itzsomebody.radon.transformers.Transformer;
+import xyz.itzsomebody.radon.transformers.Transformers;
+import xyz.itzsomebody.radon.utils.asm.ResourceNameRemapper;
+import xyz.itzsomebody.radon.utils.logging.RadonLogger;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+public class ResourceRenamer extends Transformer {
+    private final Map<String, String> mappings = new HashMap<>();
+    private Dictionary dictionary;
+
+    @Override
+    public void transform() {
+        RadonLogger.info("Generating mappings");
+        long current = System.currentTimeMillis();
+        generateMappings();
+        RadonLogger.info(String.format("Finished generating mappings [%dms]", (System.currentTimeMillis() - current)));
+
+        RadonLogger.info("Applying mappings");
+        current = System.currentTimeMillis();
+        applyMappings();
+        RadonLogger.info(String.format("Finished applying mappings [%dms]", (System.currentTimeMillis() - current)));
+    }
+
+    private void generateMappings() {
+        resourceMap().keySet().stream().filter(this::notExcluded).forEach(resourceName -> {
+            String newName;
+            do {
+                newName = dictionary.next();
+            } while (resourceMap().containsKey(newName));
+
+            mappings.put(resourceName, newName);
+        });
+    }
+
+    private void applyMappings() {
+        new ArrayList<>(classes()).forEach(classWrapper -> {
+            var classNode = classWrapper.getClassNode();
+            var copy = new ClassNode();
+            classNode.accept(new ResourceNameRemapper(copy, mappings, classWrapper.getName()));
+            classWrapper.setClassNode(copy);
+        });
+    }
+
+    @Override
+    public Exclusion.ExclusionType getExclusionType() {
+        return Exclusion.ExclusionType.RESOURCE_RENAMER;
+    }
+
+    @Override
+    public void loadSetup(Configuration config) {
+        String dictionaryName = config.get(getLocalConfigPath() + ".dictionary");
+        dictionary = dictionaryName == null ? DictionaryFactory.defaultDictionary() : DictionaryFactory.forName(dictionaryName);
+    }
+
+    @Override
+    public String getConfigName() {
+        return Transformers.RESOURCE_RENAMER.getConfigName();
+    }
 }

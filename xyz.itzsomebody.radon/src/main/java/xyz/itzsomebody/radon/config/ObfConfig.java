@@ -54,8 +54,13 @@ public class ObfConfig {
         obfConfig.put(Key.LIBRARIES, config.getOrDefault(Key.LIBRARIES.getKeyString(), Collections.emptyList()));
 
         // Exclusions
-        var patterns = config.getOrDefault(Key.EXCLUSIONS.getKeyString(), Collections.<String, String>emptyMap());
-        obfConfig.put(Key.EXCLUSIONS, new ExclusionManager(patterns));
+        var patterns = config.getOrDefault(Key.EXCLUSIONS.getKeyString(), Collections.<String>emptyList());
+        var map = new HashMap<String, String>();
+        patterns.forEach(s -> {
+            var thing = s.split(": "); // Very huge brain -- this is gonna haunt me later, lol
+            map.put(thing[0], thing[1]);
+        });
+        obfConfig.put(Key.EXCLUSIONS, new ExclusionManager(map));
 
         // Transformers
         var transformers = new ArrayList<Transformer>();

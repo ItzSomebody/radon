@@ -68,7 +68,7 @@ public class AddDeprecatedAccess extends Transformer {
 
     @Override
     public Exclusion.ExclusionType getExclusionType() {
-        return Exclusion.ExclusionType.ADD_DEPRECATED_ACCESS;
+        return Exclusion.ExclusionType.ADD_DEPRECATED_ACCESS_FLAG;
     }
 
     @Override

@@ -23,6 +23,7 @@ import xyz.itzsomebody.radon.config.Configuration;
 import xyz.itzsomebody.radon.config.ObfConfig;
 import xyz.itzsomebody.radon.exceptions.FatalRadonException;
 import xyz.itzsomebody.radon.exceptions.PreventableRadonException;
+import xyz.itzsomebody.radon.transformers.misc.Watermarker;
 import xyz.itzsomebody.radon.utils.IOUtils;
 import xyz.itzsomebody.radon.utils.logging.RadonLogger;
 
@@ -31,6 +32,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.zip.ZipFile;
 
 /**
  * Entry point for the Radon Java bytecode obfuscator.
@@ -89,7 +91,7 @@ public class RadonMain {
         if (parser.containsSwitch("help")) {
             var programName = new File(RadonMain.class.getProtectionDomain().getCodeSource().getLocation().getPath()).getName();
 
-            // todo fixme
+            RadonLogger.info(String.format("Extractor: %5s java -jar %s --extract example.jar", "", programName));
             RadonLogger.info(String.format("CLI Usage: %5s java -jar %s --config example.yml", "", programName));
             RadonLogger.info(String.format("Help Menu: %5s java -jar %s --config example.yml", "", programName));
             RadonLogger.info(String.format("License: %5s java -jar %s --config example.yml", "", programName));
@@ -151,7 +153,40 @@ public class RadonMain {
                 return -1;
             }
         } else if (parser.containsSwitch("extract")) {
-            // todo
+            // At this point I was too lazy to write proper code -- I don't think anyone uses this anyways lmao
+            var switchArgs = parser.getArgsFor("extract");
+
+            File leaked = new File(switchArgs[0]);
+            if (!leaked.exists()) {
+                RadonLogger.severe("Input file not found");
+                return -1;
+            }
+
+            try {
+                var extractor = new Watermarker.Extractor(new ZipFile(leaked), switchArgs[1]);
+                RadonLogger.info(extractor.extractId());
+            } catch (FatalRadonException e) {
+                RadonLogger.severe("A fatal exception was thrown: " + e.getMessage());
+
+                if (RadonConstants.VERBOSE) {
+                    e.printStackTrace(System.out);
+                }
+                return -1;
+            } catch (PreventableRadonException e) {
+                RadonLogger.severe("A preventable exception was thrown: " + e.getMessage());
+
+                if (RadonConstants.VERBOSE) {
+                    e.printStackTrace(System.out);
+                }
+                return 1;
+            } catch (Throwable t) {
+                RadonLogger.severe("An unknown error was throw: " + t.getMessage());
+
+                if (RadonConstants.VERBOSE) {
+                    t.printStackTrace(System.out);
+                }
+                return -1;
+            }
         } else {
             RadonLogger.info("Unknown operation: perhaps try viewing the results of --help?");
         }

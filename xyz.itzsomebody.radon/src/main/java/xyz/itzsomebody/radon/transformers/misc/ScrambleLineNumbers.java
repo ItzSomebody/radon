@@ -18,5 +18,49 @@
 
 package xyz.itzsomebody.radon.transformers.misc;
 
-public class ScrambleLineNumbers {
+import org.objectweb.asm.tree.LineNumberNode;
+import xyz.itzsomebody.radon.config.Configuration;
+import xyz.itzsomebody.radon.exclusions.Exclusion;
+import xyz.itzsomebody.radon.transformers.Transformer;
+import xyz.itzsomebody.radon.transformers.Transformers;
+import xyz.itzsomebody.radon.utils.RandomUtils;
+import xyz.itzsomebody.radon.utils.logging.RadonLogger;
+
+import java.util.concurrent.atomic.AtomicInteger;
+
+public class ScrambleLineNumbers extends Transformer {
+    private int origin;
+    private int bound;
+
+    @Override
+    public void transform() {
+        var count = new AtomicInteger();
+        classes().stream().filter(this::notExcluded).forEach(cw -> {
+            cw.methodStream().filter(this::notExcluded).forEach(mw -> {
+                mw.getMethodNode().instructions.forEach(insn -> {
+                    if (insn instanceof LineNumberNode) {
+                        ((LineNumberNode) insn).line = RandomUtils.randomInt(origin, bound);
+                        count.incrementAndGet();
+                    }
+                });
+            });
+        });
+        RadonLogger.info("Scrambled " + count.get() + " lines");
+    }
+
+    @Override
+    public Exclusion.ExclusionType getExclusionType() {
+        return Exclusion.ExclusionType.SCRAMBLE_LINE_NUMBERS;
+    }
+
+    @Override
+    public void loadSetup(Configuration config) {
+        origin = config.getOrDefault(getLocalConfigPath() + ".random_origin", Integer.MIN_VALUE);
+        bound = config.getOrDefault(getLocalConfigPath() + ".random_bound", Integer.MAX_VALUE);
+    }
+
+    @Override
+    public String getConfigName() {
+        return Transformers.SCRAMBLE_LINE_NUMBERS.getConfigName();
+    }
 }
