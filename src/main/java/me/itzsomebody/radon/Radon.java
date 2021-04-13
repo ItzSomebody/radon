@@ -298,7 +298,7 @@ public class Radon {
         if (hierarchy.get(wrapper.getName()) == null) {
             ClassTree tree = new ClassTree(wrapper);
 
-            if (wrapper.getSuperName() != null) {
+            if (wrapper.getSuperName() != null && !wrapper.getSuperName().equals("java/lang/Object")) {
                 tree.getParentClasses().add(wrapper.getSuperName());
 
                 buildHierarchy(getClassWrapper(wrapper.getSuperName()), wrapper);
