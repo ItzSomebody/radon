@@ -23,9 +23,5 @@ plugins {
 sourceCompatibility = javaVer
 
 dependencies {
-    implementation annotations
-    implementation asm
-    implementation asmTree
-    implementation asmAnalysis
     testImplementation junit
 }

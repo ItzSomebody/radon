@@ -18,8 +18,9 @@
 
 package xyz.itzsomebody.radon.transformers.misc;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.objectweb.asm.tree.ClassNode;
-import xyz.itzsomebody.radon.config.Configuration;
+import xyz.itzsomebody.radon.config.ConfigurationParser;
 import xyz.itzsomebody.radon.dictionaries.Dictionary;
 import xyz.itzsomebody.radon.dictionaries.DictionaryFactory;
 import xyz.itzsomebody.radon.exclusions.Exclusion;
@@ -34,7 +35,9 @@ import java.util.Map;
 
 public class ResourceRenamer extends Transformer {
     private final Map<String, String> mappings = new HashMap<>();
-    private Dictionary dictionary;
+
+    @JsonProperty
+    private Dictionary dictionary = DictionaryFactory.defaultDictionary();
 
     @Override
     public void transform() {
@@ -72,12 +75,6 @@ public class ResourceRenamer extends Transformer {
     @Override
     public Exclusion.ExclusionType getExclusionType() {
         return Exclusion.ExclusionType.RESOURCE_RENAMER;
-    }
-
-    @Override
-    public void loadSetup(Configuration config) {
-        String dictionaryName = config.get(getLocalConfigPath() + ".dictionary");
-        dictionary = dictionaryName == null ? DictionaryFactory.defaultDictionary() : DictionaryFactory.forName(dictionaryName);
     }
 
     @Override

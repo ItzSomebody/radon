@@ -22,22 +22,21 @@ import xyz.itzsomebody.radon.config.ObfConfig;
 import xyz.itzsomebody.radon.exceptions.MissingClassException;
 import xyz.itzsomebody.radon.exceptions.MissingResourceException;
 import xyz.itzsomebody.radon.exclusions.ExclusionManager;
-import xyz.itzsomebody.radon.transformers.Transformer;
 import xyz.itzsomebody.radon.utils.JarLoader;
 import xyz.itzsomebody.radon.utils.JarWriter;
 import xyz.itzsomebody.radon.utils.asm.ClassWrapper;
 import xyz.itzsomebody.radon.utils.logging.RadonLogger;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 public class Radon {
     private static Radon radon;
 
     private final ExclusionManager exclusionManager;
-    private final ObfConfig config;
+    public final ObfConfig config;
 
     private Map<String, ClassWrapper> classes;
     private Map<String, ClassWrapper> classpath;
@@ -45,28 +44,25 @@ public class Radon {
 
     public Radon(ObfConfig config) {
         this.config = config;
-        this.exclusionManager = config.get(ObfConfig.Key.EXCLUSIONS.getKeyString());
+        this.exclusionManager = config.exclusions;
         radon = this;
-    }
-
-    public <T> T getConfigValue(String key) {
-        return config.get(key);
     }
 
     public void run() {
         // ========================== Load input & libs
         var loader = new JarLoader();
-        loader.loadAsInput(getConfigValue(ObfConfig.Key.INPUT.getKeyString())); // Load input
-        this.<List<String>>getConfigValue(ObfConfig.Key.LIBRARIES.getKeyString()).forEach(loader::loadAsLib); // Load libs
+        loader.loadAsInput(config.input); // Load input
+        this.config.libraries.forEach(loader::loadAsLib); // Load libs
         this.classes = loader.getClasses();
         this.classpath = loader.getClasspath();
         this.resources = loader.getResources();
 
         // ========================== Transformation
-        var transformers = this.<List<Transformer>>getConfigValue(ObfConfig.Key.TRANSFORMERS.getKeyString());
+        var transformers = config.transformers;
 
         // Run 'em all
-        transformers.forEach(transformer -> {
+        // re nonNull: check fix-me in TransformerDeserializer
+        transformers.stream().filter(Objects::nonNull).forEach(transformer -> {
             RadonLogger.info("[Transformers] Executing: " + transformer.getName() + " (" + transformer.getConfigName() + ")");
             transformer.init(this);
 
@@ -80,7 +76,7 @@ public class Radon {
 
         // ========================== Write output
         var writer = new JarWriter();
-        writer.write(getConfigValue(ObfConfig.Key.OUTPUT.getKeyString()));
+        writer.write(config.output);
     }
 
     private void buildHierarchy(ClassWrapper wrapper, ClassWrapper sub, Set<String> visited) {

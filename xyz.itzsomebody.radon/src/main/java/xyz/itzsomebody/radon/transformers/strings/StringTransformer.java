@@ -18,21 +18,23 @@
 
 package xyz.itzsomebody.radon.transformers.strings;
 
-import xyz.itzsomebody.radon.config.Configuration;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import xyz.itzsomebody.radon.dictionaries.Dictionary;
 import xyz.itzsomebody.radon.dictionaries.DictionaryFactory;
 import xyz.itzsomebody.radon.exclusions.Exclusion;
 import xyz.itzsomebody.radon.transformers.Transformer;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public abstract class StringTransformer extends Transformer {
+    @JsonProperty("excluded_strings")
     private Set<String> excludedStrings;
-    protected Dictionary dictionary;
-    protected int allowedLeeway;
+
+    @JsonProperty("dictionary")
+    protected Dictionary dictionary = DictionaryFactory.defaultDictionary();
+
+    @JsonProperty("leeway")
+    protected int allowedLeeway = 5000;
 
     protected boolean isExcludedString(String s) {
         return excludedStrings.contains(s);
@@ -41,35 +43,5 @@ public abstract class StringTransformer extends Transformer {
     @Override
     public Exclusion.ExclusionType getExclusionType() {
         return Exclusion.ExclusionType.STRING_OBFUSCATION;
-    }
-
-    @Override
-    public void loadSetup(Configuration config) {
-        // Get excluded strings
-        var stringList = config.<List<String>>getOrDefault(getLocalConfigPath() + "." + StringConfigKey.EXCLUDED_STRINGS.getKey(), Collections.emptyList());
-        excludedStrings = stringList.isEmpty() ? Collections.emptySet() : new HashSet<>(stringList);
-
-        // Dictionary :O
-        var dictionaryName = config.<String>get(getLocalConfigPath() + "." + StringConfigKey.DICTIONARY.getKey());
-        dictionary = (dictionaryName == null) ? DictionaryFactory.defaultDictionary() : DictionaryFactory.forName(dictionaryName);
-
-        // Leeway
-        allowedLeeway = config.getOrDefault(getLocalConfigPath() + "." + StringConfigKey.LEEWAY.getKey(), 5000);
-    }
-
-    enum StringConfigKey {
-        EXCLUDED_STRINGS,
-        DICTIONARY,
-        LEEWAY;
-
-        public String getKey() {
-            return name().toLowerCase();
-        }
-
-        @Override
-        public String toString() {
-            // This is in case I forget to do getKey()
-            return getKey();
-        }
     }
 }

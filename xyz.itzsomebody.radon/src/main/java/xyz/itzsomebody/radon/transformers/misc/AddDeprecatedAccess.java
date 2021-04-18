@@ -18,8 +18,9 @@
 
 package xyz.itzsomebody.radon.transformers.misc;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.objectweb.asm.Opcodes;
-import xyz.itzsomebody.radon.config.Configuration;
+import xyz.itzsomebody.radon.config.ConfigurationParser;
 import xyz.itzsomebody.radon.exclusions.Exclusion;
 import xyz.itzsomebody.radon.transformers.Transformer;
 import xyz.itzsomebody.radon.transformers.Transformers;
@@ -28,8 +29,13 @@ import xyz.itzsomebody.radon.utils.logging.RadonLogger;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class AddDeprecatedAccess extends Transformer {
+    @JsonProperty("add_to_classes")
     private boolean doClasses;
+
+    @JsonProperty("add_to_methods")
     private boolean doMethods;
+
+    @JsonProperty("add_to_fields")
     private boolean doFields;
 
     @Override
@@ -69,13 +75,6 @@ public class AddDeprecatedAccess extends Transformer {
     @Override
     public Exclusion.ExclusionType getExclusionType() {
         return Exclusion.ExclusionType.ADD_DEPRECATED_ACCESS_FLAG;
-    }
-
-    @Override
-    public void loadSetup(Configuration config) {
-        doClasses = config.getOrDefault(getLocalConfigPath() + ".add_to_classes",false);
-        doMethods = config.getOrDefault(getLocalConfigPath() + ".add_to_methods",false);
-        doFields = config.getOrDefault(getLocalConfigPath() + ".add_to_fields",false);
     }
 
     @Override

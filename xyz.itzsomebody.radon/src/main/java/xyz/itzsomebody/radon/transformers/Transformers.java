@@ -19,8 +19,8 @@
 package xyz.itzsomebody.radon.transformers;
 
 import xyz.itzsomebody.radon.transformers.misc.*;
-import xyz.itzsomebody.radon.transformers.strings.Str2Base64Encoding;
 import xyz.itzsomebody.radon.transformers.strings.StaticFieldStrPool;
+import xyz.itzsomebody.radon.transformers.strings.Str2Base64Encoding;
 
 public enum Transformers {
     // Misc.

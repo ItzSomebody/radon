@@ -16,16 +16,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
-plugins {
-    id 'java'
-}
+package xyz.itzsomebody.radon.config;
 
-sourceCompatibility = javaVer
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import xyz.itzsomebody.radon.dictionaries.Dictionary;
+import xyz.itzsomebody.radon.dictionaries.DictionaryFactory;
 
-dependencies {
-    implementation annotations
-    implementation asm
-    implementation asmTree
-    implementation asmAnalysis
-    testImplementation junit
+import java.io.IOException;
+
+public class DictionaryDeserializer extends JsonDeserializer<Dictionary> {
+    @Override
+    public Dictionary deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
+        var dictionaryName = p.readValueAs(String.class);
+        return DictionaryFactory.forName(dictionaryName);
+    }
 }

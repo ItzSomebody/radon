@@ -1,6 +1,6 @@
 /*
  * Radon - An open-source Java obfuscator
- * Copyright (C) 2020 ItzSomebody
+ * Copyright (C) 2021 ItzSomebody
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -57,7 +57,7 @@ shadowJar() {
 
     // Relocate lib classes
     relocate 'org.objectweb.asm', 'xyz.itzsomebody.radon.lib.org.objectweb.asm'
-    relocate 'org.yaml.snakeyaml', 'xyz.itzsomebody.radon.lib.org.yaml.snakeyaml'
+    relocate 'com.fasterxml.jackson', 'xyz.itzsomebody.radon.lib.com.fasterxml.jackson'
     exclude 'module-info.class'
 
     manifest { attributes 'Main-Class': mainClass }
@@ -67,7 +67,7 @@ dependencies {
     implementation project(':xyz.itzsomebody.codegen')
     implementation project(':xyz.itzsomebody.commons')
     implementation annotations
-    implementation snakeYAML
+    implementation jackson
     implementation asm
     implementation asmAnalysis
     implementation asmCommons

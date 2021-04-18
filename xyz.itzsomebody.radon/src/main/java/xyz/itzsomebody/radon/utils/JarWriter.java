@@ -41,11 +41,11 @@ public class JarWriter {
     public void write(String path) {
         var radon = Radon.getInstance();
 
-        var level = radon.<Integer>getConfigValue(ObfConfig.Key.COMPRESSION_LEVEL.getKeyString());
-        var store = radon.<Boolean>getConfigValue(ObfConfig.Key.USE_STORE.getKeyString());
-        var corruptCrcs = radon.<Boolean>getConfigValue(ObfConfig.Key.CORRUPT_CRCS.getKeyString());
-        var antiExtraction = radon.<Boolean>getConfigValue(ObfConfig.Key.ANTI_EXTRACTION.getKeyString());
-        var fakeEntries = radon.<Integer>getConfigValue(ObfConfig.Key.FAKE_DUPLICATE_ENTRIES.getKeyString());
+        var level = radon.config.compressionLevel;
+        var store = radon.config.useStore;
+        var corruptCrcs = radon.config.corruptCrcs;
+        var antiExtraction = radon.config.antiExtraction;
+        var fakeEntries = radon.config.fakeDuplicateEntries;
 
         if (corruptCrcs && store) {
             // fixme: maybe check this when loading config so people don't get annoyed that this wasn't checked until jar write
@@ -119,7 +119,7 @@ public class JarWriter {
                 }
             });
 
-            stream.setComment(radon.getConfigValue(ObfConfig.Key.ZIP_COMMENT.getKeyString()));
+            stream.setComment(radon.config.zipComment);
             stream.close();
         } catch (IOException ioe) {
             if (RadonConstants.VERBOSE) {

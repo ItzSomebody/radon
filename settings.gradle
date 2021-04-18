@@ -20,4 +20,5 @@ rootProject.name = 'radon'
 include 'xyz.itzsomebody.codegen'
 include 'xyz.itzsomebody.radon'
 include 'xyz.itzsomebody.commons'
+include 'xyz.itzsomebody.radon.template'
 

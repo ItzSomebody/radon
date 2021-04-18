@@ -18,8 +18,8 @@
 
 package xyz.itzsomebody.radon.transformers.misc;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.objectweb.asm.tree.LineNumberNode;
-import xyz.itzsomebody.radon.config.Configuration;
 import xyz.itzsomebody.radon.exclusions.Exclusion;
 import xyz.itzsomebody.radon.transformers.Transformer;
 import xyz.itzsomebody.radon.transformers.Transformers;
@@ -29,7 +29,10 @@ import xyz.itzsomebody.radon.utils.logging.RadonLogger;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ScrambleLineNumbers extends Transformer {
+    @JsonProperty("random_origin")
     private int origin;
+
+    @JsonProperty("random_bound")
     private int bound;
 
     @Override
@@ -51,12 +54,6 @@ public class ScrambleLineNumbers extends Transformer {
     @Override
     public Exclusion.ExclusionType getExclusionType() {
         return Exclusion.ExclusionType.SCRAMBLE_LINE_NUMBERS;
-    }
-
-    @Override
-    public void loadSetup(Configuration config) {
-        origin = config.getOrDefault(getLocalConfigPath() + ".random_origin", Integer.MIN_VALUE);
-        bound = config.getOrDefault(getLocalConfigPath() + ".random_bound", Integer.MAX_VALUE);
     }
 
     @Override

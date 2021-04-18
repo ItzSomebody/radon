@@ -19,7 +19,7 @@
 package xyz.itzsomebody.radon;
 
 import xyz.itzsomebody.radon.cli.CmdArgsParser;
-import xyz.itzsomebody.radon.config.Configuration;
+import xyz.itzsomebody.radon.config.ConfigurationParser;
 import xyz.itzsomebody.radon.config.ObfConfig;
 import xyz.itzsomebody.radon.exceptions.FatalRadonException;
 import xyz.itzsomebody.radon.exceptions.PreventableRadonException;
@@ -115,9 +115,9 @@ public class RadonMain {
                 RadonLogger.severe(String.format("Specified config file \"%s\" is not a file", configFile.getAbsolutePath()));
             }
 
-            Configuration config;
+            ConfigurationParser config;
             try {
-                config = new Configuration(new FileInputStream(configFile));
+                config = new ConfigurationParser(new FileInputStream(configFile));
             } catch (FileNotFoundException e) {
                 RadonLogger.severe("Unknown IO error happened: " + e.getMessage());
 
@@ -128,7 +128,7 @@ public class RadonMain {
             }
 
             try {
-                var radon = new Radon(ObfConfig.from(config));
+                var radon = new Radon(config.parseConfig());
                 radon.run();
             } catch (FatalRadonException e) {
                 RadonLogger.severe("A fatal exception was thrown: " + e.getMessage());

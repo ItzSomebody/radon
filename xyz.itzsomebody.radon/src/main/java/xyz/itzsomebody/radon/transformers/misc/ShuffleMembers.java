@@ -18,7 +18,7 @@
 
 package xyz.itzsomebody.radon.transformers.misc;
 
-import xyz.itzsomebody.radon.config.Configuration;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import xyz.itzsomebody.radon.exclusions.Exclusion;
 import xyz.itzsomebody.radon.transformers.Transformer;
 import xyz.itzsomebody.radon.transformers.Transformers;
@@ -28,7 +28,10 @@ import java.util.Collections;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class ShuffleMembers extends Transformer {
+    @JsonProperty("shuffle_methods")
     private boolean shuffleMethods;
+
+    @JsonProperty("shuffle_fields")
     private boolean shuffleFields;
 
     @Override
@@ -53,12 +56,6 @@ public class ShuffleMembers extends Transformer {
     @Override
     public Exclusion.ExclusionType getExclusionType() {
         return Exclusion.ExclusionType.SHUFFLE_MEMBERS;
-    }
-
-    @Override
-    public void loadSetup(Configuration config) {
-        shuffleFields = config.getOrDefault(getLocalConfigPath() + ".shuffle_fields", true);
-        shuffleMethods = config.getOrDefault(getLocalConfigPath() + ".shuffle_methods", false);
     }
 
     @Override

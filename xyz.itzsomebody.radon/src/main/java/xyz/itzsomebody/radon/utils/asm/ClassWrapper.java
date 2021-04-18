@@ -312,7 +312,7 @@ public class ClassWrapper implements Opcodes {
      * Converts the class this {@link ClassWrapper} represents into a byte array.
      */
     public byte[] toByteArray() {
-        var attemptMaxs = Radon.getInstance().<Boolean>getConfigValue(ObfConfig.Key.ATTEMPT_COMPUTE_MAXS.getKeyString());
+        var attemptMaxs = Radon.getInstance().config.attemptComputeMaxs;
         ClassWriter classWriter = new RadonClassWriter(ClassWriter.COMPUTE_FRAMES);
 
         try {

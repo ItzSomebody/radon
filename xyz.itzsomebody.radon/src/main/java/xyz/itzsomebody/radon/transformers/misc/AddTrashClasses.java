@@ -18,12 +18,12 @@
 
 package xyz.itzsomebody.radon.transformers.misc;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.Handle;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
 import xyz.itzsomebody.radon.RadonConstants;
-import xyz.itzsomebody.radon.config.Configuration;
 import xyz.itzsomebody.radon.dictionaries.Dictionary;
 import xyz.itzsomebody.radon.dictionaries.DictionaryFactory;
 import xyz.itzsomebody.radon.exclusions.Exclusion;
@@ -43,7 +43,11 @@ import java.util.ArrayList;
  */
 public class AddTrashClasses extends Transformer {
     private static ArrayList<String> DESCRIPTORS = new ArrayList<>();
-    private Dictionary dictionary;
+
+    @JsonProperty("dictionary")
+    private Dictionary dictionary = DictionaryFactory.defaultDictionary();
+
+    @JsonProperty("number_of_trash_classes")
     private int nTrashClasses;
 
     static {
@@ -215,13 +219,6 @@ public class AddTrashClasses extends Transformer {
     @Override
     public Exclusion.ExclusionType getExclusionType() {
         return Exclusion.ExclusionType.ADD_TRASH_CLASSES;
-    }
-
-    @Override
-    public void loadSetup(Configuration config) {
-        var dictionaryName = config.<String>get(getLocalConfigPath() + ".dictionary");
-        dictionary = (dictionaryName == null) ? DictionaryFactory.defaultDictionary() : DictionaryFactory.forName(dictionaryName);
-        nTrashClasses = config.getOrDefault(getLocalConfigPath() + ".number_of_trash_classes", 0);
     }
 
     @Override

@@ -18,12 +18,12 @@
 
 package xyz.itzsomebody.radon.transformers.misc;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.MethodNode;
 import xyz.itzsomebody.codegen.BytecodeBlock;
 import xyz.itzsomebody.codegen.WrappedType;
 import xyz.itzsomebody.codegen.expressions.IRExpression;
-import xyz.itzsomebody.radon.config.Configuration;
 import xyz.itzsomebody.radon.exclusions.Exclusion;
 import xyz.itzsomebody.radon.transformers.Transformer;
 import xyz.itzsomebody.radon.transformers.Transformers;
@@ -51,7 +51,8 @@ import static xyz.itzsomebody.codegen.expressions.IRExpressions.*;
  */
 public class AntiDebugger extends Transformer {
     private static final String[] DEBUG_OPTIONS = new String[]{"-agentlib:jdwp", "-Xdebug", "-Xrunjdwp:", "-javaagent:"};
-    private String message;
+    @JsonProperty("message")
+    private String message = "java.lang.NullPointerException"; // lul
     private AtomicInteger debugOptionIndex;
 
     @Override
@@ -167,11 +168,6 @@ public class AntiDebugger extends Transformer {
     @Override
     public Exclusion.ExclusionType getExclusionType() {
         return Exclusion.ExclusionType.INJECT_ANTI_DEBUGGER;
-    }
-
-    @Override
-    public void loadSetup(Configuration config) {
-        message = config.getOrDefault(getLocalConfigPath() + ".message", "java.lang.NullPointerException"); // lul
     }
 
     @Override

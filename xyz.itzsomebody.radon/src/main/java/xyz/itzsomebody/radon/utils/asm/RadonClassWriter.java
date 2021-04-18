@@ -29,6 +29,7 @@ import java.util.HashSet;
  * stackmap frames.
  *
  * TODO: Perhaps consider creating fully-worked out hierarchies for JVM runtime classes so we don't have to keep checking huge jars
+ * TODO: Implement shadow classes
  *
  * @author itzsomebody
  */

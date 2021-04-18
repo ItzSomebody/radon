@@ -18,10 +18,10 @@
 
 package xyz.itzsomebody.radon.transformers.misc;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.objectweb.asm.tree.InsnList;
 import xyz.itzsomebody.codegen.BytecodeBlock;
 import xyz.itzsomebody.codegen.WrappedType;
-import xyz.itzsomebody.radon.config.Configuration;
 import xyz.itzsomebody.radon.exceptions.PreventableRadonException;
 import xyz.itzsomebody.radon.exclusions.Exclusion;
 import xyz.itzsomebody.radon.transformers.Transformer;
@@ -57,9 +57,23 @@ public class ExpirationKillSwitch extends Transformer {
             IllegalArgumentException.class,
             IllegalStateException.class
     };
-    private String message;
+
+    @JsonProperty("message")
+    private String message = "tucks";
+
     private long expirationTime;
+
+    @JsonProperty("inject_joption_pane")
     private boolean injectJOptionPane;
+
+    @JsonProperty("expiration_time")
+    public void setExpirationTime(String date) {
+        try {
+            expirationTime = new SimpleDateFormat("MM/dd/yyyy").parse(date).getTime();
+        } catch (ParseException e) {
+            throw new PreventableRadonException("Error parsing " + date + " into format MM/dd/yyyy: (" + e.getMessage() + ", offset=" + e.getErrorOffset() + ")");
+        }
+    }
 
     @Override
     public void transform() {
@@ -123,19 +137,6 @@ public class ExpirationKillSwitch extends Transformer {
     @Override
     public Exclusion.ExclusionType getExclusionType() {
         return Exclusion.ExclusionType.INJECT_EXPIRATION_KILL_SWITCH;
-    }
-
-    @Override
-    public void loadSetup(Configuration config) {
-        message = config.getOrDefault(getLocalConfigPath() + ".message", "Expired! Pay me lots of money for my garbage commercial software!!!");
-        injectJOptionPane = config.getOrDefault(getLocalConfigPath() + ".inject_joptionpane", false);
-
-        String date = config.getOrDefault(getLocalConfigPath() + ".expiration_date", "1/2/2020");
-        try {
-            expirationTime = new SimpleDateFormat("MM/dd/yyyy").parse(date).getTime();
-        } catch (ParseException e) {
-            throw new PreventableRadonException("Error parsing " + date + " into format MM/dd/yyyy: (" + e.getMessage() + ", offset=" + e.getErrorOffset() + ")");
-        }
     }
 
     @Override

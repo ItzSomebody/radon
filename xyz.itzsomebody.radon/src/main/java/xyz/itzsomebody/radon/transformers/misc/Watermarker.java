@@ -18,6 +18,7 @@
 
 package xyz.itzsomebody.radon.transformers.misc;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.InsnList;
@@ -26,7 +27,6 @@ import xyz.itzsomebody.commons.MaxLocalsUpdater;
 import xyz.itzsomebody.commons.matcher.InstructionPattern;
 import xyz.itzsomebody.commons.matcher.rules.IntConstRule;
 import xyz.itzsomebody.commons.matcher.rules.OpcodeRule;
-import xyz.itzsomebody.radon.config.Configuration;
 import xyz.itzsomebody.radon.exceptions.FatalRadonException;
 import xyz.itzsomebody.radon.exclusions.Exclusion;
 import xyz.itzsomebody.radon.transformers.Transformer;
@@ -41,9 +41,14 @@ import java.util.*;
 import java.util.zip.ZipFile;
 
 public class Watermarker extends Transformer {
-    private char[] message;
-    private char[] key;
-    private int copies;
+    @JsonProperty
+    private String message = "tucks";
+
+    @JsonProperty
+    private String key = "ginkoid";
+
+    @JsonProperty
+    private int copies = 3;
 
     @Override
     public void transform() {
@@ -101,8 +106,8 @@ public class Watermarker extends Transformer {
 
     private Deque<Character> cipheredWatermark() {
         var ciphered = new ArrayDeque<Character>();
-        for (int i = 0; i < message.length; i++) {
-            ciphered.push((char) (message[i] ^ key[i % key.length]));
+        for (int i = 0; i < message.length(); i++) {
+            ciphered.push((char) (message.charAt(i) ^ key.charAt(i % key.length())));
         }
         return ciphered;
     }
@@ -110,13 +115,6 @@ public class Watermarker extends Transformer {
     @Override
     public Exclusion.ExclusionType getExclusionType() {
         return Exclusion.ExclusionType.WATERMARK;
-    }
-
-    @Override
-    public void loadSetup(Configuration config) {
-        message = config.getOrDefault(getLocalConfigPath() + ".message", "tucks is love, tucks is life").toCharArray();
-        key = config.getOrDefault(getLocalConfigPath() + ".key", "ginkoid").toCharArray();
-        copies = config.getOrDefault(getLocalConfigPath() + ".copies", 2) + 1;
     }
 
     @Override

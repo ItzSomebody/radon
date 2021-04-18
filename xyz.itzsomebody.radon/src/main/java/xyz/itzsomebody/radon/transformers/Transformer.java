@@ -21,7 +21,7 @@ package xyz.itzsomebody.radon.transformers;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.ClassNode;
 import xyz.itzsomebody.radon.Radon;
-import xyz.itzsomebody.radon.config.Configuration;
+import xyz.itzsomebody.radon.config.ConfigurationParser;
 import xyz.itzsomebody.radon.config.ObfConfig;
 import xyz.itzsomebody.radon.exclusions.Exclusion;
 import xyz.itzsomebody.radon.utils.RandomUtils;
@@ -104,15 +104,9 @@ public abstract class Transformer implements Opcodes {
         return getClass().getName();
     }
 
-    public String getLocalConfigPath() {
-        return ObfConfig.Key.TRANSFORMERS.getKeyString() + "." + getConfigName();
-    }
-
     public abstract void transform();
 
     public abstract Exclusion.ExclusionType getExclusionType();
-
-    public abstract void loadSetup(Configuration config);
 
     public abstract String getConfigName();
 }

@@ -18,11 +18,12 @@
 
 package xyz.itzsomebody.radon.transformers.misc;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.objectweb.asm.commons.ClassRemapper;
 import org.objectweb.asm.tree.ClassNode;
 import xyz.itzsomebody.radon.Radon;
 import xyz.itzsomebody.radon.RadonConstants;
-import xyz.itzsomebody.radon.config.Configuration;
+import xyz.itzsomebody.radon.config.ConfigurationParser;
 import xyz.itzsomebody.radon.dictionaries.Dictionary;
 import xyz.itzsomebody.radon.dictionaries.DictionaryFactory;
 import xyz.itzsomebody.radon.exclusions.Exclusion;
@@ -45,12 +46,23 @@ import java.util.*;
 import java.util.stream.IntStream;
 
 public class Renamer extends Transformer {
-    private List<String> resourceToAdapt;
+    @JsonProperty("resources_to_adapt")
+    private List<String> resourceToAdapt = Collections.emptyList();
+
+    @JsonProperty("dump_mappings")
     private boolean dumpMappings;
+
+    @JsonProperty("repackaging_prefix")
     private String repackagingPrefix;
-    private Dictionary classNameDictionary;
-    private Dictionary methodNameDictionary;
-    private Dictionary fieldNameDictionary;
+
+    @JsonProperty("class_name_dictionary")
+    private Dictionary classNameDictionary = DictionaryFactory.defaultDictionary();
+
+    @JsonProperty("method_name_dictionary")
+    private Dictionary methodNameDictionary = DictionaryFactory.defaultDictionary();
+
+    @JsonProperty("field_name_dictionary")
+    private Dictionary fieldNameDictionary = DictionaryFactory.defaultDictionary();
     private final Map<String, String> mappings = new HashMap<>();
 
     @Override
@@ -287,22 +299,6 @@ public class Renamer extends Transformer {
     @Override
     public Exclusion.ExclusionType getExclusionType() {
         return Exclusion.ExclusionType.RENAMER;
-    }
-
-    @Override
-    public void loadSetup(Configuration config) {
-        resourceToAdapt = config.getOrDefault(getLocalConfigPath() + ".adapt_these_resources", Collections.emptyList());
-        dumpMappings = config.getOrDefault(getLocalConfigPath() + ".dump_mappings", false);
-        repackagingPrefix = config.getOrDefault(getLocalConfigPath() + ".repackaging_prefix", null);
-
-        String classNameDictionaryString = config.get(getLocalConfigPath() + ".class_name_dictionary");
-        classNameDictionary = classNameDictionaryString == null ? DictionaryFactory.defaultDictionary() : DictionaryFactory.forName(classNameDictionaryString);
-
-        String methodNameDictionaryString = config.get(getLocalConfigPath() + ".method_name_dictionary");
-        methodNameDictionary = methodNameDictionaryString == null ? DictionaryFactory.defaultDictionary() : DictionaryFactory.forName(methodNameDictionaryString);
-
-        String fieldNameDictionaryString = config.get(getLocalConfigPath() + ".field_name_dictionary");
-        fieldNameDictionary = fieldNameDictionaryString == null ? DictionaryFactory.defaultDictionary() : DictionaryFactory.forName(fieldNameDictionaryString);
     }
 
     @Override

@@ -19,7 +19,7 @@
 package xyz.itzsomebody.radon.transformers.misc;
 
 import org.objectweb.asm.Opcodes;
-import xyz.itzsomebody.radon.config.Configuration;
+import xyz.itzsomebody.radon.config.ConfigurationParser;
 import xyz.itzsomebody.radon.exclusions.Exclusion;
 import xyz.itzsomebody.radon.transformers.Transformer;
 import xyz.itzsomebody.radon.transformers.Transformers;
@@ -46,11 +46,6 @@ public class AddBridgeAccess extends Transformer {
     @Override
     public Exclusion.ExclusionType getExclusionType() {
         return Exclusion.ExclusionType.ADD_BRIDGE_ACCESS_FLAG;
-    }
-
-    @Override
-    public void loadSetup(Configuration config) {
-        // do nothing
     }
 
     @Override
