@@ -43,9 +43,8 @@ dependencies {
     testImplementation 'org.powermock:powermock-module-junit4:1.6.6'
 }
 
-allprojects {
-    tasks.withType(Test).configureEach {
-        forkEvery = 100
-    }
 
+tasks.withType(Test).configureEach {
+    forkEvery = 100
 }
+
