@@ -12,10 +12,10 @@ even the [Discord](https://discord.gg/RfuxTea).
 This project is **not** likely to be production-safe nor bug free. If you would
 like some pointers to production-safe (more or less) and less buggy Java
 bytecode obfuscators, I would suggest one of these:
-* [Paramorphism](https://paramorphism.serenity.enterprises/) -
-[Discord](https://discordapp.com/invite/k9DPvEy)
 * [Proguard](https://www.guardsquare.com/en/products/proguard)
+* [Skidfuscator](https://github.com/terminalsin/skidfuscator-java-obfuscator) - [Discord](https://discord.gg/QJC9g8fBU9)
 * [Zelix KlassMaster](http://www.zelix.com/)
+* [zProtect](https://zprotect.dev/) - [Discord](https://discord.com/invite/dnGKGuwvGH)
 
 Additionally, here are some other obfuscators for Java that you could check out
 for fun:
@@ -25,7 +25,9 @@ for fun:
 * [JObf](https://github.com/superblaubeere27/obfuscator)
 * [NeonObf](https://github.com/MoofMonkey/NeonObf)
 * [Obzcure](https://obzcu.re/) -
-[Discord](https://discordapp.com/invite/fUCPxq8) (Dev is away for a few months)
+[Discord](https://discordapp.com/invite/fUCPxq8) (Dead)
+* [Paramorphism](https://paramorphism.serenity.enterprises/) -
+[Discord](https://discordapp.com/invite/k9DPvEy) (Dead)
 * [Sandmark](http://sandmark.cs.arizona.edu)
 * [Stringer](https://jfxstore.com/stringer/)
 * [yGuard](https://www.yworks.com/products/yguard)
