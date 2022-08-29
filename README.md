@@ -1,6 +1,6 @@
 # Radon Java Obfuscator [![Build Status](https://travis-ci.org/ItzSomebody/Radon.svg?branch=master)](https://travis-ci.org/ItzSomebody/Radon) [![Codacy Badge](https://api.codacy.com/project/badge/Grade/07b0849ead3f47f1a6950a0353f43541)](https://www.codacy.com/app/ItzSomebody/Radon?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=ItzSomebody/Radon&amp;utm_campaign=Badge_Grade)
 
-## Radon 2.0 will no longer be maintained - it will be replaced by Radon 3.0.0 (see note at bottom)
+## Radon is no longer maintained
 
 Radon is a Java bytecode obfuscator that I conceptualized in my freshman year
 of high school. I use Radon to experiment with obfuscation and to learn various
@@ -54,6 +54,4 @@ GNU General Public License v3.0 (The cancer license)
 
 # Regarding Radon 3.0.0
 
-The rewrite of Radon is now somewhat active again and is slowly but surely approaching being merged into the master branch. Check the "radon-3" branch for progress!
-
-P.S. If I actually somehow manage to get to the GUI, it will be in JavaFX because it's a bit less cancerous than Java Swing. :P
+The progress on Radon 3 is permanently dead for the foreseeable future. Check the `radon-3` branch to see where work was stopped.
