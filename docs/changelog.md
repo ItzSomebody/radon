@@ -4,7 +4,7 @@
 There are multiple turning points with the release of Radon 3.0.0 compared to all previous versions of Radon.
 
 ### Differences between Radon 3 and previous versions
-* Radon 3 is written in Java 16. Every previous version of Radon was written in Java 8.
+* Radon 3 is written in Java 11. Every previous version of Radon was written in Java 8.
 * Some of Radon 3's features are not portable to different JVMs whereas every previous version of Radon was intended for
 HotSpot.
 * Radon 3 removes all "optimizers" from Radon 2. If you need some kind of optimization done, use ProGuard instead.
