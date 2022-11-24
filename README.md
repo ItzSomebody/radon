@@ -125,7 +125,3 @@ P.S. For those wondering why there aren't any prebuilt releases, if you can't fi
 ## License
 
 GNU General Public License v3.0 (The cancer license)
-
-# Regarding Radon 3.0.0
-
-The progress on Radon 3 is permanently dead for the foreseeable future. Check the `radon-3` branch to see where work was stopped.
