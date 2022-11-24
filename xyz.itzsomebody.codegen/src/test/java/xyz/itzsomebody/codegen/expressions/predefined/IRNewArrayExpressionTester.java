@@ -21,6 +21,7 @@ package xyz.itzsomebody.codegen.expressions.predefined;
 import org.junit.Assert;
 import org.junit.Test;
 import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.tree.IntInsnNode;
 
 import java.util.stream.IntStream;
 
@@ -45,6 +46,7 @@ public class IRNewArrayExpressionTester {
         };
 
         IntStream.range(0, insns.size()).forEach(i -> Assert.assertEquals(expectedOpcodes[i], insns.get(i).getOpcode()));
+        Assert.assertEquals(Opcodes.T_INT, ((IntInsnNode) insns.get(1)).operand);
     }
 
     @Test

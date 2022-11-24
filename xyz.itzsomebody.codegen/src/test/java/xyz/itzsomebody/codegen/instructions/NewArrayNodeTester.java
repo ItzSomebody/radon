@@ -30,28 +30,28 @@ public class NewArrayNodeTester {
     @Test
     public void testPrimitiveArrayType() {
         Assert.assertEquals(Opcodes.NEWARRAY, new NewArrayNode(WrappedType.from(boolean.class)).getNode().getOpcode());
-        Assert.assertEquals(Type.BOOLEAN, ((IntInsnNode) new NewArrayNode(WrappedType.from(boolean.class)).getNode()).operand);
+        Assert.assertEquals(Opcodes.T_BOOLEAN, ((IntInsnNode) new NewArrayNode(WrappedType.from(boolean.class)).getNode()).operand);
 
         Assert.assertEquals(Opcodes.NEWARRAY, new NewArrayNode(WrappedType.from(char.class)).getNode().getOpcode());
-        Assert.assertEquals(Type.CHAR, ((IntInsnNode) new NewArrayNode(WrappedType.from(char.class)).getNode()).operand);
+        Assert.assertEquals(Opcodes.T_CHAR, ((IntInsnNode) new NewArrayNode(WrappedType.from(char.class)).getNode()).operand);
 
         Assert.assertEquals(Opcodes.NEWARRAY, new NewArrayNode(WrappedType.from(byte.class)).getNode().getOpcode());
-        Assert.assertEquals(Type.BYTE, ((IntInsnNode) new NewArrayNode(WrappedType.from(byte.class)).getNode()).operand);
+        Assert.assertEquals(Opcodes.T_BYTE, ((IntInsnNode) new NewArrayNode(WrappedType.from(byte.class)).getNode()).operand);
 
         Assert.assertEquals(Opcodes.NEWARRAY, new NewArrayNode(WrappedType.from(short.class)).getNode().getOpcode());
-        Assert.assertEquals(Type.SHORT, ((IntInsnNode) new NewArrayNode(WrappedType.from(short.class)).getNode()).operand);
+        Assert.assertEquals(Opcodes.T_SHORT, ((IntInsnNode) new NewArrayNode(WrappedType.from(short.class)).getNode()).operand);
 
         Assert.assertEquals(Opcodes.NEWARRAY, new NewArrayNode(WrappedType.from(int.class)).getNode().getOpcode());
-        Assert.assertEquals(Type.INT, ((IntInsnNode) new NewArrayNode(WrappedType.from(int.class)).getNode()).operand);
+        Assert.assertEquals(Opcodes.T_INT, ((IntInsnNode) new NewArrayNode(WrappedType.from(int.class)).getNode()).operand);
 
         Assert.assertEquals(Opcodes.NEWARRAY, new NewArrayNode(WrappedType.from(long.class)).getNode().getOpcode());
-        Assert.assertEquals(Type.LONG, ((IntInsnNode) new NewArrayNode(WrappedType.from(long.class)).getNode()).operand);
+        Assert.assertEquals(Opcodes.T_LONG, ((IntInsnNode) new NewArrayNode(WrappedType.from(long.class)).getNode()).operand);
 
         Assert.assertEquals(Opcodes.NEWARRAY, new NewArrayNode(WrappedType.from(float.class)).getNode().getOpcode());
-        Assert.assertEquals(Type.FLOAT, ((IntInsnNode) new NewArrayNode(WrappedType.from(float.class)).getNode()).operand);
+        Assert.assertEquals(Opcodes.T_FLOAT, ((IntInsnNode) new NewArrayNode(WrappedType.from(float.class)).getNode()).operand);
 
         Assert.assertEquals(Opcodes.NEWARRAY, new NewArrayNode(WrappedType.from(double.class)).getNode().getOpcode());
-        Assert.assertEquals(Type.DOUBLE, ((IntInsnNode) new NewArrayNode(WrappedType.from(double.class)).getNode()).operand);
+        Assert.assertEquals(Opcodes.T_DOUBLE, ((IntInsnNode) new NewArrayNode(WrappedType.from(double.class)).getNode()).operand);
     }
 
     @Test

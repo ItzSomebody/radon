@@ -24,7 +24,7 @@ defaultTasks 'clean', 'test', 'build'
 
 ext {
     // ASM
-    asmVer = '9.0'
+    asmVer = '9.4'
     asm = 'org.ow2.asm:asm:' + asmVer
     asmAnalysis = 'org.ow2.asm:asm-analysis:' + asmVer
     asmCommons = 'org.ow2.asm:asm-commons:' + asmVer

@@ -73,6 +73,32 @@ public class WrappedType {
         return type.getSort();
     }
 
+    /**
+     * For NEWARRAY instructions
+     */
+    public int getNewArraySort() {
+        switch (type.getSort()) {
+            case Type.BOOLEAN:
+                return Opcodes.T_BOOLEAN;
+            case Type.CHAR:
+                return Opcodes.T_CHAR;
+            case Type.FLOAT:
+                return Opcodes.T_FLOAT;
+            case Type.DOUBLE:
+                return Opcodes.T_DOUBLE;
+            case Type.BYTE:
+                return Opcodes.T_BYTE;
+            case Type.SHORT:
+                return Opcodes.T_SHORT;
+            case Type.INT:
+                return Opcodes.T_INT;
+            case Type.LONG:
+                return Opcodes.T_LONG;
+            default:
+                throw new UncompilableNodeException("Attempted to get primitive array type of " + this);
+        }
+    }
+
     public boolean isPrimitive() {
         switch (type.getSort()) {
             case Type.BOOLEAN:

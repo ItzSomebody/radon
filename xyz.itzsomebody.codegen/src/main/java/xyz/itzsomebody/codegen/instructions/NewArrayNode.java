@@ -34,7 +34,7 @@ public class NewArrayNode implements CompilableNode {
     @Override
     public AbstractInsnNode getNode() {
         if (wrappedType.isPrimitive()) {
-            return new IntInsnNode(Opcodes.NEWARRAY, wrappedType.getSort());
+            return new IntInsnNode(Opcodes.NEWARRAY, wrappedType.getNewArraySort());
         } else {
             return new TypeInsnNode(Opcodes.ANEWARRAY, wrappedType.getInternalName());
         }
