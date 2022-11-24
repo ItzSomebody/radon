@@ -1,44 +1,61 @@
+/*
+ * Radon - An open-source Java obfuscator
+ * Copyright (C) 2021 ItzSomebody
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ */
+
 plugins {
     id 'com.github.johnrengelman.shadow' version '5.1.0'
-    id 'java'
 }
 
-group 'me.itzsomebody'
-version '2.0.0-SNAPSHOT'
+defaultTasks 'clean', 'test', 'build'
 
-defaultTasks 'clean', 'shadowJar'
-sourceCompatibility = 1.8
-def main = 'me.itzsomebody.radon.Main'
+ext {
+    // ASM
+    asmVer = '9.4'
+    asm = 'org.ow2.asm:asm:' + asmVer
+    asmAnalysis = 'org.ow2.asm:asm-analysis:' + asmVer
+    asmCommons = 'org.ow2.asm:asm-commons:' + asmVer
+    asmTree = 'org.ow2.asm:asm-tree:' + asmVer
+    asmUtil = 'org.ow2.asm:asm-util:' + asmVer
 
-tasks.withType(JavaCompile) {
-    options.encoding = 'UTF-8'
+    // junit
+    junit = 'junit:junit:4.12'
+
+    // Annotations
+    annotations = 'org.jetbrains:annotations:20.1.0'
+
+    // Jackson
+    jackson = 'com.fasterxml.jackson.core:jackson-databind:2.12.2'
+
+    // Java version
+    javaVer = 11
 }
 
-jar {
-    manifest { attributes 'Main-Class': main }
+allprojects {
+    // Project group and version
+    group 'xyz.itzsomebody'
+    version '3.0.0-SNAPSHOT'
+
+    // Compile using UTF-8 encoding
+    tasks.withType(JavaCompile) {
+        options.encoding = 'UTF-8'
+    }
+
+    repositories {
+        mavenCentral()
+    }
 }
 
-shadowJar() {
-    classifier = null
-
-    relocate 'org.objectweb.asm', 'me.itzsomebody.radon.asm.lib'
-    exclude 'module-info.class'
-    manifest { attributes 'Main-Class': main }
-}
-
-repositories {
-    mavenCentral()
-    maven { url "http://oss.sonatype.org/content/groups/public/" } // SnakeYAML
-}
-
-dependencies {
-    implementation 'org.ow2.asm:asm:7.1'
-    implementation 'org.ow2.asm:asm-tree:7.1'
-    implementation 'org.ow2.asm:asm-commons:7.1'
-    implementation 'org.ow2.asm:asm-util:7.1'
-    implementation 'org.yaml:snakeyaml:1.20'
-
-    testImplementation 'junit:junit:4.12'
-    testImplementation 'org.powermock:powermock-api-mockito:1.6.6'
-    testImplementation 'org.powermock:powermock-module-junit4:1.6.6'
-}
