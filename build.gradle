@@ -40,8 +40,14 @@ subprojects {
         options.encoding = 'UTF-8'
     }
 
-    test{
+    test {
         useJUnitPlatform()
+    }
+
+    plugins.withType(JavaPlugin).configureEach {
+        dependencies {
+            testImplementation libs.junit
+        }
     }
 }
 
