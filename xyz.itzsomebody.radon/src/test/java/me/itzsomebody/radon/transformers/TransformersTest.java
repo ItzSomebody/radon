@@ -2,9 +2,8 @@ package me.itzsomebody.radon.transformers;
 
 import org.junit.Assert;
 import org.junit.Test;
-import xyz.itzsomebody.radon.exclusions.Exclusion;
 import xyz.itzsomebody.radon.transformers.Transformers;
-import xyz.itzsomebody.radon.transformers.strings.StringTransformer;
+import xyz.itzsomebody.radon.transformers.constants.ConstantsTransformer;
 
 public class TransformersTest {
     @Test
@@ -37,7 +36,7 @@ public class TransformersTest {
             transformerConstructor.setAccessible(true);
             var transformerInstance = transformerConstructor.newInstance();
 
-            if (transformerInstance instanceof StringTransformer) {
+            if (transformerInstance instanceof ConstantsTransformer) {
                 // Skip -- mostly likely no problem here
             } else {
                 Assert.assertEquals(transformerInstance.getConfigName(), transformerInstance.getExclusionType().name().toLowerCase());

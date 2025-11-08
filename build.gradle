@@ -16,46 +16,32 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
-plugins {
-    id 'com.github.johnrengelman.shadow' version '5.1.0'
-}
-
 defaultTasks 'clean', 'test', 'build'
 
-ext {
-    // ASM
-    asmVer = '9.4'
-    asm = 'org.ow2.asm:asm:' + asmVer
-    asmAnalysis = 'org.ow2.asm:asm-analysis:' + asmVer
-    asmCommons = 'org.ow2.asm:asm-commons:' + asmVer
-    asmTree = 'org.ow2.asm:asm-tree:' + asmVer
-    asmUtil = 'org.ow2.asm:asm-util:' + asmVer
-
-    // junit
-    junit = 'junit:junit:4.12'
-
-    // Annotations
-    annotations = 'org.jetbrains:annotations:20.1.0'
-
-    // Jackson
-    jackson = 'com.fasterxml.jackson.core:jackson-databind:2.12.2'
-
-    // Java version
-    javaVer = 11
-}
-
 allprojects {
-    // Project group and version
     group 'xyz.itzsomebody'
     version '3.0.0-SNAPSHOT'
+}
 
-    // Compile using UTF-8 encoding
-    tasks.withType(JavaCompile) {
-        options.encoding = 'UTF-8'
-    }
+subprojects {
+    apply plugin: 'java'
 
     repositories {
         mavenCentral()
+    }
+
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(25)
+        }
+    }
+
+    tasks.withType(JavaCompile).configureEach {
+        options.encoding = 'UTF-8'
+    }
+
+    test{
+        useJUnitPlatform()
     }
 }
 

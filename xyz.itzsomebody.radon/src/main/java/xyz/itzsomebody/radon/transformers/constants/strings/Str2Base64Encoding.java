@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package xyz.itzsomebody.radon.transformers.strings;
+package xyz.itzsomebody.radon.transformers.constants.strings;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.objectweb.asm.tree.ClassNode;
@@ -24,8 +24,8 @@ import org.objectweb.asm.tree.LdcInsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import xyz.itzsomebody.commons.InsnListModifier;
-import xyz.itzsomebody.radon.config.ConfigurationParser;
 import xyz.itzsomebody.radon.transformers.Transformers;
+import xyz.itzsomebody.radon.transformers.constants.ConstantsTransformer;
 import xyz.itzsomebody.radon.utils.asm.ClassWrapper;
 import xyz.itzsomebody.radon.utils.logging.RadonLogger;
 
@@ -39,7 +39,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  * @author itzsomebody
  */
-public class Str2Base64Encoding extends StringTransformer {
+public class Str2Base64Encoding extends ConstantsTransformer {
     @JsonProperty("decode_from_random_class")
     private boolean decodeFromRandomClass;
 

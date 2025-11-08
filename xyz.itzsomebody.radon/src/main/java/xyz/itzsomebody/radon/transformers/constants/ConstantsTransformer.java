@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
-package xyz.itzsomebody.radon.transformers.strings;
+package xyz.itzsomebody.radon.transformers.constants;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import xyz.itzsomebody.radon.dictionaries.Dictionary;
@@ -26,7 +26,7 @@ import xyz.itzsomebody.radon.transformers.Transformer;
 
 import java.util.Set;
 
-public abstract class StringTransformer extends Transformer {
+public abstract class ConstantsTransformer extends Transformer {
     @JsonProperty("excluded_strings")
     private Set<String> excludedStrings;
 
@@ -42,6 +42,6 @@ public abstract class StringTransformer extends Transformer {
 
     @Override
     public Exclusion.ExclusionType getExclusionType() {
-        return Exclusion.ExclusionType.STRING_OBFUSCATION;
+        return Exclusion.ExclusionType.CONSTANT_OBFUSCATION;
     }
 }

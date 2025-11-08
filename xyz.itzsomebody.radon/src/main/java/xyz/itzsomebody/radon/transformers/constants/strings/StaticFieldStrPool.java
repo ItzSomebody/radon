@@ -1,4 +1,4 @@
-package xyz.itzsomebody.radon.transformers.strings;
+package xyz.itzsomebody.radon.transformers.constants.strings;
 
 import org.objectweb.asm.tree.FieldNode;
 import org.objectweb.asm.tree.LdcInsnNode;
@@ -9,6 +9,7 @@ import xyz.itzsomebody.codegen.expressions.IRExpression;
 import xyz.itzsomebody.codegen.expressions.IRExpressions;
 import xyz.itzsomebody.commons.InsnListModifier;
 import xyz.itzsomebody.radon.transformers.Transformers;
+import xyz.itzsomebody.radon.transformers.constants.ConstantsTransformer;
 import xyz.itzsomebody.radon.utils.asm.ClassWrapper;
 import xyz.itzsomebody.radon.utils.logging.RadonLogger;
 
@@ -23,7 +24,7 @@ import static xyz.itzsomebody.codegen.expressions.IRExpressions.*;
  *
  * @author itzsomebody
  */
-public class StaticFieldStrPool extends StringTransformer {
+public class StaticFieldStrPool extends ConstantsTransformer {
     @Override
     public void transform() {
         var count = new AtomicInteger();

@@ -19,31 +19,14 @@
 import org.apache.tools.ant.filters.ReplaceTokens
 
 plugins {
-    id 'com.github.johnrengelman.shadow'
-    id 'java'
-}
-
-// So people stop asking why 'gradle build' doesn't work. Lmao I'm lazy
-build.dependsOn 'shadowJar'
-sourceCompatibility = javaVer
-
-// Main class
-def mainClass = 'xyz.itzsomebody.radon.RadonMain'
-
-// Function to grab the git commit hash of HEAD
-def getCommitHash = { ->
-    def stdout = new ByteArrayOutputStream()
-    exec {
-        commandLine 'git', 'rev-parse', 'HEAD'
-        standardOutput = stdout
-    }
-    return stdout.toString().trim()
+    id 'application'
+    alias(libs.plugins.shadow)
 }
 
 // Search for and replace project version and commit hash placeholders in the source code
-task processSource(type: Sync) {
+tasks.register('processSource', Sync) {
     from sourceSets.main.java
-    filter(ReplaceTokens, tokens: [VERSION: version, COMMITHASH: getCommitHash()])
+    filter(ReplaceTokens, tokens: [VERSION: version])
     into "$buildDir/src"
 }
 
@@ -51,27 +34,24 @@ compileJava {
     source = processSource.outputs
 }
 
+application {
+    mainClass  = 'xyz.itzsomebody.radon.RadonMain'
+}
+
 // Creates a fat jar
 shadowJar() {
-    archiveClassifier.set(null)
-
     // Relocate lib classes
-    relocate 'org.objectweb.asm', 'xyz.itzsomebody.radon.lib.org.objectweb.asm'
-    relocate 'com.fasterxml.jackson', 'xyz.itzsomebody.radon.lib.com.fasterxml.jackson'
+    //    relocate 'org.objectweb.asm', 'xyz.itzsomebody.radon.lib.org.objectweb.asm'
+    //    relocate 'com.fasterxml.jackson', 'xyz.itzsomebody.radon.lib.com.fasterxml.jackson'
     exclude 'module-info.class'
 
-    manifest { attributes 'Main-Class': mainClass }
+    manifest { attributes 'Main-Class': 'xyz.itzsomebody.radon.RadonMain' }
 }
 
 dependencies {
     implementation project(':xyz.itzsomebody.codegen')
     implementation project(':xyz.itzsomebody.commons')
-    implementation annotations
-    implementation jackson
-    implementation asm
-    implementation asmAnalysis
-    implementation asmCommons
-    implementation asmTree
-    implementation asmUtil
-    testImplementation junit
+    implementation libs.annotations
+    implementation libs.jackson.databind
+    implementation libs.bundles.asm
 }

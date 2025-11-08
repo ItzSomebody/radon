@@ -1,4 +1,4 @@
-package xyz.itzsomebody.radon.transformers.strings;
+package xyz.itzsomebody.radon.transformers.constants.strings;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;

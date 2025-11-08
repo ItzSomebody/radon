@@ -16,16 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>
  */
 
-plugins {
-    id 'java'
-}
-
-sourceCompatibility = javaVer
-
 dependencies {
-    implementation annotations
-    implementation asm
-    implementation asmTree
-    implementation asmAnalysis
-    testImplementation junit
+    implementation libs.annotations
+    implementation libs.bundles.asm
 }

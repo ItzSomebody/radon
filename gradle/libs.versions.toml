@@ -1,0 +1,25 @@
+[versions]
+asm = "9.9"
+jackson = "2.12.2"
+jetbrains = "20.1.0"
+junit = "4.12"
+shadow = "9.2.2"
+
+[libraries]
+annotations = { module = "org.jetbrains:annotations", version.ref = "jetbrains" }
+
+asm-core = { module = "org.ow2.asm:asm", version.ref = "asm" }
+asm-analysis = { module = "org.ow2.asm:asm-analysis", version.ref = "asm" }
+asm-commons = { module = "org.ow2.asm:asm-commons", version.ref = "asm" }
+asm-tree = { module = "org.ow2.asm:asm-tree", version.ref = "asm" }
+asm-util = { module = "org.ow2.asm:asm-util", version.ref = "asm" }
+
+jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version.ref = "jackson" }
+
+junit = { module = "junit:junit", version.ref = "junit" }
+
+[bundles]
+asm = ["asm-core", "asm-analysis", "asm-commons", "asm-tree", "asm-util"]
+
+[plugins]
+shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }

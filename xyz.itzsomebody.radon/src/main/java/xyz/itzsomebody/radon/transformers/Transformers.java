@@ -19,9 +19,9 @@
 package xyz.itzsomebody.radon.transformers;
 
 import xyz.itzsomebody.radon.transformers.misc.*;
-import xyz.itzsomebody.radon.transformers.strings.AESPCBCStringEncryption;
-import xyz.itzsomebody.radon.transformers.strings.StaticFieldStrPool;
-import xyz.itzsomebody.radon.transformers.strings.Str2Base64Encoding;
+import xyz.itzsomebody.radon.transformers.constants.strings.AESPCBCConstantsEncryption;
+import xyz.itzsomebody.radon.transformers.constants.strings.StaticFieldStrPool;
+import xyz.itzsomebody.radon.transformers.constants.strings.Str2Base64Encoding;
 
 public enum Transformers {
     // Misc.
@@ -40,7 +40,7 @@ public enum Transformers {
     // String encryption/encoding
     STRING_TO_BASE64_ENCODING(Str2Base64Encoding.class),
     POOL_STRINGS_TO_STATIC_FIELD(StaticFieldStrPool.class),
-    AES_PCBC_STRING_ENCRYPTION(AESPCBCStringEncryption.class),
+    AES_PCBC_STRING_ENCRYPTION(AESPCBCConstantsEncryption.class),
 
     ;//TODO
 

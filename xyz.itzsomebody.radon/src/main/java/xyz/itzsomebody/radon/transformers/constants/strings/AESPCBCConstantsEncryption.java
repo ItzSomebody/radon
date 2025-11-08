@@ -1,4 +1,4 @@
-package xyz.itzsomebody.radon.transformers.strings;
+package xyz.itzsomebody.radon.transformers.constants.strings;
 
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.Label;
@@ -10,6 +10,7 @@ import org.objectweb.asm.tree.LdcInsnNode;
 import xyz.itzsomebody.codegen.WrappedType;
 import xyz.itzsomebody.commons.InsnListModifier;
 import xyz.itzsomebody.radon.transformers.Transformers;
+import xyz.itzsomebody.radon.transformers.constants.ConstantsTransformer;
 import xyz.itzsomebody.radon.utils.RandomUtils;
 import xyz.itzsomebody.radon.utils.asm.ClassWrapper;
 import xyz.itzsomebody.radon.utils.asm.MethodWrapper;
@@ -32,7 +33,7 @@ import static xyz.itzsomebody.codegen.expressions.IRExpressions.longConst;
  * </p>
  * @author ItzSomebody
  */
-public class AESPCBCStringEncryption extends StringTransformer {
+public class AESPCBCConstantsEncryption extends ConstantsTransformer {
     @Override
     public void transform() {
         var stringsEncrypted = new AtomicInteger();
